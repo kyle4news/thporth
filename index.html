@@ -373,6 +373,39 @@
   text-decoration: underline;
 }
 
+	   /* Container spacing */
+#league-schedule-upcoming-content { padding: 0 8px; }
+
+/* Date header bar */
+.upcoming-date-header {
+  background: #cfcfcf;      /* light gray bar */
+  color: #111;              /* dark text for contrast */
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 2px;
+  margin: 10px 0 6px;
+}
+
+/* Day block */
+.upcoming-day { border: 1px solid #111; background: #000; padding: 8px; margin-bottom: 10px; }
+
+/* Game rows */
+.up-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 2px;
+  border-bottom: 1px solid #2f2f2f;
+}
+.up-row:last-child { border-bottom: 0; }
+
+/* Teams (left column) */
+.up-teams { display: flex; flex-direction: column; gap: 2px; }
+.up-team { color: #fff; font-size: 16px; line-height: 1.1; }
+
+/* Time (right column) */
+.up-time { color: #ddd; font-size: 14px; white-space: nowrap; padding-left: 12px; }
 /* ──────────────────────────────────────────────── */
   /* ────────────────────────────────────────────────────────── */
   /* Top Bars                          */
@@ -1104,26 +1137,24 @@ div[id^="breaking-content-"] a:hover {
   }
 
   .schedule-tab {
-    flex: 1;
-    text-align: center;
-    font-size: 10px;
-    line-height: 18px;
-    color: #aaa;
-    cursor: pointer;
-    background-color: #2a2a2a;
-    border-right: 1px solid #1f1f1f;
-    transition: all 0.2s ease;
-  }
-
-  .schedule-tab.active {
-    background-color: #3c3c3c;
-    color: #fff;
-  }
-
-  .schedule-tab:hover {
-    background-color: #333;
-    color: #fff;
-  }
+  flex: 1;
+  text-align: center;
+  font-size: 10px;
+  line-height: 18px;
+  color: #aaa;
+  cursor: pointer;
+  background-color: #2a2a2a;
+  border-right: 1px solid #1f1f1f;
+  transition: all 0.2s ease;
+}
+.schedule-tab.active {
+  background-color: #3c3c3c;
+  color: #fff;
+}
+.schedule-tab:hover {
+  background-color: #333;
+  color: #fff;
+}
 
   .schedule-content {
     min-height: 100px;
@@ -1851,8 +1882,8 @@ div[id^="breaking-content-"] a:hover {
         
         <!-- Schedule Tabs -->
         <div id="schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-bottom: 1rem; border-radius: 3px; overflow: hidden;">
-            <div class="schedule-tab active" data-schedule-tab="today" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; color: #fff; cursor: pointer; background-color: #3c3c3c; border-right: 1px solid #1f1f1f;">TODAY</div>
-            <div class="schedule-tab" data-schedule-tab="upcoming" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; color: #aaa; cursor: pointer; background-color: #2a2a2a;">UPCOMING</div>
+          <div class="schedule-tab active" data-schedule-tab="today">TODAY</div>
+          <div class="schedule-tab" data-schedule-tab="upcoming">UPCOMING</div>
         </div>
         
         <!-- Schedule Content -->
@@ -3627,49 +3658,66 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 	 
 <script>
-// --- FINAL UNIFIED SCRIPT for ALL Game, Schedule, and Standings Logic ---
+const LEAGUE_FIELDS = {
+  Bundesliga:   { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  LaLiga:       { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  LigaMX:       { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  MLB:          { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  NBA:          { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  NCAAF:        { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  NCAAM:        { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  NCAAW:        { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  NFL:          { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  NHL:          { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  NWSL:         { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  SerieA:       { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  UEFAChampionsLeague:   { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  UEFAConferenceLeague:  { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  UEFAEuropaLeague:      { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  WNBA:         { away: "Away Team", home: "Home Team", date: "Date", time: "Time" },
+  MLS:          { away: "Away", home: "Home", date: "Date", time: "Time" },
+  PremierLeague:{ away: "Away", home: "Home", date: "Date", time: "Time (ET)" }
+};
+
 document.addEventListener('DOMContentLoaded', function () {
 
-    // --- 1. CONFIGURATION ---
     const LEAGUE_DATA_CONFIG = {
-        'NFL': { leagueId: 'USA: NFL', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoXI911JBowIVpsOtYo7Jk0WwwNlujQ76rR4lgDAqxGWLa_q67gOXI0DyKsC4YkKIfbSYqerHp17-m/pub?gid=1628205730&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/YOUR_NFL_UPCOMING_SCHEDULE_ID/edit#gid=0' },
-        'NBA': { leagueId: 'USA: NBA', standingsUrl: 'YOUR_NBA_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/YOUR_NBA_UPCOMING_SCHEDULE_ID/edit#gid=0' },
-        'MLB': { leagueId: 'USA: MLB', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQHOSDTxfJ554E0MhgZPfmnarCUunnYmxDBSZ78APQ3QfvPWBnn1i68JPSuNCNByd1IzYEbj-6AVAZ/pub?gid=1312763847&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/YOUR_MLB_UPCOMING_SCHEDULE_ID/edit#gid=0' },
-        'NHL': { leagueId: 'USA: NHL', standingsUrl: 'YOUR_NHL_STANDINGS_CSV_URL_HERE' },
-        'PremierLeague': { leagueId: 'ENGLAND: PREMIER LEAGUE', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8lEnnlz6Uhb47U4yOnsSUOcsfBS3TrpEXri3g6S2Yj2FUkq1rSSgE4SveKPoAJQsu6U2kkfdGtmhO/pub?gid=0&single=true&output=csv' },
-        'MLS': { leagueId: 'USA: MLS', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQ-fXiJCsMWxpSzu9x_vE7DhdtHBBpL54Ue3vnPnk21OeTsGwZoQnJK7FNAZkT9Nfj8Ox8tuV21pwp/pub?gid=0&single=true&output=csv' },
-        'LaLiga': { leagueId: 'SPAIN: LALIGA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8ZGW33Hc9fDIq8mJZZqVj8GJdm3p08Jug6e5fTP0-KBtGpFB6BIXgDKkvHqyHnJRKZ9Ba24I3hekV/pub?gid=0&single=true&output=csv' },
-        'SerieA': { leagueId: 'ITALY: SERIE A', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaaFrDXpcgY4EiGwkYfT0zodrVA1GJU2A6qcrc1GcLxkPjHh43ksM3T4c4p5nFdqKJoj96eEpUKST3/pub?gid=0&single=true&output=csv' },
-        'Bundesliga': { leagueId: 'GERMANY: BUNDESLIGA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwpzErtNqiT5mq4kII0P1OxnY41WAgyY4fi7kiThIgNSgf6lr3kslZ9OBAP3-I2YJ4_aA0p0LNjsaH/pub?gid=0&single=true&output=csv' },
-        'Ligue1': { leagueId: 'FRANCE: LIGUE 1', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRD-758CxWtSSl1PCJRdVREjXqhrxTBjYBtnxx4ot8wUdEGfw7ONCzQNfTIdvntZoi1Kme0F7Nkt4Wa/pub?gid=0&single=true&output=csv' },
-        'NCAAF': { leagueId: 'USA: NCAAF', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRiThcO5BjAuw3818zbgA9WxlLQFK8T3n5LCPxAihwjANmnxme5ynsLG2EyD2RyPvACe4wGlY36ekF7/pub?gid=0&single=true&output=csv' },
-        'WNBA': { leagueId: 'USA: WNBA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWPTh0lOh89-qkXYbx63Vs8FQ7gUoT0333Pa9ZgPg4WWBMgB-xERDMM_U2yIUgS3TSPOXOD5M7sVl/pub?gid=0&single=true&output=csv' },
-        'Soccer': { leagueId: 'WORLD: SOCCER', standingsUrl: 'YOUR_SOCCER_STANDINGS_CSV_URL_HERE' },
-        'UEFAChampionsLeague': { leagueId: 'EUROPE: UEFA CHAMPIONS LEAGUE', standingsUrl: 'YOUR_UEFACHAMPIONSLEAGUE_STANDINGS_CSV_URL_HERE' },
-        'FACup': { leagueId: 'ENGLAND: FA CUP', standingsUrl: 'YOUR_FACUP_STANDINGS_CSV_URL_HERE' },
-        'LigaMX': { leagueId: 'MEXICO: LIGA MX', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSL_7HJC0jqhF1jy4tiIrrh5RLewsiH9RezMKDx6TpZtz2JHB8D7Dlx7yyZRWZ7rU5txoTasyiHk7M4/pub?gid=0&single=true&output=csv' },
-        'NWSL': { leagueId: 'USA: NWSL', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJn_hnVeNfnXsDpeer_hgh6dxOcL2VOJzHKsE8cv-OTaX8EzWRYIGNLqLztvuAeuJbM4oEElA-LoiU/pub?gid=0&single=true&output=csv' },
-        'UEFAEuropaLeague': { leagueId: 'EUROPE: UEFA EUROPA LEAGUE', standingsUrl: 'YOUR_UEFAEUROPALEAGUE_STANDINGS_CSV_URL_HERE' },
-        'UEFAConferenceLeague': { leagueId: 'EUROPE: UEFA CONFERENCE LEAGUE', standingsUrl: 'YOUR_UEFACONFERENCELEAGUE_STANDINGS_CSV_URL_HERE' },
-        'FormulaOne': { leagueId: 'WORLD: FORMULA ONE', standingsUrl: 'YOUR_FORMULAONE_STANDINGS_CSV_URL_HERE' },
-        'PGATour': { leagueId: 'WORLD: PGA TOUR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRh72gyQFguMGj0RkHvy-WrAH3EBpOMdikyKIjrOfSs5aAYYlE7NjbRJsBa7gkkJ4gV_nUUYSbCje2L/pub?gid=786471151&single=true&output=csv' },
-        'UFC': { leagueId: 'WORLD: UFC', standingsUrl: 'YOUR_UFC_STANDINGS_CSV_URL_HERE' },
-        'Boxing': { leagueId: 'WORLD: BOXING', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb/pub?gid=1100984840&single=true&output=csv' },
-        'NASCARCupSeries': { leagueId: 'USA: NASCAR CUP SERIES', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRzMLdfLfGydr1dpjhS8hr1PLCBod_Jm-J9ABvGaeyhttkAep5HAtWfB5hGeCaLHteZBapJMhNExe0l/pub?gid=0&single=true&output=csv' },
-        'Tennis': { leagueId: 'WORLD: TENNIS', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ74Qw3ZgBqRAKd_HVAnGLI9zDqk_JILTBTtlrFKI8oCosRHnLQZ9Nu8BIAVYdLq932wzE8oz3UNCIP/pub?gid=0&single=true&output=csv' },
-        'LIVGolf': { leagueId: 'WORLD: LIV GOLF', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZ7zf4PAme33oOeQ5NFNVE3W1OXJDJ2-qN0_TKLYaditRtpsa7yfxGY3lsGJQxZLQxhIKGzAH7NgBo/pub?gid=0&single=true&output=csv' },
-        'IndyCar': { leagueId: 'USA: INDYCAR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQWqPs7Krfm7U1_bU2MShMSgAGF5RIXqIVUZ6vQO2XWz0waDHd48eiawVeOwXwAkeZBdoNA1X4Mkzs3/pub?gid=0&single=true&output=csv' },
-        'NCAAM': { leagueId: 'USA: NCAAM', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRWwuY4T7aQXTeW_8WDncuzDZUAIr9JDhV2MjP4ZFAM0EjuUWgpKBb2sWjI9gZxvqCxnON9JTN7lo2i/pub?gid=0&single=true&output=csv' },
-        'NCAAW': { leagueId: 'USA: NCAAW', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDKX76cBl2tx7s_rW20e2TzKX-uvA6UsPBjsv_UXhhoE8zVmUFJvDaopCxEhaDWyaOtL4wDWSVE6H7/pub?gid=0&single=true&output=csv' },
-        'NCAABaseball': { leagueId: 'USA: NCAA BASEBALL', standingsUrl: 'YOUR_NCAABASEBALL_STANDINGS_CSV_URL_HERE' },
-        'NCAASoftball': { leagueId: 'USA: NCAA SOFTBALL', standingsUrl: 'YOUR_NCAASOFTBALL_STANDINGS_CSV_URL_HERE' },
-        'MotoGP': { leagueId: 'WORLD: MOTOGP', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSqOmundPRaLEu2Jcgt3KBdTRX6jy-Nmkb89fuJC_SfntbZVF_Y-tNehFSnZwqdmK2O3GJR3UlHFXms/pub?gid=0&single=true&output=csv' },
-        'LPGATour': { leagueId: 'WORLD: LPGA TOUR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv' },
-        'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv' }
+        'NFL': { leagueId: 'USA: NFL', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoXI911JBowIVpsOtYo7Jk0WwwNlujQ76rR4lgDAqxGWLa_q67gOXI0DyKsC4YkKIfbSYqerHp17-m/pub?gid=1628205730&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=441088133&single=true&output=csv' },
+        'NBA': { leagueId: 'USA: NBA', standingsUrl: 'YOUR_NBA_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1835178372&single=true&output=csv' },
+        'MLB': { leagueId: 'USA: MLB', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQHOSDTxfJ554E0MhgZPfmnarCUunnYmxDBSZ78APQ3QfvPWBnn1i68JPSuNCNByd1IzYEbj-6AVAZ/pub?gid=1312763847&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1331002848&single=true&output=csv' },
+        'NHL': { leagueId: 'USA: NHL', standingsUrl: 'YOUR_NHL_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1966787501&single=true&output=csv' },
+        'PremierLeague': { leagueId: 'ENGLAND: PREMIER LEAGUE', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8lEnnlz6Uhb47U4yOnsSUOcsfBS3TrpEXri3g6S2Yj2FUkq1rSSgE4SveKPoAJQsu6U2kkfdGtmhO/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1128603926&single=true&output=csv' },
+        'MLS': { leagueId: 'USA: MLS', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQ-fXiJCsMWxpSzu9x_vE7DhdtHBBpL54Ue3vnPnk21OeTsGwZoQnJK7FNAZkT9Nfj8Ox8tuV21pwp/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1477178262&single=true&output=csv' },
+        'LaLiga': { leagueId: 'SPAIN: LALIGA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8ZGW33Hc9fDIq8mJZZqVj8GJdm3p08Jug6e5fTP0-KBtGpFB6BIXgDKkvHqyHnJRKZ9Ba24I3hekV/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1575015516&single=true&output=csv' },
+        'SerieA': { leagueId: 'ITALY: SERIE A', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaaFrDXpcgY4EiGwkYfT0zodrVA1GJU2A6qcrc1GcLxkPjHh43ksM3T4c4p5nFdqKJoj96eEpUKST3/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1571550898&single=true&output=csv' },
+        'Bundesliga': { leagueId: 'GERMANY: BUNDESLIGA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwpzErtNqiT5mq4kII0P1OxnY41WAgyY4fi7kiThIgNSgf6lr3kslZ9OBAP3-I2YJ4_aA0p0LNjsaH/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1276850283&single=true&output=csv' },
+        'Ligue1': { leagueId: 'FRANCE: LIGUE 1', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRD-758CxWtSSl1PCJRdVREjXqhrxTBjYBtnxx4ot8wUdEGfw7ONCzQNfTIdvntZoi1Kme0F7Nkt4Wa/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'YOUR_LIGUE1_UPCOMING_SCHEDULE_CSV_URL_HERE' },
+        'NCAAF': { leagueId: 'USA: NCAAF', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRiThcO5BjAuw3818zbgA9WxlLQFK8T3n5LCPxAihwjANmnxme5ynsLG2EyD2RyPvACe4wGlY36ekF7/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=0&single=true&output=csv' },
+        'WNBA': { leagueId: 'USA: WNBA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWPTh0lOh89-qkXYbx63Vs8FQ7gUoT0333Pa9ZgPg4WWBMgB-xERDMM_U2yIUgS3TSPOXOD5M7sVl/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=2004471454&single=true&output=csv' },
+        'Soccer': { leagueId: 'WORLD: SOCCER', standingsUrl: 'YOUR_SOCCER_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'YOUR_SOCCER_UPCOMING_SCHEDULE_CSV_URL_HERE' },
+        'UEFAChampionsLeague': { leagueId: 'EUROPE: UEFA CHAMPIONS LEAGUE', standingsUrl: 'YOUR_UEFACHAMPIONSLEAGUE_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=771660800&single=true&output=csv' },
+        'FACup': { leagueId: 'ENGLAND: FA CUP', standingsUrl: 'YOUR_FACUP_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'YOUR_FACUP_UPCOMING_SCHEDULE_CSV_URL_HERE' },
+        'LigaMX': { leagueId: 'MEXICO: LIGA MX', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSL_7HJC0jqhF1jy4tiIrrh5RLewsiH9RezMKDx6TpZtz2JHB8D7Dlx7yyZRWZ7rU5txoTasyiHk7M4/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1021310271&single=true&output=csv' },
+        'NWSL': { leagueId: 'USA: NWSL', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJn_hnVeNfnXsDpeer_hgh6dxOcL2VOJzHKsE8cv-OTaX8EzWRYIGNLqLztvuAeuJbM4oEElA-LoiU/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1552635441&single=true&output=csv' },
+        'UEFAEuropaLeague': { leagueId: 'EUROPE: UEFA EUROPA LEAGUE', standingsUrl: 'YOUR_UEFAEUROPALEAGUE_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1035730105&single=true&output=csv' },
+        'UEFAConferenceLeague': { leagueId: 'EUROPE: UEFA CONFERENCE LEAGUE', standingsUrl: 'YOUR_UEFACONFERENCELEAGUE_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=356649935&single=true&output=csv' },
+        'FormulaOne': { leagueId: 'WORLD: FORMULA ONE', standingsUrl: 'YOUR_FORMULAONE_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'YOUR_FORMULAONE_UPCOMING_SCHEDULE_CSV_URL_HERE' },
+        'PGATour': { leagueId: 'WORLD: PGA TOUR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRh72gyQFguMGj0RkHvy-WrAH3EBpOMdikyKIjrOfSs5aAYYlE7NjbRJsBa7gkkJ4gV_nUUYSbCje2L/pub?gid=786471151&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=675420773&single=true&output=csv' },
+        'UFC': { leagueId: 'WORLD: UFC', standingsUrl: 'YOUR_UFC_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1659203620&single=true&output=csv' },
+        'Boxing': { leagueId: 'WORLD: BOXING', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb/pub?gid=1100984840&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=2466779&single=true&output=csv' },
+        'NASCARCupSeries': { leagueId: 'USA: NASCAR CUP SERIES', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRzMLdfLfGydr1dpjhS8hr1PLCBod_Jm-J9ABvGaeyhttkAep5HAtWfB5hGeCaLHteZBapJMhNExe0l/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1811411908&single=true&output=csv' },
+        'Tennis': { leagueId: 'WORLD: TENNIS', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ74Qw3ZgBqRAKd_HVAnGLI9zDqk_JILTBTtlrFKI8oCosRHnLQZ9Nu8BIAVYdLq932wzE8oz3UNCIP/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=411817718&single=true&output=csv' },
+        'LIVGolf': { leagueId: 'WORLD: LIV GOLF', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZ7zf4PAme33oOeQ5NFNVE3W1OXJDJ2-qN0_TKLYaditRtpsa7yfxGY3lsGJQxZLQxhIKGzAH7NgBo/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=1174336268&single=true&output=csv' },
+        'IndyCar': { leagueId: 'USA: INDYCAR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQWqPs7Krfm7U1_bU2MShMSgAGF5RIXqIVUZ6vQO2XWz0waDHd48eiawVeOwXwAkeZBdoNA1X4Mkzs3/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'YOUR_INDY_CAR_UPCOMING_SCHEDULE_CSV_URL_HERE' },
+        'NCAAM': { leagueId: 'USA: NCAAM', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRWwuY4T7aQXTeW_8WDncuzDZUAIr9JDhV2MjP4ZFAM0EjuUWgpKBb2sWjI9gZxvqCxnON9JTN7lo2i/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=272084139&single=true&output=csv' },
+        'NCAAW': { leagueId: 'USA: NCAAW', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDKX76cBl2tx7s_rW20e2TzKX-uvA6UsPBjsv_UXhhoE8zVmUFJvDaopCxEhaDWyaOtL4wDWSVE6H7/pub?gid=0&single=true&output=csv', upcomingScheduleUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=2070883604&single=true&output=csv' },
+        'NCAABaseball': { leagueId: 'USA: NCAA BASEBALL', standingsUrl: 'YOUR_NCAABASEBALL_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'YOUR_NCAABASEBALL_UPCOMING_SCHEDULE_CSV_URL_HERE' },
+        'NCAASoftball': { leagueId: 'USA: NCAA SOFTBALL', standingsUrl: 'YOUR_NCAASOFTBALL_STANDINGS_CSV_URL_HERE', upcomingScheduleUrl: 'YOUR_NCAASOFTBALL_UPCOMING_SCHEDULE_CSV_URL_HERE' }
     };
-    const LEAGUE_DISPLAY_ORDER = ["NFL", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "MLB", "Premier League", "UEFA Champions League", "ATP", "WTA", "LaLiga", "Bundesliga", "Serie A", "WNBA", "UEFA Europa League", "UEFA Conference League", "Leagues Cup", "NWSL", "FIBA AmeriCup", "Copa Libertadores", "Coppa Italia", "DFB-Pokal", "Brasileirão", "Super Lig", "Copa Sudamericana", "Club Friendly"]; 
+    const LEAGUE_DISPLAY_ORDER = [
+        "NFL", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "MLB", "Premier League", "UEFA Champions League", "ATP", "WTA", "LaLiga", "Bundesliga", "Serie A", "WNBA", "UEFA Europa League", "UEFA Conference League", "Leagues Cup", "NWSL", "FIBA AmeriCup", "Copa Libertadores", "Coppa Italia", "DFB-Pokal", "Brasileirão", "Super Lig", "Copa Sudamericana", "Club Friendly"
+    ]; 
 
-    // --- 2. FIREBASE INITIALIZATION (SINGLETON) ---
     if (!firebase.apps.length) {
         const firebaseConfig = {
             apiKey: "AIzaSyD3bw8d4q2oO2qpbgGiUG6Qnlf4aABK3Bc",
@@ -3684,12 +3732,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const db = firebase.firestore();
     const gamesCollectionRef = db.collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
 
-    // --- 3. ELEMENT REFERENCES ---
     const leagueHeader = document.getElementById('league-specific-header');
     const scheduleContent = document.getElementById('league-schedule-content');
     const standingsContent = document.getElementById('league-standings-content');
     
-    // --- 4. HELPER FUNCTIONS ---
     function getLeagueDisplayName(name) {
         const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA Women's Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga" };
         return map[name] || name;
@@ -3700,7 +3746,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return map[p] || p;
     }
     
-    // --- 5. CORE RENDERING FUNCTION ---
     function renderGames(container, gamesData, isGroupedByLeague) {
         container.innerHTML = "";
         const leagueGroups = {};
@@ -3802,7 +3847,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- 6. DATA FETCHING AND LOGIC FUNCTIONS ---
     function sortGames(a, b) {
         const statusA = (a["Match Status"] || "").toUpperCase();
         const statusB = (b["Match Status"] || "").toUpperCase();
@@ -3813,7 +3857,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return a["Start Time"].toMillis() - b["Start Time"].toMillis();
     }
 
-	 function fetchLeagueSchedule(leagueId, leagueName) {
+    function fetchLeagueSchedule(leagueId, leagueName) {
         scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
@@ -3828,7 +3872,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }, err => { scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>'; });
     }
 
-    // REPLACE THE OLD FUNCTION WITH THIS ONE
     async function fetchLeagueStandings(url) {
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         try {
@@ -3922,34 +3965,72 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     window.loadLeagueSpecificData = function(leagueKey) {
-        const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
-        if (!leagueInfo) return;
-        if (leagueHeader) leagueHeader.innerText = leagueKey;
-        const todayScheduleContent = document.getElementById('league-schedule-today-content');
-        const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
-        const standingsContent = document.getElementById('league-standings-content');
-        
-        // Load TODAY schedule from Firestore
-        todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
+  // Force TODAY tab as default (always show TODAY on league load)
+  const tabs = document.getElementById('schedule-tabs');
+  if (tabs) {
+    const todayTab = tabs.querySelector('.schedule-tab[data-schedule-tab="today"]');
+    const upcomingTab = tabs.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
+    if (todayTab && upcomingTab) {
+      tabs.querySelectorAll('.schedule-tab').forEach(t => t.classList.remove('active'));
+      todayTab.classList.add('active');
+    }
+  }
+  const todayEl = document.getElementById('league-schedule-today-content');
+  const upcomingEl = document.getElementById('league-schedule-upcoming-content');
+  if (todayEl && upcomingEl) {
+    todayEl.style.display = 'block';
+    upcomingEl.style.display = 'none';
+  }
+
+  const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
+  if (!leagueInfo) return;
+
+  if (leagueHeader) leagueHeader.innerText = leagueKey;
+
+  const todayScheduleContent = document.getElementById('league-schedule-today-content');
+  const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
+  const standingsContent = document.getElementById('league-standings-content');
+
+  // Clear UPCOMING content (no blocking placeholder)
+  if (upcomingScheduleContent) upcomingScheduleContent.innerHTML = '';
+
+  // Load TODAY schedule from Firestore
+  todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
+  const { DateTime } = luxon;
+  const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+
+  // Unsubscribe any prior listener if you track it externally (optional)
+  // if (window.__leagueTodayUnsub) { window.__leagueTodayUnsub(); window.__leagueTodayUnsub = null; }
+
+  const unsubscribe = gamesCollectionRef
+    .where('League', '==', leagueInfo.leagueId)
+    .where('gameDate', '==', todayStr)
+    .onSnapshot(snapshot => {
+      if (snapshot.empty) {
+        todayScheduleContent.innerHTML = '<p>No games found for today.</p>';
+        return;
+      }
+      const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+      renderGames(todayScheduleContent, gamesData, false);
+    }, err => {
+      todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
+    });
+
+  // Optionally store unsubscribe to clean up later (if you manage listeners)
+  // window.__leagueTodayUnsub = unsubscribe;
+
+  // Standings
+  fetchLeagueStandings(leagueInfo.standingsUrl);
+};
+
+	 // Helper: parse ET date/time into milliseconds for chronological sorting
+    function __parseEtMillis(dateStr, timeStr) {
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
-        gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
-            .onSnapshot(snapshot => {
-                if (snapshot.empty) {
-                    todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
-                    return;
-                }
-                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
-                renderGames(todayScheduleContent, gamesData, false);
-            }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
-
-        // Initialize upcoming schedule content
-        upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Click UPCOMING tab to load schedule...</p>';
-
-        // Reusing the standings fetcher
-        fetchLeagueStandings(leagueInfo.standingsUrl);
-    };
-
+        const safeTime = timeStr && timeStr.trim() ? timeStr : '12:00 AM';
+        const a = DateTime.fromFormat(`${dateStr} ${safeTime}`, 'LLL d h:mm a', { zone: 'America/New_York' });
+        const dt = a.isValid ? a : DateTime.fromFormat(`${dateStr} ${safeTime}`, 'LLLL d h:mm a', { zone: 'America/New_York' });
+        return (dt && dt.isValid) ? dt.toMillis() : Number.MAX_SAFE_INTEGER;
+    }
     // Function to load upcoming schedule from Google Sheets
     window.loadUpcomingSchedule = function() {
         const upcomingContent = document.getElementById('league-schedule-upcoming-content');
@@ -3980,11 +4061,17 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(csvText => {
                 const games = parseUpcomingScheduleCSV(csvText);
+				 // Sort chronologically by actual ET date/time (not string order)
+                const sortedGames = games.slice().sort((a, b) => {
+                    const aMs = __parseEtMillis(a.date || a.dateStr, a.time || a.timeET);
+                    const bMs = __parseEtMillis(b.date || b.dateStr, b.time || b.timeET);
+                    return aMs - bMs;
+                });
                 if (games.length === 0) {
                     upcomingContent.innerHTML = '<p>No upcoming games found.</p>';
                     return;
                 }
-                renderUpcomingGames(upcomingContent, games);
+                renderUpcomingGamesGrouped(upcomingContent, sortedGames);
             })
             .catch(error => {
                 console.error('Error loading upcoming schedule:', error);
@@ -4039,143 +4126,241 @@ document.addEventListener('DOMContentLoaded', function () {
         return games;
     }
 
-    // Function to render upcoming games
-    function renderUpcomingGames(container, games) {
-        if (games.length === 0) {
+   // Uses Luxon (already in your page) for robust timezone handling
+const { DateTime } = luxon;
+
+// Parse "Sep 4" or "September 4" and "8:20 PM" in ET -> return DateTime in user's local tz
+function toLocal(dtStr, timeStr) {
+  // Allow both "Sep 4" and "September 4"
+  const parsed = DateTime.fromFormat(`${dtStr} ${timeStr}`, 'LLL d h:mm a', { zone: 'America/New_York' })
+    || DateTime.fromFormat(`${dtStr} ${timeStr}`, 'LLLL d h:mm a', { zone: 'America/New_York' });
+
+  // If parse failed, return null
+  if (!parsed || !parsed.isValid) return null;
+
+  return parsed.setZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+}
+
+// OPTIONAL: If your CSV header row changed names, adjust these indices
+// CSV columns assumed: [Date, Time (ET), Away Team, Home Team, (Location optional), (TV optional)]
+function parseUpcomingScheduleCSV(csvText) {
+  const lines = csvText.split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length === 0) return [];
+
+  // detect header row
+  const hasHeader = /^date/i.test(lines[0]) || /time/i.test(lines[0]);
+  const startIdx = hasHeader ? 1 : 0;
+
+  const games = [];
+
+  for (let i = startIdx; i < lines.length; i++) {
+    const raw = lines[i];
+
+    // Basic CSV split respecting quotes
+    const fields = [];
+    let buf = '', q = false;
+    for (let j = 0; j < raw.length; j++) {
+      const ch = raw[j];
+      if (ch === '"') {
+        q = !q;
+      } else if (ch === ',' && !q) {
+        fields.push(buf);
+        buf = '';
+      } else {
+        buf += ch;
+      }
+    }
+    fields.push(buf);
+
+    // Trim all fields
+    for (let k = 0; k < fields.length; k++) fields[k] = fields[k].trim().replace(/^"|"$/g, '');
+
+    // Indices: 0 Date, 1 Time (ET), 2 Away, 3 Home, 4 Location?, 5 TV?
+    if (fields.length >= 4) {
+      const dateStr = fields[0];
+      const timeET = fields[1];
+      const away = fields[2];
+      const home = fields[3];
+
+      if (!dateStr || !away || !home) continue;
+
+      games.push({
+        dateStr,
+        timeET,
+        awayTeam: away,
+        homeTeam: home,
+        location: fields[4] || '',
+        tv: fields[5] || ''
+      });
+    }
+  }
+
+  return games;
+}
+
+    // --- Render Upcoming Games Grouped (unchanged) ---
+    function renderUpcomingGamesGrouped(container, games) {
+        if (!games || games.length === 0) {
             container.innerHTML = '<p>No upcoming games found.</p>';
             return;
         }
-        
-        const gamesHtml = games.map(game => `
-            <div style="padding: 0.5rem; border-bottom: 1px solid #374151; font-size: 0.875rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-                    <span style="color: #9ca3af; font-size: 0.75rem;">${game.date} ${game.time}</span>
-                    ${game.tv ? `<span style="color: #60a5fa; font-size: 0.75rem;">${game.tv}</span>` : ''}
+
+        const normalized = games
+            .map(g => {
+                return {
+                    ...g,
+                    local: g.local,
+                    dateHeader: g.local
+                        ? g.local.toFormat('MMMM d')
+                        : g.dateStr
+                };
+            })
+            .sort((a, b) => {
+                if (a.local && b.local) return a.local.toMillis() - b.local.toMillis();
+                return (a.dateStr + a.timeET).localeCompare(b.dateStr + b.timeET);
+            });
+
+        const byDate = new Map();
+        for (const g of normalized) {
+            const key = g.dateHeader;
+            if (!byDate.has(key)) byDate.set(key, []);
+            byDate.get(key).push(g);
+        }
+
+        let html = '';
+        byDate.forEach((gamesForDay, dateKey) => {
+            html += `
+                <div class="upcoming-day">
+                    <div class="upcoming-date-header">${dateKey}</div>
+                    <div class="upcoming-day-body">
+                        ${gamesForDay.map(game => {
+                            const timeLocal = game.local ? game.local.toFormat('h:mm a') : (game.timeET || '');
+                            return `
+                                <div class="up-row">
+                                    <div class="up-teams">
+                                        <div class="up-team away">${game.awayTeam}</div>
+                                        <div class="up-team home">${game.homeTeam}</div>
+                                    </div>
+                                    <div class="up-time">${timeLocal}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="color: #fff;">${game.awayTeam}</span>
-                    <span style="color: #9ca3af; margin: 0 0.5rem;">@</span>
-                    <span style="color: #fff;">${game.homeTeam}</span>
-                </div>
-                ${game.location ? `<div style="color: #9ca3af; font-size: 0.75rem; margin-top: 0.25rem;">${game.location}</div>` : ''}
-            </div>
-        `).join('');
-        
-        container.innerHTML = gamesHtml;
+            `;
+        });
+
+        container.innerHTML = html;
     }
 
-  // --- 7. TABS AND FILTER INITIALIZATION ---
-const gamesTabsContainer = document.getElementById('games-tabs');
-if (gamesTabsContainer) {
-    const todayTab = gamesTabsContainer.querySelector('.games-tab[data-tab="today"]');
-    const scoresTab = gamesTabsContainer.querySelector('.games-tab[data-tab="scores"]');
-    const liveFilter = document.getElementById('live-filter-toggle');
-    
-    let activeListenerUnsubscribe = null;
+    // --- Games Tabs Logic (unchanged except for window.loadUpcomingSchedule) ---
+    const gamesTabsContainer = document.getElementById('games-tabs');
+    if (gamesTabsContainer) {
+        const todayTab = gamesTabsContainer.querySelector('.games-tab[data-tab="today"]');
+        const scoresTab = gamesTabsContainer.querySelector('.games-tab[data-tab="scores"]');
+        const liveFilter = document.getElementById('live-filter-toggle');
+        
+        let activeListenerUnsubscribe = null;
 
-    const applyLiveFilter = () => {
-        const isFilterActive = liveFilter.classList.contains('active');
-        const todayContent = document.getElementById('games');
-        if (!todayContent) return;
-        const allGameRows = todayContent.querySelectorAll('.game-row');
-        const leagueSections = todayContent.querySelectorAll('.league-section');
+        const applyLiveFilter = () => {
+            const isFilterActive = liveFilter.classList.contains('active');
+            const todayContent = document.getElementById('games');
+            if (!todayContent) return;
+            const allGameRows = todayContent.querySelectorAll('.game-row');
+            const leagueSections = todayContent.querySelectorAll('.league-section');
 
-        allGameRows.forEach(row => {
-            let showRow = true;
-            if (isFilterActive && !row.classList.contains('live-game')) {
-                showRow = false;
+            allGameRows.forEach(row => {
+                let showRow = true;
+                if (isFilterActive && !row.classList.contains('live-game')) {
+                    showRow = false;
+                }
+                row.style.display = showRow ? '' : 'none';
+            });
+
+            leagueSections.forEach(section => {
+                const visibleRows = section.querySelectorAll('.game-row:not([style*="display: none"])');
+                section.style.display = visibleRows.length > 0 ? 'block' : 'none';
+            });
+        };
+
+        scoresTab.addEventListener('click', () => {
+            if (activeListenerUnsubscribe) {
+                activeListenerUnsubscribe();
+                activeListenerUnsubscribe = null;
             }
-            // THIS IS THE CORRECTED LINE:
-            row.style.display = showRow ? '' : 'none';
+            
+            todayTab.classList.remove('active');
+            liveFilter.classList.remove('active');
+            scoresTab.classList.add('active');
+
+            document.getElementById('tv-listings-scores').style.display = 'block';
+            document.getElementById('tv-listings-today').style.display = 'none';
+
+            fetchYesterdayScores();
         });
 
-        leagueSections.forEach(section => {
-            const visibleRows = section.querySelectorAll('.game-row:not([style*="display: none"])');
-            section.style.display = visibleRows.length > 0 ? 'block' : 'none';
+        todayTab.addEventListener('click', () => {
+            if (activeListenerUnsubscribe) {
+                activeListenerUnsubscribe();
+                activeListenerUnsubscribe = null;
+            }
+
+            scoresTab.classList.remove('active');
+            liveFilter.classList.remove('active');
+            todayTab.classList.add('active');
+            
+            document.getElementById('tv-listings-today').style.display = 'block';
+            document.getElementById('tv-listings-scores').style.display = 'none';
+            
+            activeListenerUnsubscribe = fetchTodayGames(applyLiveFilter);
         });
-    };
 
-    scoresTab.addEventListener('click', () => {
-        if (activeListenerUnsubscribe) {
-            activeListenerUnsubscribe();
-            activeListenerUnsubscribe = null;
-        }
-        
-        todayTab.classList.remove('active');
-        liveFilter.classList.remove('active');
-        scoresTab.classList.add('active');
+        liveFilter.addEventListener('click', () => {
+            if (!todayTab.classList.contains('active')) {
+                todayTab.click();
+                setTimeout(applyLiveFilter, 50); 
+            } else {
+                liveFilter.classList.toggle('active');
+                applyLiveFilter();
+            }
+        });
 
-        document.getElementById('tv-listings-scores').style.display = 'block';
-        document.getElementById('tv-listings-today').style.display = 'none';
+        if (todayTab) todayTab.click();
+    }
 
-        fetchYesterdayScores();
-    });
+    // --- Schedule Tabs Logic (unchanged except for window.loadUpcomingSchedule) ---
+    const scheduleTabsContainer = document.getElementById('schedule-tabs');
+    if (scheduleTabsContainer) {
+        const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+        const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
 
-    todayTab.addEventListener('click', () => {
-        if (activeListenerUnsubscribe) {
-            activeListenerUnsubscribe();
-            activeListenerUnsubscribe = null;
-        }
+        todayScheduleTab.addEventListener('click', () => {
+            scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => tab.classList.remove('active'));
+            todayScheduleTab.classList.add('active');
 
-        scoresTab.classList.remove('active');
-        liveFilter.classList.remove('active');
-        todayTab.classList.add('active');
-        
-        document.getElementById('tv-listings-today').style.display = 'block';
-        document.getElementById('tv-listings-scores').style.display = 'none';
-        
-        activeListenerUnsubscribe = fetchTodayGames(applyLiveFilter);
-    });
+            const todayEl = document.getElementById('league-schedule-today-content');
+            const upcomingEl = document.getElementById('league-schedule-upcoming-content');
+            if (todayEl && upcomingEl) {
+                todayEl.style.display = 'block';
+                upcomingEl.style.display = 'none';
+            }
+        });
 
-    liveFilter.addEventListener('click', () => {
-        if (!todayTab.classList.contains('active')) {
-            todayTab.click();
-            // A small delay to allow the tab content to render before filtering
-            setTimeout(applyLiveFilter, 50); 
-        } else {
-            liveFilter.classList.toggle('active');
-            applyLiveFilter();
-        }
-    });
+        upcomingScheduleTab.addEventListener('click', () => {
+            scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => tab.classList.remove('active'));
+            upcomingScheduleTab.classList.add('active');
 
-    // Initial load
-    if (todayTab) todayTab.click();
-}
+            const todayEl = document.getElementById('league-schedule-today-content');
+            const upcomingEl = document.getElementById('league-schedule-upcoming-content');
+            if (todayEl && upcomingEl) {
+                todayEl.style.display = 'none';
+                upcomingEl.style.display = 'block';
+                upcomingEl.innerHTML = '<p style="color: #9ca3af;">Loading upcoming schedule...</p>';
+            }
 
-// --- SCHEDULE TABS INITIALIZATION ---
-const scheduleTabsContainer = document.getElementById('schedule-tabs');
-if (scheduleTabsContainer) {
-    const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
-    const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
-    
-    todayScheduleTab.addEventListener('click', () => {
-        // Remove active class from all tabs
-        scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => tab.classList.remove('active'));
-        // Add active class to clicked tab
-        todayScheduleTab.classList.add('active');
-        
-        // Show today content, hide upcoming content
-        document.getElementById('league-schedule-today-content').style.display = 'block';
-        document.getElementById('league-schedule-upcoming-content').style.display = 'none';
-    });
-    
-    upcomingScheduleTab.addEventListener('click', () => {
-        // Remove active class from all tabs
-        scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => tab.classList.remove('active'));
-        // Add active class to clicked tab
-        upcomingScheduleTab.classList.add('active');
-        
-        // Show upcoming content, hide today content
-        document.getElementById('league-schedule-today-content').style.display = 'none';
-        document.getElementById('league-schedule-upcoming-content').style.display = 'block';
-        
-        // Load upcoming data if not already loaded
-        const upcomingContent = document.getElementById('league-schedule-upcoming-content');
-        if (upcomingContent.innerHTML.includes('Loading upcoming schedule...')) {
-            loadUpcomingSchedule();
-        }
-    });
-}
+            window.loadUpcomingSchedule();
+        });
+    }
 });
 </script>
 
@@ -4996,3 +5181,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </html>
 
     
+
