@@ -3658,7 +3658,161 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 		<script>
-	 
+	 const LEAGUE_FIELDS = {
+  Boxing: {
+    boxers: "Boxers",
+    date: "Date",
+    event: "Event"
+  },
+  // Leagues with Away Team, Home Team, etc.
+  Bundesliga: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  LaLiga: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  LigaMX: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  MLB: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  NBA: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  NCAAF: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  NCAAM: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  NCAAW: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  NFL: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  NHL: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  NWSL: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  SerieA: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  UEFAChampionsLeague: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  UEFAConferenceLeague: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  UEFAEuropaLeague: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  WNBA: {
+    away: "Away Team",
+    date: "Date",
+    home: "Home Team",
+    time: "Time"
+  },
+  MLS: {
+    away: "Away",
+    date: "Date",
+    home: "Home",
+    time: "Time"
+  },
+  PremierLeague: {
+    away: "Away",
+    date: "Date",
+    home: "Home",
+    time: "Time (ET)"
+  },
+  LIVGolf: {
+    date: "Date",
+    event: "Event",
+    time: "Time"
+  },
+  MotoGP: {
+    date: "Date",
+    event: "Event",
+    time: "Time"
+  },
+  UFC: {
+    date: "Date",
+    event: "Event",
+    time: "Time"
+  },
+  LPGATour: {
+    date: "Date",
+    tournament: "Tournament"
+  },
+  PGATour: {
+    date: "Date",
+    tournament: "Tournament"
+  },
+  NASCARCupSeries: {
+    date: "Date",
+    location: "Location",
+    race: "Race",
+    time: "Time"
+  },
+  Tennis: {
+    date: "Date",
+    tour: "Tour",
+    tournament: "Tournament"
+  },
+  TrackandField: {
+    date: "Date",
+    meet: "Meet"
+  }
+};
+
 // --- FINAL UNIFIED SCRIPT for ALL Game, Schedule, and Standings Logic ---
 
 // --- FIELD MAPPING --- 
