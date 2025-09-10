@@ -4123,11 +4123,11 @@ if (scheduleTabsContainer) {
         document.getElementById('league-schedule-upcoming-content').style.display = 'none';
     });
     
-    upcomingScheduleTab.addEventListener('click', (event) => {
+    upcomingScheduleTab.addEventListener('click', () => {
         // Remove active class from all tabs
         scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => tab.classList.remove('active'));
         // Add active class to clicked tab
-        event.currentTarget.classList.add('active');
+        upcomingScheduleTab.classList.add('active');
 
         // Show upcoming content, hide today content
         document.getElementById('league-schedule-today-content').style.display = 'none';
