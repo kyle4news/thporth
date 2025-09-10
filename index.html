@@ -3919,8 +3919,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
-   // START OF CORRECTED SECTION
-window.loadLeagueSpecificData = function(leagueKey) {
+  window.loadLeagueSpecificData = function(leagueKey) {
     const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
     if (!leagueInfo) return;
     if (leagueHeader) leagueHeader.innerText = leagueKey;
@@ -3928,17 +3927,16 @@ window.loadLeagueSpecificData = function(leagueKey) {
     const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
     const standingsContent = document.getElementById('league-standings-content');
     
-    // --- FIX 1: Ensure Today tab is always active on page load ---
+    // Fix: Ensure the "Today" tab is always active and the upcoming content is hidden
     const scheduleTabsContainer = document.getElementById('schedule-tabs');
     if (scheduleTabsContainer) {
         const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
         const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
-        
         todayScheduleTab.classList.add('active');
         upcomingScheduleTab.classList.remove('active');
     }
-    
-    // --- FIX 2: Clear and show the correct content areas ---
+
+    // Fix: Clear the upcoming content and show the today content on every load
     upcomingScheduleContent.innerHTML = '';
     todayScheduleContent.style.display = 'block';
     upcomingScheduleContent.style.display = 'none';
@@ -4123,23 +4121,22 @@ if (scheduleTabsContainer) {
     });
     
 upcomingScheduleTab.addEventListener('click', () => {
-    // Correctly handle the active class for all tabs
-    scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => tab.classList.remove('active'));
-    upcomingScheduleTab.classList.add('active');
+        // This correctly applies the active class to the upcoming tab
+        todayScheduleTab.classList.remove('active');
+        upcomingScheduleTab.classList.add('active');
 
-    // Show upcoming content, hide today content
-    document.getElementById('league-schedule-today-content').style.display = 'none';
-    document.getElementById('league-schedule-upcoming-content').style.display = 'block';
-    
-    // Get the current league key from the header
-    const leagueHeader = document.getElementById('league-specific-header');
-    const leagueKey = leagueHeader ? leagueHeader.innerText : null;
+        // Show upcoming content, hide today content
+        document.getElementById('league-schedule-today-content').style.display = 'none';
+        document.getElementById('league-schedule-upcoming-content').style.display = 'block';
+        
+        // Get the current league key from the header
+        const leagueHeader = document.getElementById('league-specific-header');
+        const leagueKey = leagueHeader ? leagueHeader.innerText : null;
 
-    // Call the new function to load the upcoming schedule, passing the current leagueKey
-    if (leagueKey) {
-        loadUpcomingSchedule(leagueKey);
-    }
-});
+        if (leagueKey) {
+            loadUpcomingSchedule();
+        }
+    });
 }
 });
 </script>
