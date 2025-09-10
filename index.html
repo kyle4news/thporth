@@ -4038,7 +4038,16 @@ const LEAGUE_DATA_CONFIG = {
 
             const away = data[awayField] || "";
             const home = data[homeField] || "";
-            const timeStr = String(data[timeField] || "").replace(/"/g, "");
+            let timeStr = "";
+if (data[timeField]) {
+    if (typeof data[timeField] === "object" && typeof data[timeField].toDate === "function") {
+        // It's a Firestore Timestamp
+        timeStr = luxon.DateTime.fromJSDate(data[timeField].toDate()).toFormat('h:mm a');
+    } else {
+        // It's a string
+        timeStr = String(data[timeField]).replace(/"/g, "");
+    }
+}
             let gameDate;
 
             if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
