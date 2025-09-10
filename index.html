@@ -3636,8 +3636,7 @@ document.addEventListener('DOMContentLoaded', function () {
     'NBA': { leagueId: 'USA: NBA', standingsUrl: 'YOUR_NBA_STANDINGS_CSV_URL_HERE' },
     'MLB': { leagueId: 'USA: MLB', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQHOSDTxfJ554E0MhgZPfmnarCUunnYmxDBSZ78APQ3QfvPWBnn1i68JPSuNCNByd1IzYEbj-6AVAZ/pub?gid=1312763847&single=true&output=csv' },
     'NHL': { leagueId: 'USA: NHL', standingsUrl: 'YOUR_NHL_STANDINGS_CSV_URL_HERE' },
-    'PremierLeague': { leagueId: 'ENGLAND: PREMIER LEAGUE', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8lEnnlz6Uhb47U4yOnsSUOcsfBS3TrpEXri3g6S2Yj2FUkq1rSSgE4SveKPoAJQsu6U2kkfdGtmhO/pub?gid=0&single=true&output=csv' },
-    'MLS': { leagueId: 'USA: MLS', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQ-fXiJCsMWxpSzu9x_vE7DhdtHBBpL54Ue3vnPnk21OeTsGwZoQnJK7FNAZkT9Nfj8Ox8tuV21pwp/pub?gid=0&single=true&output=csv' },
+    'PremierLeague': { leagueId: 'ENGLAND: PREMIER LEAGUE', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8lEnnlz6Uhb47U4yOnsSUOcsfBS3TrpEXri3g6S2Yj2FUkq1rSSgE4SveKPoAJQsu6U2kkfdGtmhO/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'PremierLeague' },    'MLS': { leagueId: 'USA: MLS', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQ-fXiJCsMWxpSzu9x_vE7DhdtHBBpL54Ue3vnPnk21OeTsGwZoQnJK7FNAZkT9Nfj8Ox8tuV21pwp/pub?gid=0&single=true&output=csv' },
     'LaLiga': { leagueId: 'SPAIN: LALIGA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8ZGW33Hc9fDIq8mJZZqVj8GJdm3p08Jug6e5fTP0-KBtGpFB6BIXgDKkvHqyHnJRKZ9Ba24I3hekV/pub?gid=0&single=true&output=csv' },
     'SerieA': { leagueId: 'ITALY: SERIE A', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaaFrDXpcgY4EiGwkYfT0zodrVA1GJU2A6qcrc1GcLxkPjHh43ksM3T4c4p5nFdqKJoj96eEpUKST3/pub?gid=0&single=true&output=csv' },
     'Bundesliga': { leagueId: 'GERMANY: BUNDESLIGA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwpzErtNqiT5mq4kII0P1OxnY41WAgyY4fi7kiThIgNSgf6lr3kslZ9OBAP3-I2YJ4_aA0p0LNjsaH/pub?gid=0&single=true&output=csv' },
@@ -3683,7 +3682,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     const db = firebase.firestore();
     const gamesCollectionRef = db.collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
-	const premierLeagueUpcomingCollectionRef = db.collection('PremierLeague');
 
     // --- 3. ELEMENT REFERENCES ---
     const leagueHeader = document.getElementById('league-specific-header');
@@ -3950,11 +3948,22 @@ document.addEventListener('DOMContentLoaded', function () {
         fetchLeagueStandings(leagueInfo.standingsUrl);
     };
 
-	function loadUpcomingSchedule() {
+	function loadUpcomingSchedule(leagueKey) {
     const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
     if (!upcomingScheduleContent) return;
+
+    // Use the leagueKey to get the correct Firestore collection name
+    const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
+    if (!leagueInfo || !leagueInfo.upcomingCollectionName) {
+        upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule is not available for this league.</p>';
+        return;
+    }
+
     upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading upcoming schedule...</p>';
-    premierLeagueUpcomingCollectionRef.get().then(snapshot => {
+
+    const upcomingCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
+
+    upcomingCollectionRef.get().then(snapshot => {
         const now = luxon.DateTime.now().toMillis();
         const games = [];
         snapshot.forEach(doc => {
@@ -3963,6 +3972,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const home = data["Home"] || "";
             const timeStr = (data["Time (ET)"] || "").replace(/"/g, "");
             let gameDate;
+
             if (typeof data["Date"] === "object" && typeof data["Date"].toDate === "function") {
                 gameDate = luxon.DateTime.fromJSDate(data["Date"].toDate());
             } else if (typeof data["Date"] === "string") {
@@ -3973,7 +3983,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     gameDate = luxon.DateTime.fromFormat(dateOnly, "LLLL d, yyyy", { zone: 'America/New_York' });
                 }
             }
+
             if (!gameDate || !gameDate.isValid || gameDate.toMillis() < now) return;
+
             games.push({
                 dateHeader: gameDate.toFormat('MMMM d, yyyy'),
                 time: timeStr || gameDate.toFormat('h:mm a'),
@@ -3982,16 +3994,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 gameDate
             });
         });
+
         if (games.length === 0) {
             upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
             return;
         }
+
         games.sort((a, b) => a.gameDate - b.gameDate);
         const gamesByDate = {};
         games.forEach(g => {
             if (!gamesByDate[g.dateHeader]) gamesByDate[g.dateHeader] = [];
             gamesByDate[g.dateHeader].push(g);
         });
+
         let html = "";
         Object.keys(gamesByDate).forEach(dateHeader => {
             html += `<div class="date-header">${dateHeader}</div>`;
@@ -4111,8 +4126,8 @@ upcomingScheduleTab.addEventListener('click', () => {
     document.getElementById('league-schedule-today-content').style.display = 'none';
     document.getElementById('league-schedule-upcoming-content').style.display = 'block';
 
-    // Call the new function to load the upcoming schedule
-    loadUpcomingSchedule();
+    // Call the new function to load the upcoming schedule, passing the current leagueKey
+    loadUpcomingSchedule(leagueKey);
 });
 }
 });
