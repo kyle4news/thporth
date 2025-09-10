@@ -4105,18 +4105,17 @@ if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "fu
                 }
             }
         }
-    }
-}
 
-if (!gameDate || !gameDate.isValid || gameDate.toMillis() < now) return;
+        if (!gameDate || !gameDate.isValid || gameDate.toMillis() < now) return;
 
-games.push({
-    dateHeader: gameDate.toFormat('MMMM d, yyyy'),
-    time: timeStr || gameDate.toFormat('h:mm a'),
-    away,
-    home,
-    gameDate
-});
+        games.push({
+            dateHeader: gameDate.toFormat('MMMM d, yyyy'),
+            time: timeStr || gameDate.toFormat('h:mm a'),
+            away,
+            home,
+            gameDate
+        });
+        });
         
         if (games.length === 0) {
             upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
