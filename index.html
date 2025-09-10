@@ -3992,56 +3992,56 @@ const LEAGUE_DATA_CONFIG = {
             let awayField, homeField, timeField, dateField;
             
             if (leagueKey === 'PremierLeague') {
-                awayField = 'Away Team';
-                homeField = 'Home Team';
-                timeField = 'Time ';
-                dateField = 'Date';
+                awayField = 'away';
+                homeField = 'home';
+                timeField = 'time';
+                dateField = 'date';
             } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLB', 'NBA', 'NCAAM', 'NCAAW', 'NFL', 'NHL', 'NWSL', 'SerieA', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'WNBA'].includes(leagueKey)) {
-                awayField = 'Away Team';
-                homeField = 'Home Team';
-                timeField = 'Time';
-                dateField = 'Date';
+                awayField = 'away';
+                homeField = 'home';
+                timeField = 'time';
+                dateField = 'date';
             } else if (leagueKey === 'MLS') {
-                awayField = 'Away Team';
-                homeField = 'Home Team';
-                timeField = 'Time';
-                dateField = 'Date';
+                awayField = 'away';
+                homeField = 'home';
+                timeField = 'time';
+                dateField = 'date';
             } else if (['Boxing'].includes(leagueKey)) {
-                awayField = 'Event';
-                homeField = 'Boxers';
-                timeField = 'Time';
-                dateField = 'Date';
+                awayField = 'event';
+                homeField = 'boxers';
+                timeField = 'time';
+                dateField = 'date';
             } else if (['LIVGolf', 'MotoGP', 'UFC'].includes(leagueKey)) {
-                awayField = 'Event';
-                homeField = 'Event';
-                timeField = 'Time';
-                dateField = 'Date';
+                awayField = 'event';
+                homeField = 'event';
+                timeField = 'time';
+                dateField = 'date';
             } else if (['LPGATour', 'PGATour'].includes(leagueKey)) {
-                awayField = 'Tournament';
-                homeField = 'Tournament';
-                timeField = 'Time';
-                dateField = 'Date';
+                awayField = 'tournament';
+                homeField = 'tournament';
+                timeField = 'time';
+                dateField = 'date';
             } else if (leagueKey === 'NASCARCupSeries') {
-                awayField = 'Race';
-                homeField = 'Location';
-                timeField = 'Time';
-                dateField = 'Date';
+                awayField = 'race';
+                homeField = 'location';
+                timeField = 'time';
+                dateField = 'date';
             } else if (leagueKey === 'Tennis') {
-                awayField = 'Tournament';
-                homeField = 'Tour';
-                timeField = 'Time';
-                dateField = 'Date';
+                awayField = 'tournament';
+                homeField = 'tour';
+                timeField = 'time';
+                dateField = 'date';
             } else if (leagueKey === 'TrackAndField') {
-                awayField = 'Meet';
-                homeField = 'Meet';
-                timeField = 'Time';
-                dateField = 'Date';
+                awayField = 'meet';
+                homeField = 'meet';
+                timeField = 'time';
+                dateField = 'date';
             } else {
                 // Default fallback
-                awayField = 'Away Team';
-                homeField = 'Home Team';
-                timeField = 'Time';
-                dateField = 'Date';
+                awayField = 'away';
+                homeField = 'home';
+                timeField = 'time';
+                dateField = 'date';
             }
 
             const away = data[awayField] || "";
