@@ -4039,17 +4039,28 @@ const LEAGUE_DATA_CONFIG = {
             const away = data[awayField] || "";
 const home = data[homeField] || "";
 let timeStr = "";
+
 if (data[timeField]) {
+    let easternTime;
+
     if (typeof data[timeField] === "object" && typeof data[timeField].toDate === "function") {
         // Firestore Timestamp - it's in Eastern, convert to local
         const jsDate = data[timeField].toDate();
-        timeStr = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/New_York' }).toFormat('h:mm a');
+        // Create a Luxon DateTime object from the JS Date and assign it the Eastern timezone
+        easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/New_York' });
     } else {
         // String time - it's in Eastern, convert to local
         const timeString = String(data[timeField]).replace(/"/g, "");
         if (timeString) {
-            timeStr = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' }).toFormat('h:mm a');
+            // Create a Luxon DateTime object from the string and assign it the Eastern timezone
+            easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' });
         }
+    }
+    
+    // Check if a valid Luxon object was created
+    if (easternTime && easternTime.isValid) {
+        // Convert the time to the user's local timezone and format it
+        timeStr = easternTime.setZone('local').toFormat('h:mm a');
     }
 }
 
