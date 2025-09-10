@@ -3982,6 +3982,8 @@ const LEAGUE_DATA_CONFIG = {
         const now = luxon.DateTime.now().toMillis();
         const games = [];
         
+        console.log(`Loading upcoming games for ${leagueKey}, found ${snapshot.size} documents`);
+        
         snapshot.forEach(doc => {
             const data = doc.data();
             
@@ -4109,7 +4111,11 @@ const LEAGUE_DATA_CONFIG = {
                 }
             }
 
-            if (!gameDate || !gameDate.isValid || gameDate.toMillis() < now) return;
+            if (!gameDate || !gameDate.isValid) return;
+            
+            // Show games from today onwards (not just future games)
+            const today = luxon.DateTime.now().startOf('day');
+            if (gameDate < today) return;
 
             games.push({
                 dateHeader: gameDate.toFormat('MMMM d, yyyy'),
