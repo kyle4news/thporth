@@ -4021,9 +4021,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">at ${game.home}</span><span class="time">${game.time}</span></div>`;
                 });
             });
-            upcomingScheduleContent.innerHTML = html;
+                     // Only update content if we're still on the same league
+            const currentLeagueHeader = document.getElementById('league-specific-header');
+            const currentLeagueKey = currentLeagueHeader ? currentLeagueHeader.innerText : null;
+            if (currentLeagueKey === leagueKey) {
+                upcomingScheduleContent.innerHTML = html;
+            }
         }).catch(error => {
-            upcomingScheduleContent.innerHTML = `<div class="error" style="color: #c00;">Error loading schedule: ${error.message}</div>`;
+            // Only update content if we're still on the same league
+            const currentLeagueHeader = document.getElementById('league-specific-header');
+            const currentLeagueKey = currentLeagueHeader ? currentLeagueHeader.innerText : null;
+            if (currentLeagueKey === leagueKey) {
+                upcomingScheduleContent.innerHTML = `<div class="error" style="color: #c00;">Error loading schedule: ${error.message}</div>`;
+            }
         });
     }
 
