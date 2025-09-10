@@ -3927,20 +3927,8 @@ window.loadLeagueSpecificData = function(leagueKey) {
     const todayScheduleContent = document.getElementById('league-schedule-today-content');
     const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
     const standingsContent = document.getElementById('league-standings-content');
-    
-    // --- NEW CODE ---
-    const scheduleTabsContainer = document.getElementById('schedule-tabs');
-    if (scheduleTabsContainer) {
-        const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
-        const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
-        
-        // Set Today tab as active and show its content by default
-        todayScheduleTab.classList.add('active');
-        upcomingScheduleTab.classList.remove('active');
-        document.getElementById('league-schedule-today-content').style.display = 'block';
-        document.getElementById('league-schedule-upcoming-content').style.display = 'none';
-    }
-    // --- END OF NEW CODE ---
+
+    // ❌ Removed the part that forces "today" tab active
 
     // Load TODAY schedule from Firestore
     todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
@@ -3958,6 +3946,7 @@ window.loadLeagueSpecificData = function(leagueKey) {
 
     // Initialize upcoming schedule content
     upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule functionality is currently not available.</p>';
+
     // Reusing the standings fetcher
     fetchLeagueStandings(leagueInfo.standingsUrl);
 };
