@@ -3811,7 +3811,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return a["Start Time"].toMillis() - b["Start Time"].toMillis();
     }
 
-     function fetchLeagueSchedule(leagueId, leagueName) {
+      function fetchLeagueSchedule(leagueId, leagueName) {
         scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
@@ -3928,9 +3928,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
         const standingsContent = document.getElementById('league-standings-content');
         
-        // --- REMOVED CODE THAT WAS RESETTING TAB STYLING ---
-        // The tab styling is now handled by the event listeners in the main script
-        // This prevents the loadLeagueSpecificData function from overriding user tab selections
+        // --- ADDED CODE TO MANAGE TAB ACTIVE STATE ---
+        const scheduleTabsContainer = document.getElementById('schedule-tabs');
+        if (scheduleTabsContainer) {
+            const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+            const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
+            if (todayScheduleTab && upcomingScheduleTab) {
+                todayScheduleTab.classList.add('active');
+                upcomingScheduleTab.classList.remove('active');
+            }
+        }
+        document.getElementById('league-schedule-today-content').style.display = 'block';
+        document.getElementById('league-schedule-upcoming-content').style.display = 'none';
+        // --- END OF ADDED CODE ---
 
         // Load TODAY schedule from Firestore
         todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
