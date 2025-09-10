@@ -3940,6 +3940,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         document.getElementById('league-schedule-today-content').style.display = 'block';
         document.getElementById('league-schedule-upcoming-content').style.display = 'none';
+        // --- ADDED LINE TO CLEAR CONTENT ---
+        upcomingScheduleContent.innerHTML = '';
         // --- END OF ADDED CODE ---
 
         // Load TODAY schedule from Firestore
