@@ -3982,11 +3982,8 @@ const LEAGUE_DATA_CONFIG = {
         const now = luxon.DateTime.now().toMillis();
         const games = [];
         
-        console.log(`Loading upcoming games for ${leagueKey}, found ${snapshot.size} documents`);
-        
         snapshot.forEach(doc => {
             const data = doc.data();
-            console.log('Processing document:', data);
             
             // Get field names based on league type
             let awayField, homeField, timeField, dateField;
@@ -4113,18 +4110,14 @@ const LEAGUE_DATA_CONFIG = {
             }
 
             if (!gameDate || !gameDate.isValid) {
-                console.log('Invalid date for document:', data);
                 return;
             }
             
             // Show games from today onwards (not just future games)
             const today = luxon.DateTime.now().startOf('day');
             if (gameDate < today) {
-                console.log('Game date is in the past:', gameDate.toFormat('yyyy-MM-dd'), 'vs today:', today.toFormat('yyyy-MM-dd'));
                 return;
             }
-            
-            console.log('Adding game:', away, 'vs', home, 'on', gameDate.toFormat('yyyy-MM-dd'));
 
             games.push({
                 dateHeader: gameDate.toFormat('MMMM d, yyyy'),
