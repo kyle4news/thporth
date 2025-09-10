@@ -4075,29 +4075,36 @@ if (data[timeField]) {
         }
     }
 }
-            let gameDate;
+let gameDate;
 
-            if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
-                gameDate = luxon.DateTime.fromJSDate(data[dateField].toDate());
-            } else if (typeof data[dateField] === "string") {
-                let cleaned = data[dateField].replace(" at ", " ").replace(/ UTC[-+]\d+/, "");
-                gameDate = luxon.DateTime.fromFormat(cleaned, "LLLL d, yyyy h:mm:ss.SSS a", { zone: 'America/New_York' });
-                if (!gameDate.isValid) {
-                    let dateOnly = data[dateField].split(" at ")[0];
-                    gameDate = luxon.DateTime.fromFormat(dateOnly, "LLLL d, yyyy", { zone: 'America/New_York' });
-                }
+if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
+    gameDate = luxon.DateTime.fromJSDate(data[dateField].toDate());
+} else if (typeof data[dateField] === "string") {
+    let cleaned = data[dateField].replace(" at ", " ").replace(/ UTC[-+]\d+/, "");
+    gameDate = luxon.DateTime.fromFormat(cleaned, "LLLL d, yyyy h:mm:ss.SSS a", { zone: 'America/New_York' });
+    if (!gameDate.isValid) {
+        let dateOnly = data[dateField].split(" at ")[0];
+        gameDate = luxon.DateTime.fromFormat(dateOnly, "LLLL d, yyyy", { zone: 'America/New_York' });
+        if (!gameDate.isValid) {
+            // Try parsing just month and day (assume current year)
+            gameDate = luxon.DateTime.fromFormat(dateOnly, "LLLL d", { zone: 'America/New_York' });
+            if (gameDate.isValid) {
+                // Set to current year if not specified
+                gameDate = gameDate.set({ year: luxon.DateTime.now().year });
             }
-            
-            if (!gameDate || !gameDate.isValid || gameDate.toMillis() < now) return;
-            
-            games.push({
-                dateHeader: gameDate.toFormat('MMMM d, yyyy'),
-                time: timeStr || gameDate.toFormat('h:mm a'),
-                away,
-                home,
-                gameDate
-            });
-        });
+        }
+    }
+}
+
+if (!gameDate || !gameDate.isValid || gameDate.toMillis() < now) return;
+
+games.push({
+    dateHeader: gameDate.toFormat('MMMM d, yyyy'),
+    time: timeStr || gameDate.toFormat('h:mm a'),
+    away,
+    home,
+    gameDate
+});
         
         if (games.length === 0) {
             upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
