@@ -3985,25 +3985,30 @@ const LEAGUE_DATA_CONFIG = {
         snapshot.forEach(doc => {
             const data = doc.data();
             
-            // Get field names based on league type
+            // Get field names based on league type - updated to match imported data
             let awayField, homeField, timeField, dateField;
             
             if (leagueKey === 'PremierLeague') {
-                awayField = 'Away';
-                homeField = 'Home';
-                timeField = 'Time (ET)';
+                awayField = 'Away Team';
+                homeField = 'Home Team';
+                timeField = 'Time ';
                 dateField = 'Date';
-            } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLB', 'NBA', 'NCAAF', 'NCAAM', 'NCAAW', 'NFL', 'NHL', 'NWSL', 'SerieA', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'WNBA'].includes(leagueKey)) {
+            } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLB', 'NBA', 'NCAAM', 'NCAAW', 'NFL', 'NHL', 'NWSL', 'SerieA', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'WNBA'].includes(leagueKey)) {
                 awayField = 'Away Team';
                 homeField = 'Home Team';
                 timeField = 'Time';
                 dateField = 'Date';
             } else if (leagueKey === 'MLS') {
-                awayField = 'Away';
-                homeField = 'Home';
+                awayField = 'Away Team';
+                homeField = 'Home Team';
                 timeField = 'Time';
                 dateField = 'Date';
-            } else if (['Boxing', 'LIVGolf', 'MotoGP', 'UFC'].includes(leagueKey)) {
+            } else if (['Boxing'].includes(leagueKey)) {
+                awayField = 'Event';
+                homeField = 'Boxers';
+                timeField = 'Time';
+                dateField = 'Date';
+            } else if (['LIVGolf', 'MotoGP', 'UFC'].includes(leagueKey)) {
                 awayField = 'Event';
                 homeField = 'Event';
                 timeField = 'Time';
@@ -4015,62 +4020,103 @@ const LEAGUE_DATA_CONFIG = {
                 dateField = 'Date';
             } else if (leagueKey === 'NASCARCupSeries') {
                 awayField = 'Race';
-                homeField = 'Race';
+                homeField = 'Location';
                 timeField = 'Time';
                 dateField = 'Date';
             } else if (leagueKey === 'Tennis') {
                 awayField = 'Tournament';
-                homeField = 'Tournament';
+                homeField = 'Tour';
                 timeField = 'Time';
                 dateField = 'Date';
-            } else if (leagueKey === 'TrackandField') {
+            } else if (leagueKey === 'TrackAndField') {
                 awayField = 'Meet';
                 homeField = 'Meet';
                 timeField = 'Time';
                 dateField = 'Date';
             } else {
                 // Default fallback
-                awayField = 'Away';
-                homeField = 'Home';
+                awayField = 'Away Team';
+                homeField = 'Home Team';
                 timeField = 'Time';
                 dateField = 'Date';
             }
 
             const away = data[awayField] || "";
-            const home = data[homeField] || "";
-            let timeStr = "";
+const home = data[homeField] || "";
+let timeStr = "";
+
 if (data[timeField]) {
     if (typeof data[timeField] === "object" && typeof data[timeField].toDate === "function") {
-        // It's a Firestore Timestamp
-        timeStr = luxon.DateTime.fromJSDate(data[timeField].toDate()).toFormat('h:mm a');
+        // Firestore Timestamp - try both timezones
+        const jsDate = data[timeField].toDate();
+        
+        // Try Eastern time first
+        let easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/New_York' });
+        
+        // If that doesn't look right, try UTC-6 (Central time)
+        if (!easternTime.isValid || easternTime.hour < 0 || easternTime.hour > 23) {
+            easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/Chicago' });
+        }
+        
+        timeStr = easternTime.toFormat('h:mm a');
+        
     } else {
-        // It's a string
-        timeStr = String(data[timeField]).replace(/"/g, "");
-    }
-}
-            let gameDate;
-
-            if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
-                gameDate = luxon.DateTime.fromJSDate(data[dateField].toDate());
-            } else if (typeof data[dateField] === "string") {
-                let cleaned = data[dateField].replace(" at ", " ").replace(/ UTC[-+]\d+/, "");
-                gameDate = luxon.DateTime.fromFormat(cleaned, "LLLL d, yyyy h:mm:ss.SSS a", { zone: 'America/New_York' });
-                if (!gameDate.isValid) {
-                    let dateOnly = data[dateField].split(" at ")[0];
-                    gameDate = luxon.DateTime.fromFormat(dateOnly, "LLLL d, yyyy", { zone: 'America/New_York' });
-                }
+        // String time - try both timezones
+        const timeString = String(data[timeField]).replace(/"/g, "");
+        if (timeString) {
+            // Try Eastern time first
+            let easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' });
+            
+            // If that doesn't work, try UTC-6
+            if (!easternTime.isValid) {
+                easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/Chicago' });
             }
             
-            if (!gameDate || !gameDate.isValid || gameDate.toMillis() < now) return;
-            
-            games.push({
-                dateHeader: gameDate.toFormat('MMMM d, yyyy'),
-                time: timeStr || gameDate.toFormat('h:mm a'),
-                away,
-                home,
-                gameDate
-            });
-        });
+            if (easternTime.isValid) {
+                timeStr = easternTime.toFormat('h:mm a');
+            } else {
+                timeStr = timeString; // fallback
+            }
+        }
+    }
+}
+let gameDate;
+
+if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
+    // Handle Firestore Timestamp (legacy)
+    gameDate = luxon.DateTime.fromJSDate(data[dateField].toDate());
+} else if (typeof data[dateField] === "string") {
+    // Handle new YYYY-MM-DD format
+    if (data[dateField].match(/^\d{4}-\d{2}-\d{2}$/)) {
+        gameDate = luxon.DateTime.fromISO(data[dateField]);
+    } else {
+        // Handle legacy formats
+        let cleaned = data[dateField].replace(" at ", " ").replace(/ UTC[-+]\d+/, "");
+        gameDate = luxon.DateTime.fromFormat(cleaned, "LLLL d, yyyy h:mm:ss.SSS a", { zone: 'America/New_York' });
+        if (!gameDate.isValid) {
+            let dateOnly = data[dateField].split(" at ")[0];
+            gameDate = luxon.DateTime.fromFormat(dateOnly, "LLLL d, yyyy", { zone: 'America/New_York' });
+            if (!gameDate.isValid) {
+                // Try parsing just month and day (assume current year)
+                gameDate = luxon.DateTime.fromFormat(dateOnly, "LLLL d", { zone: 'America/New_York' });
+                if (gameDate.isValid) {
+                    // Set to current year if not specified
+                    gameDate = gameDate.set({ year: luxon.DateTime.now().year });
+                }
+            }
+        }
+    }
+}
+
+if (!gameDate || !gameDate.isValid || gameDate.toMillis() < now) return;
+
+games.push({
+    dateHeader: gameDate.toFormat('MMMM d, yyyy'),
+    time: timeStr || gameDate.toFormat('h:mm a'),
+    away,
+    home,
+    gameDate
+});
         
         if (games.length === 0) {
             upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
@@ -4089,8 +4135,16 @@ if (data[timeField]) {
             html += `<div class="date-header">${dateHeader}</div>`;
             gamesByDate[dateHeader].forEach(game => {
                 // For events/tournaments, show just the name
-                if (['Boxing', 'LIVGolf', 'MotoGP', 'UFC', 'LPGATour', 'PGATour', 'NASCARCupSeries', 'Tennis', 'TrackandField'].includes(leagueKey)) {
-                    html += `<div class="match-row"><span class="team">${game.away}</span><span class="time">${game.time}</span></div>`;
+                if (['Boxing', 'LIVGolf', 'MotoGP', 'UFC', 'LPGATour', 'PGATour', 'NASCARCupSeries', 'Tennis', 'TrackAndField'].includes(leagueKey)) {
+                    if (leagueKey === 'Boxing') {
+                        html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">${game.home}</span><span class="time">${game.time}</span></div>`;
+                    } else if (leagueKey === 'NASCARCupSeries') {
+                        html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">at ${game.home}</span><span class="time">${game.time}</span></div>`;
+                    } else if (leagueKey === 'Tennis') {
+                        html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">(${game.home})</span><span class="time">${game.time}</span></div>`;
+                    } else {
+                        html += `<div class="match-row"><span class="team">${game.away}</span><span class="time">${game.time}</span></div>`;
+                    }
                 } else {
                     html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">at ${game.home}</span><span class="time">${game.time}</span></div>`;
                 }
@@ -5049,5 +5103,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </html>
 
     
-
 
