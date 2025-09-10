@@ -4041,22 +4041,17 @@ const home = data[homeField] || "";
 let timeStr = "";
 if (data[timeField]) {
     if (typeof data[timeField] === "object" && typeof data[timeField].toDate === "function") {
-        // Firestore Timestamp - convert from Eastern to user's local time
+        // Firestore Timestamp - it's in Eastern, convert to local
         const jsDate = data[timeField].toDate();
-        const easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/New_York' });
-        timeStr = easternTime.toFormat('h:mm a');
+        timeStr = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/New_York' }).toFormat('h:mm a');
     } else {
-        // String time - treat as Eastern and convert to local
+        // String time - it's in Eastern, convert to local
         const timeString = String(data[timeField]).replace(/"/g, "");
         if (timeString) {
-            const easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' });
-            if (easternTime.isValid) {
-                timeStr = easternTime.toFormat('h:mm a');
-            } else {
-                timeStr = timeString;
-            }
+            timeStr = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' }).toFormat('h:mm a');
         }
     }
+}
 }
             let gameDate;
 
