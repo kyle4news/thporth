@@ -4057,8 +4057,13 @@ const LEAGUE_DATA_CONFIG = {
                     // String time - treat as Eastern time and convert to local
                     const timeString = String(data[timeField]).replace(/"/g, "");
                     if (timeString) {
-                        // Parse as Eastern time, then convert to local
-                        const easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' });
+                        // Parse as Eastern time with seconds format, then convert to local
+                        let easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm:ss a', { zone: 'America/New_York' });
+                        
+                        // If that doesn't work, try without seconds
+                        if (!easternTime.isValid) {
+                            easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' });
+                        }
                         
                         if (easternTime.isValid) {
                             const localTime = easternTime.toLocal();
