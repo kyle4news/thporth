@@ -3936,8 +3936,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
             
             // Set Today tab as active and show its content
-            todayScheduleTab.classList.add('active');
-            upcomingScheduleTab.classList.remove('active');
+                       // Set Today tab as active and show its content
+                       if (todayScheduleTab) todayScheduleTab.classList.add('active');
+            if (upcomingScheduleTab) upcomingScheduleTab.classList.remove('active');
             document.getElementById('league-schedule-today-content').style.display = 'block';
             document.getElementById('league-schedule-upcoming-content').style.display = 'none';
         }
