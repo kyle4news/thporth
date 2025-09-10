@@ -4038,7 +4038,7 @@ const LEAGUE_DATA_CONFIG = {
 
             const away = data[awayField] || "";
             const home = data[homeField] || "";
-            const timeStr = (data[timeField] || "").replace(/"/g, "");
+            const timeStr = String(data[timeField] || "").replace(/"/g, "");
             let gameDate;
 
             if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
