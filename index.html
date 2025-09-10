@@ -4041,9 +4041,9 @@ const home = data[homeField] || "";
 let timeStr = "";
 if (data[timeField]) {
     if (typeof data[timeField] === "object" && typeof data[timeField].toDate === "function") {
-        // It's a Firestore Timestamp - convert from Eastern to user's local time
-        const easternTime = luxon.DateTime.fromJSDate(data[timeField].toDate(), { zone: 'America/New_York' });
-        timeStr = easternTime.toFormat('h:mm a');
+        // It's a Firestore Timestamp - it's already in UTC, just convert to local time
+        const utcTime = luxon.DateTime.fromJSDate(data[timeField].toDate());
+        timeStr = utcTime.toFormat('h:mm a');
     } else {
         // It's a string - assume it's in Eastern time and convert to local
         const timeString = String(data[timeField]).replace(/"/g, "");
