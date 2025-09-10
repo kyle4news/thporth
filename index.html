@@ -4041,22 +4041,38 @@ const home = data[homeField] || "";
 let timeStr = "";
 
 if (data[timeField]) {
-    let easternTime;
-
     if (typeof data[timeField] === "object" && typeof data[timeField].toDate === "function") {
-        // Firestore Timestamp -> JS Date -> Luxon DateTime in Eastern Time
+        // Firestore Timestamp - try both timezones
         const jsDate = data[timeField].toDate();
-        easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/New_York' });
+        
+        // Try Eastern time first
+        let easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/New_York' });
+        
+        // If that doesn't look right, try UTC-6 (Central time)
+        if (!easternTime.isValid || easternTime.hour < 0 || easternTime.hour > 23) {
+            easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/Chicago' });
+        }
+        
+        timeStr = easternTime.toFormat('h:mm a');
+        
     } else {
-        // String time -> Luxon DateTime in Eastern Time
+        // String time - try both timezones
         const timeString = String(data[timeField]).replace(/"/g, "");
-        easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' });
-    }
-    
-    // Check if a valid Luxon DateTime object was created
-    if (easternTime.isValid) {
-        // CORRECTED: Convert to local timezone and then format the output
-        timeStr = easternTime.setZone('local').toFormat('h:mm a');
+        if (timeString) {
+            // Try Eastern time first
+            let easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' });
+            
+            // If that doesn't work, try UTC-6
+            if (!easternTime.isValid) {
+                easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/Chicago' });
+            }
+            
+            if (easternTime.isValid) {
+                timeStr = easternTime.toFormat('h:mm a');
+            } else {
+                timeStr = timeString; // fallback
+            }
+        }
     }
 }
             let gameDate;
