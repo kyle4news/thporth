@@ -4050,7 +4050,8 @@ const LEAGUE_DATA_CONFIG = {
                     // Firestore Timestamp - treat as Eastern time and convert to local
                     const jsDate = data[timeField].toDate();
                     const easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/New_York' });
-                    timeStr = easternTime.toFormat('h:mm a');
+                    const localTime = easternTime.toLocal();
+                    timeStr = localTime.toFormat('h:mm a');
                     
                 } else {
                     // String time - treat as Eastern time and convert to local
@@ -4060,7 +4061,8 @@ const LEAGUE_DATA_CONFIG = {
                         const easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' });
                         
                         if (easternTime.isValid) {
-                            timeStr = easternTime.toFormat('h:mm a');
+                            const localTime = easternTime.toLocal();
+                            timeStr = localTime.toFormat('h:mm a');
                         } else {
                             timeStr = timeString; // fallback
                         }
