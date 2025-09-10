@@ -4047,30 +4047,17 @@ const LEAGUE_DATA_CONFIG = {
 
             if (data[timeField]) {
                 if (typeof data[timeField] === "object" && typeof data[timeField].toDate === "function") {
-                    // Firestore Timestamp - try both timezones
+                    // Firestore Timestamp - treat as Eastern time and convert to local
                     const jsDate = data[timeField].toDate();
-                    
-                    // Try Eastern time first
-                    let easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/New_York' });
-                    
-                    // If that doesn't look right, try UTC-6 (Central time)
-                    if (!easternTime.isValid || easternTime.hour < 0 || easternTime.hour > 23) {
-                        easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/Chicago' });
-                    }
-                    
+                    const easternTime = luxon.DateTime.fromJSDate(jsDate, { zone: 'America/New_York' });
                     timeStr = easternTime.toFormat('h:mm a');
                     
                 } else {
-                    // String time - try both timezones
+                    // String time - treat as Eastern time and convert to local
                     const timeString = String(data[timeField]).replace(/"/g, "");
                     if (timeString) {
-                        // Try Eastern time first
-                        let easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' });
-                        
-                        // If that doesn't work, try UTC-6
-                        if (!easternTime.isValid) {
-                            easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/Chicago' });
-                        }
+                        // Parse as Eastern time, then convert to local
+                        const easternTime = luxon.DateTime.fromFormat(timeString, 'h:mm a', { zone: 'America/New_York' });
                         
                         if (easternTime.isValid) {
                             timeStr = easternTime.toFormat('h:mm a');
