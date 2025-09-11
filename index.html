@@ -3836,11 +3836,31 @@ const LEAGUE_DATA_CONFIG = {
                 const gamesData = snapshot.docs.map(doc => {
                     const data = doc.data();
                     // Convert the upcoming games format to match the expected format for renderGames
+                    const gameDate = data.date || data.gameDate;
+                    const gameTime = data.time || data.Time;
+                    
+                    // Create a proper date object for Start Time
+                    let startTime = null;
+                    if (gameDate && gameTime) {
+                        try {
+                            // Parse the date and time to create a proper Date object
+                            const dateTimeStr = `${gameDate} ${gameTime}`;
+                            const parsedDate = luxon.DateTime.fromFormat(dateTimeStr, 'yyyy-MM-dd h:mm:ss a', { zone: 'America/New_York' });
+                            if (parsedDate.isValid) {
+                                startTime = {
+                                    toDate: () => parsedDate.toJSDate()
+                                };
+                            }
+                        } catch (e) {
+                            console.log('Error parsing date/time:', e);
+                        }
+                    }
+                    
                     return {
-                        Home: data.home || data.Home,
-                        Away: data.away || data.Away,
-                        Time: data.time || data.Time,
-                        gameDate: data.date || data.gameDate,
+                        "Home Team": data.home || data.Home,
+                        "Away Team": data.away || data.Away,
+                        "Start Time": startTime,
+                        gameDate: gameDate,
                         League: leagueId
                     };
                 }).sort(sortGames);
@@ -3981,11 +4001,31 @@ const LEAGUE_DATA_CONFIG = {
                 const gamesData = snapshot.docs.map(doc => {
                     const data = doc.data();
                     // Convert the upcoming games format to match the expected format for renderGames
+                    const gameDate = data.date || data.gameDate;
+                    const gameTime = data.time || data.Time;
+                    
+                    // Create a proper date object for Start Time
+                    let startTime = null;
+                    if (gameDate && gameTime) {
+                        try {
+                            // Parse the date and time to create a proper Date object
+                            const dateTimeStr = `${gameDate} ${gameTime}`;
+                            const parsedDate = luxon.DateTime.fromFormat(dateTimeStr, 'yyyy-MM-dd h:mm:ss a', { zone: 'America/New_York' });
+                            if (parsedDate.isValid) {
+                                startTime = {
+                                    toDate: () => parsedDate.toJSDate()
+                                };
+                            }
+                        } catch (e) {
+                            console.log('Error parsing date/time:', e);
+                        }
+                    }
+                    
                     return {
-                        Home: data.home || data.Home,
-                        Away: data.away || data.Away,
-                        Time: data.time || data.Time,
-                        gameDate: data.date || data.gameDate,
+                        "Home Team": data.home || data.Home,
+                        "Away Team": data.away || data.Away,
+                        "Start Time": startTime,
+                        gameDate: gameDate,
                         League: leagueInfo.leagueId
                     };
                 }).sort(sortGames);
