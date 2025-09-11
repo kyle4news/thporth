@@ -4226,8 +4226,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     `;
                 } else if (['Boxing'].includes(leagueKey)) {
                     // Boxing: Group by event, show event as subheader, then all boxer matchups under it
-                    const currentEvent = game.home;
-                    const lastEvent = gamesByDate[dateHeader][gamesByDate[dateHeader].indexOf(game) - 1]?.home;
+                    const currentEvent = game.away; // awayField = 'event'
+                    const lastEvent = gamesByDate[dateHeader][gamesByDate[dateHeader].indexOf(game) - 1]?.away;
                     
                     // If this is a new event, add event header
                     if (currentEvent !== lastEvent) {
@@ -4238,7 +4238,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1;">
-                                <div class="boxers" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
+                                <div class="boxers" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
                             </div>
                             <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;"></div>
                         </div>
@@ -4277,12 +4277,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
                 } else if (['NASCARCupSeries'].includes(leagueKey)) {
-                    // NASCARCupSeries: Race on top, Location on bottom, time on right
+                    // NASCARCupSeries: Location on top, Race on bottom, time on right
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1;">
-                                <div class="race" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
-                                <div class="location" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
+                                <div class="location" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.away}</div>
+                                <div class="race" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
                             </div>
                             <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
                         </div>
@@ -5258,3 +5258,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     
+
