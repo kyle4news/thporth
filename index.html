@@ -3630,8 +3630,8 @@ document.addEventListener('DOMContentLoaded', function () {
 // --- FINAL UNIFIED SCRIPT for ALL Game, Schedule, and Standings Logic ---
 document.addEventListener('DOMContentLoaded', function () {
 
-   // --- 1. CONFIGURATION ---
-const LEAGUE_DATA_CONFIG = {
+    // --- 1. CONFIGURATION ---
+  const LEAGUE_DATA_CONFIG = {
   'NFL': { leagueId: 'USA: NFL', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoXI911JBowIVpsOtYo7Jk0WwwNlujQ76rR4lgDAqxGWLa_q67gOXI0DyKsC4YkKIfbSYqerHp17-m/pub?gid=1628205730&single=true&output=csv', upcomingCollectionName: 'NFL' },
   'NBA': { leagueId: 'USA: NBA', standingsUrl: 'YOUR_NBA_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'NBA' },
   'MLB': { leagueId: 'USA: MLB', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQHOSDTxfJ554E0MhgZPfmnarCUunnYmxDBSZ78APQ3QfvPWBnn1i68JPSuNCNByd1IzYEbj-6AVAZ/pub?gid=1312763847&single=true&output=csv', upcomingCollectionName: 'MLB' },
@@ -3961,15 +3961,15 @@ const LEAGUE_DATA_CONFIG = {
         
         if (leagueKey === 'MLB') {
             // MLB uses a different API source
-            gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
-                .onSnapshot(snapshot => {
-                    if (snapshot.empty) {
-                        todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
-                        return;
-                    }
-                    const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
-                    renderGames(todayScheduleContent, gamesData, false);
-                }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
+        gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
+            .onSnapshot(snapshot => {
+                if (snapshot.empty) {
+                    todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                    return;
+                }
+                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                renderGames(todayScheduleContent, gamesData, false);
+            }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
         } else {
             // All other leagues use FlashLiveAPI (gamesCollectionRef)
             gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
@@ -3990,24 +3990,24 @@ const LEAGUE_DATA_CONFIG = {
     };
 
     function loadUpcomingSchedule(leagueKey) {
-    const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
-    if (!upcomingScheduleContent) return;
+        const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
+        if (!upcomingScheduleContent) return;
 
-    const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
-    if (!leagueInfo || !leagueInfo.upcomingCollectionName) {
-        upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule is not available for this league.</p>';
-        return;
-    }
+        const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
+        if (!leagueInfo || !leagueInfo.upcomingCollectionName) {
+            upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule is not available for this league.</p>';
+            return;
+        }
 
-    upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading upcoming schedule...</p>';
-    const upcomingCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
+        upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading upcoming schedule...</p>';
+        const upcomingCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
 
-    upcomingCollectionRef.get().then(snapshot => {
-        const now = luxon.DateTime.now().toMillis();
-        const games = [];
+        upcomingCollectionRef.get().then(snapshot => {
+            const now = luxon.DateTime.now().toMillis();
+            const games = [];
         
-        snapshot.forEach(doc => {
-            const data = doc.data();
+            snapshot.forEach(doc => {
+                const data = doc.data();
             
             // Get field names based on league type
             let awayField, homeField, timeField, dateField;
@@ -4099,7 +4099,7 @@ const LEAGUE_DATA_CONFIG = {
                 }
             }
 
-            let gameDate;
+                let gameDate;
 
             if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
                 // Handle Firestore Timestamp (legacy)
@@ -4137,29 +4137,29 @@ const LEAGUE_DATA_CONFIG = {
                 return;
             }
 
-            games.push({
-                dateHeader: gameDate.toFormat('MMMM d, yyyy'),
-                time: timeStr || gameDate.toFormat('h:mm a'),
-                away,
-                home,
-                gameDate
+                games.push({
+                    dateHeader: gameDate.toFormat('MMMM d, yyyy'),
+                    time: timeStr || gameDate.toFormat('h:mm a'),
+                    away,
+                    home,
+                    gameDate
+                });
             });
-        });
         
-        if (games.length === 0) {
-            upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
-            return;
-        }
+            if (games.length === 0) {
+                upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
+                return;
+            }
         
-        games.sort((a, b) => a.gameDate - b.gameDate);
-        const gamesByDate = {};
-        games.forEach(g => {
-            if (!gamesByDate[g.dateHeader]) gamesByDate[g.dateHeader] = [];
-            gamesByDate[g.dateHeader].push(g);
-        });
+            games.sort((a, b) => a.gameDate - b.gameDate);
+            const gamesByDate = {};
+            games.forEach(g => {
+                if (!gamesByDate[g.dateHeader]) gamesByDate[g.dateHeader] = [];
+                gamesByDate[g.dateHeader].push(g);
+            });
         
         
-        let html = "";
+            let html = "";
         
         // Sort date headers chronologically
         const sortedDateHeaders = Object.keys(gamesByDate).sort((a, b) => {
@@ -4210,7 +4210,7 @@ const LEAGUE_DATA_CONFIG = {
                                 <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.away}</div>
                                 <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time}</div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
                         </div>
                     `;
                 } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLS', 'NWSL', 'PremierLeague', 'SerieA', 'UEFAEuropaLeague', 'UEFAChampionsLeague', 'UEFAConferenceLeague'].includes(leagueKey)) {
@@ -4221,7 +4221,7 @@ const LEAGUE_DATA_CONFIG = {
                                 <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time}</div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
                         </div>
                     `;
                 } else if (['Boxing'].includes(leagueKey)) {
@@ -4262,7 +4262,7 @@ const LEAGUE_DATA_CONFIG = {
                                 <div class="event" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time}</div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
                         </div>
                     `;
                 } else if (['LPGATour', 'PGATour'].includes(leagueKey)) {
@@ -4284,7 +4284,7 @@ const LEAGUE_DATA_CONFIG = {
                                 <div class="race" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="location" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time}</div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
                         </div>
                     `;
                 } else if (['TrackAndField'].includes(leagueKey)) {
@@ -4300,10 +4300,10 @@ const LEAGUE_DATA_CONFIG = {
                     `;
                 } else {
                     // Default format for other leagues
-                    html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">at ${game.home}</span><span class="time">${game.time}</span></div>`;
+                    html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">at ${game.home}</span><span class="time">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</span></div>`;
                 }
+                });
             });
-        });
         
         // Only update content if we're still on the same league
         const currentLeagueHeader = document.getElementById('league-specific-header');
@@ -4311,15 +4311,15 @@ const LEAGUE_DATA_CONFIG = {
         if (currentLeagueKey === leagueKey) {
             upcomingScheduleContent.innerHTML = html;
         }
-    }).catch(error => {
+        }).catch(error => {
         // Only update content if we're still on the same league
         const currentLeagueHeader = document.getElementById('league-specific-header');
         const currentLeagueKey = currentLeagueHeader ? currentLeagueHeader.innerText : null;
         if (currentLeagueKey === leagueKey) {
             upcomingScheduleContent.innerHTML = `<div class="error" style="color: #c00;">Error loading schedule: ${error.message}</div>`;
         }
-    });
-}
+        });
+    }
 
 
     // --- 7. TABS AND FILTER INITIALIZATION ---
@@ -5256,6 +5256,6 @@ document.addEventListener('DOMContentLoaded', function() {
   </body>
 </html>
 
-    
 
+    
 
