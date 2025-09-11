@@ -3817,13 +3817,33 @@ const LEAGUE_DATA_CONFIG = {
         scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
-        gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr)
+        
+        // Find the league config to get the collection name
+        const leagueConfig = Object.values(LEAGUE_DATA_CONFIG).find(config => config.leagueId === leagueId);
+        if (!leagueConfig || !leagueConfig.upcomingCollectionName) {
+            scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
+            return;
+        }
+        
+        // Use the individual league collection instead of gamesCollectionRef
+        const leagueCollectionRef = db.collection(leagueConfig.upcomingCollectionName);
+        leagueCollectionRef.where('date', '==', todayStr)
             .onSnapshot(snapshot => {
                 if (snapshot.empty) {
                     scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
                     return;
                 }
-                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                const gamesData = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    // Convert the upcoming games format to match the expected format for renderGames
+                    return {
+                        Home: data.home || data.Home,
+                        Away: data.away || data.Away,
+                        Time: data.time || data.Time,
+                        gameDate: data.date || data.gameDate,
+                        League: leagueId
+                    };
+                }).sort(sortGames);
                 renderGames(scheduleContent, gamesData, false);
             }, err => { scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>'; });
     }
@@ -3945,17 +3965,30 @@ const LEAGUE_DATA_CONFIG = {
             document.getElementById('league-schedule-upcoming-content').style.display = 'none';
         }
 
-        // Load TODAY schedule from Firestore
+        // Load TODAY schedule from individual league collection
         todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
-        gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
+        
+        // Use the individual league collection instead of gamesCollectionRef
+        const leagueCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
+        leagueCollectionRef.where('date', '==', todayStr)
             .onSnapshot(snapshot => {
                 if (snapshot.empty) {
                     todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
                     return;
                 }
-                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                const gamesData = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    // Convert the upcoming games format to match the expected format for renderGames
+                    return {
+                        Home: data.home || data.Home,
+                        Away: data.away || data.Away,
+                        Time: data.time || data.Time,
+                        gameDate: data.date || data.gameDate,
+                        League: leagueInfo.leagueId
+                    };
+                }).sort(sortGames);
                 renderGames(todayScheduleContent, gamesData, false);
             }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
 
