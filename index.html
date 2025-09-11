@@ -4166,7 +4166,32 @@ const LEAGUE_DATA_CONFIG = {
             
             html += `<div class="date-header" style="background-color: #d1d5db; color: #000; padding: 0px 12px; margin: 8px 0 4px 0; font-weight: normal; font-size: 11px; line-height: 18px;">${formattedDate}</div>`;
             
-            gamesByDate[dateHeader].forEach(game => {
+            // Sort games by time within each date for ALL leagues
+            const sortedGames = gamesByDate[dateHeader].sort((a, b) => {
+                // Parse time strings to compare them
+                const timeA = a.time || '';
+                const timeB = b.time || '';
+                
+                // Convert time to 24-hour format for comparison
+                const parseTime = (timeStr) => {
+                    if (!timeStr) return 0;
+                    const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+                    if (!match) return 0;
+                    
+                    let hours = parseInt(match[1]);
+                    const minutes = parseInt(match[2]);
+                    const ampm = match[3].toUpperCase();
+                    
+                    if (ampm === 'PM' && hours !== 12) hours += 12;
+                    if (ampm === 'AM' && hours === 12) hours = 0;
+                    
+                    return hours * 60 + minutes;
+                };
+                
+                return parseTime(timeA) - parseTime(timeB);
+            });
+            
+            sortedGames.forEach(game => {
                 // Format for specified leagues: away team on top, home team on bottom, time on right
                 if (['NFL', 'NBA', 'MLB', 'NHL', 'NCAAF', 'WNBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball'].includes(leagueKey)) {
                     html += `
