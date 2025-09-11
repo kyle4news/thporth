@@ -1856,7 +1856,7 @@ div[id^="breaking-content-"] a:hover {
         </div>
         
         <!-- Schedule Content -->
-        <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
+        <div id="league-schedule-today-content" class="schedule-content" style="display: flex; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
         <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
     </div>
 
@@ -3825,47 +3825,61 @@ const LEAGUE_DATA_CONFIG = {
             return;
         }
         
-        // Use the individual league collection instead of gamesCollectionRef
-        const leagueCollectionRef = db.collection(leagueConfig.upcomingCollectionName);
-        leagueCollectionRef.where('date', '==', todayStr)
-            .onSnapshot(snapshot => {
-                if (snapshot.empty) {
-                    scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
-                    return;
-                }
-                const gamesData = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    // Convert the upcoming games format to match the expected format for renderGames
-                    const gameDate = data.date || data.gameDate;
-                    const gameTime = data.time || data.Time;
-                    
-                    // Create a proper date object for Start Time
-                    let startTime = null;
-                    if (gameDate && gameTime) {
-                        try {
-                            // Parse the date and time to create a proper Date object
-                            const dateTimeStr = `${gameDate} ${gameTime}`;
-                            const parsedDate = luxon.DateTime.fromFormat(dateTimeStr, 'yyyy-MM-dd h:mm:ss a', { zone: 'America/New_York' });
-                            if (parsedDate.isValid) {
-                                startTime = {
-                                    toDate: () => parsedDate.toJSDate()
-                                };
-                            }
-                        } catch (e) {
-                            console.log('Error parsing date/time:', e);
-                        }
+        // MLB uses FlashLiveAPI, others use individual collections
+        if (leagueId === 'USA: MLB') {
+            // MLB uses FlashLiveAPI (gamesCollectionRef)
+            gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
+                        return;
                     }
-                    
-                    return {
-                        "Home Team": data.home || data.Home,
-                        "Away Team": data.away || data.Away,
-                        "Start Time": startTime,
-                        gameDate: gameDate,
-                        League: leagueId
-                    };
-                }).sort(sortGames);
-                renderGames(scheduleContent, gamesData, false);
-            }, err => { scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>'; });
+                    const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                    renderGames(scheduleContent, gamesData, false);
+                }, err => { scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>'; });
+        } else {
+            // Other leagues use individual collections
+            const leagueCollectionRef = db.collection(leagueConfig.upcomingCollectionName);
+            leagueCollectionRef.where('date', '==', todayStr)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
+                        return;
+                    }
+                    const gamesData = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        // Convert the upcoming games format to match the expected format for renderGames
+                        const gameDate = data.date || data.gameDate;
+                        const gameTime = data.time || data.Time;
+                        
+                        // Create a proper date object for Start Time
+                        let startTime = null;
+                        if (gameDate && gameTime) {
+                            try {
+                                // Parse the date and time to create a proper Date object
+                                const dateTimeStr = `${gameDate} ${gameTime}`;
+                                const parsedDate = luxon.DateTime.fromFormat(dateTimeStr, 'yyyy-MM-dd h:mm:ss a', { zone: 'America/New_York' });
+                                if (parsedDate.isValid) {
+                                    startTime = {
+                                        toDate: () => parsedDate.toJSDate()
+                                    };
+                                }
+                            } catch (e) {
+                                console.log('Error parsing date/time:', e);
+                            }
+                        }
+                        
+                        return {
+                            "Home Team": data.home || data.Home,
+                            "Away Team": data.away || data.Away,
+                            "Start Time": startTime,
+                            gameDate: gameDate,
+                            League: leagueId
+                        };
+                    }).sort(sortGames);
+                    renderGames(scheduleContent, gamesData, false);
+                }, err => { scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>'; });
+        }
     }
 
     // REPLACE THE OLD FUNCTION WITH THIS ONE
@@ -3981,56 +3995,69 @@ const LEAGUE_DATA_CONFIG = {
                        // Set Today tab as active and show its content
                        if (todayScheduleTab) todayScheduleTab.classList.add('active');
             if (upcomingScheduleTab) upcomingScheduleTab.classList.remove('active');
-            document.getElementById('league-schedule-today-content').style.display = 'block';
+            document.getElementById('league-schedule-today-content').style.display = 'flex';
             document.getElementById('league-schedule-upcoming-content').style.display = 'none';
         }
 
-        // Load TODAY schedule from individual league collection
+        // Load TODAY schedule - use FlashLiveAPI for MLB, individual collections for others
         todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
         
-        // Use the individual league collection instead of gamesCollectionRef
-        const leagueCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
-        leagueCollectionRef.where('date', '==', todayStr)
-            .onSnapshot(snapshot => {
-                if (snapshot.empty) {
-                    todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
-                    return;
-                }
-                const gamesData = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    // Convert the upcoming games format to match the expected format for renderGames
-                    const gameDate = data.date || data.gameDate;
-                    const gameTime = data.time || data.Time;
-                    
-                    // Create a proper date object for Start Time
-                    let startTime = null;
-                    if (gameDate && gameTime) {
-                        try {
-                            // Parse the date and time to create a proper Date object
-                            const dateTimeStr = `${gameDate} ${gameTime}`;
-                            const parsedDate = luxon.DateTime.fromFormat(dateTimeStr, 'yyyy-MM-dd h:mm:ss a', { zone: 'America/New_York' });
-                            if (parsedDate.isValid) {
-                                startTime = {
-                                    toDate: () => parsedDate.toJSDate()
-                                };
-                            }
-                        } catch (e) {
-                            console.log('Error parsing date/time:', e);
-                        }
+        if (leagueKey === 'MLB') {
+            // MLB uses FlashLiveAPI (gamesCollectionRef)
+            gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                        return;
                     }
-                    
-                    return {
-                        "Home Team": data.home || data.Home,
-                        "Away Team": data.away || data.Away,
-                        "Start Time": startTime,
-                        gameDate: gameDate,
-                        League: leagueInfo.leagueId
-                    };
-                }).sort(sortGames);
-                renderGames(todayScheduleContent, gamesData, false);
-            }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
+                    const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                    renderGames(todayScheduleContent, gamesData, false);
+                }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
+        } else {
+            // Other leagues use individual collections
+            const leagueCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
+            leagueCollectionRef.where('date', '==', todayStr)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                        return;
+                    }
+                    const gamesData = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        // Convert the upcoming games format to match the expected format for renderGames
+                        const gameDate = data.date || data.gameDate;
+                        const gameTime = data.time || data.Time;
+                        
+                        // Create a proper date object for Start Time
+                        let startTime = null;
+                        if (gameDate && gameTime) {
+                            try {
+                                // Parse the date and time to create a proper Date object
+                                const dateTimeStr = `${gameDate} ${gameTime}`;
+                                const parsedDate = luxon.DateTime.fromFormat(dateTimeStr, 'yyyy-MM-dd h:mm:ss a', { zone: 'America/New_York' });
+                                if (parsedDate.isValid) {
+                                    startTime = {
+                                        toDate: () => parsedDate.toJSDate()
+                                    };
+                                }
+                            } catch (e) {
+                                console.log('Error parsing date/time:', e);
+                            }
+                        }
+                        
+                        return {
+                            "Home Team": data.home || data.Home,
+                            "Away Team": data.away || data.Away,
+                            "Start Time": startTime,
+                            gameDate: gameDate,
+                            League: leagueInfo.leagueId
+                        };
+                    }).sort(sortGames);
+                    renderGames(todayScheduleContent, gamesData, false);
+                }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
+        }
 
         // Clear upcoming schedule content when switching leagues
         upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule functionality is currently not available.</p>';
@@ -4353,7 +4380,7 @@ if (scheduleTabsContainer) {
         todayScheduleTab.classList.add('active');
         
         // Show today content, hide upcoming content
-        document.getElementById('league-schedule-today-content').style.display = 'block';
+        document.getElementById('league-schedule-today-content').style.display = 'flex';
         document.getElementById('league-schedule-upcoming-content').style.display = 'none';
     });
     
@@ -4365,7 +4392,7 @@ if (scheduleTabsContainer) {
 
         // Show upcoming content, hide today content
         document.getElementById('league-schedule-today-content').style.display = 'none';
-        document.getElementById('league-schedule-upcoming-content').style.display = 'block';
+        document.getElementById('league-schedule-upcoming-content').style.display = 'flex';
         
         // Get the current league key from the header
         const leagueHeader = document.getElementById('league-specific-header');
