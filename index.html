@@ -4206,7 +4206,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (['NFL', 'NBA', 'MLB', 'NHL', 'NCAAF', 'WNBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball'].includes(leagueKey)) {
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1;">
+                            <div class="teams" style="flex: 1; margin-right: 3px;">
                                 <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.away}</div>
                                 <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
                             </div>
@@ -4217,7 +4217,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Format for soccer leagues: home team on top, away team on bottom, time on right
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1;">
+                            <div class="teams" style="flex: 1; margin-right: 3px;">
                                 <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
                             </div>
@@ -4237,7 +4237,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Add boxer matchup
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1;">
+                            <div class="teams" style="flex: 1; margin-right: 3px;">
                                 <div class="boxers" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
                             </div>
                             <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;"></div>
@@ -4247,7 +4247,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Tennis: Tour on top, Tournament on bottom, no time
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1;">
+                            <div class="teams" style="flex: 1; margin-right: 3px;">
                                 <div class="tour" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="tournament" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
                             </div>
@@ -4258,7 +4258,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // LIVGolf, MotoGP, UFC: Event on top, blank on bottom, time on right
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1;">
+                            <div class="teams" style="flex: 1; margin-right: 3px;">
                                 <div class="event" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
                             </div>
@@ -4269,7 +4269,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // LPGATour, PGATour: Tournament on top, blank on bottom, no time
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1;">
+                            <div class="teams" style="flex: 1; margin-right: 3px;">
                                 <div class="tournament" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
                             </div>
@@ -4280,7 +4280,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // NASCARCupSeries: Race on top, Location on bottom, time on right
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1;">
+                            <div class="teams" style="flex: 1; margin-right: 3px;">
                                 <div class="race" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.away}</div>
                                 <div class="location" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
                             </div>
@@ -4291,7 +4291,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // TrackAndField: Meet on top, blank on bottom, no time
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1;">
+                            <div class="teams" style="flex: 1; margin-right: 3px;">
                                 <div class="meet" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
                             </div>
