@@ -1856,7 +1856,7 @@ div[id^="breaking-content-"] a:hover {
         </div>
         
         <!-- Schedule Content -->
-        <div id="league-schedule-today-content" class="schedule-content" style="display: flex; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
+        <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
         <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
     </div>
 
@@ -3995,7 +3995,7 @@ const LEAGUE_DATA_CONFIG = {
                        // Set Today tab as active and show its content
                        if (todayScheduleTab) todayScheduleTab.classList.add('active');
             if (upcomingScheduleTab) upcomingScheduleTab.classList.remove('active');
-            document.getElementById('league-schedule-today-content').style.display = 'flex';
+            document.getElementById('league-schedule-today-content').style.display = 'block';
             document.getElementById('league-schedule-upcoming-content').style.display = 'none';
         }
 
@@ -4380,7 +4380,7 @@ if (scheduleTabsContainer) {
         todayScheduleTab.classList.add('active');
         
         // Show today content, hide upcoming content
-        document.getElementById('league-schedule-today-content').style.display = 'flex';
+        document.getElementById('league-schedule-today-content').style.display = 'block';
         document.getElementById('league-schedule-upcoming-content').style.display = 'none';
     });
     
@@ -4392,7 +4392,7 @@ if (scheduleTabsContainer) {
 
         // Show upcoming content, hide today content
         document.getElementById('league-schedule-today-content').style.display = 'none';
-        document.getElementById('league-schedule-upcoming-content').style.display = 'flex';
+        document.getElementById('league-schedule-upcoming-content').style.display = 'block';
         
         // Get the current league key from the header
         const leagueHeader = document.getElementById('league-specific-header');
