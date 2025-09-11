@@ -1846,24 +1846,24 @@ div[id^="breaking-content-"] a:hover {
     </div>
     
     <!-- Container for Schedule -->
-    <div id="league-schedule-container" style="padding: 1rem;">
-        <h2 style="font-size: 1.125rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">Schedule</h2>
+    <div id="league-schedule-container" style="padding: 1rem; height: 50vh; display: flex; flex-direction: column;">
+        <h2 style="font-size: 1.125rem; font-weight: 700; color: #fff; margin-bottom: 1rem; flex-shrink: 0;">Schedule</h2>
         
         <!-- Schedule Tabs -->
-        <div id="schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-bottom: 1rem; border-radius: 3px; overflow: hidden;">
+        <div id="schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-bottom: 1rem; border-radius: 3px; overflow: hidden; flex-shrink: 0;">
             <div class="schedule-tab active" data-schedule-tab="today" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f;">TODAY</div>
             <div class="schedule-tab" data-schedule-tab="upcoming" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer;">UPCOMING</div>
         </div>
         
         <!-- Schedule Content -->
-        <div id="league-schedule-today-content" class="schedule-content" style="display: block;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
-        <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
+        <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
+        <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
     </div>
 
     <!-- Container for Standings -->
-    <div id="league-standings-container" style="padding: 1rem; border-top: 1px solid #374151;">
-        <h2 style="font-size: 1.125rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">Standings</h2>
-        <div id="league-standings-content"><p style="color: #9ca3af;">Loading standings...</p></div>
+    <div id="league-standings-container" style="padding: 1rem; border-top: 1px solid #374151; height: 50vh; display: flex; flex-direction: column;">
+        <h2 style="font-size: 1.125rem; font-weight: 700; color: #fff; margin-bottom: 1rem; flex-shrink: 0;">Standings</h2>
+        <div id="league-standings-content" style="flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading standings...</p></div>
     </div>
 </div>
 
