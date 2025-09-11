@@ -4164,7 +4164,7 @@ const LEAGUE_DATA_CONFIG = {
             const dateObj = luxon.DateTime.fromFormat(dateHeader, 'MMMM d, yyyy');
             const formattedDate = dateObj.isValid ? dateObj.toFormat('MMMM d') : dateHeader;
             
-            html += `<div class="date-header" style="background-color: #d1d5db; color: #000; padding: 8px 12px; margin: 8px 0 4px 0; font-weight: normal; font-size: 11px;">${formattedDate}</div>`;
+            html += `<div class="date-header" style="background-color: #d1d5db; color: #000; padding: 0px 12px; margin: 8px 0 4px 0; font-weight: normal; font-size: 11px; line-height: 18px;">${formattedDate}</div>`;
             
             gamesByDate[dateHeader].forEach(game => {
                 // Format for specified leagues: away team on top, home team on bottom, time on right
@@ -5148,3 +5148,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </html>
 
     
+
+
