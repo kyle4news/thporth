@@ -4246,12 +4246,12 @@ const LEAGUE_DATA_CONFIG = {
                 // Format for specified leagues: away team on top, home team on bottom, time on right
                 if (['NFL', 'NBA', 'MLB', 'NHL', 'NCAAF', 'WNBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball'].includes(leagueKey)) {
                     html += `
-                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #374151;">
+                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: 1px solid #374151;">
                             <div class="teams" style="flex: 1;">
-                                <div class="away-team" style="color: white; font-size: 14px; line-height: 1.2;">${game.away}</div>
+                                <div class="away-team" style="color: white; font-size: 14px; line-height: 1.2; margin-bottom: 2px;">${game.away}</div>
                                 <div class="home-team" style="color: white; font-size: 14px; line-height: 1.2;">${game.home}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 14px; font-weight: 500;">${game.time}</div>
+                            <div class="time" style="color: white; font-size: 14px; font-weight: 500; margin-top: 2px;">${game.time}</div>
                         </div>
                     `;
                 } else if (['Boxing', 'LIVGolf', 'MotoGP', 'UFC', 'LPGATour', 'PGATour', 'NASCARCupSeries', 'Tennis', 'TrackAndField'].includes(leagueKey)) {
