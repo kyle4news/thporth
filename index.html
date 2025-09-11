@@ -3088,6 +3088,33 @@ div[id^="breaking-content-"] a:hover {
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
+    // ── URL ROUTING FUNCTIONALITY ──
+    function handleURLRouting() {
+        const hash = window.location.hash.substring(1); // Remove the # symbol
+        if (hash) {
+            // Find the menu item with matching data-section
+            const menuItem = document.querySelector(`li[data-section="${hash}"]`);
+            if (menuItem) {
+                // Simulate a click on the menu item
+                menuItem.click();
+            }
+        }
+    }
+    
+    // Handle URL routing on page load
+    handleURLRouting();
+    
+    // Handle URL routing when hash changes (back/forward buttons)
+    window.addEventListener('hashchange', handleURLRouting);
+    
+    // Update URL when menu items are clicked
+    document.querySelectorAll("#menuList li[data-section]").forEach(item => {
+        item.addEventListener('click', () => {
+            const section = item.dataset.section;
+            window.location.hash = section;
+        });
+    });
+
     // ── A) Grab all four tab elements and define their order ──
     const tabs    = Array.from(document.querySelectorAll(".headlines-tab"));
     const sources = ["espn", "cbs", "yahoo", "fox"];
@@ -3905,29 +3932,25 @@ document.addEventListener('DOMContentLoaded', function () {
         scoresError.style.display = 'none';
         scoresContainer.innerHTML = '';
 
-        const { DateTime } = luxon;
-        const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
-
-        const scoresDocRef = db.collection('dailyScores').doc(yesterdayStr);
-
-        scoresDocRef.get().then(doc => {
-            scoresLoading.style.display = 'none';
-            if (doc.exists) {
-                const gamesData = doc.data().games; 
-                if (gamesData && gamesData.length > 0) {
-                    renderGames(scoresContainer, gamesData, true);
-                } else {
-                    scoresContainer.innerHTML = '<p style="padding: 10px;">No scores found for yesterday.</p>';
+        // Read from YesterdayScores collection (completed games moved by daily job)
+        const yesterdayScoresRef = db.collection('YesterdayScores');
+        
+        yesterdayScoresRef.get()
+            .then(snapshot => {
+                scoresLoading.style.display = 'none';
+                if (snapshot.empty) {
+                    scoresContainer.innerHTML = '<p style="padding: 10px;">No completed games found. Check back after games finish.</p>';
+                    return;
                 }
-            } else {
-                scoresContainer.innerHTML = `<p style="padding: 10px;">Yesterday's final scores are not yet available. Please check back later.</p>`;
-            }
-        }).catch(error => {
-            scoresLoading.style.display = 'none';
-            scoresError.style.display = 'block';
-            if(scoresErrorText) scoresErrorText.textContent = "An error occurred while loading scores.";
-            console.error("Error fetching yesterday's scores:", error);
-        });
+                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                renderGames(scoresContainer, gamesData, true);
+            })
+            .catch(error => {
+                scoresLoading.style.display = 'none';
+                scoresError.style.display = 'block';
+                if(scoresErrorText) scoresErrorText.textContent = "An error occurred while loading scores.";
+                console.error("Error fetching yesterday's scores:", error);
+            });
     }
     
     // START OF CORRECTED SECTION
