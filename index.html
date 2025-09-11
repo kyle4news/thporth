@@ -4225,11 +4225,19 @@ const LEAGUE_DATA_CONFIG = {
                         </div>
                     `;
                 } else if (['Boxing'].includes(leagueKey)) {
-                    // Boxing: Event on top, Boxer vs. Boxer on bottom, no time
+                    // Boxing: Group by event, show event as subheader, then all boxer matchups under it
+                    const currentEvent = game.home;
+                    const lastEvent = gamesByDate[dateHeader][gamesByDate[dateHeader].indexOf(game) - 1]?.home;
+                    
+                    // If this is a new event, add event header
+                    if (currentEvent !== lastEvent) {
+                        html += `<div class="event-header" style="background-color: #9ca3af; color: #000; padding: 4px 12px; margin: 4px 0 2px 0; font-weight: normal; font-size: 10px; line-height: 16px;">${currentEvent}</div>`;
+                    }
+                    
+                    // Add boxer matchup
                     html += `
-                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
+                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1;">
-                                <div class="event" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="boxers" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
                             </div>
                             <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;"></div>
