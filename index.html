@@ -4168,7 +4168,11 @@ document.addEventListener('DOMContentLoaded', function () {
             return dateA - dateB;
         });
         
-        sortedDateHeaders.forEach(dateHeader => {
+        // Filter out today's date from upcoming games
+        const today = luxon.DateTime.now().toFormat('MMMM d, yyyy');
+        const filteredDateHeaders = sortedDateHeaders.filter(dateHeader => dateHeader !== today);
+        
+        filteredDateHeaders.forEach(dateHeader => {
             // Format date header to match screenshot (e.g., "September 4")
             const dateObj = luxon.DateTime.fromFormat(dateHeader, 'MMMM d, yyyy');
             const formattedDate = dateObj.isValid ? dateObj.toFormat('MMMM d') : dateHeader;
