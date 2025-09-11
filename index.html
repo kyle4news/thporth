@@ -4158,12 +4158,22 @@ const LEAGUE_DATA_CONFIG = {
             gamesByDate[g.dateHeader].push(g);
         });
         
+        
         let html = "";
-        Object.keys(gamesByDate).forEach(dateHeader => {
+        
+        // Sort date headers chronologically
+        const sortedDateHeaders = Object.keys(gamesByDate).sort((a, b) => {
+            const dateA = luxon.DateTime.fromFormat(a, 'MMMM d, yyyy');
+            const dateB = luxon.DateTime.fromFormat(b, 'MMMM d, yyyy');
+            return dateA - dateB;
+        });
+        
+        sortedDateHeaders.forEach(dateHeader => {
             // Format date header to match screenshot (e.g., "September 4")
             const dateObj = luxon.DateTime.fromFormat(dateHeader, 'MMMM d, yyyy');
             const formattedDate = dateObj.isValid ? dateObj.toFormat('MMMM d') : dateHeader;
             
+            // Always show the date header
             html += `<div class="date-header" style="background-color: #d1d5db; color: #000; padding: 0px 12px; margin: 8px 0 4px 0; font-weight: normal; font-size: 11px; line-height: 18px;">${formattedDate}</div>`;
             
             // Sort games by time within each date for ALL leagues
@@ -4174,9 +4184,9 @@ const LEAGUE_DATA_CONFIG = {
                 
                 // Convert time to 24-hour format for comparison
                 const parseTime = (timeStr) => {
-                    if (!timeStr) return 0;
+                    if (!timeStr) return 9999; // Put games without times at the end
                     const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-                    if (!match) return 0;
+                    if (!match) return 9999; // Put invalid times at the end
                     
                     let hours = parseInt(match[1]);
                     const minutes = parseInt(match[2]);
