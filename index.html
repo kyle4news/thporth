@@ -1846,24 +1846,24 @@ div[id^="breaking-content-"] a:hover {
     </div>
     
     <!-- Container for Schedule -->
-    <div id="league-schedule-container" style="padding: 1rem;">
-        <h2 style="font-size: 1.125rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">Schedule</h2>
+    <div id="league-schedule-container" style="padding: 1rem; height: 50vh; display: flex; flex-direction: column;">
+        <h2 style="font-size: 1.125rem; font-weight: 700; color: #fff; margin-bottom: 1rem; flex-shrink: 0;">Schedule</h2>
         
         <!-- Schedule Tabs -->
-        <div id="schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-bottom: 1rem; border-radius: 3px; overflow: hidden;">
+        <div id="schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-bottom: 1rem; border-radius: 3px; overflow: hidden; flex-shrink: 0;">
             <div class="schedule-tab active" data-schedule-tab="today" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f;">TODAY</div>
             <div class="schedule-tab" data-schedule-tab="upcoming" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer;">UPCOMING</div>
         </div>
         
         <!-- Schedule Content -->
-        <div id="league-schedule-today-content" class="schedule-content" style="display: block;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
-        <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
+        <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
+        <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
     </div>
 
     <!-- Container for Standings -->
-    <div id="league-standings-container" style="padding: 1rem; border-top: 1px solid #374151;">
-        <h2 style="font-size: 1.125rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">Standings</h2>
-        <div id="league-standings-content"><p style="color: #9ca3af;">Loading standings...</p></div>
+    <div id="league-standings-container" style="padding: 1rem; border-top: 1px solid #374151; height: 50vh; display: flex; flex-direction: column;">
+        <h2 style="font-size: 1.125rem; font-weight: 700; color: #fff; margin-bottom: 1rem; flex-shrink: 0;">Standings</h2>
+        <div id="league-standings-content" style="flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading standings...</p></div>
     </div>
 </div>
 
@@ -3825,45 +3825,14 @@ const LEAGUE_DATA_CONFIG = {
             return;
         }
         
-        // Use the individual league collection instead of gamesCollectionRef
-        const leagueCollectionRef = db.collection(leagueConfig.upcomingCollectionName);
-        leagueCollectionRef.where('date', '==', todayStr)
+        // All leagues use FlashLiveAPI (gamesCollectionRef)
+        gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr)
             .onSnapshot(snapshot => {
                 if (snapshot.empty) {
                     scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
                     return;
                 }
-                const gamesData = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    // Convert the upcoming games format to match the expected format for renderGames
-                    const gameDate = data.date || data.gameDate;
-                    const gameTime = data.time || data.Time;
-                    
-                    // Create a proper date object for Start Time
-                    let startTime = null;
-                    if (gameDate && gameTime) {
-                        try {
-                            // Parse the date and time to create a proper Date object
-                            const dateTimeStr = `${gameDate} ${gameTime}`;
-                            const parsedDate = luxon.DateTime.fromFormat(dateTimeStr, 'yyyy-MM-dd h:mm:ss a', { zone: 'America/New_York' });
-                            if (parsedDate.isValid) {
-                                startTime = {
-                                    toDate: () => parsedDate.toJSDate()
-                                };
-                            }
-                        } catch (e) {
-                            console.log('Error parsing date/time:', e);
-                        }
-                    }
-                    
-                    return {
-                        "Home Team": data.home || data.Home,
-                        "Away Team": data.away || data.Away,
-                        "Start Time": startTime,
-                        gameDate: gameDate,
-                        League: leagueId
-                    };
-                }).sort(sortGames);
+                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
                 renderGames(scheduleContent, gamesData, false);
             }, err => { scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>'; });
     }
@@ -3985,52 +3954,34 @@ const LEAGUE_DATA_CONFIG = {
             document.getElementById('league-schedule-upcoming-content').style.display = 'none';
         }
 
-        // Load TODAY schedule from individual league collection
+        // Load TODAY schedule - use FlashLiveAPI for MLB, individual collections for others
         todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
         
-        // Use the individual league collection instead of gamesCollectionRef
-        const leagueCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
-        leagueCollectionRef.where('date', '==', todayStr)
-            .onSnapshot(snapshot => {
-                if (snapshot.empty) {
-                    todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
-                    return;
-                }
-                const gamesData = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    // Convert the upcoming games format to match the expected format for renderGames
-                    const gameDate = data.date || data.gameDate;
-                    const gameTime = data.time || data.Time;
-                    
-                    // Create a proper date object for Start Time
-                    let startTime = null;
-                    if (gameDate && gameTime) {
-                        try {
-                            // Parse the date and time to create a proper Date object
-                            const dateTimeStr = `${gameDate} ${gameTime}`;
-                            const parsedDate = luxon.DateTime.fromFormat(dateTimeStr, 'yyyy-MM-dd h:mm:ss a', { zone: 'America/New_York' });
-                            if (parsedDate.isValid) {
-                                startTime = {
-                                    toDate: () => parsedDate.toJSDate()
-                                };
-                            }
-                        } catch (e) {
-                            console.log('Error parsing date/time:', e);
-                        }
+        if (leagueKey === 'MLB') {
+            // MLB uses a different API source
+            gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                        return;
                     }
-                    
-                    return {
-                        "Home Team": data.home || data.Home,
-                        "Away Team": data.away || data.Away,
-                        "Start Time": startTime,
-                        gameDate: gameDate,
-                        League: leagueInfo.leagueId
-                    };
-                }).sort(sortGames);
-                renderGames(todayScheduleContent, gamesData, false);
-            }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
+                    const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                    renderGames(todayScheduleContent, gamesData, false);
+                }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
+        } else {
+            // All other leagues use FlashLiveAPI (gamesCollectionRef)
+            gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                        return;
+                    }
+                    const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                    renderGames(todayScheduleContent, gamesData, false);
+                }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
+        }
 
         // Clear upcoming schedule content when switching leagues
         upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule functionality is currently not available.</p>';
@@ -4066,7 +4017,7 @@ const LEAGUE_DATA_CONFIG = {
                 homeField = 'home';
                 timeField = 'time';
                 dateField = 'date';
-            } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLB', 'NBA', 'NCAAM', 'NCAAW', 'NFL', 'NHL', 'NWSL', 'SerieA', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'WNBA'].includes(leagueKey)) {
+            } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLB', 'NBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball', 'NFL', 'NHL', 'NWSL', 'SerieA', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'WNBA'].includes(leagueKey)) {
                 awayField = 'away';
                 homeField = 'home';
                 timeField = 'time';
@@ -4209,10 +4160,26 @@ const LEAGUE_DATA_CONFIG = {
         
         let html = "";
         Object.keys(gamesByDate).forEach(dateHeader => {
-            html += `<div class="date-header">${dateHeader}</div>`;
+            // Format date header to match screenshot (e.g., "September 4")
+            const dateObj = luxon.DateTime.fromFormat(dateHeader, 'MMMM d, yyyy');
+            const formattedDate = dateObj.isValid ? dateObj.toFormat('MMMM d') : dateHeader;
+            
+            html += `<div class="date-header" style="background-color: #374151; color: #d1d5db; padding: 8px 12px; margin: 8px 0 4px 0; border-radius: 4px; font-weight: 500;">${formattedDate}</div>`;
+            
             gamesByDate[dateHeader].forEach(game => {
-                // For events/tournaments, show just the name
-                if (['Boxing', 'LIVGolf', 'MotoGP', 'UFC', 'LPGATour', 'PGATour', 'NASCARCupSeries', 'Tennis', 'TrackAndField'].includes(leagueKey)) {
+                // Format for specified leagues: away team on top, home team on bottom, time on right
+                if (['NFL', 'NBA', 'MLB', 'NHL', 'NCAAF', 'WNBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball'].includes(leagueKey)) {
+                    html += `
+                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: 1px solid #374151;">
+                            <div class="teams" style="flex: 1;">
+                                <div class="away-team" style="color: white; font-size: 14px; line-height: 1.2; margin-bottom: 2px;">${game.away}</div>
+                                <div class="home-team" style="color: white; font-size: 14px; line-height: 1.2;">${game.home}</div>
+                            </div>
+                            <div class="time" style="color: white; font-size: 14px; font-weight: 500; margin-top: 2px;">${game.time}</div>
+                        </div>
+                    `;
+                } else if (['Boxing', 'LIVGolf', 'MotoGP', 'UFC', 'LPGATour', 'PGATour', 'NASCARCupSeries', 'Tennis', 'TrackAndField'].includes(leagueKey)) {
+                    // Keep existing format for other leagues
                     if (leagueKey === 'Boxing') {
                         html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">${game.home}</span><span class="time">${game.time}</span></div>`;
                     } else if (leagueKey === 'NASCARCupSeries') {
@@ -4223,6 +4190,7 @@ const LEAGUE_DATA_CONFIG = {
                         html += `<div class="match-row"><span class="team">${game.away}</span><span class="time">${game.time}</span></div>`;
                     }
                 } else {
+                    // Default format for other leagues
                     html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">at ${game.home}</span><span class="time">${game.time}</span></div>`;
                 }
             });
@@ -5180,4 +5148,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </html>
 
     
+
 
