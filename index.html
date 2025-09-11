@@ -4213,6 +4213,17 @@ const LEAGUE_DATA_CONFIG = {
                             <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time}</div>
                         </div>
                     `;
+                } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLS', 'NWSL', 'PremierLeague', 'SerieA', 'UEFAEuropaLeague', 'UEFAChampionsLeague', 'UEFAConferenceLeague'].includes(leagueKey)) {
+                    // Format for soccer leagues: home team on top, away team on bottom, time on right
+                    html += `
+                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
+                            <div class="teams" style="flex: 1;">
+                                <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
+                                <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
+                            </div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time}</div>
+                        </div>
+                    `;
                 } else if (['Boxing', 'LIVGolf', 'MotoGP', 'UFC', 'LPGATour', 'PGATour', 'NASCARCupSeries', 'Tennis', 'TrackAndField'].includes(leagueKey)) {
                     // Keep existing format for other leagues
                     if (leagueKey === 'Boxing') {
