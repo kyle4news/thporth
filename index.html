@@ -4116,68 +4116,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(snapshot => {
                         console.log(`Found ${snapshot.size} upcoming games for ${leagueKey} from ${leagueInfo.upcomingCollectionName}`);
                         
-                        const { DateTime } = luxon;
-                        const now = DateTime.now().toMillis();
                         snapshot.forEach(doc => {
                             const data = doc.data();
                             
-                            // Get field names based on league type
-                            let awayField, homeField, timeField, dateField;
+                            const away = data['away'] || '';
+                            const home = data['home'] || '';
+                            const timeStr = data['time'] || '';
+                            const dateStr = data['date'] || '';
                             
-                            if (leagueKey === 'PremierLeague') {
-                                awayField = 'away';
-                                homeField = 'home';
-                                timeField = 'time';
-                                dateField = 'date';
-                            } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLS', 'SerieA', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'FACup', 'Ligue1', 'NWSL'].includes(leagueKey)) {
-                                awayField = 'away';
-                                homeField = 'home';
-                                timeField = 'time';
-                                dateField = 'date';
-                            } else {
-                                awayField = 'away';
-                                homeField = 'home';
-                                timeField = 'time';
-                                dateField = 'date';
-                            }
-                            
-                            const away = data[awayField] || '';
-                            const home = data[homeField] || '';
-                            const timeStr = data[timeField] || '';
-                            
-                            let gameDate;
-                            if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
-                                gameDate = DateTime.fromJSDate(data[dateField].toDate());
-                            } else if (typeof data[dateField] === "string") {
-                                if (data[dateField].match(/^\d{4}-\d{2}-\d{2}$/)) {
-                                    gameDate = DateTime.fromISO(data[dateField]);
-                                } else {
-                                    let cleaned = data[dateField].replace(" at ", " ").replace(/ UTC[-+]\d+/, "");
-                                    gameDate = DateTime.fromFormat(cleaned, "LLLL d, yyyy h:mm:ss.SSS a", { zone: 'America/New_York' });
-                                    if (!gameDate.isValid) {
-                                        let dateOnly = data[dateField].split(" at ")[0];
-                                        gameDate = DateTime.fromFormat(dateOnly, "LLLL d, yyyy", { zone: 'America/New_York' });
-                                        if (!gameDate.isValid) {
-                                            gameDate = DateTime.fromFormat(dateOnly, "LLLL d", { zone: 'America/New_York' });
-                                            if (gameDate.isValid) {
-                                                gameDate = gameDate.set({ year: DateTime.now().year });
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            if (!gameDate || !gameDate.isValid) {
-                                return;
-                            }
-                            
-                            // Only include future games (not today, since those come from FlashLiveAPI)
-                            const todayStart = DateTime.now().startOf('day');
-                            if (gameDate >= todayStart.plus({ days: 1 })) {
+                            // Simple check: if date is not today, include it
+                            const today = new Date().toISOString().split('T')[0];
+                            if (dateStr && dateStr !== today) {
                                 allGames.push({
                                     'Home Team': home,
                                     'Away Team': away,
-                                    'Start Time': gameDate.toMillis(),
+                                    'Start Time': timeStr,
                                     'Match Status': 'SCHEDULED',
                                     'Home Score': '',
                                     'Away Score': '',
@@ -4187,7 +4140,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     leagueDisplayName: getLeagueDisplayName(leagueInfo.leagueId),
                                     isToday: false,
                                     source: 'upcoming',
-                                    gameDate: gameDate.toISODate()
+                                    gameDate: dateStr
                                 });
                             }
                         });
@@ -4271,11 +4224,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const status = game['Match Status'] || '';
                     
                     // Format time
-                    let timeDisplay = '';
-                    if (game['Start Time']) {
-                        const gameTime = DateTime.fromMillis(game['Start Time']).setZone('America/New_York');
-                        timeDisplay = gameTime.toFormat('h:mm a');
-                    }
+                    let timeDisplay = game['Start Time'] || '';
                     
                     // Determine if it's today or upcoming for formatting
                     const isGameToday = game.isToday;
