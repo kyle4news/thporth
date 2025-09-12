@@ -4199,20 +4199,22 @@ document.addEventListener('DOMContentLoaded', function () {
             const isToday = dateStr === today.toISODate();
             const dateHeader = isToday ? 'Today' : dateStr;
             
-            html += `<div class="date-section" style="margin-bottom: 20px;">`;
-            html += `<div class="date-header" style="background-color: #374151; color: white; padding: 8px 12px; font-weight: bold; font-size: 14px; margin-bottom: 8px;">${dateHeader}</div>`;
-            
             // Sort leagues within each date
             const leagues = Object.keys(gamesByDate[dateStr]).sort();
             leagues.forEach(leagueName => {
                 const games = gamesByDate[dateStr][leagueName];
-                html += `<div class="league-subsection" style="margin-bottom: 12px;">`;
-                html += `<div class="league-subheader" style="background-color: #4a5568; color: white; padding: 6px 12px; font-weight: 600; font-size: 12px; margin-bottom: 4px;">${leagueName}</div>`;
                 
-                // Sort games by time
+                // Use the same league-section and league-title styling as other pages
+                html += `<div class="league-section">`;
+                html += `<div class="league-title">${leagueName}</div>`;
+                
+                // Use the same game-table styling as other pages
+                html += `<table class="game-table">`;
+                
+                // Sort games by time (handle both timestamp and string formats)
                 games.sort((a, b) => {
-                    const timeA = a['Start Time'] || 0;
-                    const timeB = b['Start Time'] || 0;
+                    const timeA = typeof a['Start Time'] === 'number' ? a['Start Time'] : 0;
+                    const timeB = typeof b['Start Time'] === 'number' ? b['Start Time'] : 0;
                     return timeA - timeB;
                 });
                 
@@ -4223,36 +4225,46 @@ document.addEventListener('DOMContentLoaded', function () {
                     const awayScore = game['Away Score'] || '';
                     const status = game['Match Status'] || '';
                     
-                    // Format time
-                    let timeDisplay = game['Start Time'] || '';
+                    // Format time (handle both timestamp and string formats)
+                    let timeDisplay = '';
+                    if (typeof game['Start Time'] === 'number') {
+                        // Handle timestamp from FlashLiveAPI
+                        const { DateTime } = luxon;
+                        const gameTime = DateTime.fromMillis(game['Start Time']).setZone('America/New_York');
+                        timeDisplay = gameTime.toFormat('h:mm a');
+                    } else {
+                        // Handle string time from upcoming collections
+                        timeDisplay = game['Start Time'] || '';
+                    }
                     
                     // Determine if it's today or upcoming for formatting
                     const isGameToday = game.isToday;
                     
+                    html += `<tr class="game-row">`;
+                    
                     if (isGameToday) {
                         // Today format: time on left, teams on right
-                        html += `<div class="game-row" style="display: flex; align-items: center; padding: 4px 12px; border-bottom: 1px solid #374151;">`;
-                        html += `<div class="time-column" style="width: 80px; font-size: 11px; color: #9ca3af;">${timeDisplay}</div>`;
-                        html += `<div class="teams-column" style="flex: 1; font-size: 11px;">`;
+                        html += `<td>${timeDisplay}</td>`;
+                        html += `<td>`;
                         if (status === 'FINISHED' || status === 'FINAL') {
                             html += `${awayTeam} ${awayScore} - ${homeScore} ${homeTeam}`;
                         } else {
                             html += `${awayTeam} vs ${homeTeam}`;
                         }
-                        html += `</div></div>`;
+                        html += `</td>`;
+                        html += `<td></td>`;
                     } else {
                         // Upcoming format: teams on left, time on right
-                        html += `<div class="game-row" style="display: flex; align-items: center; padding: 4px 12px; border-bottom: 1px solid #374151;">`;
-                        html += `<div class="teams-column" style="flex: 1; font-size: 11px;">${awayTeam} vs ${homeTeam}</div>`;
-                        html += `<div class="time-column" style="width: 80px; font-size: 11px; color: #9ca3af; text-align: right;">${timeDisplay}</div>`;
-                        html += `</div>`;
+                        html += `<td></td>`;
+                        html += `<td>${awayTeam} vs ${homeTeam}</td>`;
+                        html += `<td>${timeDisplay}</td>`;
                     }
+                    
+                    html += `</tr>`;
                 });
                 
-                html += `</div>`;
+                html += `</table></div>`;
             });
-            
-            html += `</div>`;
         });
         
         container.innerHTML = html;
