@@ -4230,12 +4230,36 @@ document.addEventListener('DOMContentLoaded', function () {
                         timeA = a['Start Time'];
                     } else if (a['Start Time'] && typeof a['Start Time'] === 'object' && a['Start Time'].seconds) {
                         timeA = a['Start Time'].seconds * 1000;
+                    } else if (typeof a['Start Time'] === 'string' && a['Start Time']) {
+                        // Handle string times like "9:30 AM" - convert to comparable timestamp
+                        const { DateTime } = luxon;
+                        try {
+                            // Parse string time and convert to timestamp for comparison
+                            const timeStr = a['Start Time'].replace(/:\d{2}(?=\s*[AP]M)/, ''); // Remove seconds if present
+                            const gameDate = a.gameDate || new Date().toISOString().split('T')[0];
+                            const dateTime = DateTime.fromISO(`${gameDate}T${timeStr}`).setZone('local');
+                            timeA = dateTime.toMillis();
+                        } catch (e) {
+                            timeA = 0; // Fallback if parsing fails
+                        }
                     }
                     
                     if (typeof b['Start Time'] === 'number') {
                         timeB = b['Start Time'];
                     } else if (b['Start Time'] && typeof b['Start Time'] === 'object' && b['Start Time'].seconds) {
                         timeB = b['Start Time'].seconds * 1000;
+                    } else if (typeof b['Start Time'] === 'string' && b['Start Time']) {
+                        // Handle string times like "9:30 AM" - convert to comparable timestamp
+                        const { DateTime } = luxon;
+                        try {
+                            // Parse string time and convert to timestamp for comparison
+                            const timeStr = b['Start Time'].replace(/:\d{2}(?=\s*[AP]M)/, ''); // Remove seconds if present
+                            const gameDate = b.gameDate || new Date().toISOString().split('T')[0];
+                            const dateTime = DateTime.fromISO(`${gameDate}T${timeStr}`).setZone('local');
+                            timeB = dateTime.toMillis();
+                        } catch (e) {
+                            timeB = 0; // Fallback if parsing fails
+                        }
                     }
                     
                     return timeA - timeB;
