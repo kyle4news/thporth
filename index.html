@@ -4036,6 +4036,14 @@ document.addEventListener('DOMContentLoaded', function () {
         // Load consolidated soccer data
         loadAllSoccerGames(soccerLeagues, todayScheduleContent);
         
+        // Fallback timeout in case requests take too long
+        setTimeout(() => {
+            if (todayScheduleContent.innerHTML.includes('Loading all soccer games')) {
+                console.log('Soccer games loading timeout - showing fallback message');
+                todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading soccer games... If this persists, check console for errors.</p>';
+            }
+        }, 10000); // 10 second timeout
+        
         // Load standings (use a generic soccer standings or hide it)
         if (standingsContent) {
             standingsContent.innerHTML = '<p style="color: #9ca3af;">Standings available on individual league pages.</p>';
@@ -4209,6 +4217,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderConsolidatedSoccerGames(container, allGames, today) {
         if (!container) return;
+        
+        console.log('Rendering consolidated soccer games:', allGames.length, 'games');
         
         if (allGames.length === 0) {
             container.innerHTML = '<p style="color: #9ca3af;">No soccer games found.</p>';
