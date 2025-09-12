@@ -2900,6 +2900,12 @@ div[id^="breaking-content-"] a:hover {
                     gamesContent.style.display = 'block';
                     f1Content.style.display = 'none';
 
+                    // Ensure TODAY tab is active when navigating to Home page
+                    const todayTab = document.querySelector('.games-tab[data-tab="today"]');
+                    if (todayTab && !todayTab.classList.contains('active')) {
+                        todayTab.click();
+                    }
+
                     const espnTab = document.querySelector('#headlines-tabs .headlines-tab[data-source="espn"]');
                     if (espnTab) {
                         espnTab.click();
