@@ -4188,11 +4188,19 @@ document.addEventListener('DOMContentLoaded', function () {
         let html = '';
         sortedDates.forEach(dateStr => {
             const isToday = dateStr === today.toISODate();
-            const dateHeader = isToday ? 'Today' : dateStr;
+            let dateHeader;
+            if (isToday) {
+                dateHeader = 'Today';
+            } else {
+                // Format date as "September 13" in user's local timezone
+                const { DateTime } = luxon;
+                const dateObj = DateTime.fromISO(dateStr).setZone('local');
+                dateHeader = dateObj.toFormat('MMMM d');
+            }
             
             // Add date header - match the large TODAY tab styling from the image
             html += `<div class="date-section" style="margin-bottom: 20px;">`;
-            html += `<div class="date-header" style="background-color: #d1d5db; color: black; padding: 4px 16px; font-weight: bold; font-size: 14px; margin-bottom: 8px; text-transform: uppercase;">${dateHeader}</div>`;
+            html += `<div class="date-header" style="background-color: #d1d5db; color: black; padding: 2px 16px; font-weight: bold; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; border: none;">${dateHeader}</div>`;
             
             // Sort leagues within each date
             const leagues = Object.keys(gamesByDate[dateStr]).sort();
@@ -4201,7 +4209,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Use the same league-section and league-title styling as other pages
                 html += `<div class="league-section">`;
-                html += `<div class="league-title" style="font-size: 14px; padding: 4px 16px;">${leagueName}</div>`;
+                html += `<div class="league-title" style="font-size: 12px; padding: 2px 16px; border: none;">${leagueName}</div>`;
                 
                 // Use the same game-table styling as other pages
                 html += `<table class="game-table">`;
@@ -4247,8 +4255,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         const gameTime = DateTime.fromSeconds(game['Start Time'].seconds).setZone('local');
                         timeDisplay = gameTime.toFormat('h:mm a');
                     } else {
-                        // Handle string time from upcoming collections
-                        timeDisplay = game['Start Time'] || '';
+                        // Handle string time from upcoming collections - format to remove seconds
+                        const timeStr = game['Start Time'] || '';
+                        if (timeStr && timeStr.includes(':')) {
+                            // Remove seconds if present (e.g., "9:30:00 AM" -> "9:30 AM")
+                            timeDisplay = timeStr.replace(/:\d{2}(?=\s*[AP]M)/, '');
+                        } else {
+                            timeDisplay = timeStr;
+                        }
                     }
                     
                     // Determine if it's today or upcoming for formatting
