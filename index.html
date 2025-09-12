@@ -4338,7 +4338,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += `<tr class="game-row">`;
                     html += `<td style="text-align: left; vertical-align: middle; width: 80px; font-size: 12px;">${timeDisplay}</td>`;
                     html += `<td style="vertical-align: middle; padding: 4px 0;">`;
-                    if (status === 'FINISHED' || status === 'FINAL') {
+                    // Show scores for live and finished games (same logic as renderGames function)
+                    const isLive = status.includes("IN PROGRESS") || status.includes("LIVE");
+                    const isFinal = status.includes("FINISHED") || status.includes("FINAL") || status.includes("GAME OVER");
+                    
+                    if (isLive || isFinal) {
                         html += `<div style="font-size: 12px; line-height: 1.2;">${awayTeam} ${awayScore}</div>`;
                         html += `<div style="font-size: 12px; line-height: 1.2;">${homeTeam} ${homeScore}</div>`;
                     } else {
