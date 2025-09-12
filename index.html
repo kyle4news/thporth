@@ -4290,44 +4290,69 @@ document.addEventListener('DOMContentLoaded', function () {
                     const awayScore = game['Away Score'] || '';
                     const status = game['Match Status'] || '';
                     
-                    // Format time in user's local timezone (handle both timestamp and string formats)
+                    // Format time/status display (same logic as home page)
                     let timeDisplay = '';
-                    if (typeof game['Start Time'] === 'number') {
-                        // Handle timestamp from FlashLiveAPI - convert to user's local time
-                        const { DateTime } = luxon;
-                        const gameTime = DateTime.fromMillis(game['Start Time']).setZone('local');
-                        timeDisplay = gameTime.toFormat('h:mm a');
-                    } else if (game['Start Time'] && typeof game['Start Time'] === 'object' && game['Start Time'].seconds) {
-                        // Handle Firestore Timestamp object - convert to user's local time
-                        const { DateTime } = luxon;
-                        const gameTime = DateTime.fromSeconds(game['Start Time'].seconds).setZone('local');
-                        timeDisplay = gameTime.toFormat('h:mm a');
+                    const isLive = status.includes("IN PROGRESS") || status.includes("LIVE");
+                    const isFinal = status.includes("FINISHED") || status.includes("FINAL") || status.includes("GAME OVER");
+                    
+                    if (isLive) {
+                        // Show live status instead of start time
+                        let parsedStatus = '';
+                        const displayLeague = getLeagueDisplayName(game.League);
+                        if (displayLeague === "MLB") {
+                            const inningHalf = game.inningHalf || "";
+                            const currentInning = game.currentInning || "";
+                            parsedStatus = `${inningHalf} ${currentInning}`.trim();
+                        } else if (displayLeague === "NBA" || displayLeague === "NCAAM" || displayLeague === "NCAAW") {
+                            const status = game['Match Status'] || "";
+                            const quarterMatch = status.match(/Q(\d+)/);
+                            if (quarterMatch) parsedStatus = `Q${quarterMatch[1]}`;
+                            else if (status.toUpperCase() === "HALF_TIME") parsedStatus = "Half";
+                        } else if (game.Sport === "Tennis") { 
+                            parsedStatus = game.Status || "Live";
+                        }
+                        timeDisplay = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
+                    } else if (isFinal) {
+                        timeDisplay = "F";
                     } else {
-                        // Handle string time from upcoming collections - use same logic as LigaMX league page
-                        const timeStr = game['Start Time'] || '';
-                        if (timeStr && timeStr.includes(':')) {
+                        // Show start time for scheduled games
+                        if (typeof game['Start Time'] === 'number') {
+                            // Handle timestamp from FlashLiveAPI - convert to user's local time
                             const { DateTime } = luxon;
-                            try {
-                                // Parse as Eastern time with seconds format, then convert to local (same as LigaMX)
-                                let easternTime = DateTime.fromFormat(timeStr, 'h:mm:ss a', { zone: 'America/New_York' });
-                                
-                                // If that doesn't work, try without seconds
-                                if (!easternTime.isValid) {
-                                    easternTime = DateTime.fromFormat(timeStr, 'h:mm a', { zone: 'America/New_York' });
-                                }
-                                
-                                if (easternTime.isValid) {
-                                    const localTime = easternTime.toLocal();
-                                    timeDisplay = localTime.toFormat('h:mm a');
-                                } else {
-                                    timeDisplay = timeStr.replace(/:\d{2}(?=\s*[AP]M)/, ''); // fallback
-                                }
-                            } catch (e) {
-                                // Fallback to original string if parsing fails
-                                timeDisplay = timeStr.replace(/:\d{2}(?=\s*[AP]M)/, '');
-                            }
+                            const gameTime = DateTime.fromMillis(game['Start Time']).setZone('local');
+                            timeDisplay = gameTime.toFormat('h:mm a');
+                        } else if (game['Start Time'] && typeof game['Start Time'] === 'object' && game['Start Time'].seconds) {
+                            // Handle Firestore Timestamp object - convert to user's local time
+                            const { DateTime } = luxon;
+                            const gameTime = DateTime.fromSeconds(game['Start Time'].seconds).setZone('local');
+                            timeDisplay = gameTime.toFormat('h:mm a');
                         } else {
-                            timeDisplay = timeStr;
+                            // Handle string time from upcoming collections - use same logic as LigaMX league page
+                            const timeStr = game['Start Time'] || '';
+                            if (timeStr && timeStr.includes(':')) {
+                                const { DateTime } = luxon;
+                                try {
+                                    // Parse as Eastern time with seconds format, then convert to local (same as LigaMX)
+                                    let easternTime = DateTime.fromFormat(timeStr, 'h:mm:ss a', { zone: 'America/New_York' });
+                                    
+                                    // If that doesn't work, try without seconds
+                                    if (!easternTime.isValid) {
+                                        easternTime = DateTime.fromFormat(timeStr, 'h:mm a', { zone: 'America/New_York' });
+                                    }
+                                    
+                                    if (easternTime.isValid) {
+                                        const localTime = easternTime.toLocal();
+                                        timeDisplay = localTime.toFormat('h:mm a');
+                                    } else {
+                                        timeDisplay = timeStr.replace(/:\d{2}(?=\s*[AP]M)/, ''); // fallback
+                                    }
+                                } catch (e) {
+                                    // Fallback to original string if parsing fails
+                                    timeDisplay = timeStr.replace(/:\d{2}(?=\s*[AP]M)/, '');
+                                }
+                            } else {
+                                timeDisplay = timeStr || 'TBD';
+                            }
                         }
                     }
                     
@@ -4339,8 +4364,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += `<td style="text-align: left; vertical-align: middle; width: 80px; font-size: 12px;">${timeDisplay}</td>`;
                     html += `<td style="vertical-align: middle; padding: 4px 0;">`;
                     // Show scores for live and finished games (same logic as renderGames function)
-                    const isLive = status.includes("IN PROGRESS") || status.includes("LIVE");
-                    const isFinal = status.includes("FINISHED") || status.includes("FINAL") || status.includes("GAME OVER");
                     
                     
                     if (isLive || isFinal) {
