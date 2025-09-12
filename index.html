@@ -3906,7 +3906,7 @@ document.addEventListener('DOMContentLoaded', function () {
         scoresContainer.innerHTML = '';
 
         // Read from yesterdayScores collection (completed games from all leagues)
-        const yesterdayScoresRef = db.collection(`artifacts/${FIREBASE_PROJECT_ID}/public/data/yesterdayScores`);
+        const yesterdayScoresRef = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
 
         yesterdayScoresRef.get()
             .then(snapshot => {
@@ -5258,3 +5258,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     
+
