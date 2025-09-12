@@ -4081,10 +4081,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             
-            // 1. Get TODAY'S games from FlashLiveAPI
+            // 1. Get TODAY'S games from FlashLiveAPI with real-time updates
             gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
-                .get()
-                .then(snapshot => {
+                .onSnapshot(snapshot => {
+                    // Clear existing games for this league from allGames
+                    allGames = allGames.filter(game => !(game.leagueKey === leagueKey && game.source === 'flashlive'));
+                    
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         allGames.push({
@@ -4096,18 +4098,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                     });
                     
-                    completedRequests++;
-                    if (completedRequests === totalRequests) {
-                        console.log(`Total games found: ${allGames.length}`);
-                        renderConsolidatedSoccerGames(container, allGames, today);
-                    }
-                })
-                .catch(error => {
+                    // Re-render with updated data
+                    renderConsolidatedSoccerGames(container, allGames, today);
+                }, error => {
                     console.error(`Error loading today's games for ${leagueKey}:`, error);
-                    completedRequests++;
-                    if (completedRequests === totalRequests) {
-                        renderConsolidatedSoccerGames(container, allGames, today);
-                    }
                 });
             
             // 2. Get UPCOMING games from individual Firestore collections
