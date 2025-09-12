@@ -4363,20 +4363,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += `<tr class="game-row">`;
                     html += `<td style="text-align: left; vertical-align: middle; width: 80px; font-size: 12px;">${timeDisplay}</td>`;
                     html += `<td style="vertical-align: middle; padding: 4px 0;">`;
-                    // Show scores for live and finished games (same logic as renderGames function)
-                    
-                    
+                    html += `<div style="font-size: 12px; line-height: 1.2;">${awayTeam}</div>`;
+                    html += `<div style="font-size: 12px; line-height: 1.2;">${homeTeam}</div>`;
+                    html += `</td>`;
+                    html += `<td style="text-align: right; vertical-align: middle; width: 40px; font-size: 12px;">`;
                     if (isLive || isFinal) {
-                        const awayScoreDisplay = awayScore !== '' ? ` ${awayScore}` : '';
-                        const homeScoreDisplay = homeScore !== '' ? ` ${homeScore}` : '';
-                        html += `<div style="font-size: 12px; line-height: 1.2;">${awayTeam}${awayScoreDisplay}</div>`;
-                        html += `<div style="font-size: 12px; line-height: 1.2;">${homeTeam}${homeScoreDisplay}</div>`;
+                        const awayScoreDisplay = awayScore !== '' ? awayScore : '';
+                        const homeScoreDisplay = homeScore !== '' ? homeScore : '';
+                        html += `<div style="font-size: 12px; line-height: 1.2;">${awayScoreDisplay}</div>`;
+                        html += `<div style="font-size: 12px; line-height: 1.2;">${homeScoreDisplay}</div>`;
                     } else {
-                        html += `<div style="font-size: 12px; line-height: 1.2;">${awayTeam}</div>`;
-                        html += `<div style="font-size: 12px; line-height: 1.2;">${homeTeam}</div>`;
+                        html += `<div style="font-size: 12px; line-height: 1.2;"></div>`;
+                        html += `<div style="font-size: 12px; line-height: 1.2;"></div>`;
                     }
                     html += `</td>`;
-                    html += `<td></td>`;
                     html += `</tr>`;
                 });
                 
