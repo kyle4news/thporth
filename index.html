@@ -4235,9 +4235,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         const { DateTime } = luxon;
                         try {
                             // Parse string time and convert to timestamp for comparison
-                            const timeStr = a['Start Time'].replace(/:\d{2}(?=\s*[AP]M)/, ''); // Remove seconds if present
+                            let timeStr = a['Start Time'].replace(/:\d{2}(?=\s*[AP]M)/, ''); // Remove seconds if present
                             const gameDate = a.gameDate || new Date().toISOString().split('T')[0];
-                            const dateTime = DateTime.fromISO(`${gameDate}T${timeStr}`).setZone('local');
+                            
+                            // Convert 12-hour format to 24-hour format for proper parsing
+                            let hour = parseInt(timeStr.split(':')[0]);
+                            const minute = timeStr.split(':')[1].split(' ')[0];
+                            const ampm = timeStr.split(' ')[1];
+                            
+                            if (ampm === 'PM' && hour !== 12) hour += 12;
+                            if (ampm === 'AM' && hour === 12) hour = 0;
+                            
+                            const dateTime = DateTime.fromISO(`${gameDate}T${hour.toString().padStart(2, '0')}:${minute}`).setZone('local');
                             timeA = dateTime.toMillis();
                         } catch (e) {
                             timeA = 0; // Fallback if parsing fails
@@ -4253,9 +4262,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         const { DateTime } = luxon;
                         try {
                             // Parse string time and convert to timestamp for comparison
-                            const timeStr = b['Start Time'].replace(/:\d{2}(?=\s*[AP]M)/, ''); // Remove seconds if present
+                            let timeStr = b['Start Time'].replace(/:\d{2}(?=\s*[AP]M)/, ''); // Remove seconds if present
                             const gameDate = b.gameDate || new Date().toISOString().split('T')[0];
-                            const dateTime = DateTime.fromISO(`${gameDate}T${timeStr}`).setZone('local');
+                            
+                            // Convert 12-hour format to 24-hour format for proper parsing
+                            let hour = parseInt(timeStr.split(':')[0]);
+                            const minute = timeStr.split(':')[1].split(' ')[0];
+                            const ampm = timeStr.split(' ')[1];
+                            
+                            if (ampm === 'PM' && hour !== 12) hour += 12;
+                            if (ampm === 'AM' && hour === 12) hour = 0;
+                            
+                            const dateTime = DateTime.fromISO(`${gameDate}T${hour.toString().padStart(2, '0')}:${minute}`).setZone('local');
                             timeB = dateTime.toMillis();
                         } catch (e) {
                             timeB = 0; // Fallback if parsing fails
