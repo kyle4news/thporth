@@ -4199,6 +4199,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const isToday = dateStr === today.toISODate();
             const dateHeader = isToday ? 'Today' : dateStr;
             
+            // Add date header
+            html += `<div class="date-section" style="margin-bottom: 20px;">`;
+            html += `<div class="date-header" style="background-color: #374151; color: white; padding: 8px 12px; font-weight: bold; font-size: 14px; margin-bottom: 8px;">${dateHeader}</div>`;
+            
             // Sort leagues within each date
             const leagues = Object.keys(gamesByDate[dateStr]).sort();
             leagues.forEach(leagueName => {
@@ -4231,6 +4235,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Handle timestamp from FlashLiveAPI
                         const { DateTime } = luxon;
                         const gameTime = DateTime.fromMillis(game['Start Time']).setZone('America/New_York');
+                        timeDisplay = gameTime.toFormat('h:mm a');
+                    } else if (game['Start Time'] && typeof game['Start Time'] === 'object' && game['Start Time'].seconds) {
+                        // Handle Firestore Timestamp object
+                        const { DateTime } = luxon;
+                        const gameTime = DateTime.fromSeconds(game['Start Time'].seconds).setZone('America/New_York');
                         timeDisplay = gameTime.toFormat('h:mm a');
                     } else {
                         // Handle string time from upcoming collections
@@ -4265,6 +4274,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 html += `</table></div>`;
             });
+            
+            html += `</div>`; // Close date-section
         });
         
         container.innerHTML = html;
