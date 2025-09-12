@@ -3935,9 +3935,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
         const standingsContent = document.getElementById('league-standings-content');
         
+        // Special handling for Soccer page - consolidated view
+        if (leagueKey === 'Soccer') {
+            loadConsolidatedSoccerData();
+            return;
+        }
+        
+        // Restore tab system for non-soccer pages
+        const scheduleTabsContainer = document.getElementById('schedule-tabs');
+        if (scheduleTabsContainer) {
+            scheduleTabsContainer.style.display = 'flex';
+        }
+        
         // --- RESET TAB STATE WHEN SWITCHING LEAGUES ---
         // Always reset to Today tab when switching to a new league
-        const scheduleTabsContainer = document.getElementById('schedule-tabs');
         if (scheduleTabsContainer) {
             const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
             const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
@@ -3984,6 +3995,216 @@ document.addEventListener('DOMContentLoaded', function () {
         // Reusing the standings fetcher
         fetchLeagueStandings(leagueInfo.standingsUrl);
     };
+
+    // Consolidated Soccer Data Loading Function
+    function loadConsolidatedSoccerData() {
+        const todayScheduleContent = document.getElementById('league-schedule-today-content');
+        const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
+        const standingsContent = document.getElementById('league-standings-content');
+        
+        // Hide the tab system for soccer page
+        const scheduleTabsContainer = document.getElementById('schedule-tabs');
+        if (scheduleTabsContainer) {
+            scheduleTabsContainer.style.display = 'none';
+        }
+        
+        // Show only the today content area (we'll use it for consolidated view)
+        if (todayScheduleContent) {
+            todayScheduleContent.style.display = 'block';
+            todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading all soccer games...</p>';
+        }
+        if (upcomingScheduleContent) {
+            upcomingScheduleContent.style.display = 'none';
+        }
+        
+        // Define all soccer leagues
+        const soccerLeagues = [
+            'UEFAChampionsLeague',
+            'PremierLeague', 
+            'MLS',
+            'LaLiga',
+            'SerieA',
+            'Bundesliga',
+            'FACup',
+            'LigaMX',
+            'NWSL',
+            'Ligue1',
+            'UEFAEuropaLeague',
+            'UEFAConferenceLeague'
+        ];
+        
+        // Load consolidated soccer data
+        loadAllSoccerGames(soccerLeagues, todayScheduleContent);
+        
+        // Load standings (use a generic soccer standings or hide it)
+        if (standingsContent) {
+            standingsContent.innerHTML = '<p style="color: #9ca3af;">Standings available on individual league pages.</p>';
+        }
+    }
+
+    function loadAllSoccerGames(soccerLeagues, container) {
+        const { DateTime } = luxon;
+        const today = DateTime.now().setZone('America/New_York');
+        const todayStr = today.toISODate();
+        
+        // Get games from FlashLiveAPI for today and upcoming
+        const allGames = [];
+        let completedRequests = 0;
+        const totalRequests = soccerLeagues.length;
+        
+        soccerLeagues.forEach(leagueKey => {
+            const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
+            if (!leagueInfo) {
+                completedRequests++;
+                if (completedRequests === totalRequests) {
+                    renderConsolidatedSoccerGames(container, allGames, today);
+                }
+                return;
+            }
+            
+            // Get today's games
+            gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
+                .get()
+                .then(snapshot => {
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        allGames.push({
+                            ...data,
+                            leagueKey: leagueKey,
+                            leagueDisplayName: getLeagueDisplayName(data.League),
+                            isToday: true
+                        });
+                    });
+                    
+                    // Get upcoming games (next 7 days)
+                    const upcomingPromises = [];
+                    for (let i = 1; i <= 7; i++) {
+                        const futureDate = today.plus({ days: i }).toISODate();
+                        upcomingPromises.push(
+                            gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', futureDate).get()
+                        );
+                    }
+                    
+                    Promise.all(upcomingPromises).then(upcomingSnapshots => {
+                        upcomingSnapshots.forEach(snapshot => {
+                            snapshot.forEach(doc => {
+                                const data = doc.data();
+                                allGames.push({
+                                    ...data,
+                                    leagueKey: leagueKey,
+                                    leagueDisplayName: getLeagueDisplayName(data.League),
+                                    isToday: false
+                                });
+                            });
+                        });
+                        
+                        completedRequests++;
+                        if (completedRequests === totalRequests) {
+                            renderConsolidatedSoccerGames(container, allGames, today);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error(`Error loading games for ${leagueKey}:`, error);
+                    completedRequests++;
+                    if (completedRequests === totalRequests) {
+                        renderConsolidatedSoccerGames(container, allGames, today);
+                    }
+                });
+        });
+    }
+
+    function renderConsolidatedSoccerGames(container, allGames, today) {
+        if (!container) return;
+        
+        if (allGames.length === 0) {
+            container.innerHTML = '<p style="color: #9ca3af;">No soccer games found.</p>';
+            return;
+        }
+        
+        // Group games by date
+        const gamesByDate = {};
+        allGames.forEach(game => {
+            const gameDate = game.gameDate;
+            if (!gamesByDate[gameDate]) {
+                gamesByDate[gameDate] = {};
+            }
+            if (!gamesByDate[gameDate][game.leagueDisplayName]) {
+                gamesByDate[gameDate][game.leagueDisplayName] = [];
+            }
+            gamesByDate[gameDate][game.leagueDisplayName].push(game);
+        });
+        
+        // Sort dates
+        const sortedDates = Object.keys(gamesByDate).sort();
+        
+        let html = '';
+        sortedDates.forEach(dateStr => {
+            const isToday = dateStr === today.toISODate();
+            const dateHeader = isToday ? 'Today' : DateTime.fromISO(dateStr).toFormat('MMMM d, yyyy');
+            
+            html += `<div class="date-section" style="margin-bottom: 20px;">`;
+            html += `<div class="date-header" style="background-color: #374151; color: white; padding: 8px 12px; font-weight: bold; font-size: 14px; margin-bottom: 8px;">${dateHeader}</div>`;
+            
+            // Sort leagues within each date
+            const leagues = Object.keys(gamesByDate[dateStr]).sort();
+            leagues.forEach(leagueName => {
+                const games = gamesByDate[dateStr][leagueName];
+                html += `<div class="league-subsection" style="margin-bottom: 12px;">`;
+                html += `<div class="league-subheader" style="background-color: #4a5568; color: white; padding: 6px 12px; font-weight: 600; font-size: 12px; margin-bottom: 4px;">${leagueName}</div>`;
+                
+                // Sort games by time
+                games.sort((a, b) => {
+                    const timeA = a['Start Time'] || 0;
+                    const timeB = b['Start Time'] || 0;
+                    return timeA - timeB;
+                });
+                
+                games.forEach(game => {
+                    const homeTeam = getTeamDisplayName(game['Home Team'] || '');
+                    const awayTeam = getTeamDisplayName(game['Away Team'] || '');
+                    const homeScore = game['Home Score'] || '';
+                    const awayScore = game['Away Score'] || '';
+                    const status = game['Match Status'] || '';
+                    
+                    // Format time
+                    let timeDisplay = '';
+                    if (game['Start Time']) {
+                        const gameTime = DateTime.fromMillis(game['Start Time']).setZone('America/New_York');
+                        timeDisplay = gameTime.toFormat('h:mm a');
+                    }
+                    
+                    // Determine if it's today or upcoming for formatting
+                    const isGameToday = game.isToday;
+                    
+                    if (isGameToday) {
+                        // Today format: time on left, teams on right
+                        html += `<div class="game-row" style="display: flex; align-items: center; padding: 4px 12px; border-bottom: 1px solid #374151;">`;
+                        html += `<div class="time-column" style="width: 80px; font-size: 11px; color: #9ca3af;">${timeDisplay}</div>`;
+                        html += `<div class="teams-column" style="flex: 1; font-size: 11px;">`;
+                        if (status === 'FINISHED' || status === 'FINAL') {
+                            html += `${awayTeam} ${awayScore} - ${homeScore} ${homeTeam}`;
+                        } else {
+                            html += `${awayTeam} vs ${homeTeam}`;
+                        }
+                        html += `</div></div>`;
+                    } else {
+                        // Upcoming format: teams on left, time on right
+                        html += `<div class="game-row" style="display: flex; align-items: center; padding: 4px 12px; border-bottom: 1px solid #374151;">`;
+                        html += `<div class="teams-column" style="flex: 1; font-size: 11px;">${awayTeam} vs ${homeTeam}</div>`;
+                        html += `<div class="time-column" style="width: 80px; font-size: 11px; color: #9ca3af; text-align: right;">${timeDisplay}</div>`;
+                        html += `</div>`;
+                    }
+                });
+                
+                html += `</div>`;
+            });
+            
+            html += `</div>`;
+        });
+        
+        container.innerHTML = html;
+    }
 
     function loadUpcomingSchedule(leagueKey) {
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
