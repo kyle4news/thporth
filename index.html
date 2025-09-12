@@ -4039,7 +4039,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Fallback timeout in case requests take too long
         setTimeout(() => {
             if (todayScheduleContent.innerHTML.includes('Loading all soccer games')) {
-                console.log('Soccer games loading timeout - showing fallback message');
                 todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading soccer games... If this persists, check console for errors.</p>';
             }
         }, 10000); // 10 second timeout
@@ -4055,7 +4054,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const today = DateTime.now().setZone('America/New_York');
         const todayStr = today.toISODate();
         
-        console.log('Loading soccer games for leagues:', soccerLeagues);
         
         const allGames = [];
         let completedRequests = 0;
@@ -4069,7 +4067,6 @@ document.addEventListener('DOMContentLoaded', function () {
         soccerLeagues.forEach(leagueKey => {
             const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
             if (!leagueInfo) {
-                console.log(`No league info found for ${leagueKey}`);
                 completedRequests += 2; // Skip both today and upcoming
                 if (completedRequests === totalRequests) {
                     renderConsolidatedSoccerGames(container, allGames, today);
@@ -4077,13 +4074,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
             
-            console.log(`Loading games for ${leagueKey} (${leagueInfo.leagueId})`);
             
             // 1. Get TODAY'S games from FlashLiveAPI
             gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
                 .get()
                 .then(snapshot => {
-                    console.log(`Found ${snapshot.size} today games for ${leagueKey} from FlashLiveAPI`);
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         allGames.push({
@@ -4114,7 +4109,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const upcomingCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
                 upcomingCollectionRef.get()
                     .then(snapshot => {
-                        console.log(`Found ${snapshot.size} upcoming games for ${leagueKey} from ${leagueInfo.upcomingCollectionName}`);
                         
                         snapshot.forEach(doc => {
                             const data = doc.data();
@@ -4147,7 +4141,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         completedRequests++;
                         if (completedRequests === totalRequests) {
-                            console.log(`Total games found: ${allGames.length}`);
                             renderConsolidatedSoccerGames(container, allGames, today);
                         }
                     })
@@ -4159,7 +4152,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
             } else {
-                console.log(`No upcoming collection for ${leagueKey}`);
                 completedRequests++;
                 if (completedRequests === totalRequests) {
                     renderConsolidatedSoccerGames(container, allGames, today);
@@ -4171,7 +4163,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderConsolidatedSoccerGames(container, allGames, today) {
         if (!container) return;
         
-        console.log('Rendering consolidated soccer games:', allGames.length, 'games');
         
         if (allGames.length === 0) {
             container.innerHTML = '<p style="color: #9ca3af;">No soccer games found.</p>';
@@ -4215,10 +4206,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Use the same game-table styling as other pages
                 html += `<table class="game-table">`;
                 
-                // Sort games by time (handle both timestamp and string formats)
+                // Sort games by time chronologically (handle both timestamp and string formats)
                 games.sort((a, b) => {
-                    const timeA = typeof a['Start Time'] === 'number' ? a['Start Time'] : 0;
-                    const timeB = typeof b['Start Time'] === 'number' ? b['Start Time'] : 0;
+                    let timeA = 0;
+                    let timeB = 0;
+                    
+                    // Convert to comparable timestamps
+                    if (typeof a['Start Time'] === 'number') {
+                        timeA = a['Start Time'];
+                    } else if (a['Start Time'] && typeof a['Start Time'] === 'object' && a['Start Time'].seconds) {
+                        timeA = a['Start Time'].seconds * 1000;
+                    }
+                    
+                    if (typeof b['Start Time'] === 'number') {
+                        timeB = b['Start Time'];
+                    } else if (b['Start Time'] && typeof b['Start Time'] === 'object' && b['Start Time'].seconds) {
+                        timeB = b['Start Time'].seconds * 1000;
+                    }
+                    
                     return timeA - timeB;
                 });
                 
@@ -4229,17 +4234,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     const awayScore = game['Away Score'] || '';
                     const status = game['Match Status'] || '';
                     
-                    // Format time (handle both timestamp and string formats)
+                    // Format time in user's local timezone (handle both timestamp and string formats)
                     let timeDisplay = '';
                     if (typeof game['Start Time'] === 'number') {
-                        // Handle timestamp from FlashLiveAPI
+                        // Handle timestamp from FlashLiveAPI - convert to user's local time
                         const { DateTime } = luxon;
-                        const gameTime = DateTime.fromMillis(game['Start Time']).setZone('America/New_York');
+                        const gameTime = DateTime.fromMillis(game['Start Time']).setZone('local');
                         timeDisplay = gameTime.toFormat('h:mm a');
                     } else if (game['Start Time'] && typeof game['Start Time'] === 'object' && game['Start Time'].seconds) {
-                        // Handle Firestore Timestamp object
+                        // Handle Firestore Timestamp object - convert to user's local time
                         const { DateTime } = luxon;
-                        const gameTime = DateTime.fromSeconds(game['Start Time'].seconds).setZone('America/New_York');
+                        const gameTime = DateTime.fromSeconds(game['Start Time'].seconds).setZone('local');
                         timeDisplay = gameTime.toFormat('h:mm a');
                     } else {
                         // Handle string time from upcoming collections
@@ -4249,26 +4254,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Determine if it's today or upcoming for formatting
                     const isGameToday = game.isToday;
                     
+                    // Match the exact styling from the image - teams stacked vertically, time right-aligned
                     html += `<tr class="game-row">`;
-                    
-                    if (isGameToday) {
-                        // Today format: time on left, teams on right
-                        html += `<td>${timeDisplay}</td>`;
-                        html += `<td>`;
-                        if (status === 'FINISHED' || status === 'FINAL') {
-                            html += `${awayTeam} ${awayScore} - ${homeScore} ${homeTeam}`;
-                        } else {
-                            html += `${awayTeam} vs ${homeTeam}`;
-                        }
-                        html += `</td>`;
-                        html += `<td></td>`;
+                    html += `<td style="text-align: right; vertical-align: middle; width: 80px; font-size: 12px;">${timeDisplay}</td>`;
+                    html += `<td style="vertical-align: middle; padding: 4px 0;">`;
+                    if (status === 'FINISHED' || status === 'FINAL') {
+                        html += `<div style="font-size: 12px; line-height: 1.2;">${awayTeam} ${awayScore}</div>`;
+                        html += `<div style="font-size: 12px; line-height: 1.2;">${homeTeam} ${homeScore}</div>`;
                     } else {
-                        // Upcoming format: teams on left, time on right
-                        html += `<td></td>`;
-                        html += `<td>${awayTeam} vs ${homeTeam}</td>`;
-                        html += `<td>${timeDisplay}</td>`;
+                        html += `<div style="font-size: 12px; line-height: 1.2;">${awayTeam}</div>`;
+                        html += `<div style="font-size: 12px; line-height: 1.2;">${homeTeam}</div>`;
                     }
-                    
+                    html += `</td>`;
+                    html += `<td></td>`;
                     html += `</tr>`;
                 });
                 
