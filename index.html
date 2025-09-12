@@ -4061,7 +4061,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const todayStr = today.toISODate();
         
         
-        const allGames = [];
+        let allGames = [];
         let completedRequests = 0;
         const totalRequests = soccerLeagues.length * 2; // 2 requests per league (today + upcoming)
         
@@ -4081,12 +4081,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             
-            // 1. Get TODAY'S games from FlashLiveAPI with real-time updates
+            // 1. Get TODAY'S games from FlashLiveAPI
             gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
-                .onSnapshot(snapshot => {
-                    // Clear existing games for this league from allGames
-                    allGames = allGames.filter(game => !(game.leagueKey === leagueKey && game.source === 'flashlive'));
-                    
+                .get()
+                .then(snapshot => {
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         allGames.push({
@@ -4098,10 +4096,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                     });
                     
-                    // Re-render with updated data
-                    renderConsolidatedSoccerGames(container, allGames, today);
-                }, error => {
+                    completedRequests++;
+                    if (completedRequests === totalRequests) {
+                        console.log(`Total games found: ${allGames.length}`);
+                        renderConsolidatedSoccerGames(container, allGames, today);
+                    }
+                })
+                .catch(error => {
                     console.error(`Error loading today's games for ${leagueKey}:`, error);
+                    completedRequests++;
+                    if (completedRequests === totalRequests) {
+                        renderConsolidatedSoccerGames(container, allGames, today);
+                    }
                 });
             
             // 2. Get UPCOMING games from individual Firestore collections
