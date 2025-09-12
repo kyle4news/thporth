@@ -3810,7 +3810,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const isFinalB = statusB.includes("FINISHED") || statusB.includes("FINAL");
         if (isFinalA && !isFinalB) return 1;
         if (!isFinalA && isFinalB) return -1;
-        return a["Start Time"].toMillis() - b["Start Time"].toMillis();
+        return a["Start Time"] - b["Start Time"];
     }
 
      function fetchLeagueSchedule(leagueId, leagueName) {
