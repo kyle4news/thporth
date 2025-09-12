@@ -3810,7 +3810,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const isFinalB = statusB.includes("FINISHED") || statusB.includes("FINAL");
         if (isFinalA && !isFinalB) return 1;
         if (!isFinalA && isFinalB) return -1;
-        return a["Start Time"].toMillis() - b["Start Time"].toMillis();
+        return a["Start Time"] - b["Start Time"];
     }
 
      function fetchLeagueSchedule(leagueId, leagueName) {
@@ -3905,8 +3905,8 @@ document.addEventListener('DOMContentLoaded', function () {
         scoresError.style.display = 'none';
         scoresContainer.innerHTML = '';
 
-        // Read from YesterdayScores collection (completed games moved by daily job)
-        const yesterdayScoresRef = db.collection('YesterdayScores');
+        // Read from yesterdayScores collection (completed games from all leagues)
+        const yesterdayScoresRef = db.collection(`artifacts/${FIREBASE_PROJECT_ID}/public/data/yesterdayScores`);
 
         yesterdayScoresRef.get()
             .then(snapshot => {
@@ -5258,4 +5258,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     
-
