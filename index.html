@@ -4017,12 +4017,20 @@ document.addEventListener('DOMContentLoaded', function () {
             upcomingScheduleContent.style.display = 'none';
         }
         
-        // Define all soccer leagues (only include ones that have games in FlashLiveAPI)
+        // Define all soccer leagues (both FlashLiveAPI and individual collections)
         const soccerLeagues = [
+            'UEFAChampionsLeague',
+            'PremierLeague', 
+            'MLS',
             'LaLiga',
+            'SerieA',
             'Bundesliga',
+            'FACup',
+            'LigaMX',
+            'NWSL',
             'Ligue1',
-            'NWSL'
+            'UEFAEuropaLeague',
+            'UEFAConferenceLeague'
         ];
         
         // Load consolidated soccer data
@@ -4041,10 +4049,9 @@ document.addEventListener('DOMContentLoaded', function () {
         
         console.log('Loading soccer games for leagues:', soccerLeagues);
         
-        // Get games from FlashLiveAPI for today and upcoming
         const allGames = [];
         let completedRequests = 0;
-        const totalRequests = soccerLeagues.length;
+        const totalRequests = soccerLeagues.length * 2; // 2 requests per league (today + upcoming)
         
         if (totalRequests === 0) {
             container.innerHTML = '<p style="color: #9ca3af;">No soccer leagues configured.</p>';
@@ -4055,7 +4062,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
             if (!leagueInfo) {
                 console.log(`No league info found for ${leagueKey}`);
-                completedRequests++;
+                completedRequests += 2; // Skip both today and upcoming
                 if (completedRequests === totalRequests) {
                     renderConsolidatedSoccerGames(container, allGames, today);
                 }
@@ -4064,61 +4071,138 @@ document.addEventListener('DOMContentLoaded', function () {
             
             console.log(`Loading games for ${leagueKey} (${leagueInfo.leagueId})`);
             
-            // Get today's games
+            // 1. Get TODAY'S games from FlashLiveAPI
             gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
                 .get()
                 .then(snapshot => {
-                    console.log(`Found ${snapshot.size} today games for ${leagueKey}`);
+                    console.log(`Found ${snapshot.size} today games for ${leagueKey} from FlashLiveAPI`);
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         allGames.push({
                             ...data,
                             leagueKey: leagueKey,
                             leagueDisplayName: getLeagueDisplayName(data.League),
-                            isToday: true
+                            isToday: true,
+                            source: 'flashlive'
                         });
                     });
                     
-                    // Get upcoming games (next 7 days)
-                    const upcomingPromises = [];
-                    for (let i = 1; i <= 7; i++) {
-                        const futureDate = today.plus({ days: i }).toISODate();
-                        upcomingPromises.push(
-                            gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', futureDate).get()
-                        );
+                    completedRequests++;
+                    if (completedRequests === totalRequests) {
+                        console.log(`Total games found: ${allGames.length}`);
+                        renderConsolidatedSoccerGames(container, allGames, today);
                     }
-                    
-                    Promise.all(upcomingPromises).then(upcomingSnapshots => {
-                        let upcomingCount = 0;
-                        upcomingSnapshots.forEach(snapshot => {
-                            upcomingCount += snapshot.size;
-                            snapshot.forEach(doc => {
-                                const data = doc.data();
-                                allGames.push({
-                                    ...data,
-                                    leagueKey: leagueKey,
-                                    leagueDisplayName: getLeagueDisplayName(data.League),
-                                    isToday: false
-                                });
-                            });
-                        });
-                        console.log(`Found ${upcomingCount} upcoming games for ${leagueKey}`);
-                        
-                        completedRequests++;
-                        console.log(`Completed ${completedRequests}/${totalRequests} requests`);
-                        if (completedRequests === totalRequests) {
-                            console.log(`Total games found: ${allGames.length}`);
-                            renderConsolidatedSoccerGames(container, allGames, today);
-                        }
-                    });
                 })
                 .catch(error => {
-                    console.error(`Error loading games for ${leagueKey}:`, error);
+                    console.error(`Error loading today's games for ${leagueKey}:`, error);
                     completedRequests++;
                     if (completedRequests === totalRequests) {
                         renderConsolidatedSoccerGames(container, allGames, today);
                     }
                 });
+            
+            // 2. Get UPCOMING games from individual Firestore collections
+            if (leagueInfo.upcomingCollectionName) {
+                const upcomingCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
+                upcomingCollectionRef.get()
+                    .then(snapshot => {
+                        console.log(`Found ${snapshot.size} upcoming games for ${leagueKey} from ${leagueInfo.upcomingCollectionName}`);
+                        
+                        const now = DateTime.now().toMillis();
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            
+                            // Get field names based on league type
+                            let awayField, homeField, timeField, dateField;
+                            
+                            if (leagueKey === 'PremierLeague') {
+                                awayField = 'away';
+                                homeField = 'home';
+                                timeField = 'time';
+                                dateField = 'date';
+                            } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLS', 'SerieA', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'FACup', 'Ligue1', 'NWSL'].includes(leagueKey)) {
+                                awayField = 'away';
+                                homeField = 'home';
+                                timeField = 'time';
+                                dateField = 'date';
+                            } else {
+                                awayField = 'away';
+                                homeField = 'home';
+                                timeField = 'time';
+                                dateField = 'date';
+                            }
+                            
+                            const away = data[awayField] || '';
+                            const home = data[homeField] || '';
+                            const timeStr = data[timeField] || '';
+                            
+                            let gameDate;
+                            if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
+                                gameDate = DateTime.fromJSDate(data[dateField].toDate());
+                            } else if (typeof data[dateField] === "string") {
+                                if (data[dateField].match(/^\d{4}-\d{2}-\d{2}$/)) {
+                                    gameDate = DateTime.fromISO(data[dateField]);
+                                } else {
+                                    let cleaned = data[dateField].replace(" at ", " ").replace(/ UTC[-+]\d+/, "");
+                                    gameDate = DateTime.fromFormat(cleaned, "LLLL d, yyyy h:mm:ss.SSS a", { zone: 'America/New_York' });
+                                    if (!gameDate.isValid) {
+                                        let dateOnly = data[dateField].split(" at ")[0];
+                                        gameDate = DateTime.fromFormat(dateOnly, "LLLL d, yyyy", { zone: 'America/New_York' });
+                                        if (!gameDate.isValid) {
+                                            gameDate = DateTime.fromFormat(dateOnly, "LLLL d", { zone: 'America/New_York' });
+                                            if (gameDate.isValid) {
+                                                gameDate = gameDate.set({ year: DateTime.now().year });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (!gameDate || !gameDate.isValid) {
+                                return;
+                            }
+                            
+                            // Only include future games (not today, since those come from FlashLiveAPI)
+                            const todayStart = DateTime.now().startOf('day');
+                            if (gameDate >= todayStart.plus({ days: 1 })) {
+                                allGames.push({
+                                    'Home Team': home,
+                                    'Away Team': away,
+                                    'Start Time': gameDate.toMillis(),
+                                    'Match Status': 'SCHEDULED',
+                                    'Home Score': '',
+                                    'Away Score': '',
+                                    'League': leagueInfo.leagueId,
+                                    'Sport': 'Soccer',
+                                    leagueKey: leagueKey,
+                                    leagueDisplayName: getLeagueDisplayName(leagueInfo.leagueId),
+                                    isToday: false,
+                                    source: 'upcoming',
+                                    gameDate: gameDate.toISODate()
+                                });
+                            }
+                        });
+                        
+                        completedRequests++;
+                        if (completedRequests === totalRequests) {
+                            console.log(`Total games found: ${allGames.length}`);
+                            renderConsolidatedSoccerGames(container, allGames, today);
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error loading upcoming games for ${leagueKey}:`, error);
+                        completedRequests++;
+                        if (completedRequests === totalRequests) {
+                            renderConsolidatedSoccerGames(container, allGames, today);
+                        }
+                    });
+            } else {
+                console.log(`No upcoming collection for ${leagueKey}`);
+                completedRequests++;
+                if (completedRequests === totalRequests) {
+                    renderConsolidatedSoccerGames(container, allGames, today);
+                }
+            }
         });
     }
 
