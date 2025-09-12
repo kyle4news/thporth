@@ -4197,7 +4197,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let html = '';
         sortedDates.forEach(dateStr => {
             const isToday = dateStr === today.toISODate();
-            const dateHeader = isToday ? 'Today' : DateTime.fromISO(dateStr).toFormat('MMMM d, yyyy');
+            const dateHeader = isToday ? 'Today' : dateStr;
             
             html += `<div class="date-section" style="margin-bottom: 20px;">`;
             html += `<div class="date-header" style="background-color: #374151; color: white; padding: 8px 12px; font-weight: bold; font-size: 14px; margin-bottom: 8px;">${dateHeader}</div>`;
