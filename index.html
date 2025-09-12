@@ -4190,9 +4190,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const isToday = dateStr === today.toISODate();
             const dateHeader = isToday ? 'Today' : dateStr;
             
-            // Add date header
+            // Add date header - match the large TODAY tab styling from the image
             html += `<div class="date-section" style="margin-bottom: 20px;">`;
-            html += `<div class="date-header" style="background-color: #374151; color: white; padding: 8px 12px; font-weight: bold; font-size: 14px; margin-bottom: 8px;">${dateHeader}</div>`;
+            html += `<div class="date-header" style="background-color: #374151; color: white; padding: 12px 16px; font-weight: bold; font-size: 16px; margin-bottom: 8px; text-transform: uppercase;">${dateHeader}</div>`;
             
             // Sort leagues within each date
             const leagues = Object.keys(gamesByDate[dateStr]).sort();
