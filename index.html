@@ -4694,11 +4694,27 @@ if (gamesTabsContainer) {
     });
 
     liveFilter.addEventListener('click', () => {
+        // Always switch to TODAY tab first, then apply LIVE filter
         if (!todayTab.classList.contains('active')) {
-            todayTab.click();
-            // A small delay to allow the tab content to render before filtering
-            setTimeout(applyLiveFilter, 50); 
+            // Switch to TODAY tab
+            if (activeListenerUnsubscribe) {
+                activeListenerUnsubscribe();
+                activeListenerUnsubscribe = null;
+            }
+            
+            scoresTab.classList.remove('active');
+            todayTab.classList.add('active');
+            
+            document.getElementById('tv-listings-today').style.display = 'block';
+            document.getElementById('tv-listings-scores').style.display = 'none';
+            
+            // Load today's games and then apply LIVE filter
+            activeListenerUnsubscribe = fetchTodayGames(() => {
+                liveFilter.classList.add('active');
+                applyLiveFilter();
+            });
         } else {
+            // Already on TODAY tab, just toggle LIVE filter
             liveFilter.classList.toggle('active');
             applyLiveFilter();
         }
