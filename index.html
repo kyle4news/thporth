@@ -4099,6 +4099,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     completedRequests++;
                     if (completedRequests === totalRequests) {
                         console.log(`Total games found: ${allGames.length}`);
+                        console.log('Soccer page games data:', allGames);
                         renderConsolidatedSoccerGames(container, allGames, today);
                     }
                 })
@@ -4341,6 +4342,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Show scores for live and finished games (same logic as renderGames function)
                     const isLive = status.includes("IN PROGRESS") || status.includes("LIVE");
                     const isFinal = status.includes("FINISHED") || status.includes("FINAL") || status.includes("GAME OVER");
+                    
+                    // Debug logging
+                    if (status && (isLive || isFinal)) {
+                        console.log(`Soccer page - Live/Final game found: ${awayTeam} vs ${homeTeam}, Status: ${status}, Scores: ${awayScore}-${homeScore}`);
+                    }
                     
                     if (isLive || isFinal) {
                         html += `<div style="font-size: 12px; line-height: 1.2;">${awayTeam} ${awayScore}</div>`;
