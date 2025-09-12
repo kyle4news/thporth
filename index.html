@@ -4303,11 +4303,29 @@ document.addEventListener('DOMContentLoaded', function () {
                         const gameTime = DateTime.fromSeconds(game['Start Time'].seconds).setZone('local');
                         timeDisplay = gameTime.toFormat('h:mm a');
                     } else {
-                        // Handle string time from upcoming collections - format to remove seconds
+                        // Handle string time from upcoming collections - use same logic as LigaMX league page
                         const timeStr = game['Start Time'] || '';
                         if (timeStr && timeStr.includes(':')) {
-                            // Remove seconds if present (e.g., "9:30:00 AM" -> "9:30 AM")
-                            timeDisplay = timeStr.replace(/:\d{2}(?=\s*[AP]M)/, '');
+                            const { DateTime } = luxon;
+                            try {
+                                // Parse as Eastern time with seconds format, then convert to local (same as LigaMX)
+                                let easternTime = DateTime.fromFormat(timeStr, 'h:mm:ss a', { zone: 'America/New_York' });
+                                
+                                // If that doesn't work, try without seconds
+                                if (!easternTime.isValid) {
+                                    easternTime = DateTime.fromFormat(timeStr, 'h:mm a', { zone: 'America/New_York' });
+                                }
+                                
+                                if (easternTime.isValid) {
+                                    const localTime = easternTime.toLocal();
+                                    timeDisplay = localTime.toFormat('h:mm a');
+                                } else {
+                                    timeDisplay = timeStr.replace(/:\d{2}(?=\s*[AP]M)/, ''); // fallback
+                                }
+                            } catch (e) {
+                                // Fallback to original string if parsing fails
+                                timeDisplay = timeStr.replace(/:\d{2}(?=\s*[AP]M)/, '');
+                            }
                         } else {
                             timeDisplay = timeStr;
                         }
