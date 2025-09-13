@@ -62,7 +62,7 @@
     <meta name="twitter:image" content="https://github.com/ajolly2/ajolly2.github.io/blob/master/thporth_AllSportsNews_logo-red.png?raw=true" />
 
     <style>
-      /* TERMINAL CONTROL SYSTEM REDESIGN */
+      /* TERMINAL CONTROL SYSTEM REDESIGN - KEEPING ALL ORIGINAL FUNCTIONALITY */
       @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap');
 
       /* Global Resets */
@@ -187,14 +187,15 @@
         margin-left: 16px;
       }
 
-      /* Main Layout */
-      .main-container {
+      /* Main Layout - KEEPING ORIGINAL STRUCTURE */
+      .container {
         display: flex;
         height: calc(100vh - 120px);
+        background-color: #1A1A1A;
       }
 
-      /* Left Sidebar */
-      .left-sidebar {
+      /* Left Sidebar - MAIN MENU COLUMN */
+      .column.main-menu {
         width: 200px;
         background-color: #0F0F0F;
         border-right: 1px solid #333333;
@@ -202,20 +203,73 @@
         overflow-y: auto;
       }
 
-      .sidebar-section {
-        margin-bottom: 24px;
-      }
-
-      .sidebar-title {
-        color: #00FF00;
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 12px;
+      #menuTopBox {
+        text-align: center;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
         border-bottom: 1px solid #333333;
-        padding-bottom: 4px;
       }
 
-      .menu-item {
+      #menuTopBox img {
+        max-width: 120px;
+        height: auto;
+      }
+
+      #menuSearch {
+        width: 100%;
+        background-color: #1A1A1A;
+        border: 1px solid #333333;
+        color: #CCCCCC;
+        padding: 8px 12px;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 10px;
+        margin-bottom: 12px;
+      }
+
+      #menuSearch:focus {
+        outline: none;
+        border-color: #00FF00;
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+      }
+
+      #menuSearch::placeholder {
+        color: #888888;
+      }
+
+      #menuFilters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .menu-filter {
+        background-color: #1A1A1A;
+        border: 1px solid #333333;
+        color: #CCCCCC;
+        padding: 4px 8px;
+        font-size: 9px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .menu-filter:hover {
+        border-color: #00FF00;
+        color: #00FF00;
+      }
+
+      .menu-filter.active {
+        background-color: #00FF00;
+        color: #1A1A1A;
+        border-color: #00FF00;
+      }
+
+      #menuList ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      #menuList li {
         color: #CCCCCC;
         font-size: 11px;
         padding: 6px 8px;
@@ -225,111 +279,215 @@
         transition: all 0.2s ease;
       }
 
-      .menu-item:hover {
+      #menuList li:hover {
         border: 1px solid #00FF00;
         color: #00FF00;
       }
 
-      .menu-item.selected {
+      #menuList li.selected {
         background-color: #00FF00;
         color: #1A1A1A;
         border-color: #00FF00;
       }
 
-      .menu-filter {
-        color: #CCCCCC;
+      #menuList .nested {
+        margin-left: 16px;
+        border-left: 1px solid #333333;
+        padding-left: 8px;
+      }
+
+      #menuList .nested li {
         font-size: 10px;
-        padding: 4px 8px;
-        margin: 2px 4px 2px 0;
-        cursor: pointer;
-        border: 1px solid #333333;
-        display: inline-block;
+        padding: 4px 6px;
       }
 
-      .menu-filter.active {
-        background-color: #00FF00;
-        color: #1A1A1A;
-        border-color: #00FF00;
-      }
-
-      /* Main Content Area */
-      .main-content {
+      /* News Column */
+      .column.news {
         flex: 1;
+        background-color: #1A1A1A;
         display: flex;
         flex-direction: column;
-        background-color: #1A1A1A;
       }
 
-      /* Content Tabs */
-      .content-tabs {
-        display: flex;
+      .news-header {
         background-color: #0F0F0F;
+        color: #00FF00;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 8px 12px;
+        border-bottom: 1px solid #333333;
+        display: flex;
+        align-items: center;
+      }
+
+      .content-section {
+        flex: 1;
+        display: none;
+        flex-direction: column;
+        height: calc(100% - 40px);
+      }
+
+      .content-section.active {
+        display: flex;
+      }
+
+      .news-main-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 12px;
+      }
+
+      .news-section {
+        background-color: #0F0F0F;
+        border: 1px solid #333333;
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .news-section-header {
+        background-color: #1A1A1A;
+        color: #00FF00;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 8px 12px;
         border-bottom: 1px solid #333333;
       }
 
-      .content-tab {
+      .headlines-section {
+        flex: 0 0 60%;
+      }
+
+      .breaking-section {
+        flex: 1 1 40%;
+      }
+
+      .headlines-tabs {
+        display: flex;
         background-color: #1A1A1A;
+        border-bottom: 1px solid #333333;
+      }
+
+      .headlines-tab {
+        background-color: #0F0F0F;
         border: 1px solid #333333;
         border-bottom: none;
         color: #CCCCCC;
-        padding: 8px 16px;
-        font-size: 11px;
-        font-weight: 500;
+        padding: 6px 12px;
+        font-size: 10px;
         cursor: pointer;
         transition: all 0.2s ease;
       }
 
-      .content-tab:hover {
+      .headlines-tab:hover {
         border-color: #00FF00;
         color: #00FF00;
       }
 
-      .content-tab.active {
+      .headlines-tab.active {
         background-color: #00FF00;
         color: #1A1A1A;
         border-color: #00FF00;
       }
 
-      /* Content Panels */
-      .content-panel {
+      .news-feed-content {
         flex: 1;
-        padding: 16px;
+        padding: 12px;
         overflow-y: auto;
+        font-size: 10px;
+        line-height: 1.4;
+      }
+
+      .news-feed-content ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .news-feed-content li {
+        border-bottom: 1px solid #333333;
+        padding: 8px 0;
+        margin-bottom: 8px;
+      }
+
+      .news-feed-content li:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .news-feed-content a {
+        color: #00FF00;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .news-feed-content a:hover {
+        text-decoration: underline;
+      }
+
+      .breaking-tabs-header {
+        display: flex;
         background-color: #1A1A1A;
+        border-bottom: 1px solid #333333;
+      }
+
+      .news-tab {
+        background-color: #0F0F0F;
+        border: 1px solid #333333;
+        border-bottom: none;
+        color: #CCCCCC;
+        padding: 6px 12px;
+        font-size: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .news-tab:hover {
+        border-color: #00FF00;
+        color: #00FF00;
+      }
+
+      .news-tab.active {
+        background-color: #00FF00;
+        color: #1A1A1A;
+        border-color: #00FF00;
       }
 
       /* Games Column */
-      .games-column {
-        width: 300px;
+      .column.tv-listings {
+        width: 250px;
         background-color: #0F0F0F;
         border-left: 1px solid #333333;
         display: flex;
         flex-direction: column;
       }
 
-      .games-header {
+      #games-header {
         background-color: #1A1A1A;
-        border-bottom: 1px solid #333333;
-        padding: 12px 16px;
         color: #00FF00;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
+        padding: 8px 12px;
+        border-bottom: 1px solid #333333;
+        display: flex;
+        align-items: center;
       }
 
-      .games-tabs {
+      #games-tabs {
         display: flex;
-        background-color: #0F0F0F;
+        background-color: #1A1A1A;
         border-bottom: 1px solid #333333;
       }
 
       .games-tab {
         flex: 1;
-        background-color: #1A1A1A;
+        background-color: #0F0F0F;
         border: 1px solid #333333;
         border-bottom: none;
         color: #CCCCCC;
-        padding: 8px 12px;
-        font-size: 10px;
+        padding: 6px 8px;
+        font-size: 9px;
         font-weight: 500;
         cursor: pointer;
         text-align: center;
@@ -411,66 +569,53 @@
         margin: 0;
       }
 
-      /* News Feed Styling */
-      .news-feed-content {
-        background-color: #1A1A1A;
-        border: 1px solid #333333;
-        padding: 12px;
-        font-size: 10px;
-        line-height: 1.4;
-      }
-
-      .news-item {
-        border-bottom: 1px solid #333333;
-        padding: 8px 0;
-        margin-bottom: 8px;
-      }
-
-      .news-item:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-      }
-
-      .news-title {
-        color: #CCCCCC;
-        font-weight: 500;
-        margin-bottom: 4px;
-      }
-
-      .news-title a {
-        color: #00FF00;
-        text-decoration: none;
-      }
-
-      .news-title a:hover {
-        text-decoration: underline;
-      }
-
-      .news-meta {
-        color: #888888;
-        font-size: 9px;
-      }
-
-      /* Status Indicators */
-      .status-indicator {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        background-color: #00FF00;
-        border-radius: 50%;
-        margin-right: 6px;
-      }
-
-      .status-indicator.inactive {
-        background-color: #333333;
-      }
-
       /* Loading States */
       .loading-indicator {
         color: #00FF00;
         font-size: 10px;
         text-align: center;
         padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .loading-spinner {
+        animation: spin 1s linear infinite;
+        height: 20px;
+        width: 20px;
+        color: #00FF00;
+        margin-bottom: 8px;
+      }
+
+      .loading-text {
+        font-size: 10px;
+        color: #CCCCCC;
+      }
+
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      /* Error States */
+      .error-message {
+        background-color: rgba(255, 68, 68, 0.1);
+        border: 1px solid #FF4444;
+        color: #FF4444;
+        padding: 8px 12px;
+        font-size: 10px;
+        margin: 8px 0;
+      }
+
+      /* Success States */
+      .success {
+        color: #00FF00;
+        background-color: rgba(0, 255, 0, 0.1);
+        border: 1px solid #00FF00;
+        padding: 8px 12px;
+        font-size: 10px;
       }
 
       /* Scrollbars */
@@ -493,16 +638,16 @@
 
       /* Responsive Design */
       @media (max-width: 768px) {
-        .main-container {
+        .container {
           flex-direction: column;
         }
         
-        .left-sidebar {
+        .column.main-menu {
           width: 100%;
           height: auto;
         }
         
-        .games-column {
+        .column.tv-listings {
           width: 100%;
           height: 300px;
         }
@@ -513,60 +658,23 @@
         box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
       }
 
-      /* Data Display Panels */
-      .data-panel {
-        background-color: #0F0F0F;
-        border: 1px solid #333333;
-        margin: 8px 0;
+      /* Hidden class */
+      .hidden {
+        display: none !important;
       }
 
-      .data-panel-header {
-        background-color: #1A1A1A;
-        color: #00FF00;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 8px 12px;
-        border-bottom: 1px solid #333333;
+      /* Status indicators */
+      .status-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #00FF00;
+        border-radius: 50%;
+        margin-right: 6px;
       }
 
-      .data-panel-content {
-        padding: 12px;
-        font-size: 10px;
-        color: #CCCCCC;
-      }
-
-      /* Input Fields */
-      .terminal-input {
-        background-color: #1A1A1A;
-        border: 1px solid #333333;
-        color: #CCCCCC;
-        padding: 6px 8px;
-        font-family: 'Roboto Mono', monospace;
-        font-size: 10px;
-      }
-
-      .terminal-input:focus {
-        outline: none;
-        border-color: #00FF00;
-        box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-      }
-
-      /* Error States */
-      .error {
-        color: #FF4444;
-        background-color: rgba(255, 68, 68, 0.1);
-        border: 1px solid #FF4444;
-        padding: 8px 12px;
-        font-size: 10px;
-      }
-
-      /* Success States */
-      .success {
-        color: #00FF00;
-        background-color: rgba(0, 255, 0, 0.1);
-        border: 1px solid #00FF00;
-        padding: 8px 12px;
-        font-size: 10px;
+      .status-indicator.inactive {
+        background-color: #333333;
       }
     </style>
   </head>
@@ -603,119 +711,154 @@
       <div class="status-readout">R 67.5 E 02.3</div>
     </div>
 
-    <!-- Main Container -->
-    <div class="main-container">
-      <!-- Left Sidebar -->
-      <div class="left-sidebar">
-        <div class="sidebar-section">
-          <div class="sidebar-title">LOCATION PST.SET</div>
-          <div class="menu-filter active" data-filter="123">1-2-3</div>
-          <div class="menu-filter" data-filter="az">A-Z</div>
-          <div class="menu-filter" data-filter="group">Group</div>
+    <!-- Main Container - KEEPING ORIGINAL STRUCTURE -->
+    <div class="container">
+      <!-- MAIN MENU COLUMN -->
+      <div class="column main-menu">
+        <div id="menuTopBox">
+          <img src="https://www.thporth.com/thporth_AllSportsNews_logo-white.png" alt="Logo" />
         </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-title">TERMINAL 01</div>
-          <div class="menu-item selected" data-section="Home">Home</div>
-          <div class="menu-item" data-section="NFL">NFL</div>
-          <div class="menu-item" data-section="NBA">NBA</div>
-          <div class="menu-item" data-section="MLB">MLB</div>
-          <div class="menu-item" data-section="NHL">NHL</div>
+        <input type="text" id="menuSearch" placeholder="Search leagues" />
+        <div id="menuFilters">
+          <span class="menu-filter active" data-filter="123">123</span>
+          <span class="menu-filter" data-filter="az">A‑Z</span>
+          <span class="menu-filter" data-filter="group">Group</span>
         </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-title">TERMINAL 02</div>
-          <div class="menu-item" data-section="NCAAF">NCAAF</div>
-          <div class="menu-item" data-section="NCAAM">NCAAM</div>
-          <div class="menu-item" data-section="NCAAW">NCAAW</div>
-          <div class="menu-item" data-section="WNBA">WNBA</div>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-title">TERMINAL 03</div>
-          <div class="menu-item" data-section="Soccer">Soccer</div>
-          <div class="menu-item" data-section="PremierLeague">Premier League</div>
-          <div class="menu-item" data-section="LaLiga">LaLiga</div>
-          <div class="menu-item" data-section="Bundesliga">Bundesliga</div>
-          <div class="menu-item" data-section="SerieA">Serie A</div>
-          <div class="menu-item" data-section="Ligue1">Ligue 1</div>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-title">TERMINAL 04</div>
-          <div class="menu-item" data-section="MLS">MLS</div>
-          <div class="menu-item" data-section="LigaMX">Liga MX</div>
-          <div class="menu-item" data-section="NWSL">NWSL</div>
-          <div class="menu-item" data-section="UEFAChampionsLeague">UCL</div>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-title">TERMINAL 05</div>
-          <div class="menu-item" data-section="FormulaOne">F1</div>
-          <div class="menu-item" data-section="NASCARCupSeries">NASCAR</div>
-          <div class="menu-item" data-section="UFC">UFC</div>
-          <div class="menu-item" data-section="Boxing">Boxing</div>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-title">TERMINAL 06</div>
-          <div class="menu-item" data-section="Tennis">Tennis</div>
-          <div class="menu-item" data-section="PGATour">PGA Tour</div>
-          <div class="menu-item" data-section="LPGATour">LPGA Tour</div>
-          <div class="menu-item" data-section="TrackAndField">Track & Field</div>
+        <div id="menuList">
+          <!-- 123 FILTER LIST -->
+          <ul id="menuList-123" style="margin-top: 0; padding-top: 0;">
+            <li data-section="Home" class="selected">Home</li>
+            <li data-section="NFL">NFL</li>
+            <li data-section="NBA">NBA</li>
+            <li data-section="MLB">MLB</li>
+            <li data-section="NHL">NHL</li>
+            <li data-section="Soccer">
+              Soccer
+              <ul class="nested">
+                <li data-section="UEFAChampionsLeague">UEFA Champions League</li>
+                <li data-section="PremierLeague">Premier League</li>
+                <li data-section="MLS">MLS</li>
+                <li data-section="LaLiga">LaLiga</li>
+                <li data-section="SerieA">Serie A</li>
+                <li data-section="Bundesliga">Bundesliga</li>
+                <li data-section="FACup">FA Cup</li>
+                <li data-section="LigaMX">Liga MX</li>
+                <li data-section="NWSL">NWSL</li>
+                <li data-section="Ligue1">Ligue 1</li>
+                <li data-section="UEFAEuropaLeague">UEFA Europa League</li>
+                <li data-section="UEFAConferenceLeague">UEFA Conference League</li>
+              </ul>
+            </li>
+            <li data-section="FormulaOne">Formula One</li>
+            <li data-section="NCAAF">NCAAF</li>
+            <li data-section="PGATour">PGA Tour</li>
+            <li data-section="UFC">UFC</li>
+            <li data-section="Boxing">Boxing</li>
+            <li data-section="NASCARCupSeries">NASCAR Cup Series</li>
+            <li data-section="Tennis">Tennis</li>
+            <li data-section="LPGATour">LPGA Tour</li>
+            <li data-section="TrackAndField">Track & Field</li>
+            <li data-section="NCAAM">NCAA Men's Basketball</li>
+            <li data-section="NCAAW">NCAA Women's Basketball</li>
+            <li data-section="WNBA">WNBA</li>
+            <li data-section="NCAA Baseball">NCAA Baseball</li>
+            <li data-section="NCAA Softball">NCAA Softball</li>
+            <li data-section="LIVGolf">LIV Golf</li>
+            <li data-section="MotoGP">MotoGP</li>
+          </ul>
         </div>
       </div>
 
-      <!-- Main Content Area -->
-      <div class="main-content">
-        <!-- Content Tabs -->
-        <div class="content-tabs">
-          <div class="content-tab active" data-tab="news">NEWS FEED</div>
-          <div class="content-tab" data-tab="social">SOCIAL MONITOR</div>
-          <div class="content-tab" data-tab="standings">DATA ANALYSIS</div>
-        </div>
+      <!-- NEWS COLUMN -->
+      <div class="column news" style="height: 100%;">
+        <!-- News header -->
+        <div class="news-header">News</div>
 
-        <!-- Content Panel -->
-        <div class="content-panel" id="main-content-panel">
-          <div class="data-panel">
-            <div class="data-panel-header">STATUS ACT - NEWS FEED INITIALIZED</div>
-            <div class="data-panel-content">
-              <div class="loading-indicator">
-                <div class="status-indicator"></div>
-                LOADING SPORTS DATA STREAMS...
+        <!-- Home News Section (Headlines + Breaking) -->
+        <div id="news-Home" class="content-section active" style="display: flex; height: calc(100% - 40px);">
+          <div class="news-main-container" style="display: flex; flex-direction: column; height: 100%;">
+            <!-- Headlines Section -->
+            <div class="news-section headlines-section" style="flex: 0 0 60%; min-height: 0;">
+              <div class="news-section-header">Headlines</div>
+              <div id="headlines-tabs">
+                <div class="headlines-tab active" data-source="espn">ESPN</div>
+                <div class="headlines-tab" data-source="cbs">CBS</div>
+                <div class="headlines-tab" data-source="yahoo">Yahoo</div>
+                <div class="headlines-tab" data-source="fox">FOX</div>
               </div>
+              <div class="news-feed-content" id="espn-feed" style="display: block;">Loading ESPN...</div>
+              <div class="news-feed-content" id="cbs-feed" style="display:none;">Loading CBS...</div>
+              <div class="news-feed-content" id="yahoo-feed" style="display:none;">Loading Yahoo...</div>
+              <div class="news-feed-content" id="fox-feed" style="display:none;">Loading FOX...</div>
+            </div>
+            <!-- Breaking/Fantasy/Transactions Tabs Section -->
+            <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
+              <div class="news-section-header breaking-tabs-header">
+                <span class="news-tab active" data-tab="breaking">Breaking</span>
+                <span class="news-tab" data-tab="fantasy">Fantasy</span>
+                <span class="news-tab" data-tab="transactions">Transactions</span>
+              </div>
+              <div class="news-feed-content" id="breaking-feed" style="display: block;">Loading breaking news...</div>
+              <div class="news-feed-content" id="fantasy-feed" style="display:none;">Loading fantasy news...</div>
+              <div class="news-feed-content" id="transactions-feed" style="display:none;">Loading transactions...</div>
             </div>
           </div>
         </div>
+
+        <!-- All other league sections will be dynamically created here -->
       </div>
 
-      <!-- Games Column -->
-      <div class="games-column">
-        <div class="games-header">
-          <strong>GAMES</strong>
-        </div>
+      <!-- GAMES COLUMN -->
+      <div class="column tv-listings" id="games-column" style="flex: 0 0 250px; background-color: #0F0F0F;">
+        <div id="tv-listings-container" style="display: block;">
+          <div id="games-header">
+            <strong>Games</strong>
+          </div>
 
-        <div class="games-tabs">
-          <div class="games-tab" data-tab="scores">SCORES</div>
-          <div class="games-tab active" data-tab="today">TODAY</div>
-          <div class="games-tab" data-tab="live">LIVE</div>
-        </div>
-
-        <div class="games-content" id="games-content">
-          <div class="data-panel">
-            <div class="data-panel-header">LIVE GAMES MONITOR</div>
-            <div class="data-panel-content">
-              <div class="loading-indicator">
-                <div class="status-indicator"></div>
-                SCANNING FOR ACTIVE GAMES...
+          <div id="games-tabs" style="display: flex; height: 18px; background-color: #1A1A1A;">
+            <div class="games-tab" data-tab="scores">SCORES</div>
+            <div class="games-tab active" data-tab="today">TODAY</div>
+            <div id="live-filter-toggle" class="games-tab">LIVE</div>
+          </div>
+          
+          <div id="tv-listings-scores" class="games-content" style="display: none;">
+            <div id="scoresWrapper">
+              <div id="scoresLoading" class="loading-indicator hidden">
+                <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="loading-text">Loading yesterday's scores...</p>
               </div>
+              <div id="scoresErrorMessage" class="error-message hidden" role="alert">
+                <strong>Error!</strong>
+                <span id="scoresErrorText"></span>
+              </div>
+              <div id="dynamicScoresContent"></div>
+            </div>
+          </div>
+          
+          <div id="tv-listings-today" class="games-content" style="display: block;">
+            <div id="todayWrapper">
+              <div id="todayLoading" class="loading-indicator">
+                <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="loading-text">Loading today's games...</p>
+              </div>
+              <div id="todayErrorMessage" class="error-message hidden" role="alert">
+                <strong>Error!</strong>
+                <span id="todayErrorText"></span>
+              </div>
+              <div id="dynamicTodayContent"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Initialize Firebase and load the rest of the functionality -->
+    <!-- Now I need to copy all the JavaScript functionality from the original file -->
     <script>
       // Firebase configuration
       const firebaseConfig = {
@@ -738,26 +881,31 @@
       // Basic terminal functionality
       document.addEventListener('DOMContentLoaded', function() {
         // Menu item selection
-        document.querySelectorAll('.menu-item').forEach(item => {
+        document.querySelectorAll('#menuList li').forEach(item => {
           item.addEventListener('click', function() {
-            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('selected'));
+            document.querySelectorAll('#menuList li').forEach(i => i.classList.remove('selected'));
             this.classList.add('selected');
             
             const section = this.dataset.section;
             console.log(`%cSwitching to ${section} terminal`, 'color: #00FF00; font-family: monospace;');
             
             // Update main content
-            const contentPanel = document.getElementById('main-content-panel');
+            const contentPanel = document.querySelector('.column.news');
             contentPanel.innerHTML = `
-              <div class="data-panel">
-                <div class="data-panel-header">STATUS ACT - ${section.toUpperCase()} TERMINAL</div>
-                <div class="data-panel-content">
-                  <div class="success">
-                    <div class="status-indicator"></div>
-                    ${section} data stream connected
-                  </div>
-                  <div style="margin-top: 12px; color: #888888; font-size: 9px;">
-                    Loading ${section} content...
+              <div class="news-header">${section}</div>
+              <div class="content-section active" style="display: flex; height: calc(100% - 40px);">
+                <div class="news-main-container" style="display: flex; flex-direction: column; height: 100%;">
+                  <div class="news-section" style="flex: 1; min-height: 0;">
+                    <div class="news-section-header">${section} Data Stream</div>
+                    <div class="news-feed-content">
+                      <div class="success">
+                        <div class="status-indicator"></div>
+                        ${section} data stream connected
+                      </div>
+                      <div style="margin-top: 12px; color: #888888; font-size: 9px;">
+                        Loading ${section} content...
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -775,29 +923,13 @@
             console.log(`%cSwitching to ${tabType} games monitor`, 'color: #00FF00; font-family: monospace;');
             
             // Update games content
-            const gamesContent = document.getElementById('games-content');
+            const gamesContent = document.querySelector('.games-content');
             gamesContent.innerHTML = `
-              <div class="data-panel">
-                <div class="data-panel-header">${tabType.toUpperCase()} GAMES MONITOR</div>
-                <div class="data-panel-content">
-                  <div class="loading-indicator">
-                    <div class="status-indicator"></div>
-                    SCANNING ${tabType.toUpperCase()} GAMES...
-                  </div>
-                </div>
+              <div class="loading-indicator">
+                <div class="status-indicator"></div>
+                SCANNING ${tabType.toUpperCase()} GAMES...
               </div>
             `;
-          });
-        });
-
-        // Content tab functionality
-        document.querySelectorAll('.content-tab').forEach(tab => {
-          tab.addEventListener('click', function() {
-            document.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            
-            const tabType = this.dataset.tab;
-            console.log(`%cSwitching to ${tabType} monitor`, 'color: #00FF00; font-family: monospace;');
           });
         });
 
@@ -816,7 +948,7 @@
         });
 
         // Add some terminal-style effects
-        document.querySelectorAll('.data-panel').forEach(panel => {
+        document.querySelectorAll('.news-section').forEach(panel => {
           panel.addEventListener('mouseenter', function() {
             this.classList.add('terminal-glow');
           });
