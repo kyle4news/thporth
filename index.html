@@ -113,7 +113,8 @@
     margin-top: 10px;
 }
 .game-table {
-    border-collapse: collapse; /* Enable borders on table rows */
+    border-collapse: separate; /* Allow spacing between table rows for block effect */
+    border-spacing: 0 8px; /* Add vertical spacing between rows */
 }
 .game-table td {
     padding: 4px 10px; /* Default cell padding */
@@ -137,7 +138,12 @@
 	font-size: 10px;
 }
 .game-row {
-    border-bottom: 1px solid white; /* Add bottom border to separate game entries */
+    background-color: #2a2a2a; /* Dark gray background for each game block */
+    border: 1px solid #444; /* Subtle border */
+    border-radius: 4px; /* Rounded corners */
+    margin-bottom: 8px; /* Space between blocks */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Bevel/raised effect */
+    padding: 8px; /* Internal padding */
 }
 .game-separator {
     border-bottom: 1px solid #333; /* Apply border only to the second row of each game */
