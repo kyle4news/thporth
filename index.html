@@ -1857,44 +1857,6 @@ div[id^="breaking-content-"] a:hover {
     </div>
     </div>
 
-    <!-- VIDEOS COLUMN -->
-    <div class="column videos-column" id="videos-column" style="flex: 0 0 500px; background-color: #1f1f1f;">
-      <div id="videos-container" style="display: block;">
-        <div id="videos-header" style="
-            position: sticky; top: 0; width: 100%; height: 18px;
-            background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif;
-            font-size: 10px; display: flex; align-items: center;
-            padding-left: 1px; z-index: 11; border-bottom: 1px solid #1f1f1f;
-          ">
-          <strong>Videos</strong>
-        </div>
-
-        <!-- Videos tabs (only shown for pages with two tabs) -->
-        <div id="videos-tabs" style="display: none; height: 18px; background-color: #2a2a2a;">
-          <div class="videos-tab active" data-tab="highlights">HIGHLIGHTS</div>
-          <div class="videos-tab" data-tab="all-videos">ALL VIDEOS</div>
-        </div>
-
-        <!-- Videos content -->
-        <div id="videos-content" class="videos-content" style="display: block;">
-          <div id="videosWrapper">
-            <div id="videosLoading" class="loading-indicator hidden">
-              <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <p class="loading-text">Loading videos...</p>
-            </div>
-            <div id="videosErrorMessage" class="error-message hidden" role="alert">
-              <strong>Error!</strong>
-              <span id="videosErrorText"></span>
-            </div>
-            <div id="dynamicVideosContent"></div>
-          </div>
-        </div>
-    </div>
-    </div>
-
   <div id="f1-column-content" style="display: none; height: 100%; flex-direction: column; background-color: #1f1f1f; color: #e5e7eb;">
       
       <div style="padding: 0.5rem; border-bottom: 0px; background-color: #3c3c3c;">
@@ -2781,6 +2743,44 @@ div[id^="breaking-content-"] a:hover {
         <!-- Single dynamic container for social feeds -->
        <div id="social-feed-container"></div>
 </div>
+
+    <!-- VIDEOS COLUMN -->
+    <div class="column videos-column" id="videos-column" style="flex: 0 0 500px; background-color: #1f1f1f;">
+      <div id="videos-container" style="display: block;">
+        <div id="videos-header" style="
+            position: sticky; top: 0; width: 100%; height: 18px;
+            background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif;
+            font-size: 10px; display: flex; align-items: center;
+            padding-left: 1px; z-index: 11; border-bottom: 1px solid #1f1f1f;
+          ">
+          <strong>Videos</strong>
+        </div>
+
+        <!-- Videos tabs (only shown for pages with two tabs) -->
+        <div id="videos-tabs" style="display: none; height: 18px; background-color: #2a2a2a;">
+          <div class="videos-tab active" data-tab="highlights">HIGHLIGHTS</div>
+          <div class="videos-tab" data-tab="all-videos">ALL VIDEOS</div>
+        </div>
+
+        <!-- Videos content -->
+        <div id="videos-content" class="videos-content" style="display: block;">
+          <div id="videosWrapper">
+            <div id="videosLoading" class="loading-indicator hidden">
+              <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p class="loading-text">Loading videos...</p>
+            </div>
+            <div id="videosErrorMessage" class="error-message hidden" role="alert">
+              <strong>Error!</strong>
+              <span id="videosErrorText"></span>
+            </div>
+            <div id="dynamicVideosContent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
  <!-- DIVIDER BETWEEN SOCIAL PANEL AND MEDIA CENTER PANEL -->
       <div class="divider"></div>
