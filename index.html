@@ -152,6 +152,77 @@
 .error {
     color: red;
 }
+
+/* Videos Column Styling */
+.videos-column {
+    border-left: 1px solid #333333;
+}
+
+.videos-tab {
+    flex: 1;
+    background-color: #1f1f1f;
+    border: 1px solid #333333;
+    border-bottom: none;
+    color: #CCCCCC;
+    padding: 6px 8px;
+    font-size: 9px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.videos-tab:hover {
+    border-color: #00FF00;
+    color: #00FF00;
+}
+
+.videos-tab.active {
+    background-color: #00FF00;
+    color: #1A1A1A;
+    border-color: #00FF00;
+}
+
+.videos-content {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    background-color: #1A1A1A;
+}
+
+.video-item {
+    border-bottom: 1px solid #333333;
+    padding: 8px 0;
+    margin-bottom: 8px;
+}
+
+.video-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.video-title {
+    color: #CCCCCC;
+    font-weight: 500;
+    margin-bottom: 4px;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.video-title a {
+    color: #00FF00;
+    text-decoration: none;
+}
+
+.video-title a:hover {
+    text-decoration: underline;
+}
+
+.video-meta {
+    color: #888888;
+    font-size: 9px;
+}
+
 /* --- END CSS FROM testing_testing-3.html --- */
 
 
@@ -1783,6 +1854,44 @@ div[id^="breaking-content-"] a:hover {
     <div id="tv-listings-today" class="games-content" style="display: block;">
       <div id="games"></div>
       <div id="error" class="error"></div>
+    </div>
+    </div>
+
+    <!-- VIDEOS COLUMN -->
+    <div class="column videos-column" id="videos-column" style="flex: 0 0 500px; background-color: #1f1f1f;">
+      <div id="videos-container" style="display: block;">
+        <div id="videos-header" style="
+            position: sticky; top: 0; width: 100%; height: 18px;
+            background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif;
+            font-size: 10px; display: flex; align-items: center;
+            padding-left: 1px; z-index: 11; border-bottom: 1px solid #1f1f1f;
+          ">
+          <strong>Videos</strong>
+        </div>
+
+        <!-- Videos tabs (only shown for pages with two tabs) -->
+        <div id="videos-tabs" style="display: none; height: 18px; background-color: #2a2a2a;">
+          <div class="videos-tab active" data-tab="highlights">HIGHLIGHTS</div>
+          <div class="videos-tab" data-tab="all-videos">ALL VIDEOS</div>
+        </div>
+
+        <!-- Videos content -->
+        <div id="videos-content" class="videos-content" style="display: block;">
+          <div id="videosWrapper">
+            <div id="videosLoading" class="loading-indicator hidden">
+              <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p class="loading-text">Loading videos...</p>
+            </div>
+            <div id="videosErrorMessage" class="error-message hidden" role="alert">
+              <strong>Error!</strong>
+              <span id="videosErrorText"></span>
+            </div>
+            <div id="dynamicVideosContent"></div>
+          </div>
+        </div>
     </div>
     </div>
 
@@ -5679,6 +5788,187 @@ document.addEventListener('DOMContentLoaded', function() {
     if (urlNCAABaseball && contentPaneNCAABaseball) {
         fetchFeedNCAABaseball(urlNCAABaseball, contentPaneNCAABaseball);
     }
+});
+</script>
+
+<!-- Videos Column JavaScript -->
+<script>
+// Videos RSS Feed Configuration
+const VIDEOS_CONFIG = {
+    // Single tab pages (just "Videos" header)
+    singleTab: {
+        'Home': 'https://rss.app/feeds/videos-home.xml',
+        'NFL': 'https://rss.app/feeds/videos-nfl.xml',
+        'NBA': 'https://rss.app/feeds/videos-nba.xml',
+        'MLB': 'https://rss.app/feeds/videos-mlb.xml',
+        'NHL': 'https://rss.app/feeds/videos-nhl.xml'
+    },
+    
+    // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
+    twoTabs: {
+        'Soccer': {
+            highlights: 'https://rss.app/feeds/videos-soccer-highlights.xml',
+            allVideos: 'https://rss.app/feeds/videos-soccer-all.xml'
+        },
+        'PremierLeague': {
+            highlights: 'https://rss.app/feeds/videos-premier-highlights.xml',
+            allVideos: 'https://rss.app/feeds/videos-premier-all.xml'
+        },
+        'LaLiga': {
+            highlights: 'https://rss.app/feeds/videos-laliga-highlights.xml',
+            allVideos: 'https://rss.app/feeds/videos-laliga-all.xml'
+        }
+        // Add more two-tab configurations as needed
+    }
+};
+
+// Initialize Videos Column
+function initializeVideosColumn(currentSection) {
+    const videosColumn = document.getElementById('videos-column');
+    const videosTabs = document.getElementById('videos-tabs');
+    const videosContent = document.getElementById('videos-content');
+    
+    if (!videosColumn) return;
+    
+    // Check if current section has two tabs
+    if (VIDEOS_CONFIG.twoTabs[currentSection]) {
+        // Show tabs for two-tab configuration
+        videosTabs.style.display = 'flex';
+        loadVideosWithTabs(currentSection);
+    } else if (VIDEOS_CONFIG.singleTab[currentSection]) {
+        // Hide tabs for single-tab configuration
+        videosTabs.style.display = 'none';
+        loadSingleVideoFeed(currentSection);
+    } else {
+        // Default: hide tabs and show placeholder
+        videosTabs.style.display = 'none';
+        videosContent.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">No videos available for this section.</div>';
+    }
+}
+
+// Load videos for single tab configuration
+function loadSingleVideoFeed(section) {
+    const feedUrl = VIDEOS_CONFIG.singleTab[section];
+    const videosContent = document.getElementById('dynamicVideosContent');
+    
+    if (!feedUrl || !videosContent) return;
+    
+    videosContent.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">Loading videos...</div>';
+    
+    fetchVideoFeed(feedUrl, videosContent);
+}
+
+// Load videos for two tab configuration
+function loadVideosWithTabs(section) {
+    const config = VIDEOS_CONFIG.twoTabs[section];
+    if (!config) return;
+    
+    // Set up tab event listeners
+    const highlightsTab = document.querySelector('.videos-tab[data-tab="highlights"]');
+    const allVideosTab = document.querySelector('.videos-tab[data-tab="all-videos"]');
+    
+    if (highlightsTab) {
+        highlightsTab.addEventListener('click', () => {
+            switchVideosTab('highlights');
+            fetchVideoFeed(config.highlights, document.getElementById('dynamicVideosContent'));
+        });
+    }
+    
+    if (allVideosTab) {
+        allVideosTab.addEventListener('click', () => {
+            switchVideosTab('all-videos');
+            fetchVideoFeed(config.allVideos, document.getElementById('dynamicVideosContent'));
+        });
+    }
+    
+    // Load highlights by default
+    switchVideosTab('highlights');
+    fetchVideoFeed(config.highlights, document.getElementById('dynamicVideosContent'));
+}
+
+// Switch between video tabs
+function switchVideosTab(activeTab) {
+    const tabs = document.querySelectorAll('.videos-tab');
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.tab === activeTab) {
+            tab.classList.add('active');
+        }
+    });
+}
+
+// Fetch and display video feed
+function fetchVideoFeed(feedUrl, container) {
+    if (!feedUrl || !container) return;
+    
+    container.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">Loading videos...</div>';
+    
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+    const finalUrl = proxyUrl + encodeURIComponent(feedUrl);
+    
+    fetch(finalUrl)
+        .then(response => response.text())
+        .then(str => {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(str, "text/xml");
+            const items = xmlDoc.querySelectorAll("item");
+            
+            if (items.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">No videos found.</div>';
+                return;
+            }
+            
+            let html = '';
+            items.forEach((item, index) => {
+                if (index >= 20) return; // Limit to 20 videos
+                
+                const title = item.querySelector("title")?.textContent || 'No title';
+                const link = item.querySelector("link")?.textContent || '#';
+                const pubDate = item.querySelector("pubDate")?.textContent || '';
+                const description = item.querySelector("description")?.textContent || '';
+                
+                // Format date
+                let formattedDate = '';
+                if (pubDate) {
+                    try {
+                        const date = new Date(pubDate);
+                        formattedDate = date.toLocaleDateString();
+                    } catch (e) {
+                        formattedDate = pubDate;
+                    }
+                }
+                
+                html += `
+                    <div class="video-item">
+                        <div class="video-title">
+                            <a href="${link}" target="_blank">${title}</a>
+                        </div>
+                        <div class="video-meta">${formattedDate}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error("Error fetching video feed:", error);
+            container.innerHTML = '<div style="padding: 20px; color: #ef4444; text-align: center;">Error loading videos. Please try again later.</div>';
+        });
+}
+
+// Initialize videos when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize with Home section by default
+    initializeVideosColumn('Home');
+    
+    // Listen for section changes (when user clicks on different leagues)
+    const menuItems = document.querySelectorAll('#menuList li[data-section]');
+    menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const section = this.dataset.section;
+            initializeVideosColumn(section);
+        });
+    });
 });
 </script>
  
