@@ -5935,6 +5935,19 @@ function fetchVideoFeed(feedUrl, container) {
                 const pubDate = item.querySelector("pubDate")?.textContent || '';
                 const description = item.querySelector("description")?.textContent || '';
                 
+                // Extract thumbnail from description or look for media:thumbnail
+                let thumbnail = '';
+                const mediaThumbnail = item.querySelector("media\\:thumbnail, thumbnail");
+                if (mediaThumbnail) {
+                    thumbnail = mediaThumbnail.getAttribute('url') || mediaThumbnail.textContent;
+                } else {
+                    // Try to extract thumbnail from description HTML
+                    const descMatch = description.match(/<img[^>]+src="([^"]+)"/i);
+                    if (descMatch) {
+                        thumbnail = descMatch[1];
+                    }
+                }
+                
                 // Format date
                 let formattedDate = '';
                 if (pubDate) {
@@ -5948,6 +5961,7 @@ function fetchVideoFeed(feedUrl, container) {
                 
                 html += `
                     <div class="video-item">
+                        ${thumbnail ? `<div class="video-thumbnail"><img src="${thumbnail}" alt="${title}" style="width: 100%; height: auto; border-radius: 4px; margin-bottom: 8px;"></div>` : ''}
                         <div class="video-title">
                             <a href="${link}" target="_blank">${title}</a>
                         </div>
