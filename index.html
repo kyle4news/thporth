@@ -5807,10 +5807,27 @@ const VIDEOS_CONFIG = {
     // Single tab pages (just "Videos" header)
     singleTab: {
         'Home': 'VTAPXtLpRtEGkfzO',
-        'NFL': 'VTAPXtLpRtEGkfzO',
-        'NBA': 'VTAPXtLpRtEGkfzO',
-        'MLB': 'VTAPXtLpRtEGkfzO',
-        'NHL': 'VTAPXtLpRtEGkfzO'
+        'NFL': 'placeholder-widget-id',
+        'NBA': 'placeholder-widget-id',
+        'NHL': 'placeholder-widget-id',
+        'NCAAF': 'placeholder-widget-id',
+        'NCAAM': 'placeholder-widget-id',
+        'NCAAW': 'placeholder-widget-id',
+        'WNBA': 'placeholder-widget-id',
+        'Boxing': 'placeholder-widget-id',
+        'Tennis': 'placeholder-widget-id',
+        'LIVGolf': 'placeholder-widget-id',
+        'MotoGP': 'placeholder-widget-id',
+        'UFC': 'placeholder-widget-id',
+        'LPGATour': 'placeholder-widget-id',
+        'PGATour': 'placeholder-widget-id',
+        'NASCARCupSeries': 'placeholder-widget-id',
+        'TrackAndField': 'placeholder-widget-id',
+        'LigaMX': 'placeholder-widget-id',
+        'Bundesliga': 'placeholder-widget-id',
+        'SerieA': 'placeholder-widget-id',
+        'Ligue1': 'placeholder-widget-id',
+        'NWSL': 'placeholder-widget-id'
     },
     
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
@@ -5820,12 +5837,16 @@ const VIDEOS_CONFIG = {
             allVideos: 'cUFj7j0xiPJG7WK5'
         },
         'PremierLeague': {
-            highlights: 'VTAPXtLpRtEGkfzO',
-            allVideos: 'cUFj7j0xiPJG7WK5'
+            highlights: 'videos-premier-highlights-widget-id',
+            allVideos: 'videos-premier-all-widget-id'
+        },
+        'MLB': {
+            highlights: 'videos-premier-highlights-widget-id',
+            allVideos: 'videos-premier-all-widget-id'
         },
         'LaLiga': {
             highlights: 'VTAPXtLpRtEGkfzO',
-            allVideos: 'cUFj7j0xiPJG7WK5'
+            allVideos: '0r7sMjvCjaspA2dD'
         }
         // Add more two-tab configurations as needed
     }
@@ -5910,12 +5931,14 @@ function displayRSSWidget(widgetId, container) {
     
     container.innerHTML = '<rssapp-feed id="' + widgetId + '"></rssapp-feed>';
     
-    // Add the script tag separately
-    const script = document.createElement('script');
-    script.src = 'https://widget.rss.app/v1/feed.js';
-    script.type = 'text/javascript';
-    script.async = true;
-    document.head.appendChild(script);
+    // Only add the script tag once
+    if (!document.querySelector('script[src="https://widget.rss.app/v1/feed.js"]')) {
+        const script = document.createElement('script');
+        script.src = 'https://widget.rss.app/v1/feed.js';
+        script.type = 'text/javascript';
+        script.async = true;
+        document.head.appendChild(script);
+    }
 }
 
 // Initialize videos when page loads
