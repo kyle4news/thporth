@@ -5802,29 +5802,29 @@ document.addEventListener('DOMContentLoaded', function() {
 const VIDEOS_CONFIG = {
     // Single tab pages (just "Videos" header)
     singleTab: {
-        'Home': 'https://rss.app/feeds/videos-home.xml',
-        'NFL': 'https://rss.app/feeds/videos-nfl.xml',
-        'NBA': 'https://rss.app/feeds/videos-nba.xml',
-        'NHL': 'https://rss.app/feeds/videos-nhl.xml'
+        'Home': 'videos-home-widget-id',
+        'NFL': 'videos-nfl-widget-id',
+        'NBA': 'videos-nba-widget-id',
+        'NHL': 'videos-nhl-widget-id'
     },
     
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
         'Soccer': {
-            highlights: 'https://rss.app/feeds/videos-soccer-highlights.xml',
-            allVideos: 'https://rss.app/feeds/videos-soccer-all.xml'
+            highlights: 'videos-soccer-highlights-widget-id',
+            allVideos: 'videos-soccer-all-widget-id'
         },
         'PremierLeague': {
-            highlights: 'https://rss.app/feeds/videos-premier-highlights.xml',
-            allVideos: 'https://rss.app/feeds/videos-premier-all.xml'
+            highlights: 'videos-premier-highlights-widget-id',
+            allVideos: 'videos-premier-all-widget-id'
         },
         'LaLiga': {
-            highlights: 'https://rss.app/feeds/videos-laliga-highlights.xml',
-            allVideos: 'https://rss.app/feeds/videos-laliga-all.xml'
+            highlights: 'videos-laliga-highlights-widget-id',
+            allVideos: 'videos-laliga-all-widget-id'
         },
         'MLB': {
-            highlights: 'https://rss.app/feeds/VTAPXtLpRtEGkfzO.xml',
-            allVideos: 'https://rss.app/feeds/cUFj7j0xiPJG7WK5.xml'
+            highlights: 'VTAPXtLpRtEGkfzO',
+            allVideos: 'cUFj7j0xiPJG7WK5'
         }
         // Add more two-tab configurations as needed
     }
@@ -5856,14 +5856,12 @@ function initializeVideosColumn(currentSection) {
 
 // Load videos for single tab configuration
 function loadSingleVideoFeed(section) {
-    const feedUrl = VIDEOS_CONFIG.singleTab[section];
+    const widgetId = VIDEOS_CONFIG.singleTab[section];
     const videosContent = document.getElementById('dynamicVideosContent');
     
-    if (!feedUrl || !videosContent) return;
+    if (!widgetId || !videosContent) return;
     
-    videosContent.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">Loading videos...</div>';
-    
-    fetchVideoFeed(feedUrl, videosContent);
+    displayRSSWidget(widgetId, videosContent);
 }
 
 // Load videos for two tab configuration
@@ -5878,20 +5876,20 @@ function loadVideosWithTabs(section) {
     if (highlightsTab) {
         highlightsTab.addEventListener('click', () => {
             switchVideosTab('highlights');
-            fetchVideoFeed(config.highlights, document.getElementById('dynamicVideosContent'));
+            displayRSSWidget(config.highlights, document.getElementById('dynamicVideosContent'));
         });
     }
     
     if (allVideosTab) {
         allVideosTab.addEventListener('click', () => {
             switchVideosTab('all-videos');
-            fetchVideoFeed(config.allVideos, document.getElementById('dynamicVideosContent'));
+            displayRSSWidget(config.allVideos, document.getElementById('dynamicVideosContent'));
         });
     }
     
     // Load highlights by default
     switchVideosTab('highlights');
-    fetchVideoFeed(config.highlights, document.getElementById('dynamicVideosContent'));
+    displayRSSWidget(config.highlights, document.getElementById('dynamicVideosContent'));
 }
 
 // Switch between video tabs
@@ -5905,77 +5903,14 @@ function switchVideosTab(activeTab) {
     });
 }
 
-// Fetch and display video feed
-function fetchVideoFeed(feedUrl, container) {
-    if (!feedUrl || !container) return;
+// Display RSS.app widget
+function displayRSSWidget(widgetId, container) {
+    if (!widgetId || !container) return;
     
-    container.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">Loading videos...</div>';
-    
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const finalUrl = proxyUrl + encodeURIComponent(feedUrl);
-    
-    fetch(finalUrl)
-        .then(response => response.text())
-        .then(str => {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(str, "text/xml");
-            const items = xmlDoc.querySelectorAll("item");
-            
-            if (items.length === 0) {
-                container.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">No videos found.</div>';
-                return;
-            }
-            
-            let html = '';
-            items.forEach((item, index) => {
-                if (index >= 20) return; // Limit to 20 videos
-                
-                const title = item.querySelector("title")?.textContent || 'No title';
-                const link = item.querySelector("link")?.textContent || '#';
-                const pubDate = item.querySelector("pubDate")?.textContent || '';
-                const description = item.querySelector("description")?.textContent || '';
-                
-                // Extract thumbnail from description or look for media:thumbnail
-                let thumbnail = '';
-                const mediaThumbnail = item.querySelector("media\\:thumbnail, thumbnail");
-                if (mediaThumbnail) {
-                    thumbnail = mediaThumbnail.getAttribute('url') || mediaThumbnail.textContent;
-                } else {
-                    // Try to extract thumbnail from description HTML
-                    const descMatch = description.match(/<img[^>]+src="([^"]+)"/i);
-                    if (descMatch) {
-                        thumbnail = descMatch[1];
-                    }
-                }
-                
-                // Format date
-                let formattedDate = '';
-                if (pubDate) {
-                    try {
-                        const date = new Date(pubDate);
-                        formattedDate = date.toLocaleDateString();
-                    } catch (e) {
-                        formattedDate = pubDate;
-                    }
-                }
-                
-                html += `
-                    <div class="video-item">
-                        ${thumbnail ? `<div class="video-thumbnail"><img src="${thumbnail}" alt="${title}" style="width: 100%; height: auto; border-radius: 4px; margin-bottom: 8px;"></div>` : ''}
-                        <div class="video-title">
-                            <a href="${link}" target="_blank">${title}</a>
-                        </div>
-                        <div class="video-meta">${formattedDate}</div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        })
-        .catch(error => {
-            console.error("Error fetching video feed:", error);
-            container.innerHTML = '<div style="padding: 20px; color: #ef4444; text-align: center;">Error loading videos. Please try again later.</div>';
-        });
+    container.innerHTML = `
+        <rssapp-feed id="${widgetId}"></rssapp-feed>
+        <script src="https://widget.rss.app/v1/feed.js" type="text/javascript" async></script>
+    `;
 }
 
 // Initialize videos when page loads
