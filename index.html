@@ -5802,29 +5802,26 @@ document.addEventListener('DOMContentLoaded', function() {
 const VIDEOS_CONFIG = {
     // Single tab pages (just "Videos" header)
     singleTab: {
-        'Home': 'VTAPXtLpRtEGkfzO',
-        'NFL': 'VTAPXtLpRtEGkfzO',
-        'NBA': 'VTAPXtLpRtEGkfzO',
-        'NHL': 'VTAPXtLpRtEGkfzO'
+        'Home': 'https://rss.app/feeds/videos-home.xml',
+        'NFL': 'https://rss.app/feeds/videos-nfl.xml',
+        'NBA': 'https://rss.app/feeds/videos-nba.xml',
+        'MLB': 'https://rss.app/feeds/videos-mlb.xml',
+        'NHL': 'https://rss.app/feeds/videos-nhl.xml'
     },
     
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
         'Soccer': {
-            highlights: 'VTAPXtLpRtEGkfzO',
-            allVideos: 'cUFj7j0xiPJG7WK5'
+            highlights: 'https://rss.app/feeds/videos-soccer-highlights.xml',
+            allVideos: 'https://rss.app/feeds/videos-soccer-all.xml'
         },
         'PremierLeague': {
-            highlights: 'VTAPXtLpRtEGkfzO',
-            allVideos: 'cUFj7j0xiPJG7WK5'
+            highlights: 'https://rss.app/feeds/videos-premier-highlights.xml',
+            allVideos: 'https://rss.app/feeds/videos-premier-all.xml'
         },
         'LaLiga': {
-            highlights: 'VTAPXtLpRtEGkfzO',
-            allVideos: 'cUFj7j0xiPJG7WK5'
-        },
-        'MLB': {
-            highlights: 'VTAPXtLpRtEGkfzO',
-            allVideos: 'cUFj7j0xiPJG7WK5'
+            highlights: 'https://rss.app/feeds/videos-laliga-highlights.xml',
+            allVideos: 'https://rss.app/feeds/videos-laliga-all.xml'
         }
         // Add more two-tab configurations as needed
     }
@@ -5856,12 +5853,14 @@ function initializeVideosColumn(currentSection) {
 
 // Load videos for single tab configuration
 function loadSingleVideoFeed(section) {
-    const widgetId = VIDEOS_CONFIG.singleTab[section];
+    const feedUrl = VIDEOS_CONFIG.singleTab[section];
     const videosContent = document.getElementById('dynamicVideosContent');
     
-    if (!widgetId || !videosContent) return;
+    if (!feedUrl || !videosContent) return;
     
-    displayRSSWidget(widgetId, videosContent);
+    videosContent.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">Loading videos...</div>';
+    
+    fetchVideoFeed(feedUrl, videosContent);
 }
 
 // Load videos for two tab configuration
@@ -5876,20 +5875,20 @@ function loadVideosWithTabs(section) {
     if (highlightsTab) {
         highlightsTab.addEventListener('click', () => {
             switchVideosTab('highlights');
-            displayRSSWidget(config.highlights, document.getElementById('dynamicVideosContent'));
+            fetchVideoFeed(config.highlights, document.getElementById('dynamicVideosContent'));
         });
     }
     
     if (allVideosTab) {
         allVideosTab.addEventListener('click', () => {
             switchVideosTab('all-videos');
-            displayRSSWidget(config.allVideos, document.getElementById('dynamicVideosContent'));
+            fetchVideoFeed(config.allVideos, document.getElementById('dynamicVideosContent'));
         });
     }
     
     // Load highlights by default
     switchVideosTab('highlights');
-    displayRSSWidget(config.highlights, document.getElementById('dynamicVideosContent'));
+    fetchVideoFeed(config.highlights, document.getElementById('dynamicVideosContent'));
 }
 
 // Switch between video tabs
@@ -5903,14 +5902,63 @@ function switchVideosTab(activeTab) {
     });
 }
 
-// Display RSS.app widget
-function displayRSSWidget(widgetId, container) {
-    if (!widgetId || !container) return;
+// Fetch and display video feed
+function fetchVideoFeed(feedUrl, container) {
+    if (!feedUrl || !container) return;
     
-    container.innerHTML = `
-        <rssapp-feed id="${widgetId}"></rssapp-feed>
-        <script src="https://widget.rss.app/v1/feed.js" type="text/javascript" async></script>
-    `;
+    container.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">Loading videos...</div>';
+    
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+    const finalUrl = proxyUrl + encodeURIComponent(feedUrl);
+    
+    fetch(finalUrl)
+        .then(response => response.text())
+        .then(str => {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(str, "text/xml");
+            const items = xmlDoc.querySelectorAll("item");
+            
+            if (items.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; color: #888; text-align: center;">No videos found.</div>';
+                return;
+            }
+            
+            let html = '';
+            items.forEach((item, index) => {
+                if (index >= 20) return; // Limit to 20 videos
+                
+                const title = item.querySelector("title")?.textContent || 'No title';
+                const link = item.querySelector("link")?.textContent || '#';
+                const pubDate = item.querySelector("pubDate")?.textContent || '';
+                const description = item.querySelector("description")?.textContent || '';
+                
+                // Format date
+                let formattedDate = '';
+                if (pubDate) {
+                    try {
+                        const date = new Date(pubDate);
+                        formattedDate = date.toLocaleDateString();
+                    } catch (e) {
+                        formattedDate = pubDate;
+                    }
+                }
+                
+                html += `
+                    <div class="video-item">
+                        <div class="video-title">
+                            <a href="${link}" target="_blank">${title}</a>
+                        </div>
+                        <div class="video-meta">${formattedDate}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error("Error fetching video feed:", error);
+            container.innerHTML = '<div style="padding: 20px; color: #ef4444; text-align: center;">Error loading videos. Please try again later.</div>';
+        });
 }
 
 // Initialize videos when page loads
@@ -5931,3 +5979,6 @@ document.addEventListener('DOMContentLoaded', function() {
  
   </body>
 </html>
+
+
+    
