@@ -141,12 +141,13 @@
     /* Remove block styling - back to simple rows */
 }
 .game-separator {
-    /* Add extra spacing after each game */
+    /* Add line break after each game */
 }
 .game-separator::after {
-    content: "";
+    content: "\A";
+    white-space: pre;
     display: block;
-    height: 16px;
+    height: 20px;
 }
 .error {
     color: red;
