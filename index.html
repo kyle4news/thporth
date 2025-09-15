@@ -140,11 +140,13 @@
 .game-row {
     /* Remove block styling - back to simple rows */
 }
-.game-row:not(.game-separator) {
-    margin-bottom: 8px; /* 8px space between teams within same game */
+.game-separator {
+    /* Add extra spacing after each game */
 }
-.game-separator td {
-    padding-bottom: 20px; /* 20px space between games */
+.game-separator::after {
+    content: "";
+    display: block;
+    height: 16px;
 }
 .error {
     color: red;
