@@ -5904,10 +5904,7 @@ function switchVideosTab(activeTab) {
 function displayRSSWidget(widgetId, container) {
     if (!widgetId || !container) return;
     
-    container.innerHTML = `
-        <rssapp-feed id="${widgetId}"></rssapp-feed>
-        <script src="https://widget.rss.app/v1/feed.js" type="text/javascript" async></script>
-    `;
+    container.innerHTML = '<rssapp-feed id="' + widgetId + '"></rssapp-feed><script src="https://widget.rss.app/v1/feed.js" type="text/javascript" async></script>';
 }
 
 // Initialize videos when page loads
