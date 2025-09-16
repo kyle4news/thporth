@@ -1389,87 +1389,62 @@ div[id^="breaking-content-"] a:hover {
   display: block !important;
 }
 
-/* ───────────── 900px–1100px "show header + 3 cols" ───────────── */
-@media (max-width: 1100px) {
-  /* show header */
-  #resp-header { display: flex; }
-
-  /* hide main-menu panel until toggled */
-  .column.main-menu { display: none; }
-
-  /* keep the three content columns in a row */
+/* ───────────── MOBILE & TABLET (≤1023px) ───────────── */
+@media (max-width: 1023px) {
+  /* Hide desktop elements */
+  .main-menu { display: none !important; }
+  .divider { display: none !important; }
+  #resp-header { display: none !important; }
+  
+  /* Show mobile elements */
+  #mobile-toolbar { display: flex !important; }
+  #mobile-menu-overlay { display: block !important; }
+  
+  /* Container becomes single column */
   .container {
     display: flex !important;
-    flex-direction: row !important;
+    flex-direction: column !important;
+    padding: 0 10px !important;
+    max-width: none !important;
+    width: 100% !important;
     height: auto !important;
-    overflow-x: auto;
   }
-  .column.tv-listings,
-  .column.news,
-  .column.social {
-    display: block;
-    flex: 0 0 auto !important;
-    width: 250px;
-    min-width: 200px;
-	  padding: 0;
-  }
-
-  /* hide anything else (dividers, other columns) */
-  .column:not(.tv-listings):not(.news):not(.social),
-  .divider {
-    display: none;
-  }
-}
-
-/* ───────────── 700px–900px "hide games" ───────────── */
-/* ───────────── ≤900px "news 80% + social below" ───────────── */
-@media (max-width: 900px) {
-  /* hide games column */
-  .column.tv-listings {
-    display: none !important;
-  }
-  /* header's Games–toggle stays visible */
-  #resp-header button#games-toggle {
-    display: inline-block;
-  }
-
-  /* now stack News above Social */
-  .container {
-    display: flex !important;
-    flex-direction: column !important;
-    overflow-x: hidden;
-  }
-
-  /* News takes 80% width */
-  .column.news {
-    display: block !important;
-    flex: 0 0 auto !important;
-    width: 80% !important;
-    min-width: 0;
-  }
-
-  /* Social below at full width */
-  .column.social {
-    display: block !important;
-    flex: 0 0 auto !important;
+  
+  /* All columns full width and stacked */
+  .column {
     width: 100% !important;
-    min-width: 0;
-    margin-top: 10px;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    margin-bottom: 10px !important;
   }
-}
-
-
-/* ───────────── ≤700px "stack news+social" ───────────── */
-@media (max-width: 700px) {
-  /* everything stacks vertically */
-  .container {
+  
+  /* Column order: Games, News, Social, Videos */
+  .column.tv-listings { order: 1; }
+  #league-specific-column { order: 1; }
+  .column.news { order: 2; }
+  .column.social { order: 3; }
+  .column.videos-column { order: 4; }
+  
+  /* Top bar with centered logo */
+  #topBar {
     display: flex !important;
-    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
   }
-  .column.news,
-  .column.social {
-    width: 100% !important;
-    min-width: 0;
+  
+  /* Mobile logo */
+  #topBar::after {
+    content: "THPORTH";
+    color: #00ff00;
+    font-weight: bold;
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+  
+  /* Body padding for mobile toolbar */
+  body {
+    padding-bottom: 60px !important;
   }
 }
 
@@ -2795,6 +2770,45 @@ div[id^="breaking-content-"] a:hover {
 
  <!-- DIVIDER BETWEEN SOCIAL PANEL AND MEDIA CENTER PANEL -->
       <div class="divider"></div>
+
+    <!-- Mobile Toolbar (hidden on desktop) -->
+    <div id="mobile-toolbar" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background-color: #2a2a2a; border-top: 1px solid #444; z-index: 1000;">
+        <div style="display: flex; height: 100%;">
+            <button id="mobile-leagues-btn" class="mobile-tab-btn" style="flex: 1; background: none; border: none; color: #ccc; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+                <div style="margin-bottom: 2px;">☰</div>
+                <div>Leagues</div>
+            </button>
+            <button id="mobile-games-btn" class="mobile-tab-btn active" style="flex: 1; background: none; border: none; color: #00ff00; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+                <div style="margin-bottom: 2px;">🎮</div>
+                <div>Games</div>
+            </button>
+            <button id="mobile-news-btn" class="mobile-tab-btn" style="flex: 1; background: none; border: none; color: #ccc; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+                <div style="margin-bottom: 2px;">📰</div>
+                <div>News</div>
+            </button>
+            <button id="mobile-social-btn" class="mobile-tab-btn" style="flex: 1; background: none; border: none; color: #ccc; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+                <div style="margin-bottom: 2px;">💬</div>
+                <div>Social</div>
+            </button>
+            <button id="mobile-videos-btn" class="mobile-tab-btn" style="flex: 1; background: none; border: none; color: #ccc; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+                <div style="margin-bottom: 2px;">📺</div>
+                <div>Videos</div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay (hidden on desktop) -->
+    <div id="mobile-menu-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.8); z-index: 2000; transform: translateX(-100%); transition: transform 0.3s ease;">
+        <div id="mobile-menu-content" style="width: 100%; height: 100%; background-color: #151515; overflow-y: auto; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                <h2 style="color: #00ff00; margin: 0;">Select League</h2>
+                <button id="mobile-menu-close" style="background: none; border: none; color: #ccc; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <div id="mobile-menu-list" style="color: #ccc;">
+                <!-- Menu items will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
 
       
 
@@ -5978,6 +5992,143 @@ document.addEventListener('DOMContentLoaded', function() {
             initializeVideosColumn(section);
         });
     });
+});
+
+// Mobile Interface JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileToolbar = document.getElementById('mobile-toolbar');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+    const mobileMenuList = document.getElementById('mobile-menu-list');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    
+    // Mobile tab buttons
+    const mobileLeaguesBtn = document.getElementById('mobile-leagues-btn');
+    const mobileGamesBtn = document.getElementById('mobile-games-btn');
+    const mobileNewsBtn = document.getElementById('mobile-news-btn');
+    const mobileSocialBtn = document.getElementById('mobile-social-btn');
+    const mobileVideosBtn = document.getElementById('mobile-videos-btn');
+    
+    // Columns
+    const gamesColumn = document.getElementById('games-column');
+    const leagueColumn = document.getElementById('league-specific-column');
+    const newsColumn = document.querySelector('.column.news');
+    const socialColumn = document.querySelector('.column.social');
+    const videosColumn = document.querySelector('.column.videos-column');
+    
+    // Populate mobile menu with league list
+    function populateMobileMenu() {
+        const menuItems = document.querySelectorAll('#menuList li[data-section]');
+        let html = '';
+        menuItems.forEach(item => {
+            const section = item.dataset.section;
+            const text = item.textContent.trim();
+            html += `<div class="mobile-menu-item" data-section="${section}" style="padding: 15px 0; border-bottom: 1px solid #333; cursor: pointer; font-size: 16px;">${text}</div>`;
+        });
+        mobileMenuList.innerHTML = html;
+        
+        // Add click handlers to mobile menu items
+        document.querySelectorAll('.mobile-menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const section = this.dataset.section;
+                // Trigger the same click as desktop menu
+                const desktopItem = document.querySelector(`#menuList li[data-section="${section}"]`);
+                if (desktopItem) {
+                    desktopItem.click();
+                }
+                closeMobileMenu();
+            });
+        });
+    }
+    
+    // Mobile menu functions
+    function openMobileMenu() {
+        mobileMenuOverlay.style.transform = 'translateX(0)';
+    }
+    
+    function closeMobileMenu() {
+        mobileMenuOverlay.style.transform = 'translateX(-100%)';
+    }
+    
+    // Mobile tab switching
+    function switchMobileTab(activeBtn) {
+        // Remove active class from all buttons
+        document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.color = '#ccc';
+        });
+        
+        // Add active class to clicked button
+        activeBtn.classList.add('active');
+        activeBtn.style.color = '#00ff00';
+        
+        // Hide all columns
+        if (gamesColumn) gamesColumn.style.display = 'none';
+        if (leagueColumn) leagueColumn.style.display = 'none';
+        if (newsColumn) newsColumn.style.display = 'none';
+        if (socialColumn) socialColumn.style.display = 'none';
+        if (videosColumn) videosColumn.style.display = 'none';
+        
+        // Show selected column
+        if (activeBtn === mobileGamesBtn) {
+            if (gamesColumn && gamesColumn.style.display !== 'none') {
+                gamesColumn.style.display = 'block';
+            } else if (leagueColumn) {
+                leagueColumn.style.display = 'block';
+            }
+        } else if (activeBtn === mobileNewsBtn && newsColumn) {
+            newsColumn.style.display = 'block';
+        } else if (activeBtn === mobileSocialBtn && socialColumn) {
+            socialColumn.style.display = 'block';
+        } else if (activeBtn === mobileVideosBtn && videosColumn) {
+            videosColumn.style.display = 'block';
+        }
+    }
+    
+    // Event listeners
+    if (mobileLeaguesBtn) {
+        mobileLeaguesBtn.addEventListener('click', openMobileMenu);
+    }
+    
+    if (mobileGamesBtn) {
+        mobileGamesBtn.addEventListener('click', () => switchMobileTab(mobileGamesBtn));
+    }
+    
+    if (mobileNewsBtn) {
+        mobileNewsBtn.addEventListener('click', () => switchMobileTab(mobileNewsBtn));
+    }
+    
+    if (mobileSocialBtn) {
+        mobileSocialBtn.addEventListener('click', () => switchMobileTab(mobileSocialBtn));
+    }
+    
+    if (mobileVideosBtn) {
+        mobileVideosBtn.addEventListener('click', () => switchMobileTab(mobileVideosBtn));
+    }
+    
+    if (mobileMenuClose) {
+        mobileMenuClose.addEventListener('click', closeMobileMenu);
+    }
+    
+    // Close menu when clicking overlay
+    if (mobileMenuOverlay) {
+        mobileMenuOverlay.addEventListener('click', function(e) {
+            if (e.target === mobileMenuOverlay) {
+                closeMobileMenu();
+            }
+        });
+    }
+    
+    // Initialize mobile interface
+    populateMobileMenu();
+    
+    // On mobile, show all columns by default (they'll be stacked)
+    if (window.innerWidth <= 1023) {
+        if (gamesColumn) gamesColumn.style.display = 'block';
+        if (leagueColumn) leagueColumn.style.display = 'block';
+        if (newsColumn) newsColumn.style.display = 'block';
+        if (socialColumn) socialColumn.style.display = 'block';
+        if (videosColumn) videosColumn.style.display = 'block';
+    }
 });
 </script>
  
