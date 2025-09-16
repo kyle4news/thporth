@@ -4107,6 +4107,13 @@ document.addEventListener('DOMContentLoaded', function () {
             .onSnapshot(snapshot => {
                 if (snapshot.empty) {
                     todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                    // Switch to Upcoming tab if no games today
+                    const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+                    const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
+                    if (todayScheduleTab) todayScheduleTab.classList.remove('active');
+                    if (upcomingScheduleTab) upcomingScheduleTab.classList.add('active');
+                    document.getElementById('league-schedule-today-content').style.display = 'none';
+                    document.getElementById('league-schedule-upcoming-content').style.display = 'block';
                     return;
                 }
                 const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
@@ -4118,6 +4125,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 .onSnapshot(snapshot => {
                     if (snapshot.empty) {
                         todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                        // Switch to Upcoming tab if no games today
+                        const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+                        const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
+                        if (todayScheduleTab) todayScheduleTab.classList.remove('active');
+                        if (upcomingScheduleTab) upcomingScheduleTab.classList.add('active');
+                        document.getElementById('league-schedule-today-content').style.display = 'none';
+                        document.getElementById('league-schedule-upcoming-content').style.display = 'block';
                         return;
                     }
                     const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
