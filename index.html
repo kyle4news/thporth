@@ -1443,6 +1443,28 @@ div[id^="breaking-content-"] a:hover {
   body {
     padding-bottom: 0 !important;
   }
+  
+  /* Show all columns on desktop */
+  .column {
+    display: block !important;
+  }
+  
+  /* Reset column ordering */
+  .column.tv-listings { order: unset; }
+  #league-specific-column { order: unset; }
+  .column.news { order: unset; }
+  .column.social { order: unset; }
+  .column.videos-column { order: unset; }
+  
+  /* Reset container to original desktop layout */
+  .container {
+    display: flex !important;
+    flex-direction: row !important;
+    padding: 0 !important;
+    max-width: 1421px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
 }
 
 .game-entry, .game-entry * {
@@ -6118,14 +6140,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize mobile interface
     populateMobileMenu();
     
-    // On mobile, show all columns by default (they'll be stacked)
-    if (window.innerWidth <= 1023) {
-        if (gamesColumn) gamesColumn.style.display = 'block';
-        if (leagueColumn) leagueColumn.style.display = 'block';
-        if (newsColumn) newsColumn.style.display = 'block';
-        if (socialColumn) socialColumn.style.display = 'block';
-        if (videosColumn) videosColumn.style.display = 'block';
+    // Function to handle responsive layout
+    function handleResponsiveLayout() {
+        if (window.innerWidth <= 1023) {
+            // Mobile: show all columns by default (they'll be stacked)
+            if (gamesColumn) gamesColumn.style.display = 'block';
+            if (leagueColumn) leagueColumn.style.display = 'block';
+            if (newsColumn) newsColumn.style.display = 'block';
+            if (socialColumn) socialColumn.style.display = 'block';
+            if (videosColumn) videosColumn.style.display = 'block';
+        } else {
+            // Desktop: show all columns (CSS will handle layout)
+            if (gamesColumn) gamesColumn.style.display = 'block';
+            if (leagueColumn) leagueColumn.style.display = 'block';
+            if (newsColumn) newsColumn.style.display = 'block';
+            if (socialColumn) socialColumn.style.display = 'block';
+            if (videosColumn) videosColumn.style.display = 'block';
+        }
     }
+    
+    // Initialize layout
+    handleResponsiveLayout();
+    
+    // Handle window resize
+    window.addEventListener('resize', handleResponsiveLayout);
 });
 </script>
  
