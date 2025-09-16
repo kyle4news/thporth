@@ -32,7 +32,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Get the latest sports news, social buzz, and live scores for NFL, NBA, MLB, and more — all in one place.">
     <meta name="robots" content="index, follow" />
-    <title>THPORTH | Sports paradise: Breaking news. Highlights. Social. Videos.</title>
+    <title>THPORTH | Breaking news. Highlights. Social. Videos.</title>
    
 <link rel="icon" type="image/png" href="https://github.com/THPORTH/thporth/blob/main/thporth_AllSportsNews_logo-white.png?raw=true" />
   
@@ -1374,138 +1374,6 @@ div[id^="breaking-content-"] a:hover {
   display: block !important;
 }
 
-/* ───────────── PROGRESSIVE DESKTOP RESPONSIVE ───────────── */
-
-/* Stage 1: Full width - all columns fit with side margins */
-@media (min-width: 1422px) {
-  .container {
-    max-width: 1421px;
-    margin: 0 auto;
-  }
-}
-
-/* Stage 2: Remove left margin - fix to left edge */
-@media (max-width: 1421px) and (min-width: 1300px) {
-  .container {
-    max-width: none;
-    margin-left: 0;
-    margin-right: auto;
-    width: 1421px;
-  }
-}
-
-/* Stage 3: Remove right margin - fix all columns */
-@media (max-width: 1299px) and (min-width: 1146px) {
-  .container {
-    max-width: none;
-    margin: 0;
-    width: 1421px;
-  }
-  
-  /* Add responsive tabs to top bar */
-  #responsive-tabs {
-    display: flex;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-}
-
-/* Stage 4: Videos column starts disappearing */
-@media (max-width: 1145px) and (min-width: 1070px) {
-  .container {
-    width: 100%;
-    overflow: hidden;
-  }
-  
-  #responsive-tabs {
-    display: flex;
-  }
-  
-  .videos-tab-btn {
-    display: inline-block;
-    background: #2a2a2a;
-    color: #5f5f5f;
-    border: none;
-    padding: 4px 8px;
-    font-size: 9px;
-    cursor: pointer;
-  }
-  
-  .videos-tab-btn.active {
-    background: #3c3c3c;
-    color: white;
-  }
-}
-
-/* Stage 5: Videos column completely hidden */
-@media (max-width: 1069px) and (min-width: 995px) {
-  .column.videos-column {
-    display: none;
-  }
-  
-  #videos-tab {
-    display: inline-block;
-  }
-}
-
-/* Stage 6: Social column starts disappearing */
-@media (max-width: 994px) and (min-width: 920px) {
-  .column.videos-column {
-    display: none;
-  }
-  
-  #videos-tab,
-  #social-tab {
-    display: inline-block;
-  }
-}
-
-/* Stage 7: Social column completely hidden */
-@media (max-width: 919px) and (min-width: 800px) {
-  .column.videos-column,
-  .column.social {
-    display: none;
-  }
-  
-  #videos-tab,
-  #social-tab {
-    display: inline-block;
-  }
-}
-
-/* Stage 8: Stack remaining columns below */
-@media (max-width: 799px) and (min-width: 1024px) {
-  .container {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  /* Keep menu and games horizontal */
-  .top-columns {
-    display: flex;
-    flex-direction: row;
-  }
-  
-  .column.main-menu,
-  .column.tv-listings,
-  #league-specific-column {
-    order: 1;
-  }
-  
-  /* Stack others below */
-  .column.news,
-  .column.social,
-  .column.videos-column {
-    width: 100%;
-    order: 2;
-  }
-  
-  #responsive-tabs {
-    display: none;
-  }
-}
 
 /* ───────────── MOBILE & TABLET (≤1023px) ───────────── */
 @media (max-width: 1023px) {
@@ -1576,7 +1444,7 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* ───────────── DESKTOP (≥1024px) ───────────── */
+/* ───────────── DESKTOP BASE (≥1024px) ───────────── */
 @media (min-width: 1024px) {
   /* Force hide mobile elements on desktop with highest specificity */
   #mobile-toolbar,
@@ -1599,13 +1467,6 @@ div[id^="breaking-content-"] a:hover {
     padding-bottom: 0 !important;
   }
   
-  /* Show main columns on desktop (but respect original visibility logic) */
-  .column.news,
-  .column.social,
-  .column.videos-column {
-    display: block !important;
-  }
-  
   /* Reset column ordering */
   .column.tv-listings { order: unset; }
   #league-specific-column { order: unset; }
@@ -1613,14 +1474,145 @@ div[id^="breaking-content-"] a:hover {
   .column.social { order: unset; }
   .column.videos-column { order: unset; }
   
-  /* Reset container to original desktop layout */
+  /* Base desktop container - will be overridden by progressive responsive */
   .container {
     display: flex !important;
     flex-direction: row !important;
     padding: 0 !important;
+  }
+}
+
+/* ───────────── PROGRESSIVE DESKTOP RESPONSIVE ───────────── */
+
+/* Stage 1: Full width - all columns fit with side margins */
+@media (min-width: 1422px) {
+  .container {
     max-width: 1421px !important;
-    width: 100% !important;
     margin: 0 auto !important;
+    width: 100% !important;
+  }
+}
+
+/* Stage 2: Remove left margin - fix to left edge */
+@media (max-width: 1421px) and (min-width: 1300px) {
+  .container {
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    width: 1421px !important;
+  }
+}
+
+/* Stage 3: Remove right margin - fix all columns */
+@media (max-width: 1299px) and (min-width: 1146px) {
+  .container {
+    max-width: none !important;
+    margin: 0 !important;
+    width: 1421px !important;
+  }
+  
+  /* Add responsive tabs to top bar */
+  #responsive-tabs {
+    display: flex !important;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+/* Stage 4: Videos column starts disappearing */
+@media (max-width: 1145px) and (min-width: 1070px) {
+  .container {
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+  
+  #responsive-tabs {
+    display: flex !important;
+  }
+  
+  .videos-tab-btn {
+    display: inline-block !important;
+    background: #2a2a2a;
+    color: #5f5f5f;
+    border: none;
+    padding: 4px 8px;
+    font-size: 9px;
+    cursor: pointer;
+  }
+  
+  .videos-tab-btn.active {
+    background: #3c3c3c;
+    color: white;
+  }
+}
+
+/* Stage 5: Videos column completely hidden */
+@media (max-width: 1069px) and (min-width: 995px) {
+  .column.videos-column {
+    display: none !important;
+  }
+  
+  #videos-tab {
+    display: inline-block !important;
+  }
+}
+
+/* Stage 6: Social column starts disappearing */
+@media (max-width: 994px) and (min-width: 920px) {
+  .column.videos-column {
+    display: none !important;
+  }
+  
+  #videos-tab,
+  #social-tab {
+    display: inline-block !important;
+  }
+}
+
+/* Stage 7: Social column completely hidden */
+@media (max-width: 919px) and (min-width: 800px) {
+  .column.videos-column,
+  .column.social {
+    display: none !important;
+  }
+  
+  #videos-tab,
+  #social-tab {
+    display: inline-block !important;
+  }
+}
+
+/* Stage 8: Stack remaining columns below */
+@media (max-width: 799px) and (min-width: 1024px) {
+  .container {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  
+  /* Keep menu and games horizontal */
+  .top-columns {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .column.main-menu,
+  .column.tv-listings,
+  #league-specific-column {
+    order: 1;
+  }
+  
+  /* Stack others below */
+  .column.news,
+  .column.social,
+  .column.videos-column {
+    width: 100% !important;
+    order: 2;
+  }
+  
+  #responsive-tabs {
+    display: none !important;
   }
 }
 
