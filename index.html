@@ -4139,8 +4139,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }, err => { todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>'; });
         }
 
-        // Clear upcoming schedule content when switching leagues
-        upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule functionality is currently not available.</p>';
+        // Load UPCOMING schedule
+        loadUpcomingSchedule(leagueKey);
+        
         // Reusing the standings fetcher
         fetchLeagueStandings(leagueInfo.standingsUrl);
     };
