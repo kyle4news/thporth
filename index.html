@@ -1381,7 +1381,7 @@ div[id^="breaking-content-"] a:hover {
   .divider { display: none !important; }
   #resp-header { display: none !important; }
   
-  /* Show mobile elements */
+  /* Show mobile elements only on mobile */
   #mobile-toolbar { display: flex !important; }
   #mobile-menu-overlay { display: none !important; }
   
@@ -1435,9 +1435,21 @@ div[id^="breaking-content-"] a:hover {
 
 /* ───────────── DESKTOP (≥1024px) ───────────── */
 @media (min-width: 1024px) {
-  /* Ensure mobile elements are hidden on desktop */
-  #mobile-toolbar { display: none !important; }
-  #mobile-menu-overlay { display: none !important; }
+  /* Force hide mobile elements on desktop with highest specificity */
+  #mobile-toolbar,
+  div#mobile-toolbar { 
+    display: none !important; 
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  #mobile-menu-overlay,
+  div#mobile-menu-overlay { 
+    display: none !important; 
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
   
   /* Reset body padding */
   body {
