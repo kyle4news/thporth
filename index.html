@@ -1484,62 +1484,48 @@ div[id^="breaking-content-"] a:hover {
 
 /* ───────────── PROGRESSIVE DESKTOP RESPONSIVE ───────────── */
 
-/* Stage 1: Full width - all columns fit with side margins */
-@media (min-width: 1422px) {
-  .container {
-    max-width: 1421px !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-  }
-}
+/* Stage 1: Full screen - all columns visible with left/right space */
+/* Default: Container centered with max-width, creating space on both sides */
 
-/* Stage 2: Remove left margin - fix to left edge */
-@media (max-width: 1421px) and (min-width: 1300px) {
+/* Stage 2: Remove left space - container moves to left edge */
+@media (max-width: 1500px) and (min-width: 1422px) {
   .container {
-    max-width: none !important;
     margin-left: 0 !important;
     margin-right: auto !important;
-    width: 1421px !important;
   }
 }
 
-/* Stage 3: Remove right margin - fix all columns */
-@media (max-width: 1299px) and (min-width: 1146px) {
+/* Stage 3: Remove right space - container fills full width */
+@media (max-width: 1421px) and (min-width: 1422px) {
   .container {
-    max-width: none !important;
     margin: 0 !important;
+    max-width: none !important;
     width: 1421px !important;
-  }
-  
-  /* Add responsive tabs to top bar */
-  #responsive-tabs {
-    display: flex !important;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
   }
 }
 
-/* Stage 4: Videos column starts disappearing */
-@media (max-width: 1145px) and (min-width: 1070px) {
+/* Stage 4: Videos column starts getting cut off */
+@media (max-width: 1421px) and (min-width: 1145px) {
   .container {
-    width: 100% !important;
+    margin: 0 !important;
+    max-width: none !important;
+    width: 1421px !important;
     overflow: hidden !important;
   }
   
+  /* Show responsive tabs */
   #responsive-tabs {
     display: flex !important;
   }
   
   .videos-tab-btn {
-    display: inline-block !important;
     background: #2a2a2a;
     color: #5f5f5f;
     border: none;
     padding: 4px 8px;
     font-size: 9px;
     cursor: pointer;
+    margin-left: 4px;
   }
   
   .videos-tab-btn.active {
@@ -1548,67 +1534,117 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Stage 5: Videos column completely hidden */
-@media (max-width: 1069px) and (min-width: 995px) {
+/* Stage 5: Videos column completely disappears, "Videos →" tab appears */
+@media (max-width: 1144px) and (min-width: 995px) {
+  .container {
+    margin: 0 !important;
+    max-width: none !important;
+    width: 1145px !important;
+  }
+  
   .column.videos-column {
     display: none !important;
+  }
+  
+  #responsive-tabs {
+    display: flex !important;
   }
   
   #videos-tab {
     display: inline-block !important;
   }
+  
+  #videos-tab::after {
+    content: " →";
+  }
 }
 
-/* Stage 6: Social column starts disappearing */
-@media (max-width: 994px) and (min-width: 920px) {
+/* Stage 6: Social column starts getting cut off, both tabs visible */
+@media (max-width: 994px) and (min-width: 795px) {
+  .container {
+    margin: 0 !important;
+    max-width: none !important;
+    width: 994px !important;
+  }
+  
   .column.videos-column {
     display: none !important;
+  }
+  
+  #responsive-tabs {
+    display: flex !important;
   }
   
   #videos-tab,
   #social-tab {
     display: inline-block !important;
   }
+  
+  #videos-tab::after {
+    content: "";
+  }
+  
+  #social-tab::after {
+    content: " →";
+  }
 }
 
-/* Stage 7: Social column completely hidden */
-@media (max-width: 919px) and (min-width: 800px) {
+/* Stage 7: Social column completely disappears */
+@media (max-width: 794px) and (min-width: 640px) {
+  .container {
+    margin: 0 !important;
+    max-width: none !important;
+    width: 795px !important;
+  }
+  
   .column.videos-column,
   .column.social {
     display: none !important;
   }
   
+  #responsive-tabs {
+    display: flex !important;
+  }
+  
   #videos-tab,
   #social-tab {
     display: inline-block !important;
   }
+  
+  #social-tab::after {
+    content: " →";
+  }
 }
 
-/* Stage 8: Stack remaining columns below */
-@media (max-width: 799px) and (min-width: 1024px) {
+/* Stage 8: Only Menu + Games horizontal, others stack below */
+@media (max-width: 639px) and (min-width: 1024px) {
   .container {
     flex-direction: column !important;
+    margin: 0 !important;
+    max-width: none !important;
     width: 100% !important;
   }
   
-  /* Keep menu and games horizontal */
-  .top-columns {
-    display: flex;
-    flex-direction: row;
+  /* Top row: Menu + Games */
+  .horizontal-columns {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
   }
   
   .column.main-menu,
   .column.tv-listings,
   #league-specific-column {
-    order: 1;
+    flex: 0 0 auto !important;
   }
   
-  /* Stack others below */
+  /* Stacked below: News, Social, Videos */
   .column.news,
   .column.social,
   .column.videos-column {
+    display: block !important;
     width: 100% !important;
-    order: 2;
+    margin-bottom: 10px !important;
   }
   
   #responsive-tabs {
