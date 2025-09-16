@@ -1381,8 +1381,10 @@ div[id^="breaking-content-"] a:hover {
   .divider { display: none !important; }
   #resp-header { display: none !important; }
   
-  /* Show mobile elements only on mobile */
-  #mobile-toolbar { display: flex !important; }
+  /* Show mobile elements only on mobile screens */
+  #mobile-toolbar { 
+    display: flex !important; 
+  }
   #mobile-menu-overlay { display: none !important; }
   
   /* Container becomes single column */
@@ -2804,8 +2806,8 @@ div[id^="breaking-content-"] a:hover {
  <!-- DIVIDER BETWEEN SOCIAL PANEL AND MEDIA CENTER PANEL -->
       <div class="divider"></div>
 
-    <!-- Mobile Toolbar (hidden on desktop) -->
-    <div id="mobile-toolbar" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background-color: #2a2a2a; border-top: 1px solid #444; z-index: 1000;">
+    <!-- Mobile Toolbar (hidden by default) -->
+    <div id="mobile-toolbar" style="display: none !important; position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background-color: #2a2a2a; border-top: 1px solid #444; z-index: 1000;">
         <div style="display: flex; height: 100%;">
             <button id="mobile-leagues-btn" class="mobile-tab-btn" style="flex: 1; background: none; border: none; color: #ccc; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
                 <div style="margin-bottom: 2px;">☰</div>
