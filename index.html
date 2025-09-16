@@ -1444,8 +1444,10 @@ div[id^="breaking-content-"] a:hover {
     padding-bottom: 0 !important;
   }
   
-  /* Show all columns on desktop */
-  .column {
+  /* Show main columns on desktop (but respect original visibility logic) */
+  .column.news,
+  .column.social,
+  .column.videos-column {
     display: block !important;
   }
   
@@ -6143,16 +6145,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to handle responsive layout
     function handleResponsiveLayout() {
         if (window.innerWidth <= 1023) {
-            // Mobile: show all columns by default (they'll be stacked)
+            // Mobile: show appropriate columns (league column only if on league page)
             if (gamesColumn) gamesColumn.style.display = 'block';
-            if (leagueColumn) leagueColumn.style.display = 'block';
+            // League column should only be visible if it was already visible (on league pages)
+            if (leagueColumn && leagueColumn.style.display === 'block') {
+                leagueColumn.style.display = 'block';
+            } else if (leagueColumn) {
+                leagueColumn.style.display = 'none';
+            }
             if (newsColumn) newsColumn.style.display = 'block';
             if (socialColumn) socialColumn.style.display = 'block';
             if (videosColumn) videosColumn.style.display = 'block';
         } else {
-            // Desktop: show all columns (CSS will handle layout)
+            // Desktop: show appropriate columns (respect original visibility logic)
             if (gamesColumn) gamesColumn.style.display = 'block';
-            if (leagueColumn) leagueColumn.style.display = 'block';
+            // League column should only be visible if it was already visible (on league pages)
+            if (leagueColumn && leagueColumn.style.display === 'block') {
+                leagueColumn.style.display = 'block';
+            } else if (leagueColumn) {
+                leagueColumn.style.display = 'none';
+            }
             if (newsColumn) newsColumn.style.display = 'block';
             if (socialColumn) socialColumn.style.display = 'block';
             if (videosColumn) videosColumn.style.display = 'block';
