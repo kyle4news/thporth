@@ -1382,8 +1382,12 @@ div[id^="breaking-content-"] a:hover {
   #resp-header { display: none !important; }
   
   /* Show mobile elements only on mobile screens */
-  #mobile-toolbar { 
-    display: flex !important; 
+  #mobile-toolbar,
+  div#mobile-toolbar { 
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
   #mobile-menu-overlay { display: none !important; }
   
@@ -1403,6 +1407,7 @@ div[id^="breaking-content-"] a:hover {
     min-width: 0 !important;
     flex: 0 0 auto !important;
     margin-bottom: 10px !important;
+    max-width: 100% !important;
   }
   
   /* Column order: Games, News, Social, Videos */
