@@ -1375,8 +1375,8 @@ div[id^="breaking-content-"] a:hover {
 }
 
 
-/* ───────────── MOBILE & TABLET (≤1023px) ───────────── */
-@media (max-width: 1023px) {
+/* ───────────── MOBILE & TABLET (≤767px) ───────────── */
+@media (max-width: 767px) {
   /* Hide desktop elements */
   .main-menu { display: none !important; }
   .divider { display: none !important; }
@@ -1487,7 +1487,7 @@ div[id^="breaking-content-"] a:hover {
 /* Default: All columns visible with centered container and side margins */
 
 /* Stage 1: Videos column disappears - Menu, Games, News, Social remain */
-@media (max-width: 1145px) and (min-width: 1024px) {
+@media (max-width: 1145px) and (min-width: 768px) {
   .container {
     max-width: 1145px !important;
     margin: 0 auto !important;
@@ -1522,7 +1522,7 @@ div[id^="breaking-content-"] a:hover {
 }
 
 /* Stage 2: Social column disappears - Menu, Games, News remain */
-@media (max-width: 795px) and (min-width: 1024px) {
+@media (max-width: 795px) and (min-width: 768px) {
   .container {
     max-width: 795px !important;
     margin: 0 auto !important;
@@ -1564,7 +1564,7 @@ div[id^="breaking-content-"] a:hover {
 }
 
 /* Stage 3: News column disappears - Menu, Games remain */
-@media (max-width: 425px) and (min-width: 1024px) {
+@media (max-width: 425px) and (min-width: 768px) {
   .container {
     max-width: 425px !important;
     margin: 0 auto !important;
@@ -1609,7 +1609,7 @@ div[id^="breaking-content-"] a:hover {
 }
 
 /* Stage 4: Final - Menu + Games horizontal, others stack below */
-@media (max-width: 424px) and (min-width: 1024px) {
+@media (max-width: 424px) and (min-width: 768px) {
   /* Top section: Menu + Games horizontal */
   .container {
     display: flex !important;
@@ -1644,7 +1644,7 @@ div[id^="breaking-content-"] a:hover {
 }
 
 /* Stacked columns below Menu + Games */
-@media (max-width: 424px) and (min-width: 1024px) {
+@media (max-width: 424px) and (min-width: 768px) {
   /* Add stacked columns after container */
   body::after {
     content: "";
