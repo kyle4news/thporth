@@ -1484,85 +1484,20 @@ div[id^="breaking-content-"] a:hover {
 
 /* ───────────── PROGRESSIVE DESKTOP RESPONSIVE ───────────── */
 
-/* Stage 1: Full screen - all columns visible with left/right space */
-/* Default: Container centered with max-width, creating space on both sides */
+/* Default: All columns visible with centered container and side margins */
 
-/* Stage 2: Remove left space - container moves to left edge */
-@media (max-width: 1500px) and (min-width: 1422px) {
+/* Stage 1: Videos column disappears - Menu, Games, News, Social remain */
+@media (max-width: 1145px) and (min-width: 1024px) {
   .container {
-    margin-left: 0 !important;
-    margin-right: auto !important;
-  }
-}
-
-/* Stage 3: Remove right space - container fills full width, all columns fixed edge-to-edge */
-@media (max-width: 1421px) and (min-width: 1145px) {
-  .container {
-    margin: 0 !important;
-    max-width: none !important;
-    width: 1421px !important;
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-  }
-  
-  /* Fix main menu to left edge */
-  .column.main-menu {
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    width: 165px !important;
-    height: calc(100vh - 20px) !important;
-    z-index: 50 !important;
-  }
-  
-  /* Fix other columns next to menu */
-  .column.tv-listings,
-  #league-specific-column {
-    margin-left: 165px !important;
-    width: 250px !important;
-  }
-  
-  .column.news {
-    width: 370px !important;
-  }
-  
-  .column.social {
-    width: 350px !important;
-  }
-  
-  .column.videos-column {
-    width: 276px !important;
-  }
-}
-
-/* Stage 4: Videos column starts getting cut off */
-@media (max-width: 1144px) and (min-width: 995px) {
-  .container {
-    margin: 0 !important;
-    max-width: none !important;
-    width: 1145px !important;
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    overflow: hidden !important;
-  }
-  
-  /* Fix main menu to left edge */
-  .column.main-menu {
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    width: 165px !important;
-    height: calc(100vh - 20px) !important;
-    z-index: 50 !important;
+    max-width: 1145px !important;
+    margin: 0 auto !important;
   }
   
   .column.videos-column {
     display: none !important;
   }
   
-  /* Show Videos tab in top bar - far right */
+  /* Show Videos tab in top bar */
   #responsive-tabs {
     display: flex !important;
     position: absolute !important;
@@ -1586,29 +1521,15 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Stage 5: Social column starts getting cut off */
-@media (max-width: 994px) and (min-width: 795px) {
+/* Stage 2: Social column disappears - Menu, Games, News remain */
+@media (max-width: 795px) and (min-width: 1024px) {
   .container {
-    margin: 0 !important;
-    max-width: none !important;
-    width: 994px !important;
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    overflow: hidden !important;
+    max-width: 795px !important;
+    margin: 0 auto !important;
   }
   
-  /* Fix main menu to left edge */
-  .column.main-menu {
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    width: 165px !important;
-    height: calc(100vh - 20px) !important;
-    z-index: 50 !important;
-  }
-  
-  .column.videos-column {
+  .column.videos-column,
+  .column.social {
     display: none !important;
   }
   
@@ -1642,46 +1563,20 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Stage 6: Social column completely disappears - only Menu, Games, News visible */
-@media (max-width: 794px) and (min-width: 580px) {
+/* Stage 3: News column disappears - Menu, Games remain */
+@media (max-width: 425px) and (min-width: 1024px) {
   .container {
-    margin: 0 !important;
-    max-width: none !important;
-    width: 785px !important;
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
+    max-width: 425px !important;
+    margin: 0 auto !important;
   }
   
-  /* Fix main menu to left edge */
-  .column.main-menu {
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    width: 165px !important;
-    height: calc(100vh - 20px) !important;
-    z-index: 50 !important;
-  }
-  
-  /* Games column fixed next to menu */
-  .column.tv-listings,
-  #league-specific-column {
-    margin-left: 165px !important;
-    width: 250px !important;
-  }
-  
-  /* News column fixed next to games */
-  .column.news {
-    width: 370px !important;
-  }
-  
-  /* Hide social and videos */
+  .column.videos-column,
   .column.social,
-  .column.videos-column {
+  .column.news {
     display: none !important;
   }
   
-  /* Show both tabs */
+  /* Show all three tabs */
   #responsive-tabs {
     display: flex !important;
     position: absolute !important;
@@ -1691,7 +1586,8 @@ div[id^="breaking-content-"] a:hover {
   }
   
   #videos-tab,
-  #social-tab {
+  #social-tab,
+  #news-tab {
     display: inline-block !important;
     background: #2a2a2a;
     color: #5f5f5f;
@@ -1702,71 +1598,63 @@ div[id^="breaking-content-"] a:hover {
     margin-left: 4px;
   }
   
+  #videos-tab::after,
   #social-tab::after {
+    content: "";
+  }
+  
+  #news-tab::after {
     content: " →";
   }
 }
 
-/* Stage 7: Only Menu + Games horizontal, News/Social/Videos stack below */
-@media (max-width: 579px) and (min-width: 1024px) {
-  body {
-    padding-top: 20px !important;
-  }
-  
-  /* Top horizontal section: Menu + Games only */
-  .horizontal-section {
-    position: fixed !important;
-    top: 20px !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: auto !important;
+/* Stage 4: Final - Menu + Games horizontal, others stack below */
+@media (max-width: 424px) and (min-width: 1024px) {
+  /* Top section: Menu + Games horizontal */
+  .container {
     display: flex !important;
     flex-direction: row !important;
-    z-index: 40 !important;
+    max-width: 415px !important;
+    margin: 0 auto !important;
+    height: 50vh !important;
   }
   
   .column.main-menu {
-    position: relative !important;
     width: 165px !important;
-    height: 50vh !important;
     flex: 0 0 165px !important;
   }
   
   .column.tv-listings,
   #league-specific-column {
-    position: relative !important;
     width: 250px !important;
-    height: 50vh !important;
     flex: 0 0 250px !important;
   }
   
-  /* Stacked below: News, Social, Videos */
-  .stacked-section {
-    position: absolute !important;
-    top: 50vh !important;
-    left: 0 !important;
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  
+  /* Hide other columns from horizontal layout */
   .column.news,
   .column.social,
   .column.videos-column {
-    display: block !important;
-    width: 100% !important;
-    margin-bottom: 10px !important;
-    position: relative !important;
+    display: none !important;
   }
   
   /* Hide tabs */
   #responsive-tabs {
     display: none !important;
   }
-  
-  /* Hide container */
-  .container {
-    display: none !important;
+}
+
+/* Stacked columns below Menu + Games */
+@media (max-width: 424px) and (min-width: 1024px) {
+  /* Add stacked columns after container */
+  body::after {
+    content: "";
+    position: fixed;
+    top: 50vh;
+    left: 0;
+    width: 100%;
+    height: 50vh;
+    background: #1f1f1f;
+    z-index: 10;
   }
 }
 
@@ -1798,8 +1686,9 @@ div[id^="breaking-content-"] a:hover {
 </header>
         <div id="topBar" style="position: relative;">
             <div id="responsive-tabs" style="display: none;">
-                <button id="videos-tab" class="videos-tab-btn" style="display: none;">Videos →</button>
-                <button id="social-tab" class="videos-tab-btn" style="display: none;">Social →</button>
+                <button id="videos-tab" class="videos-tab-btn" style="display: none;">Videos</button>
+                <button id="social-tab" class="videos-tab-btn" style="display: none;">Social</button>
+                <button id="news-tab" class="videos-tab-btn" style="display: none;">News</button>
             </div>
         </div>
     <div id="topDivider"></div>
