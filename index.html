@@ -7,21 +7,6 @@
     <!-- Luxon for date/time handling - MOVED HERE to ensure it loads before dependent scripts -->
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.x/build/global/luxon.min.js"></script>
 
-   <script>
-  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const host    = location.hostname; // e.g. "thporth.com" or "www.thporth.com"
-  if ( isMobile && !host.startsWith("m.") ) {
-    // build the mobile host dynamically
-    const mobileHost = "m." + host.replace(/^www\\./, "");
-    location.replace(
-      location.protocol + "//" +
-      mobileHost +
-      location.pathname +
-      location.search +
-      location.hash
-    );
-  }
-</script>
 	 <style>
       /* RESTORED: Original CSS for news tabs */
       .news-tab[data-tab="fantasy"],
@@ -1398,7 +1383,7 @@ div[id^="breaking-content-"] a:hover {
   
   /* Show mobile elements */
   #mobile-toolbar { display: flex !important; }
-  #mobile-menu-overlay { display: block !important; }
+  #mobile-menu-overlay { display: none !important; }
   
   /* Container becomes single column */
   .container {
@@ -1445,6 +1430,18 @@ div[id^="breaking-content-"] a:hover {
   /* Body padding for mobile toolbar */
   body {
     padding-bottom: 60px !important;
+  }
+}
+
+/* ───────────── DESKTOP (≥1024px) ───────────── */
+@media (min-width: 1024px) {
+  /* Ensure mobile elements are hidden on desktop */
+  #mobile-toolbar { display: none !important; }
+  #mobile-menu-overlay { display: none !important; }
+  
+  /* Reset body padding */
+  body {
+    padding-bottom: 0 !important;
   }
 }
 
