@@ -1480,14 +1480,38 @@ div[id^="breaking-content-"] a:hover {
   .column.social { order: unset; }
   .column.videos-column { order: unset; }
   
-  /* Reset container to original desktop layout */
+  /* Reset container to original desktop layout with fixed menu */
   .container {
     display: flex !important;
     flex-direction: row !important;
     padding: 0 !important;
-    max-width: 1421px !important;
+    padding-left: 165px !important; /* Space for fixed menu */
+    max-width: none !important;
     width: 100% !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
+  }
+  
+  /* Fix main menu to left edge */
+  .main-menu {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 165px !important;
+    height: 100vh !important;
+    z-index: 100 !important;
+    display: block !important;
+  }
+  
+  /* Adjust top bar to account for fixed menu */
+  #topBar {
+    margin-left: 165px !important;
+    width: calc(100% - 165px) !important;
+  }
+  
+  /* Adjust top divider too */
+  #topDivider {
+    margin-left: 165px !important;
+    width: calc(100% - 165px) !important;
   }
 }
 
