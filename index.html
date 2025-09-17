@@ -1482,110 +1482,28 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* ───────────── DESKTOP PROGRESSIVE RESPONSIVE ───────────── */
-
-/* Videos disappears first */
-@media (max-width: 1145px) and (min-width: 796px) {
-  .column.videos-column {
-    display: none !important;
-  }
-  
-  #responsive-tabs {
-    display: flex !important;
-    position: absolute !important;
-    right: 10px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-  }
-  
-  #videos-tab {
-    display: inline-block !important;
-    background: #2a2a2a;
-    color: #5f5f5f;
-    border: none;
-    padding: 4px 8px;
-    font-size: 9px;
-    cursor: pointer;
-  }
-  
-  #videos-tab::after {
-    content: " →";
-  }
+/* ───────────── RESPONSIVE TABS STYLING ───────────── */
+#responsive-tabs {
+  display: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-/* Social disappears second */
-@media (max-width: 795px) and (min-width: 746px) {
-  .column.videos-column,
-  .column.social {
-    display: none !important;
-  }
-  
-  #responsive-tabs {
-    display: flex !important;
-    position: absolute !important;
-    right: 10px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-  }
-  
-  #videos-tab,
-  #social-tab {
-    display: inline-block !important;
-    background: #2a2a2a;
-    color: #5f5f5f;
-    border: none;
-    padding: 4px 8px;
-    font-size: 9px;
-    cursor: pointer;
-    margin-left: 4px;
-  }
-  
-  #videos-tab::after {
-    content: "";
-  }
-  
-  #social-tab::after {
-    content: " →";
-  }
+.responsive-tab-btn {
+  background: #2a2a2a;
+  color: #5f5f5f;
+  border: none;
+  padding: 4px 8px;
+  font-size: 9px;
+  cursor: pointer;
+  margin-left: 4px;
 }
 
-/* News disappears third - only Menu + Games remain */
-@media (max-width: 745px) and (min-width: 768px) {
-  .column.videos-column,
-  .column.social,
-  .column.news {
-    display: none !important;
-  }
-  
-  #responsive-tabs {
-    display: flex !important;
-    position: absolute !important;
-    right: 10px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-  }
-  
-  #videos-tab,
-  #social-tab,
-  #news-tab {
-    display: inline-block !important;
-    background: #2a2a2a;
-    color: #5f5f5f;
-    border: none;
-    padding: 4px 8px;
-    font-size: 9px;
-    cursor: pointer;
-    margin-left: 4px;
-  }
-  
-  #videos-tab::after,
-  #social-tab::after {
-    content: "";
-  }
-  
-  #news-tab::after {
-    content: " →";
-  }
+.responsive-tab-btn.active {
+  background: #3c3c3c;
+  color: white;
 }
 
 .game-entry, .game-entry * {
@@ -6301,6 +6219,101 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle window resize
     window.addEventListener('resize', handleResponsiveLayout);
+});
+
+// Progressive Responsive System - Detects when columns are cut off
+document.addEventListener('DOMContentLoaded', function() {
+    const responsiveTabs = document.getElementById('responsive-tabs');
+    const videosTab = document.getElementById('videos-tab');
+    const socialTab = document.getElementById('social-tab');
+    const newsTab = document.getElementById('news-tab');
+    
+    const videosColumn = document.querySelector('.column.videos-column');
+    const socialColumn = document.querySelector('.column.social');
+    const newsColumn = document.querySelector('.column.news');
+    const container = document.querySelector('.container');
+    
+    function checkColumnVisibility() {
+        // Only run on desktop (not mobile)
+        if (window.innerWidth <= 767) {
+            if (responsiveTabs) responsiveTabs.style.display = 'none';
+            return;
+        }
+        
+        const containerRect = container.getBoundingClientRect();
+        const containerRight = containerRect.right;
+        const windowWidth = window.innerWidth;
+        
+        // Check if videos column is cut off
+        const videosRect = videosColumn ? videosColumn.getBoundingClientRect() : null;
+        const videosVisible = videosRect && (videosRect.right <= windowWidth);
+        
+        // Check if social column is cut off  
+        const socialRect = socialColumn ? socialColumn.getBoundingClientRect() : null;
+        const socialVisible = socialRect && (socialRect.right <= windowWidth);
+        
+        // Check if news column is cut off
+        const newsRect = newsColumn ? newsColumn.getBoundingClientRect() : null;
+        const newsVisible = newsRect && (newsRect.right <= windowWidth);
+        
+        // Hide columns that are cut off and show tabs
+        let tabsToShow = [];
+        
+        if (!videosVisible && videosColumn) {
+            videosColumn.style.display = 'none';
+            tabsToShow.push('videos');
+        } else if (videosColumn) {
+            videosColumn.style.display = 'block';
+        }
+        
+        if (!socialVisible && socialColumn) {
+            socialColumn.style.display = 'none';
+            tabsToShow.push('social');
+        } else if (socialColumn && videosVisible) {
+            socialColumn.style.display = 'block';
+        }
+        
+        if (!newsVisible && newsColumn) {
+            newsColumn.style.display = 'none';
+            tabsToShow.push('news');
+        } else if (newsColumn && socialVisible && videosVisible) {
+            newsColumn.style.display = 'block';
+        }
+        
+        // Show/hide responsive tabs
+        if (tabsToShow.length > 0) {
+            if (responsiveTabs) responsiveTabs.style.display = 'flex';
+            
+            // Hide all tabs first
+            if (videosTab) videosTab.style.display = 'none';
+            if (socialTab) socialTab.style.display = 'none';
+            if (newsTab) newsTab.style.display = 'none';
+            
+            // Show relevant tabs
+            tabsToShow.forEach((tab, index) => {
+                const isLast = index === tabsToShow.length - 1;
+                
+                if (tab === 'videos' && videosTab) {
+                    videosTab.style.display = 'inline-block';
+                    videosTab.innerHTML = isLast ? 'Videos →' : 'Videos';
+                }
+                if (tab === 'social' && socialTab) {
+                    socialTab.style.display = 'inline-block';
+                    socialTab.innerHTML = isLast ? 'Social →' : 'Social';
+                }
+                if (tab === 'news' && newsTab) {
+                    newsTab.style.display = 'inline-block';
+                    newsTab.innerHTML = isLast ? 'News →' : 'News';
+                }
+            });
+        } else {
+            if (responsiveTabs) responsiveTabs.style.display = 'none';
+        }
+    }
+    
+    // Run on load and resize
+    checkColumnVisibility();
+    window.addEventListener('resize', checkColumnVisibility);
 });
 </script>
  
