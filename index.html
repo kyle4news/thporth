@@ -1491,8 +1491,8 @@ div[id^="breaking-content-"] a:hover {
   .container {
     max-width: 1145px !important;
     margin: 0 !important;
-    margin-left: 0 !important;
-    width: 1145px !important;
+    margin-left: 165px !important;
+    width: calc(1145px - 165px) !important;
   }
   
   /* Fix main menu to left edge */
@@ -1538,8 +1538,8 @@ div[id^="breaking-content-"] a:hover {
   .container {
     max-width: 795px !important;
     margin: 0 !important;
-    margin-left: 0 !important;
-    width: 795px !important;
+    margin-left: 165px !important;
+    width: calc(795px - 165px) !important;
   }
   
   /* Fix main menu to left edge */
@@ -1588,12 +1588,12 @@ div[id^="breaking-content-"] a:hover {
 }
 
 /* Stage 3: News column disappears - Menu, Games remain */
-@media (max-width: 744px) and (min-width: 768px) {
+@media (max-width: 744px) and (min-width: 416px) {
   .container {
     max-width: 415px !important;
     margin: 0 !important;
-    margin-left: 0 !important;
-    width: 415px !important;
+    margin-left: 165px !important;
+    width: 250px !important;
   }
   
   /* Fix main menu to left edge */
@@ -1606,11 +1606,11 @@ div[id^="breaking-content-"] a:hover {
     z-index: 50 !important;
   }
   
-  /* Games column fixed next to menu */
+  /* Games column takes remaining space */
   .column.tv-listings,
   #league-specific-column {
-    margin-left: 165px !important;
     width: 250px !important;
+    flex: 0 0 250px !important;
   }
   
   .column.videos-column,
@@ -1652,7 +1652,7 @@ div[id^="breaking-content-"] a:hover {
 }
 
 /* Stage 4: Final - Menu + Games horizontal, others stack below */
-@media (max-width: 424px) and (min-width: 768px) {
+@media (max-width: 415px) and (min-width: 768px) {
   /* Top section: Menu + Games horizontal */
   .container {
     display: flex !important;
