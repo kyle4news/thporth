@@ -1482,34 +1482,14 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* ───────────── PROGRESSIVE DESKTOP RESPONSIVE ───────────── */
+/* SIMPLE PROGRESSIVE HIDING - NO FIXED POSITIONING */
 
-/* Default: All columns visible with centered container and side margins */
-
-/* Stage 1: Videos column disappears - Menu, Games, News, Social remain */
+/* Stage 1: Videos column disappears */
 @media (max-width: 1145px) and (min-width: 796px) {
-  .container {
-    max-width: 1145px !important;
-    margin: 0 !important;
-    margin-left: 165px !important;
-    width: calc(1145px - 165px) !important;
-  }
-  
-  /* Fix main menu to left edge */
-  .column.main-menu {
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    width: 165px !important;
-    height: calc(100vh - 20px) !important;
-    z-index: 50 !important;
-  }
-  
   .column.videos-column {
     display: none !important;
   }
   
-  /* Show Videos tab in top bar */
   #responsive-tabs {
     display: flex !important;
     position: absolute !important;
@@ -1533,31 +1513,13 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Stage 2: Social column disappears - Menu, Games, News remain */
-@media (max-width: 795px) and (min-width: 745px) {
-  .container {
-    max-width: 795px !important;
-    margin: 0 !important;
-    margin-left: 165px !important;
-    width: calc(795px - 165px) !important;
-  }
-  
-  /* Fix main menu to left edge */
-  .column.main-menu {
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    width: 165px !important;
-    height: calc(100vh - 20px) !important;
-    z-index: 50 !important;
-  }
-  
+/* Stage 2: Social column disappears */
+@media (max-width: 795px) and (min-width: 746px) {
   .column.videos-column,
   .column.social {
     display: none !important;
   }
   
-  /* Show both tabs */
   #responsive-tabs {
     display: flex !important;
     position: absolute !important;
@@ -1587,39 +1549,14 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Stage 3: News column disappears - Menu, Games remain */
-@media (max-width: 744px) and (min-width: 416px) {
-  .container {
-    max-width: 415px !important;
-    margin: 0 !important;
-    margin-left: 165px !important;
-    width: 250px !important;
-  }
-  
-  /* Fix main menu to left edge */
-  .column.main-menu {
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    width: 165px !important;
-    height: calc(100vh - 20px) !important;
-    z-index: 50 !important;
-  }
-  
-  /* Games column takes remaining space */
-  .column.tv-listings,
-  #league-specific-column {
-    width: 250px !important;
-    flex: 0 0 250px !important;
-  }
-  
+/* Stage 3: News column disappears */
+@media (max-width: 745px) and (min-width: 416px) {
   .column.videos-column,
   .column.social,
   .column.news {
     display: none !important;
   }
   
-  /* Show all three tabs */
   #responsive-tabs {
     display: flex !important;
     position: absolute !important;
@@ -1651,15 +1588,19 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Stage 4: Final - Menu + Games horizontal, others stack below */
+/* Stage 4: Final stacking - Menu + Games horizontal, others below */
 @media (max-width: 415px) and (min-width: 768px) {
-  /* Top section: Menu + Games horizontal */
   .container {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  
+  /* Create horizontal section for Menu + Games */
+  .horizontal-wrapper {
     display: flex !important;
     flex-direction: row !important;
-    max-width: 415px !important;
-    margin: 0 auto !important;
-    height: 50vh !important;
+    width: 415px !important;
+    margin-bottom: 10px !important;
   }
   
   .column.main-menu {
@@ -1673,31 +1614,17 @@ div[id^="breaking-content-"] a:hover {
     flex: 0 0 250px !important;
   }
   
-  /* Hide other columns from horizontal layout */
+  /* Stack others below */
   .column.news,
   .column.social,
   .column.videos-column {
-    display: none !important;
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 10px !important;
   }
   
-  /* Hide tabs */
   #responsive-tabs {
     display: none !important;
-  }
-}
-
-/* Stacked columns below Menu + Games */
-@media (max-width: 424px) and (min-width: 768px) {
-  /* Add stacked columns after container */
-  body::after {
-    content: "";
-    position: fixed;
-    top: 50vh;
-    left: 0;
-    width: 100%;
-    height: 50vh;
-    background: #1f1f1f;
-    z-index: 10;
   }
 }
 
