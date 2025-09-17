@@ -3967,23 +3967,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Build grouped HTML
                     let groupedHtml = '';
                     Object.keys(groupedData).forEach(classification => {
-                        groupedHtml += `<div style="margin-bottom: 20px;">`;
-                        groupedHtml += `<h3 style="color: white; font-size: 14px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #4a4a4a;">${classification}</h3>`;
-                        groupedHtml += `<table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px;">`;
+                        groupedHtml += `<div style="margin-bottom: 25px;">`;
+                        groupedHtml += `<h3 style="color: white; font-size: 14px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #4a4a4a; font-weight: bold;">${classification}</h3>`;
+                        groupedHtml += `<table style="width: 100%; border-collapse: collapse; font-size: 11px;">`;
                         groupedHtml += `<thead><tr>`;
-                        // Skip classification column in headers
+                        // Only show Rank, Fighter, Record columns (skip Classification)
                         headers.forEach((header, index) => {
                             if (index !== classificationIndex) {
-                                groupedHtml += `<th style="padding: 4px; text-align: left; border-bottom: 1px solid #4a4a4a;">${header}</th>`;
+                                groupedHtml += `<th style="padding: 6px 4px; text-align: left; border-bottom: 1px solid #4a4a4a; color: #ccc;">${header}</th>`;
                             }
                         });
                         groupedHtml += `</tr></thead><tbody>`;
                         
                         groupedData[classification].forEach(row => {
-                            groupedHtml += `<tr style="border-top: 1px solid #374151;">`;
+                            groupedHtml += `<tr style="border-bottom: 1px solid #333;">`;
                             row.forEach((cell, index) => {
                                 if (index !== classificationIndex) {
-                                    groupedHtml += `<td style="padding: 4px;">${cell.trim().replace(/^"|"$/g, '')}</td>`;
+                                    groupedHtml += `<td style="padding: 6px 4px; color: white;">${cell.trim().replace(/^"|"$/g, '')}</td>`;
                                 }
                             });
                             groupedHtml += `</tr>`;
