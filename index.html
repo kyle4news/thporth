@@ -3929,7 +3929,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // REPLACE THE OLD FUNCTION WITH THIS ONE
-    async function fetchLeagueStandings(url) {
+    async function fetchLeagueStandings(url, leagueKey) {
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         try {
             if (!url || !url.startsWith('http')) {
@@ -3944,6 +3944,59 @@ document.addEventListener('DOMContentLoaded', function () {
                 standingsContent.innerHTML = '<p>No standings data available.</p>';
                 return;
             }
+            
+            // Special handling for UFC - group by classification
+            if (leagueKey === 'UFC' || leagueKey === 'Boxing') {
+                const headers = rows[0].map(h => h.trim().replace(/^"|"$/g, ''));
+                const classificationIndex = headers.findIndex(h => h.toLowerCase().includes('classification'));
+                
+                if (classificationIndex !== -1) {
+                    // Group data by classification
+                    const groupedData = {};
+                    for (let i = 1; i < rows.length; i++) {
+                        if (rows[i].length < 2) continue;
+                        const classification = rows[i][classificationIndex]?.trim().replace(/^"|"$/g, '');
+                        if (!classification) continue;
+                        
+                        if (!groupedData[classification]) {
+                            groupedData[classification] = [];
+                        }
+                        groupedData[classification].push(rows[i]);
+                    }
+                    
+                    // Build grouped HTML
+                    let groupedHtml = '';
+                    Object.keys(groupedData).forEach(classification => {
+                        groupedHtml += `<div style="margin-bottom: 20px;">`;
+                        groupedHtml += `<h3 style="color: white; font-size: 14px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #4a4a4a;">${classification}</h3>`;
+                        groupedHtml += `<table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px;">`;
+                        groupedHtml += `<thead><tr>`;
+                        // Skip classification column in headers
+                        headers.forEach((header, index) => {
+                            if (index !== classificationIndex) {
+                                groupedHtml += `<th style="padding: 4px; text-align: left; border-bottom: 1px solid #4a4a4a;">${header}</th>`;
+                            }
+                        });
+                        groupedHtml += `</tr></thead><tbody>`;
+                        
+                        groupedData[classification].forEach(row => {
+                            groupedHtml += `<tr style="border-top: 1px solid #374151;">`;
+                            row.forEach((cell, index) => {
+                                if (index !== classificationIndex) {
+                                    groupedHtml += `<td style="padding: 4px;">${cell.trim().replace(/^"|"$/g, '')}</td>`;
+                                }
+                            });
+                            groupedHtml += `</tr>`;
+                        });
+                        groupedHtml += `</tbody></table></div>`;
+                    });
+                    
+                    standingsContent.innerHTML = groupedHtml;
+                    return;
+                }
+            }
+            
+            // Default table display for other leagues
             let tableHtml = '<table style="width: 100%; border-collapse: collapse; font-size: 11px;"><thead><tr>';
             rows[0].forEach(header => tableHtml += `<th style="padding: 4px; text-align: left; border-bottom: 1px solid #4a4a4a;">${header.trim().replace(/^"|"$/g, '')}</th>`);
             tableHtml += '</tr></thead><tbody>';
