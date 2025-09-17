@@ -1489,6 +1489,8 @@ div[id^="breaking-content-"] a:hover {
   right: 0;
   top: 50%;
   transform: translateY(-50%);
+  padding-right: 0;
+  margin-right: 0;
 }
 
 .responsive-tab-btn {
@@ -1534,9 +1536,9 @@ div[id^="breaking-content-"] a:hover {
 </header>
         <div id="topBar" style="position: relative;">
             <div id="responsive-tabs" style="display: none;">
-                <button id="videos-tab" class="responsive-tab-btn" style="display: none;">Videos</button>
-                <button id="social-tab" class="responsive-tab-btn" style="display: none;">Social</button>
-                <button id="news-tab" class="responsive-tab-btn" style="display: none;">News</button>
+                <button id="videos-tab" class="videos-tab-btn" style="display: none;">Videos</button>
+                <button id="social-tab" class="videos-tab-btn" style="display: none;">Social</button>
+                <button id="news-tab" class="videos-tab-btn" style="display: none;">News</button>
             </div>
         </div>
     <div id="topDivider"></div>
@@ -6244,15 +6246,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const containerRight = containerRect.right;
         const windowWidth = window.innerWidth;
         
-        // Check if videos column is cut off
+        // Check if videos column is 85% cut off
         const videosRect = videosColumn ? videosColumn.getBoundingClientRect() : null;
-        const videosVisible = videosRect && (videosRect.right <= windowWidth);
+        const videosVisible = videosRect ? (videosRect.right - (videosRect.width * 0.85)) <= windowWidth : true;
         
-        // Check if social column is cut off  
+        // Check if social column is 85% cut off  
         const socialRect = socialColumn ? socialColumn.getBoundingClientRect() : null;
-        const socialVisible = socialRect && (socialRect.right <= windowWidth);
+        const socialVisible = socialRect ? (socialRect.right - (socialRect.width * 0.85)) <= windowWidth : true;
         
-        // Check if news column is cut off
+        // Check if news column is cut off (keep original for news)
         const newsRect = newsColumn ? newsColumn.getBoundingClientRect() : null;
         const newsVisible = newsRect && (newsRect.right <= windowWidth);
         
