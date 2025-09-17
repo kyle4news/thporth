@@ -1532,6 +1532,28 @@ div[id^="breaking-content-"] a:hover {
   flex-shrink: 0 !important;
 }
 
+/* RESPONSIVE LAYOUT ADJUSTMENTS */
+@media (max-width: 1200px) {
+  /* Make main menu and games column full height when other columns are stacked */
+  .main-menu,
+  .column.tv-listings,
+  #league-specific-column {
+    height: calc(100vh - 20px) !important;
+  }
+  
+  /* Double the height of news sections when stacked */
+  .column.news {
+    height: calc(200vh - 40px) !important;
+  }
+  
+  /* Specifically target Headlines and Breaking sections */
+  .news-content #headlines,
+  .news-content #breaking {
+    min-height: calc(100vh - 100px) !important;
+    height: calc(100vh - 100px) !important;
+  }
+}
+
 </style>
 
 <!-- Add this snippet above closing </head> or integrate into your existing <style> section -->
