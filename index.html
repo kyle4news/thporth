@@ -1490,7 +1490,7 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Desktop (1024px+) - CORRECTED RESPONSIVE BEHAVIOR */
+/* Desktop (1024px+) - Base desktop behavior */
 @media (min-width: 1024px) {
   /* Hide mobile elements */
   #mobile-toolbar,
@@ -1518,30 +1518,24 @@ div[id^="breaking-content-"] a:hover {
     margin-bottom: 0 !important;
   }
   
-  /* MAIN MENU FIXED TO LEFT EDGE FOR ALL DESKTOP SIZES */
+  /* NORMAL DESKTOP CONTAINER - CENTERED */
+  .container {
+    display: flex !important;
+    flex-direction: row !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 1421px !important;
+    margin: 0 auto !important; /* CENTERED at full screen */
+    height: calc(100% - 20px) !important;
+  }
+  
+  /* FIXED COLUMN WIDTHS */
   .main-menu {
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    z-index: 100 !important;
     flex: 0 0 165px !important;
     width: 165px !important;
     min-width: 165px !important;
     max-width: 165px !important;
   }
-  
-  /* CONTAINER ADJUSTED FOR FIXED MENU - THIS IS THE KEY FIX */
-  .container {
-    display: flex !important;
-    flex-direction: row !important;
-    padding: 0 !important;
-    margin-left: 165px !important; /* Space for fixed menu */
-    width: calc(100% - 165px) !important;
-    max-width: calc(1421px - 165px) !important;
-    height: calc(100% - 20px) !important;
-  }
-  
-  /* FIXED COLUMN WIDTHS */
   .column.tv-listings,
   #league-specific-column {
     flex: 0 0 250px !important;
@@ -1566,6 +1560,27 @@ div[id^="breaking-content-"] a:hover {
     width: 276px !important;
     min-width: 276px !important;
     max-width: 276px !important;
+  }
+}
+
+/* ONLY WHEN WINDOW GETS SMALLER - Fix main menu to left edge */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .container {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+  }
+  
+  .main-menu {
+    position: fixed !important;
+    left: 0 !important;
+    top: 20px !important;
+    z-index: 100 !important;
+  }
+  
+  .container {
+    margin-left: 165px !important; /* Space for fixed menu */
+    width: calc(100% - 165px) !important;
+    max-width: calc(1421px - 165px) !important;
   }
 }
 
