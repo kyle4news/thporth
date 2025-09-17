@@ -6255,12 +6255,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Keep container left-aligned when columns start disappearing
         if (windowWidth < totalWidth) {
-            container.style.margin = '0';
-            container.style.marginLeft = '0';
-            container.style.maxWidth = 'none';
+            container.style.setProperty('margin', '0', 'important');
+            container.style.setProperty('margin-left', '0', 'important');
+            container.style.setProperty('margin-right', 'auto', 'important');
+            container.style.setProperty('max-width', 'none', 'important');
+            container.style.setProperty('width', '100%', 'important');
         } else {
-            container.style.margin = '0 auto';
-            container.style.maxWidth = '1421px';
+            container.style.setProperty('margin', '0 auto', 'important');
+            container.style.setProperty('max-width', '1421px', 'important');
+            container.style.setProperty('width', '100%', 'important');
         }
         
         // Check if videos column is 85% cut off
