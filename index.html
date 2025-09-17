@@ -1534,24 +1534,9 @@ div[id^="breaking-content-"] a:hover {
 
 /* PREVENT MAIN MENU FROM GETTING CUT OFF */
 @media (min-width: 1024px) {
-  .main-menu {
-    position: relative !important;
-    left: auto !important;
-  }
-  
   .container {
-    margin-left: 0 !important;
-    width: 100% !important;
-    max-width: 1421px !important;
-    margin: 0 auto !important;
-  }
-}
-
-/* Only fix main menu when container actually moves to left edge */
-@media (min-width: 1024px) and (max-width: 1440px) {
-  .container {
-    margin: 0 !important;
-    margin-left: 0 !important;
+    min-width: 415px !important; /* Menu (165px) + Games (250px) minimum */
+    overflow-x: auto !important; /* Allow horizontal scroll if needed */
   }
 }
 
