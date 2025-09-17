@@ -1521,9 +1521,9 @@ div[id^="breaking-content-"] a:hover {
 
 
 
-/* PREVENT GAMES COLUMN FROM EXPANDING */
-.column.tv-listings,
-#league-specific-column {
+/* PREVENT GAMES COLUMN FROM EXPANDING - BUT RESPECT JS VISIBILITY */
+.column.tv-listings:not([style*="display: none"]),
+#league-specific-column:not([style*="display: none"]) {
   flex: 0 0 250px !important;
   width: 250px !important;
   min-width: 250px !important;
