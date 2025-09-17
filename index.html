@@ -1508,15 +1508,6 @@ div[id^="breaking-content-"] a:hover {
   color: white;
 }
 
-/* Force container to stay left-aligned when resizing */
-@media (max-width: 1420px) and (min-width: 768px) {
-  .container {
-    margin: 0 !important;
-    margin-left: 0 !important;
-    max-width: none !important;
-    width: 1421px !important;
-  }
-}
 
 .game-entry, .game-entry * {
   margin-top: 0 !important;
@@ -6233,110 +6224,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', handleResponsiveLayout);
 });
 
-// Progressive Responsive System - EXACT Implementation
-document.addEventListener('DOMContentLoaded', function() {
-    const responsiveTabs = document.getElementById('responsive-tabs');
-    const videosTab = document.getElementById('videos-tab');
-    const socialTab = document.getElementById('social-tab');
-    const newsTab = document.getElementById('news-tab');
-    
-    const videosColumn = document.querySelector('.column.videos-column');
-    const socialColumn = document.querySelector('.column.social');
-    const newsColumn = document.querySelector('.column.news');
-    const container = document.querySelector('.container');
-    
-    function handleProgressiveResize() {
-        // Only run on desktop
-        if (window.innerWidth <= 767) {
-            if (responsiveTabs) responsiveTabs.style.display = 'none';
-            // Show all columns on mobile
-            if (videosColumn) videosColumn.style.display = 'block';
-            if (socialColumn) socialColumn.style.display = 'block';
-            if (newsColumn) newsColumn.style.display = 'block';
-            return;
-        }
-        
-        const windowWidth = window.innerWidth;
-        
-        // Check each column individually for 85% cut-off
-        const videosRect = videosColumn ? videosColumn.getBoundingClientRect() : null;
-        const socialRect = socialColumn ? socialColumn.getBoundingClientRect() : null;
-        const newsRect = newsColumn ? newsColumn.getBoundingClientRect() : null;
-        
-        let hideVideos = false;
-        let hideSocial = false;
-        let hideNews = false;
-        
-        // Videos column 85% cut off check
-        if (videosRect) {
-            const cutOffAmount = Math.max(0, videosRect.right - windowWidth);
-            const cutOffPercentage = cutOffAmount / videosRect.width;
-            hideVideos = cutOffPercentage >= 0.85;
-        }
-        
-        // Social column 85% cut off check (only if videos is still visible)
-        if (socialRect && !hideVideos) {
-            const cutOffAmount = Math.max(0, socialRect.right - windowWidth);
-            const cutOffPercentage = cutOffAmount / socialRect.width;
-            hideSocial = cutOffPercentage >= 0.85;
-        } else if (hideVideos) {
-            hideSocial = true; // Hide social if videos is already hidden
-        }
-        
-        // News column 85% cut off check (only if social is still visible)
-        if (newsRect && !hideSocial) {
-            const cutOffAmount = Math.max(0, newsRect.right - windowWidth);
-            const cutOffPercentage = cutOffAmount / newsRect.width;
-            hideNews = cutOffPercentage >= 0.85;
-        } else if (hideSocial) {
-            hideNews = true; // Hide news if social is already hidden
-        }
-        
-        // Apply visibility
-        if (videosColumn) videosColumn.style.display = hideVideos ? 'none' : 'block';
-        if (socialColumn) socialColumn.style.display = hideSocial ? 'none' : 'block';
-        if (newsColumn) newsColumn.style.display = hideNews ? 'none' : 'block';
-        
-        // Handle tabs
-        let tabsToShow = [];
-        if (hideVideos) tabsToShow.push('videos');
-        if (hideSocial) tabsToShow.push('social');
-        if (hideNews) tabsToShow.push('news');
-        
-        if (tabsToShow.length > 0) {
-            if (responsiveTabs) responsiveTabs.style.display = 'flex';
-            
-            // Reset all tabs
-            if (videosTab) videosTab.style.display = 'none';
-            if (socialTab) socialTab.style.display = 'none';
-            if (newsTab) newsTab.style.display = 'none';
-            
-            // Show only hidden column tabs
-            tabsToShow.forEach((tab, index) => {
-                const isLast = index === tabsToShow.length - 1;
-                
-                if (tab === 'videos' && videosTab) {
-                    videosTab.style.display = 'inline-block';
-                    videosTab.innerHTML = isLast ? 'Videos →' : 'Videos';
-                }
-                if (tab === 'social' && socialTab) {
-                    socialTab.style.display = 'inline-block';
-                    socialTab.innerHTML = isLast ? 'Social →' : 'Social';
-                }
-                if (tab === 'news' && newsTab) {
-                    newsTab.style.display = 'inline-block';
-                    newsTab.innerHTML = isLast ? 'News →' : 'News';
-                }
-            });
-        } else {
-            if (responsiveTabs) responsiveTabs.style.display = 'none';
-        }
-    }
-    
-    // Run on load and resize
-    handleProgressiveResize();
-    window.addEventListener('resize', handleProgressiveResize);
-});
 </script>
  
   </body>
