@@ -1508,6 +1508,16 @@ div[id^="breaking-content-"] a:hover {
   color: white;
 }
 
+/* Force container to stay left-aligned when resizing */
+@media (max-width: 1420px) and (min-width: 768px) {
+  .container {
+    margin: 0 !important;
+    margin-left: 0 !important;
+    max-width: none !important;
+    width: 1421px !important;
+  }
+}
+
 .game-entry, .game-entry * {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
@@ -6239,53 +6249,50 @@ document.addEventListener('DOMContentLoaded', function() {
         // Only run on desktop
         if (window.innerWidth <= 767) {
             if (responsiveTabs) responsiveTabs.style.display = 'none';
+            // Show all columns on mobile
+            if (videosColumn) videosColumn.style.display = 'block';
+            if (socialColumn) socialColumn.style.display = 'block';
+            if (newsColumn) newsColumn.style.display = 'block';
             return;
         }
         
         const windowWidth = window.innerWidth;
         
-        // Stage 1: Remove right space, then left space
-        // Total width: 165+4+250+4+370+4+350+4+276 = 1427px
-        if (windowWidth >= 1427) {
-            // Full screen - centered with side margins
-            container.style.setProperty('margin', '0 auto', 'important');
-            container.style.setProperty('max-width', '1421px', 'important');
-        } else {
-            // Remove side margins - fix to left edge
-            container.style.setProperty('margin', '0', 'important');
-            container.style.setProperty('margin-left', '0', 'important');
-            container.style.setProperty('max-width', 'none', 'important');
-            container.style.setProperty('width', '1421px', 'important');
-        }
-        
-        // Stage 2: Videos column 85% cut off
+        // Check each column individually for 85% cut-off
         const videosRect = videosColumn ? videosColumn.getBoundingClientRect() : null;
+        const socialRect = socialColumn ? socialColumn.getBoundingClientRect() : null;
+        const newsRect = newsColumn ? newsColumn.getBoundingClientRect() : null;
+        
         let hideVideos = false;
-        if (videosRect && windowWidth < 1421) {
+        let hideSocial = false;
+        let hideNews = false;
+        
+        // Videos column 85% cut off check
+        if (videosRect) {
             const cutOffAmount = Math.max(0, videosRect.right - windowWidth);
             const cutOffPercentage = cutOffAmount / videosRect.width;
             hideVideos = cutOffPercentage >= 0.85;
         }
         
-        // Stage 3: Social column 85% cut off
-        const socialRect = socialColumn ? socialColumn.getBoundingClientRect() : null;
-        let hideSocial = false;
-        if (socialRect && windowWidth < 1421) {
+        // Social column 85% cut off check (only if videos is still visible)
+        if (socialRect && !hideVideos) {
             const cutOffAmount = Math.max(0, socialRect.right - windowWidth);
             const cutOffPercentage = cutOffAmount / socialRect.width;
             hideSocial = cutOffPercentage >= 0.85;
+        } else if (hideVideos) {
+            hideSocial = true; // Hide social if videos is already hidden
         }
         
-        // Stage 4: News column 85% cut off
-        const newsRect = newsColumn ? newsColumn.getBoundingClientRect() : null;
-        let hideNews = false;
-        if (newsRect && windowWidth < 1421) {
+        // News column 85% cut off check (only if social is still visible)
+        if (newsRect && !hideSocial) {
             const cutOffAmount = Math.max(0, newsRect.right - windowWidth);
             const cutOffPercentage = cutOffAmount / newsRect.width;
             hideNews = cutOffPercentage >= 0.85;
+        } else if (hideSocial) {
+            hideNews = true; // Hide news if social is already hidden
         }
         
-        // Apply column visibility
+        // Apply visibility
         if (videosColumn) videosColumn.style.display = hideVideos ? 'none' : 'block';
         if (socialColumn) socialColumn.style.display = hideSocial ? 'none' : 'block';
         if (newsColumn) newsColumn.style.display = hideNews ? 'none' : 'block';
@@ -6299,12 +6306,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tabsToShow.length > 0) {
             if (responsiveTabs) responsiveTabs.style.display = 'flex';
             
-            // Hide all tabs
+            // Reset all tabs
             if (videosTab) videosTab.style.display = 'none';
             if (socialTab) socialTab.style.display = 'none';
             if (newsTab) newsTab.style.display = 'none';
             
-            // Show relevant tabs with arrow on last
+            // Show only hidden column tabs
             tabsToShow.forEach((tab, index) => {
                 const isLast = index === tabsToShow.length - 1;
                 
@@ -6323,28 +6330,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         } else {
             if (responsiveTabs) responsiveTabs.style.display = 'none';
-        }
-        
-        // Final stage: Stack columns below when only Menu + Games remain
-        if (hideNews && hideSocial && hideVideos) {
-            // Enable stacking mode
-            container.style.setProperty('flex-direction', 'column', 'important');
-            
-            // Create horizontal section for Menu + Games
-            const menuGamesWrapper = document.createElement('div');
-            menuGamesWrapper.style.display = 'flex';
-            menuGamesWrapper.style.flexDirection = 'row';
-            menuGamesWrapper.style.width = '415px';
-            
-            // Move columns to stacked layout (simplified for now)
-            if (newsColumn) newsColumn.style.setProperty('order', '2', 'important');
-            if (socialColumn) socialColumn.style.setProperty('order', '3', 'important');
-            if (videosColumn) videosColumn.style.setProperty('order', '4', 'important');
-        } else {
-            container.style.setProperty('flex-direction', 'row', 'important');
-            if (newsColumn) newsColumn.style.setProperty('order', 'unset', 'important');
-            if (socialColumn) socialColumn.style.setProperty('order', 'unset', 'important');
-            if (videosColumn) videosColumn.style.setProperty('order', 'unset', 'important');
         }
     }
     
