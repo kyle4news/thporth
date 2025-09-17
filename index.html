@@ -3051,23 +3051,6 @@ div[id^="breaking-content-"] a:hover {
         const f1Content = document.getElementById('f1-column-content');
         const gamesContent = document.getElementById('tv-listings-container');
         
-        // --- TRACK CURRENT PAGE STATE ---
-        let currentLeagueKey = 'Home';
-        
-        // --- CORRECTED RESIZE HANDLER THAT RESPECTS PAGE STATE ---
-        function handleResponsiveLayout() {
-            // Only apply the correct visibility based on current page
-            if (currentLeagueKey === 'Home') {
-                if (gamesColumn) gamesColumn.style.display = 'block';
-                if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'none';
-            } else {
-                if (gamesColumn) gamesColumn.style.display = 'none';
-                if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'block';
-            }
-        }
-        
-        // Add resize handler
-        window.addEventListener('resize', handleResponsiveLayout);
 
         // --- NEW: FALLBACK URLs FOR THE HOME PAGE ---
         const HOME_PAGE_FEEDS = {
@@ -3148,9 +3131,6 @@ div[id^="breaking-content-"] a:hover {
                 document.querySelectorAll("#menuList li[data-section]").forEach(li => li.classList.remove("selected"));
                 item.classList.add("selected");
                 const section = item.dataset.section;
-                
-                // Update current page state
-                currentLeagueKey = section;
 
                 if (section === 'Home') {
                     gamesColumn.style.display = 'block';
