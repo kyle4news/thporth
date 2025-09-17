@@ -6248,11 +6248,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Check if videos column is 85% cut off
         const videosRect = videosColumn ? videosColumn.getBoundingClientRect() : null;
-        const videosVisible = videosRect ? (videosRect.left + (videosRect.width * 0.15)) <= windowWidth : true;
+        let videosVisible = true;
+        if (videosRect) {
+            const visibleWidth = Math.max(0, windowWidth - videosRect.left);
+            const visiblePercentage = visibleWidth / videosRect.width;
+            videosVisible = visiblePercentage >= 0.15; // Hide when less than 15% visible (85% cut off)
+        }
         
         // Check if social column is 85% cut off  
         const socialRect = socialColumn ? socialColumn.getBoundingClientRect() : null;
-        const socialVisible = socialRect ? (socialRect.left + (socialRect.width * 0.15)) <= windowWidth : true;
+        let socialVisible = true;
+        if (socialRect) {
+            const visibleWidth = Math.max(0, windowWidth - socialRect.left);
+            const visiblePercentage = visibleWidth / socialRect.width;
+            socialVisible = visiblePercentage >= 0.15; // Hide when less than 15% visible (85% cut off)
+        }
         
         // Check if news column is cut off (keep original for news)
         const newsRect = newsColumn ? newsColumn.getBoundingClientRect() : null;
