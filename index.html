@@ -1490,7 +1490,7 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Desktop (1024px+) - Standard responsive behavior */
+/* Desktop (1024px+) - CORRECTED RESPONSIVE BEHAVIOR */
 @media (min-width: 1024px) {
   /* Hide mobile elements */
   #mobile-toolbar,
@@ -1514,26 +1514,34 @@ div[id^="breaking-content-"] a:hover {
   .column.social,
   .column.videos-column { 
     order: unset; 
+    display: block !important;
+    margin-bottom: 0 !important;
   }
   
-  /* Desktop container - responsive width */
-  .container {
-    display: flex !important;
-    flex-direction: row !important;
-    padding: 0 !important;
-    width: 100% !important;
-    max-width: 1421px !important;
-    margin: 0 auto !important;
-    height: calc(100% - 20px) !important;
-  }
-  
-  /* FORCE ALL COLUMNS TO KEEP THEIR FIXED WIDTHS ALWAYS */
+  /* MAIN MENU FIXED TO LEFT EDGE FOR ALL DESKTOP SIZES */
   .main-menu {
+    position: fixed !important;
+    left: 0 !important;
+    top: 20px !important;
+    z-index: 100 !important;
     flex: 0 0 165px !important;
     width: 165px !important;
     min-width: 165px !important;
     max-width: 165px !important;
   }
+  
+  /* CONTAINER ADJUSTED FOR FIXED MENU - THIS IS THE KEY FIX */
+  .container {
+    display: flex !important;
+    flex-direction: row !important;
+    padding: 0 !important;
+    margin-left: 165px !important; /* Space for fixed menu */
+    width: calc(100% - 165px) !important;
+    max-width: calc(1421px - 165px) !important;
+    height: calc(100% - 20px) !important;
+  }
+  
+  /* FIXED COLUMN WIDTHS */
   .column.tv-listings,
   #league-specific-column {
     flex: 0 0 250px !important;
@@ -1561,31 +1569,7 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* SIMPLE RULE: Fix main menu to left edge when window is smaller than full width */
-@media (min-width: 1024px) and (max-width: 1440px) {
-  .container {
-    margin-left: 0 !important;
-    margin-right: auto !important;
-  }
-}
-
-/* Large Desktop - Progressive column hiding */
-@media (min-width: 1024px) and (max-width: 1420px) {
-  .container {
-    margin: 0 !important;
-    margin-left: 0 !important;
-  }
-  
-  /* Keep main menu fixed to left edge FOREVER once window gets smaller */
-  .main-menu {
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    z-index: 100 !important;
-  }
-}
-
-/* Very small desktop - Hide videos column */
+/* Progressive column hiding for smaller desktop screens */
 @media (min-width: 1024px) and (max-width: 1200px) {
   .column.videos-column {
     display: none !important;
@@ -1596,85 +1580,14 @@ div[id^="breaking-content-"] a:hover {
   #videos-tab {
     display: inline-block !important;
   }
-  
-  /* Keep columns at their fixed widths */
-  .main-menu {
-    flex: 0 0 165px !important;
-    position: sticky !important;
-    left: 0 !important;
-  }
-  .column.tv-listings,
-  #league-specific-column {
-    flex: 0 0 250px !important;
-  }
-  .column.news {
-    flex: 0 0 370px !important;
-  }
-  .column.social {
-    flex: 0 0 350px !important;
-  }
 }
 
-/* Smaller desktop - Hide social column too */
 @media (min-width: 1024px) and (max-width: 1000px) {
   .column.social {
     display: none !important;
   }
   #social-tab {
     display: inline-block !important;
-  }
-  
-  /* Keep remaining columns at their fixed widths */
-  .main-menu {
-    flex: 0 0 165px !important;
-    position: sticky !important;
-    left: 0 !important;
-  }
-  .column.tv-listings,
-  #league-specific-column {
-    flex: 0 0 250px !important;
-  }
-  .column.news {
-    flex: 0 0 370px !important;
-  }
-}
-
-/* Small desktop - Hide news column, stack remaining */
-@media (min-width: 1024px) and (max-width: 800px) {
-  .column.news {
-    display: none !important;
-  }
-  #news-tab {
-    display: inline-block !important;
-  }
-  
-  .container {
-    flex-direction: column !important;
-    height: auto !important;
-  }
-  
-  /* Create horizontal section for menu + games */
-  .main-menu,
-  .column.tv-listings,
-  #league-specific-column {
-    order: 1 !important;
-  }
-  
-  /* Stack hidden columns below */
-  .column.news {
-    order: 2 !important;
-    display: block !important;
-    width: 100% !important;
-  }
-  .column.social {
-    order: 3 !important;
-    display: block !important;
-    width: 100% !important;
-  }
-  .column.videos-column {
-    order: 4 !important;
-    display: block !important;
-    width: 100% !important;
   }
 }
 
