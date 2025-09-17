@@ -1532,25 +1532,26 @@ div[id^="breaking-content-"] a:hover {
   flex-shrink: 0 !important;
 }
 
-/* RESPONSIVE LAYOUT ADJUSTMENTS */
-@media (max-width: 1200px) {
-  /* Make main menu and games column full height when other columns are stacked */
-  .main-menu,
-  .column.tv-listings,
-  #league-specific-column {
-    height: calc(100vh - 20px) !important;
+/* PREVENT MAIN MENU FROM GETTING CUT OFF */
+@media (min-width: 1024px) {
+  .main-menu {
+    position: relative !important;
+    left: auto !important;
   }
   
-  /* Double the height of news sections when stacked */
-  .column.news {
-    height: calc(200vh - 40px) !important;
+  .container {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 1421px !important;
+    margin: 0 auto !important;
   }
-  
-  /* Specifically target Headlines and Breaking sections */
-  .news-content #headlines,
-  .news-content #breaking {
-    min-height: calc(100vh - 100px) !important;
-    height: calc(100vh - 100px) !important;
+}
+
+/* Only fix main menu when container actually moves to left edge */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .container {
+    margin: 0 !important;
+    margin-left: 0 !important;
   }
 }
 
