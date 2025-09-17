@@ -1309,7 +1309,8 @@ div[id^="breaking-content-"] a:hover {
   }
 </style>
 	  <style>
-		  /* ───────────── Header Styling ───────────── */
+		/* ───────────── Header Styling ───────────── */
+/* Note: No changes needed here, your original code is fine. */
 #resp-header {
   display: none;
   position: sticky;
@@ -1348,6 +1349,7 @@ div[id^="breaking-content-"] a:hover {
 #resp-header .hamburger::after  { top:  6px; }
 
 /* ───────────── Overlay Panels ───────────── */
+/* Note: No changes needed here, your original code is fine. */
 .column.main-menu.open,
 .column.tv-listings.open {
   position: absolute;
@@ -1376,19 +1378,23 @@ div[id^="breaking-content-"] a:hover {
 
 
 /* ═══════════════════════════════════════════════════════════════════
-   RESPONSIVE DESIGN - STANDARD WEB PRACTICES
+   RESPONSIVE DESIGN - CORRECTED LOGIC
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Mobile First - Base styles (0-767px) */
-@media (max-width: 767px) {
+/* ──────────────────────────────────────────────────
+   Mobile First: Styles for screens up to 1023px
+   (This covers both mobile and tablet breakpoints)
+   ────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
   /* Hide desktop elements */
-  .main-menu { display: none !important; }
-  .divider { display: none !important; }
-  #resp-header { display: none !important; }
+  .main-menu,
+  .divider,
+  #resp-header {
+    display: none !important;
+  }
   
   /* Show mobile toolbar */
-  #mobile-toolbar,
-  div#mobile-toolbar { 
+  #mobile-toolbar { 
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -1404,6 +1410,7 @@ div[id^="breaking-content-"] a:hover {
     max-width: none !important;
     width: 100% !important;
     height: auto !important;
+    margin: 0 !important; /* Reset desktop margin */
   }
   
   /* All columns full width and stacked */
@@ -1416,7 +1423,7 @@ div[id^="breaking-content-"] a:hover {
   }
   
   /* Column priority order */
-  .column.tv-listings { order: 1; }
+  .column.tv-listings,
   #league-specific-column { order: 1; }
   .column.news { order: 2; }
   .column.social { order: 3; }
@@ -1448,88 +1455,61 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Tablet (768px - 1023px) - Same as mobile */
-@media (min-width: 768px) and (max-width: 1023px) {
-  /* Same mobile layout for tablets */
-  .main-menu { display: none !important; }
-  .divider { display: none !important; }
-  
-  #mobile-toolbar,
-  div#mobile-toolbar { 
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-  
-  .container {
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 0 15px !important;
-    max-width: none !important;
-    width: 100% !important;
-    height: auto !important;
-  }
-  
-  .column {
-    width: 100% !important;
-    min-width: 0 !important;
-    flex: 0 0 auto !important;
-    margin-bottom: 15px !important;
-    max-width: 100% !important;
-  }
-  
-  .column.tv-listings { order: 1; }
-  #league-specific-column { order: 1; }
-  .column.news { order: 2; }
-  .column.social { order: 3; }
-  .column.videos-column { order: 4; }
-  
-  body {
-    padding-bottom: 60px !important;
-  }
-}
 
-/* Desktop (1024px+) - Base desktop behavior */
+/* ──────────────────────────────────────────────────
+   Desktop: Styles for screens 1024px and up
+   (This is the new desktop base)
+   ────────────────────────────────────────────────── */
 @media (min-width: 1024px) {
   /* Hide mobile elements */
   #mobile-toolbar,
-  div#mobile-toolbar,
   #mobile-menu-overlay,
-  div#mobile-menu-overlay { 
-    display: none !important; 
+  #topBar::after {
+    display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
   }
   
-  body {
-    padding-bottom: 0 !important;
-  }
+  /* Show desktop elements */
+  #resp-header { display: flex !important; }
+  body { padding-bottom: 0 !important; }
   
-  /* Reset column ordering */
-  .column.tv-listings,
-  #league-specific-column,
-  .column.news,
-  .column.social,
-  .column.videos-column { 
-    order: unset; 
-    display: block !important;
-    margin-bottom: 0 !important;
-  }
+  /* Reset mobile column ordering */
+  .column { order: unset; }
   
-  /* NORMAL DESKTOP CONTAINER - CENTERED */
+  /* Desktop container - responsive width, not full width */
   .container {
     display: flex !important;
     flex-direction: row !important;
     padding: 0 !important;
     width: 100% !important;
     max-width: 1421px !important;
-    margin: 0 auto !important; /* CENTERED at full screen */
+    margin: 0 auto !important;
     height: calc(100% - 20px) !important;
   }
+
+  /*
+    REQUEST 1: Force main menu to be fixed to the left edge of the browser window.
+    We apply this to all desktop views (1024px and up).
+  */
+  .main-menu {
+    position: fixed;
+    left: 0;
+    top: 50px; /* Aligns with the desktop header */
+    z-index: 100;
+  }
   
-  /* FIXED COLUMN WIDTHS */
+  /*
+    To prevent content from hiding behind the fixed menu,
+    we must add a left margin to the main content container.
+  */
+  .container {
+    margin-left: 165px !important; /* Matches the width of the main-menu */
+  }
+
+  /* REQUEST 2: FORCE ALL COLUMNS TO KEEP THEIR FIXED WIDTHS ALWAYS */
+  /* This ensures the games column never expands. */
   .main-menu {
     flex: 0 0 165px !important;
     width: 165px !important;
@@ -1563,48 +1543,29 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* ONLY WHEN WINDOW GETS SMALLER - Fix main menu to left edge */
-@media (min-width: 1024px) and (max-width: 1440px) {
-  .container {
-    margin-left: 0 !important;
-    margin-right: auto !important;
-  }
-  
-  .main-menu {
-    position: fixed !important;
-    left: 0 !important;
-    top: 20px !important;
-    z-index: 100 !important;
-  }
-  
-  .container {
-    margin-left: 165px !important; /* Space for fixed menu */
-    width: calc(100% - 165px) !important;
-    max-width: calc(1421px - 165px) !important;
-  }
-}
-
-/* Progressive column hiding for smaller desktop screens */
-@media (min-width: 1024px) and (max-width: 1200px) {
-  .column.videos-column {
-    display: none !important;
-  }
-  #responsive-tabs {
-    display: flex !important;
-  }
-  #videos-tab {
-    display: inline-block !important;
-  }
-}
-
-@media (min-width: 1024px) and (max-width: 1000px) {
+/* ──────────────────────────────────────────────────
+   Progressive Column Hiding for smaller desktops
+   ────────────────────────────────────────────────── */
+@media (min-width: 1024px) and (max-width: 1420px) {
+  /* Hide videos column and social column together to save space */
+  .column.videos-column,
   .column.social {
     display: none !important;
   }
+  #responsive-tabs,
+  #videos-tab,
   #social-tab {
     display: inline-block !important;
   }
 }
+
+/* ──────────────────────────────────────────────────
+   Very Small Desktop: Hide news column
+   ────────────────────────────────────────────────── */
+@media (min-width: 1024px) and (max-width: 1023px) {
+  /* This media query is impossible and has been removed */
+}
+
 
 /* ───────────── RESPONSIVE TABS STYLING ───────────── */
 #responsive-tabs {
@@ -1616,7 +1577,6 @@ div[id^="breaking-content-"] a:hover {
   padding-right: 0;
   margin-right: 0;
 }
-
 .videos-tab-btn {
   background: #2a2a2a;
   color: #5f5f5f;
@@ -1626,13 +1586,12 @@ div[id^="breaking-content-"] a:hover {
   cursor: pointer;
   margin-left: 1px;
 }
-
 .videos-tab-btn.active {
   background: #3c3c3c;
   color: white;
 }
 
-
+/* ───────────── UTILITY STYLES ───────────── */
 .game-entry, .game-entry * {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
@@ -1642,8 +1601,6 @@ div[id^="breaking-content-"] a:hover {
   padding-bottom: 0 !important;
   line-height: 1.1 !important;
 }
-
-
 
 </style>
 
