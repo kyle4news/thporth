@@ -1497,7 +1497,7 @@ div[id^="breaking-content-"] a:hover {
   div#mobile-toolbar,
   #mobile-menu-overlay,
   div#mobile-menu-overlay { 
-    display: none !important;
+    display: none !important; 
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
@@ -1525,6 +1525,14 @@ div[id^="breaking-content-"] a:hover {
     max-width: 1421px !important;
     margin: 0 auto !important;
     height: calc(100% - 20px) !important;
+  }
+}
+
+/* SIMPLE RULE: Fix main menu to left edge when window is smaller than full width */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .container {
+    margin-left: 0 !important;
+    margin-right: auto !important;
   }
 }
 
