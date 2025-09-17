@@ -6063,40 +6063,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize mobile interface
     populateMobileMenu();
     
-    // Function to handle responsive layout
-    function handleResponsiveLayout() {
-        if (window.innerWidth <= 1023) {
-            // Mobile: show appropriate columns (league column only if on league page)
-            if (gamesColumn) gamesColumn.style.display = 'block';
-            // League column should only be visible if it was already visible (on league pages)
-            if (leagueColumn && leagueColumn.style.display === 'block') {
-                leagueColumn.style.display = 'block';
-            } else if (leagueColumn) {
-                leagueColumn.style.display = 'none';
-            }
-            if (newsColumn) newsColumn.style.display = 'block';
-            if (socialColumn) socialColumn.style.display = 'block';
-            if (videosColumn) videosColumn.style.display = 'block';
-        } else {
-            // Desktop: show appropriate columns (respect original visibility logic)
-            if (gamesColumn) gamesColumn.style.display = 'block';
-            // League column should only be visible if it was already visible (on league pages)
-            if (leagueColumn && leagueColumn.style.display === 'block') {
-                leagueColumn.style.display = 'block';
-            } else if (leagueColumn) {
-                leagueColumn.style.display = 'none';
-            }
-            if (newsColumn) newsColumn.style.display = 'block';
-            if (socialColumn) socialColumn.style.display = 'block';
-            if (videosColumn) videosColumn.style.display = 'block';
-        }
-    }
-    
-    // Initialize layout
-    handleResponsiveLayout();
-    
-    // Handle window resize
-    window.addEventListener('resize', handleResponsiveLayout);
 });
 
 </script>
