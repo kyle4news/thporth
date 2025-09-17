@@ -1553,6 +1553,21 @@ div[id^="breaking-content-"] a:hover {
   #videos-tab {
     display: inline-block !important;
   }
+  
+  /* Keep columns at their fixed widths */
+  .main-menu {
+    flex: 0 0 165px !important;
+  }
+  .column.tv-listings,
+  #league-specific-column {
+    flex: 0 0 250px !important;
+  }
+  .column.news {
+    flex: 0 0 370px !important;
+  }
+  .column.social {
+    flex: 0 0 350px !important;
+  }
 }
 
 /* Smaller desktop - Hide social column too */
@@ -1562,6 +1577,18 @@ div[id^="breaking-content-"] a:hover {
   }
   #social-tab {
     display: inline-block !important;
+  }
+  
+  /* Keep remaining columns at their fixed widths */
+  .main-menu {
+    flex: 0 0 165px !important;
+  }
+  .column.tv-listings,
+  #league-specific-column {
+    flex: 0 0 250px !important;
+  }
+  .column.news {
+    flex: 0 0 370px !important;
   }
 }
 
