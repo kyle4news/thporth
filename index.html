@@ -1375,14 +1375,18 @@ div[id^="breaking-content-"] a:hover {
 }
 
 
-/* ───────────── MOBILE & TABLET (≤767px) ───────────── */
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN - STANDARD WEB PRACTICES
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Mobile First - Base styles (0-767px) */
 @media (max-width: 767px) {
   /* Hide desktop elements */
   .main-menu { display: none !important; }
   .divider { display: none !important; }
   #resp-header { display: none !important; }
   
-  /* Show mobile elements only on mobile screens */
+  /* Show mobile toolbar */
   #mobile-toolbar,
   div#mobile-toolbar { 
     display: flex !important;
@@ -1392,7 +1396,7 @@ div[id^="breaking-content-"] a:hover {
   }
   #mobile-menu-overlay { display: none !important; }
   
-  /* Container becomes single column */
+  /* Single column stacked layout */
   .container {
     display: flex !important;
     flex-direction: column !important;
@@ -1411,7 +1415,7 @@ div[id^="breaking-content-"] a:hover {
     max-width: 100% !important;
   }
   
-  /* Column order: Games, News, Social, Videos */
+  /* Column priority order */
   .column.tv-listings { order: 1; }
   #league-specific-column { order: 1; }
   .column.news { order: 2; }
@@ -1438,22 +1442,59 @@ div[id^="breaking-content-"] a:hover {
     display: block;
   }
   
-  /* Body padding for mobile toolbar */
+  /* Space for mobile toolbar */
   body {
     padding-bottom: 60px !important;
   }
 }
 
-/* ───────────── DESKTOP BASE (≥1024px) ───────────── */
-@media (min-width: 1024px) {
-  /* Force hide mobile elements on desktop with highest specificity */
+/* Tablet (768px - 1023px) - Same as mobile */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Same mobile layout for tablets */
+  .main-menu { display: none !important; }
+  .divider { display: none !important; }
+  
   #mobile-toolbar,
   div#mobile-toolbar { 
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
+  
+  .container {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 15px !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  .column {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    margin-bottom: 15px !important;
+    max-width: 100% !important;
+  }
+  
+  .column.tv-listings { order: 1; }
+  #league-specific-column { order: 1; }
+  .column.news { order: 2; }
+  .column.social { order: 3; }
+  .column.videos-column { order: 4; }
+  
+  body {
+    padding-bottom: 60px !important;
+  }
+}
+
+/* Desktop (1024px+) - Standard responsive behavior */
+@media (min-width: 1024px) {
+  /* Hide mobile elements */
+  #mobile-toolbar,
+  div#mobile-toolbar,
   #mobile-menu-overlay,
   div#mobile-menu-overlay { 
     display: none !important; 
@@ -1462,23 +1503,98 @@ div[id^="breaking-content-"] a:hover {
     pointer-events: none !important;
   }
   
-  /* Reset body padding */
   body {
     padding-bottom: 0 !important;
   }
   
   /* Reset column ordering */
-  .column.tv-listings { order: unset; }
-  #league-specific-column { order: unset; }
-  .column.news { order: unset; }
-  .column.social { order: unset; }
-  .column.videos-column { order: unset; }
+  .column.tv-listings,
+  #league-specific-column,
+  .column.news,
+  .column.social,
+  .column.videos-column { 
+    order: unset; 
+  }
   
-  /* Base desktop container - will be overridden by progressive responsive */
+  /* Desktop container - responsive width */
   .container {
     display: flex !important;
     flex-direction: row !important;
     padding: 0 !important;
+    width: 100% !important;
+    max-width: 1421px !important;
+    margin: 0 auto !important;
+    height: calc(100% - 20px) !important;
+  }
+}
+
+/* Large Desktop - Progressive column hiding */
+@media (min-width: 1024px) and (max-width: 1420px) {
+  .container {
+    margin: 0 !important;
+    margin-left: 0 !important;
+  }
+}
+
+/* Very small desktop - Hide videos column */
+@media (min-width: 1024px) and (max-width: 1200px) {
+  .column.videos-column {
+    display: none !important;
+  }
+  #responsive-tabs {
+    display: flex !important;
+  }
+  #videos-tab {
+    display: inline-block !important;
+  }
+}
+
+/* Smaller desktop - Hide social column too */
+@media (min-width: 1024px) and (max-width: 1000px) {
+  .column.social {
+    display: none !important;
+  }
+  #social-tab {
+    display: inline-block !important;
+  }
+}
+
+/* Small desktop - Hide news column, stack remaining */
+@media (min-width: 1024px) and (max-width: 800px) {
+  .column.news {
+    display: none !important;
+  }
+  #news-tab {
+    display: inline-block !important;
+  }
+  
+  .container {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  
+  /* Create horizontal section for menu + games */
+  .main-menu,
+  .column.tv-listings,
+  #league-specific-column {
+    order: 1 !important;
+  }
+  
+  /* Stack hidden columns below */
+  .column.news {
+    order: 2 !important;
+    display: block !important;
+    width: 100% !important;
+  }
+  .column.social {
+    order: 3 !important;
+    display: block !important;
+    width: 100% !important;
+  }
+  .column.videos-column {
+    order: 4 !important;
+    display: block !important;
+    width: 100% !important;
   }
 }
 
