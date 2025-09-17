@@ -1487,10 +1487,22 @@ div[id^="breaking-content-"] a:hover {
 /* Default: All columns visible with centered container and side margins */
 
 /* Stage 1: Videos column disappears - Menu, Games, News, Social remain */
-@media (max-width: 1145px) and (min-width: 768px) {
+@media (max-width: 1145px) and (min-width: 796px) {
   .container {
     max-width: 1145px !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+    width: 1145px !important;
+  }
+  
+  /* Fix main menu to left edge */
+  .column.main-menu {
+    position: fixed !important;
+    left: 0 !important;
+    top: 20px !important;
+    width: 165px !important;
+    height: calc(100vh - 20px) !important;
+    z-index: 50 !important;
   }
   
   .column.videos-column {
@@ -1522,10 +1534,22 @@ div[id^="breaking-content-"] a:hover {
 }
 
 /* Stage 2: Social column disappears - Menu, Games, News remain */
-@media (max-width: 795px) and (min-width: 768px) {
+@media (max-width: 795px) and (min-width: 745px) {
   .container {
     max-width: 795px !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+    width: 795px !important;
+  }
+  
+  /* Fix main menu to left edge */
+  .column.main-menu {
+    position: fixed !important;
+    left: 0 !important;
+    top: 20px !important;
+    width: 165px !important;
+    height: calc(100vh - 20px) !important;
+    z-index: 50 !important;
   }
   
   .column.videos-column,
@@ -1564,10 +1588,29 @@ div[id^="breaking-content-"] a:hover {
 }
 
 /* Stage 3: News column disappears - Menu, Games remain */
-@media (max-width: 425px) and (min-width: 768px) {
+@media (max-width: 744px) and (min-width: 768px) {
   .container {
-    max-width: 425px !important;
-    margin: 0 auto !important;
+    max-width: 415px !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+    width: 415px !important;
+  }
+  
+  /* Fix main menu to left edge */
+  .column.main-menu {
+    position: fixed !important;
+    left: 0 !important;
+    top: 20px !important;
+    width: 165px !important;
+    height: calc(100vh - 20px) !important;
+    z-index: 50 !important;
+  }
+  
+  /* Games column fixed next to menu */
+  .column.tv-listings,
+  #league-specific-column {
+    margin-left: 165px !important;
+    width: 250px !important;
   }
   
   .column.videos-column,
