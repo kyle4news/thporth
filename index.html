@@ -6242,9 +6242,26 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        const containerRect = container.getBoundingClientRect();
-        const containerRight = containerRect.right;
+        // Calculate total width of all visible columns
+        const menuWidth = 165;
+        const gamesWidth = 250; 
+        const newsWidth = 370;
+        const socialWidth = 350;
+        const videosWidth = 276;
+        const dividerWidth = 4;
+        
+        const totalWidth = menuWidth + gamesWidth + newsWidth + socialWidth + videosWidth + (dividerWidth * 4);
         const windowWidth = window.innerWidth;
+        
+        // Keep container left-aligned when columns start disappearing
+        if (windowWidth < totalWidth) {
+            container.style.margin = '0';
+            container.style.marginLeft = '0';
+            container.style.maxWidth = 'none';
+        } else {
+            container.style.margin = '0 auto';
+            container.style.maxWidth = '1421px';
+        }
         
         // Check if videos column is 85% cut off
         const videosRect = videosColumn ? videosColumn.getBoundingClientRect() : null;
