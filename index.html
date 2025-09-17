@@ -1526,6 +1526,39 @@ div[id^="breaking-content-"] a:hover {
     margin: 0 auto !important;
     height: calc(100% - 20px) !important;
   }
+  
+  /* FORCE ALL COLUMNS TO KEEP THEIR FIXED WIDTHS ALWAYS */
+  .main-menu {
+    flex: 0 0 165px !important;
+    width: 165px !important;
+    min-width: 165px !important;
+    max-width: 165px !important;
+  }
+  .column.tv-listings,
+  #league-specific-column {
+    flex: 0 0 250px !important;
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+  }
+  .column.news {
+    flex: 0 0 370px !important;
+    width: 370px !important;
+    min-width: 370px !important;
+    max-width: 370px !important;
+  }
+  .column.social {
+    flex: 0 0 350px !important;
+    width: 350px !important;
+    min-width: 350px !important;
+    max-width: 350px !important;
+  }
+  .column.videos-column {
+    flex: 0 0 276px !important;
+    width: 276px !important;
+    min-width: 276px !important;
+    max-width: 276px !important;
+  }
 }
 
 /* SIMPLE RULE: Fix main menu to left edge when window is smaller than full width */
