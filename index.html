@@ -1521,15 +1521,31 @@ div[id^="breaking-content-"] a:hover {
 
 
 
-/* PREVENT GAMES COLUMN FROM EXPANDING */
-.column.tv-listings,
-#league-specific-column {
+/* ABSOLUTELY FORCE HIDE COLUMNS WHEN JS SETS DISPLAY NONE - OVERRIDE ALL RESPONSIVE CSS */
+.column.tv-listings[style*="display: none"],
+#league-specific-column[style*="display: none"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* PREVENT GAMES COLUMN FROM EXPANDING - ONLY WHEN VISIBLE */
+.column.tv-listings:not([style*="display: none"]),
+#league-specific-column:not([style*="display: none"]) {
   flex: 0 0 250px !important;
   width: 250px !important;
   min-width: 250px !important;
   max-width: 250px !important;
   flex-grow: 0 !important;
   flex-shrink: 0 !important;
+}
+
+/* ADD 10PX SPACE TO LEFT OF MAIN MENU */
+.main-menu {
+  margin-left: 10px !important;
 }
 
 </style>
@@ -6239,4 +6255,3 @@ document.addEventListener('DOMContentLoaded', function() {
  
   </body>
 </html>
-
