@@ -1521,6 +1521,17 @@ div[id^="breaking-content-"] a:hover {
 
 
 
+/* PREVENT GAMES COLUMN FROM EXPANDING */
+.column.tv-listings,
+#league-specific-column {
+  flex: 0 0 250px !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+}
+
 </style>
 
 <!-- Add this snippet above closing </head> or integrate into your existing <style> section -->
