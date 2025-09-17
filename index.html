@@ -1449,7 +1449,7 @@ div[id^="breaking-content-"] a:hover {
   /* Force hide mobile elements on desktop with highest specificity */
   #mobile-toolbar,
   div#mobile-toolbar { 
-    display: none !important; 
+    display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
@@ -1482,9 +1482,9 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* SIMPLE PROGRESSIVE HIDING - NO FIXED POSITIONING */
+/* ───────────── DESKTOP PROGRESSIVE RESPONSIVE ───────────── */
 
-/* Stage 1: Videos column disappears */
+/* Videos disappears first */
 @media (max-width: 1145px) and (min-width: 796px) {
   .column.videos-column {
     display: none !important;
@@ -1513,7 +1513,7 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Stage 2: Social column disappears */
+/* Social disappears second */
 @media (max-width: 795px) and (min-width: 746px) {
   .column.videos-column,
   .column.social {
@@ -1549,8 +1549,8 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
-/* Stage 3: News column disappears */
-@media (max-width: 745px) and (min-width: 416px) {
+/* News disappears third - only Menu + Games remain */
+@media (max-width: 745px) and (min-width: 768px) {
   .column.videos-column,
   .column.social,
   .column.news {
@@ -1585,46 +1585,6 @@ div[id^="breaking-content-"] a:hover {
   
   #news-tab::after {
     content: " →";
-  }
-}
-
-/* Stage 4: Final stacking - Menu + Games horizontal, others below */
-@media (max-width: 415px) and (min-width: 768px) {
-  .container {
-    flex-direction: column !important;
-    height: auto !important;
-  }
-  
-  /* Create horizontal section for Menu + Games */
-  .horizontal-wrapper {
-    display: flex !important;
-    flex-direction: row !important;
-    width: 415px !important;
-    margin-bottom: 10px !important;
-  }
-  
-  .column.main-menu {
-    width: 165px !important;
-    flex: 0 0 165px !important;
-  }
-  
-  .column.tv-listings,
-  #league-specific-column {
-    width: 250px !important;
-    flex: 0 0 250px !important;
-  }
-  
-  /* Stack others below */
-  .column.news,
-  .column.social,
-  .column.videos-column {
-    display: block !important;
-    width: 100% !important;
-    margin-bottom: 10px !important;
-  }
-  
-  #responsive-tabs {
-    display: none !important;
   }
 }
 
