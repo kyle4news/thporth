@@ -6223,7 +6223,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', handleResponsiveLayout);
 });
 
-// Progressive Responsive System - Detects when columns are cut off
+// Progressive Responsive System - EXACT Implementation
 document.addEventListener('DOMContentLoaded', function() {
     const responsiveTabs = document.getElementById('responsive-tabs');
     const videosTab = document.getElementById('videos-tab');
@@ -6235,93 +6235,76 @@ document.addEventListener('DOMContentLoaded', function() {
     const newsColumn = document.querySelector('.column.news');
     const container = document.querySelector('.container');
     
-    function checkColumnVisibility() {
-        // Only run on desktop (not mobile)
+    function handleProgressiveResize() {
+        // Only run on desktop
         if (window.innerWidth <= 767) {
             if (responsiveTabs) responsiveTabs.style.display = 'none';
             return;
         }
         
-        // Calculate total width of all visible columns
-        const menuWidth = 165;
-        const gamesWidth = 250; 
-        const newsWidth = 370;
-        const socialWidth = 350;
-        const videosWidth = 276;
-        const dividerWidth = 4;
-        
-        const totalWidth = menuWidth + gamesWidth + newsWidth + socialWidth + videosWidth + (dividerWidth * 4);
         const windowWidth = window.innerWidth;
         
-        // Keep container left-aligned when columns start disappearing
-        if (windowWidth < totalWidth) {
-            container.style.setProperty('margin', '0', 'important');
-            container.style.setProperty('margin-left', '0', 'important');
-            container.style.setProperty('margin-right', 'auto', 'important');
-            container.style.setProperty('max-width', 'none', 'important');
-            container.style.setProperty('width', '100%', 'important');
-        } else {
+        // Stage 1: Remove right space, then left space
+        // Total width: 165+4+250+4+370+4+350+4+276 = 1427px
+        if (windowWidth >= 1427) {
+            // Full screen - centered with side margins
             container.style.setProperty('margin', '0 auto', 'important');
             container.style.setProperty('max-width', '1421px', 'important');
-            container.style.setProperty('width', '100%', 'important');
+        } else {
+            // Remove side margins - fix to left edge
+            container.style.setProperty('margin', '0', 'important');
+            container.style.setProperty('margin-left', '0', 'important');
+            container.style.setProperty('max-width', 'none', 'important');
+            container.style.setProperty('width', '1421px', 'important');
         }
         
-        // Check if videos column is 85% cut off
+        // Stage 2: Videos column 85% cut off
         const videosRect = videosColumn ? videosColumn.getBoundingClientRect() : null;
-        let videosVisible = true;
-        if (videosRect) {
-            const visibleWidth = Math.max(0, windowWidth - videosRect.left);
-            const visiblePercentage = visibleWidth / videosRect.width;
-            videosVisible = visiblePercentage >= 0.15; // Hide when less than 15% visible (85% cut off)
+        let hideVideos = false;
+        if (videosRect && windowWidth < 1421) {
+            const cutOffAmount = Math.max(0, videosRect.right - windowWidth);
+            const cutOffPercentage = cutOffAmount / videosRect.width;
+            hideVideos = cutOffPercentage >= 0.85;
         }
         
-        // Check if social column is 85% cut off  
+        // Stage 3: Social column 85% cut off
         const socialRect = socialColumn ? socialColumn.getBoundingClientRect() : null;
-        let socialVisible = true;
-        if (socialRect) {
-            const visibleWidth = Math.max(0, windowWidth - socialRect.left);
-            const visiblePercentage = visibleWidth / socialRect.width;
-            socialVisible = visiblePercentage >= 0.15; // Hide when less than 15% visible (85% cut off)
+        let hideSocial = false;
+        if (socialRect && windowWidth < 1421) {
+            const cutOffAmount = Math.max(0, socialRect.right - windowWidth);
+            const cutOffPercentage = cutOffAmount / socialRect.width;
+            hideSocial = cutOffPercentage >= 0.85;
         }
         
-        // Check if news column is cut off (keep original for news)
+        // Stage 4: News column 85% cut off
         const newsRect = newsColumn ? newsColumn.getBoundingClientRect() : null;
-        const newsVisible = newsRect && (newsRect.right <= windowWidth);
+        let hideNews = false;
+        if (newsRect && windowWidth < 1421) {
+            const cutOffAmount = Math.max(0, newsRect.right - windowWidth);
+            const cutOffPercentage = cutOffAmount / newsRect.width;
+            hideNews = cutOffPercentage >= 0.85;
+        }
         
-        // Hide columns that are cut off and show tabs
+        // Apply column visibility
+        if (videosColumn) videosColumn.style.display = hideVideos ? 'none' : 'block';
+        if (socialColumn) socialColumn.style.display = hideSocial ? 'none' : 'block';
+        if (newsColumn) newsColumn.style.display = hideNews ? 'none' : 'block';
+        
+        // Handle tabs
         let tabsToShow = [];
+        if (hideVideos) tabsToShow.push('videos');
+        if (hideSocial) tabsToShow.push('social');
+        if (hideNews) tabsToShow.push('news');
         
-        if (!videosVisible && videosColumn) {
-            videosColumn.style.display = 'none';
-            tabsToShow.push('videos');
-        } else if (videosColumn) {
-            videosColumn.style.display = 'block';
-        }
-        
-        if (!socialVisible && socialColumn) {
-            socialColumn.style.display = 'none';
-            tabsToShow.push('social');
-        } else if (socialColumn && videosVisible) {
-            socialColumn.style.display = 'block';
-        }
-        
-        if (!newsVisible && newsColumn) {
-            newsColumn.style.display = 'none';
-            tabsToShow.push('news');
-        } else if (newsColumn && socialVisible && videosVisible) {
-            newsColumn.style.display = 'block';
-        }
-        
-        // Show/hide responsive tabs
         if (tabsToShow.length > 0) {
             if (responsiveTabs) responsiveTabs.style.display = 'flex';
             
-            // Hide all tabs first
+            // Hide all tabs
             if (videosTab) videosTab.style.display = 'none';
             if (socialTab) socialTab.style.display = 'none';
             if (newsTab) newsTab.style.display = 'none';
             
-            // Show relevant tabs
+            // Show relevant tabs with arrow on last
             tabsToShow.forEach((tab, index) => {
                 const isLast = index === tabsToShow.length - 1;
                 
@@ -6341,11 +6324,33 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             if (responsiveTabs) responsiveTabs.style.display = 'none';
         }
+        
+        // Final stage: Stack columns below when only Menu + Games remain
+        if (hideNews && hideSocial && hideVideos) {
+            // Enable stacking mode
+            container.style.setProperty('flex-direction', 'column', 'important');
+            
+            // Create horizontal section for Menu + Games
+            const menuGamesWrapper = document.createElement('div');
+            menuGamesWrapper.style.display = 'flex';
+            menuGamesWrapper.style.flexDirection = 'row';
+            menuGamesWrapper.style.width = '415px';
+            
+            // Move columns to stacked layout (simplified for now)
+            if (newsColumn) newsColumn.style.setProperty('order', '2', 'important');
+            if (socialColumn) socialColumn.style.setProperty('order', '3', 'important');
+            if (videosColumn) videosColumn.style.setProperty('order', '4', 'important');
+        } else {
+            container.style.setProperty('flex-direction', 'row', 'important');
+            if (newsColumn) newsColumn.style.setProperty('order', 'unset', 'important');
+            if (socialColumn) socialColumn.style.setProperty('order', 'unset', 'important');
+            if (videosColumn) videosColumn.style.setProperty('order', 'unset', 'important');
+        }
     }
     
     // Run on load and resize
-    checkColumnVisibility();
-    window.addEventListener('resize', checkColumnVisibility);
+    handleProgressiveResize();
+    window.addEventListener('resize', handleProgressiveResize);
 });
 </script>
  
