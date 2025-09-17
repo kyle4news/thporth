@@ -3930,6 +3930,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // REPLACE THE OLD FUNCTION WITH THIS ONE
     async function fetchLeagueStandings(url, leagueKey) {
+        console.log('fetchLeagueStandings called with:', url, leagueKey);
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         try {
             if (!url || !url.startsWith('http')) {
@@ -3945,8 +3946,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
             
-            // Special handling for UFC - group by classification
-            if (leagueKey === 'UFC' || leagueKey === 'Boxing') {
+            // Special handling for UFC/Boxing - group by classification (detect from URL)
+            const isUFC = url.includes('2PACX-1vS2Z0QfXw34ib6V0gmcdqVvu6gwy8vHnD6cF3xMhJGZJHpU_s0vwC0h7phvbV0joe4tdVDGHiJ1kBfX');
+            const isBoxing = url.includes('2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb');
+            if (isUFC || isBoxing) {
                 const headers = rows[0].map(h => h.trim().replace(/^"|"$/g, ''));
                 const classificationIndex = headers.findIndex(h => h.toLowerCase().includes('classification'));
                 
