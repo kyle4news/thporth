@@ -1521,22 +1521,182 @@ div[id^="breaking-content-"] a:hover {
 
 
 
-/* PREVENT GAMES COLUMN FROM EXPANDING */
-.column.tv-listings,
-#league-specific-column {
-  flex: 0 0 250px !important;
-  width: 250px !important;
-  min-width: 250px !important;
-  max-width: 250px !important;
-  flex-grow: 0 !important;
-  flex-shrink: 0 !important;
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN - CORRECTED LOGIC FROM CHATGPT/GEMINI
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ──────────────────────────────────────────────────
+   Mobile First: Styles for screens up to 1023px
+   ────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  /* Hide desktop elements */
+  .main-menu,
+  .divider,
+  #resp-header {
+    display: none !important;
+  }
+  
+  /* Show mobile toolbar */
+  #mobile-toolbar { 
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  #mobile-menu-overlay { display: none !important; }
+  
+  /* Single column stacked layout */
+  .container {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 10px !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+  
+  /* All columns full width and stacked */
+  .column {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    margin-bottom: 10px !important;
+    max-width: 100% !important;
+  }
+  
+  /* Column priority order */
+  .column.tv-listings,
+  #league-specific-column { order: 1; }
+  .column.news { order: 2; }
+  .column.social { order: 3; }
+  .column.videos-column { order: 4; }
+  
+  /* Top bar with centered logo */
+  #topBar {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
+  }
+  
+  /* Mobile logo */
+  #topBar::after {
+    content: "";
+    background-image: url('https://www.thporth.com/thporth_AllSportsNews_logo-white.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 120px;
+    height: 30px;
+    display: block;
+  }
+  
+  /* Space for mobile toolbar */
+  body {
+    padding-bottom: 60px !important;
+  }
 }
 
-/* PREVENT MAIN MENU FROM GETTING CUT OFF */
+/* ──────────────────────────────────────────────────
+   Desktop: Styles for screens 1024px and up
+   ────────────────────────────────────────────────── */
 @media (min-width: 1024px) {
+  /* Hide mobile elements */
+  #mobile-toolbar,
+  #mobile-menu-overlay,
+  #topBar::after {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  
+  body { padding-bottom: 0 !important; }
+  
+  /* Reset mobile column ordering */
+  .column { order: unset; }
+  
+  /* Desktop container - responsive width */
   .container {
-    min-width: 415px !important; /* Menu (165px) + Games (250px) minimum */
-    overflow-x: auto !important; /* Allow horizontal scroll if needed */
+    display: flex !important;
+    flex-direction: row !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 1421px !important;
+    margin: 0 auto !important;
+    height: calc(100% - 20px) !important;
+  }
+
+  /* FORCE ALL COLUMNS TO KEEP THEIR FIXED WIDTHS ALWAYS */
+  .main-menu {
+    flex: 0 0 165px !important;
+    width: 165px !important;
+    min-width: 165px !important;
+    max-width: 165px !important;
+  }
+  .column.tv-listings,
+  #league-specific-column {
+    flex: 0 0 250px !important;
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+  }
+  .column.news {
+    flex: 0 0 370px !important;
+    width: 370px !important;
+    min-width: 370px !important;
+    max-width: 370px !important;
+  }
+  .column.social {
+    flex: 0 0 350px !important;
+    width: 350px !important;
+    min-width: 350px !important;
+    max-width: 350px !important;
+  }
+  .column.videos-column {
+    flex: 0 0 276px !important;
+    width: 276px !important;
+    min-width: 276px !important;
+    max-width: 276px !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────
+   Main Menu Fixed to Left Edge (when container moves left)
+   ────────────────────────────────────────────────── */
+@media (max-width: 1440px) and (min-width: 1024px) {
+  .main-menu {
+    position: fixed !important;
+    left: 0 !important;
+    top: 20px !important;
+    z-index: 100 !important;
+  }
+  
+  .container {
+    margin-left: 165px !important; /* Space for fixed menu */
+  }
+}
+
+/* ──────────────────────────────────────────────────
+   Progressive Column Hiding
+   ────────────────────────────────────────────────── */
+@media (min-width: 1024px) and (max-width: 1200px) {
+  .column.videos-column {
+    display: none !important;
+  }
+  #responsive-tabs,
+  #videos-tab {
+    display: inline-block !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1000px) {
+  .column.social {
+    display: none !important;
+  }
+  #social-tab {
+    display: inline-block !important;
   }
 }
 
