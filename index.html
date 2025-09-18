@@ -6290,9 +6290,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         mobileLeagueList.innerHTML = '';
         
-        // Create mobile league list that matches desktop exactly (including individual soccer leagues)
+        // Create mobile league list that matches desktop order exactly
         const mobileLeagues = [
             { section: 'Home', text: 'ALL' },
+            { section: 'NFL', text: 'NFL' },
+            { section: 'NBA', text: 'NBA' },
+            { section: 'MLB', text: 'MLB' },
+            { section: 'NHL', text: 'NHL' },
             { section: 'Soccer', text: 'Soccer' },
             { section: 'UEFAChampionsLeague', text: '    UEFA Champions League', indent: true },
             { section: 'PremierLeague', text: '    Premier League', indent: true },
@@ -6306,27 +6310,23 @@ document.addEventListener('DOMContentLoaded', function() {
             { section: 'Ligue1', text: '    Ligue 1', indent: true },
             { section: 'UEFAEuropaLeague', text: '    UEFA Europa League', indent: true },
             { section: 'UEFAConferenceLeague', text: '    UEFA Conference League', indent: true },
-            { section: 'NFL', text: 'NFL' },
-            { section: 'NBA', text: 'NBA' },
-            { section: 'MLB', text: 'MLB' },
-            { section: 'NHL', text: 'NHL' },
+            { section: 'FormulaOne', text: 'Formula One' },
             { section: 'NCAAF', text: 'NCAAF' },
-            { section: 'NCAAM', text: 'NCAAM' },
-            { section: 'NCAAW', text: 'NCAAW' },
-            { section: 'WNBA', text: 'WNBA' },
+            { section: 'PGATour', text: 'PGA Tour' },
             { section: 'UFC', text: 'UFC' },
             { section: 'Boxing', text: 'Boxing' },
-            { section: 'Tennis', text: 'Tennis' },
-            { section: 'FormulaOne', text: 'Formula One' },
-            { section: 'MotoGP', text: 'MotoGP' },
-            { section: 'IndyCar', text: 'IndyCar' },
             { section: 'NASCARCupSeries', text: 'NASCAR Cup Series' },
-            { section: 'PGATour', text: 'PGA Tour' },
-            { section: 'LPGATour', text: 'LPGA Tour' },
+            { section: 'Tennis', text: 'Tennis' },
+            { section: 'WNBA', text: 'WNBA' },
             { section: 'LIVGolf', text: 'LIV Golf' },
-            { section: 'TrackAndField', text: 'Track and Field' },
+            { section: 'IndyCar', text: 'IndyCar' },
+            { section: 'NCAAM', text: 'NCAAM' },
+            { section: 'NCAAW', text: 'NCAAW' },
             { section: 'NCAABaseball', text: 'NCAA Baseball' },
-            { section: 'NCAASoftball', text: 'NCAA Softball' }
+            { section: 'NCAASoftball', text: 'NCAA Softball' },
+            { section: 'MotoGP', text: 'MotoGP' },
+            { section: 'LPGATour', text: 'LPGA Tour' },
+            { section: 'TrackAndField', text: 'Track & Field' }
         ];
         
         mobileLeagues.forEach(league => {
