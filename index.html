@@ -2910,13 +2910,13 @@ div[id^="breaking-content-"] a:hover {
     <!-- Mobile Toolbar (hidden by default) -->
     <!-- Mobile Bottom Toolbar -->
     <div id="mobile-bottom-toolbar">
-        <button class="mobile-toolbar-btn active" id="mobile-league-btn">
+        <button class="mobile-toolbar-btn" id="mobile-league-btn">
             <span>ALL</span>
             <span style="font-size: 10px;">▲</span>
         </button>
-        <button class="mobile-toolbar-btn" id="mobile-news-btn">News</button>
-        <button class="mobile-toolbar-btn" id="mobile-games-btn">Games</button>
+        <button class="mobile-toolbar-btn active" id="mobile-news-btn">News</button>
         <button class="mobile-toolbar-btn" id="mobile-social-btn">Social</button>
+        <button class="mobile-toolbar-btn" id="mobile-games-btn">Games</button>
         <button class="mobile-toolbar-btn" id="mobile-videos-btn">Videos</button>
     </div>
 
@@ -6287,11 +6287,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log('Mobile: League selection completed successfully');
             
-            // Close menu and show games column
+            // Close menu and show news column
             if (mobileLeagueMenu) {
                 mobileLeagueMenu.style.display = 'none';
             }
-            showMobileColumn('games');
+            showMobileColumn('news');
             
         } catch (error) {
             console.error('Error in mobile league selection:', error);
@@ -6341,9 +6341,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize mobile interface
     populateMobileLeagueMenu();
     
-    // Show games column by default on mobile
+    // Show news column by default on mobile
     if (window.innerWidth <= 767) {
-        showMobileColumn('games');
+        showMobileColumn('news');
     }
 });
 
