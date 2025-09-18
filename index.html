@@ -1425,12 +1425,15 @@ div[id^="breaking-content-"] a:hover {
     flex: 1 !important;
     margin-bottom: 0 !important;
     max-width: 100% !important;
+    height: 100% !important;
     display: none !important; /* Hidden by default, shown by JS */
   }
   
   /* Show only the active column */
   .column.mobile-active {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
   }
   
   /* Top bar adjustments */
@@ -1465,22 +1468,20 @@ div[id^="breaking-content-"] a:hover {
     flex-direction: column !important;
   }
   
-  /* Headlines section takes 60% of mobile screen height */
+  /* Headlines section takes 60% of available height */
   .column.news .news-section:first-child {
-    flex: 0 0 60% !important;
-    min-height: 60vh !important;
-    max-height: 60vh !important;
+    flex: 3 !important; /* 60% = 3 parts out of 5 total */
     display: flex !important;
     flex-direction: column !important;
+    min-height: 0 !important;
   }
   
-  /* Breaking section takes 40% of mobile screen height */
+  /* Breaking section takes 40% of available height */
   .column.news .news-section:last-child {
-    flex: 0 0 40% !important;
-    min-height: 40vh !important;
-    max-height: 40vh !important;
+    flex: 2 !important; /* 40% = 2 parts out of 5 total */
     display: flex !important;
     flex-direction: column !important;
+    min-height: 0 !important;
   }
   
   /* Ensure feed content areas fill their containers */
