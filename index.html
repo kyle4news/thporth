@@ -6290,9 +6290,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         mobileLeagueList.innerHTML = '';
         
-        // Get leagues from desktop menu
+        // Get leagues from desktop menu, but exclude individual soccer leagues
         const leagues = document.querySelectorAll('#menuList-123 li[data-section]');
+        const excludedSoccerLeagues = ['UEFAChampionsLeague', 'PremierLeague', 'MLS', 'LaLiga', 'SerieA', 'Bundesliga', 'FACup', 'LigaMX', 'NWSL', 'Ligue1', 'UEFAEuropaLeague', 'UEFAConferenceLeague'];
+        
         leagues.forEach(league => {
+            // Skip individual soccer leagues, keep only "Soccer"
+            if (excludedSoccerLeagues.includes(league.dataset.section)) {
+                return;
+            }
+            
             const li = document.createElement('li');
             li.textContent = league.textContent;
             li.dataset.section = league.dataset.section;
