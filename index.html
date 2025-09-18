@@ -1497,6 +1497,29 @@ div[id^="breaking-content-"] a:hover {
   transition: all 0.2s ease;
 }
 
+/* Special styling for the league button (first button) */
+#mobile-league-btn {
+  flex: 2; /* Make it twice as wide as other buttons */
+  flex-direction: row; /* Horizontal layout for league name and arrow */
+  justify-content: space-between; /* Space between text and arrow */
+  align-items: center; /* Center vertically */
+  padding: 8px 12px; /* Add padding for better spacing */
+  text-align: left; /* Left align the text */
+}
+
+#mobile-league-btn span:first-child {
+  flex: 1; /* League name takes available space */
+  text-align: left; /* Left align league name */
+  line-height: 1.2; /* Better line height for multi-line text */
+  word-wrap: break-word; /* Allow text to wrap */
+  overflow-wrap: break-word; /* Better word wrapping */
+}
+
+#mobile-league-btn span:last-child {
+  flex-shrink: 0; /* Arrow doesn't shrink */
+  margin-left: 8px; /* Space between text and arrow */
+}
+
 .mobile-toolbar-btn.active {
   background-color: #ccc !important; /* Light gray for active league */
   color: #333 !important; /* Dark text for active league */
