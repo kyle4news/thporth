@@ -1457,6 +1457,39 @@ div[id^="breaking-content-"] a:hover {
   body {
     padding-bottom: 80px !important;
   }
+  
+  /* Mobile News Section Height Allocation */
+  .column.news .news-main-container {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Headlines section takes 60% of mobile screen height */
+  .column.news .news-section:first-child {
+    flex: 0 0 60% !important;
+    min-height: 60vh !important;
+    max-height: 60vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Breaking section takes 40% of mobile screen height */
+  .column.news .news-section:last-child {
+    flex: 0 0 40% !important;
+    min-height: 40vh !important;
+    max-height: 40vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Ensure feed content areas fill their containers */
+  .column.news .news-feed-content,
+  .column.news .news-content-pane {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    min-height: 0 !important;
+  }
 }
 
 /* Bottom Toolbar Styling */
