@@ -4080,7 +4080,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
         
         // Find the league config to get the collection name
-        const leagueConfig = Object.values(LEAGUE_DATA_CONFIG).find(config => config.leagueId === leagueId);
+        const leagueConfig = LEAGUE_DATA_CONFIG && typeof LEAGUE_DATA_CONFIG === 'object' ? 
+            Object.values(LEAGUE_DATA_CONFIG).find(config => config && config.leagueId === leagueId) : null;
         if (!leagueConfig || !leagueConfig.upcomingCollectionName) {
             scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
             return;
@@ -4244,8 +4245,17 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // START OF CORRECTED SECTION
     window.loadLeagueSpecificData = function(leagueKey) {
-        const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
-        if (!leagueInfo) return;
+        try {
+            if (!LEAGUE_DATA_CONFIG || typeof LEAGUE_DATA_CONFIG !== 'object') {
+                console.error('LEAGUE_DATA_CONFIG is not available');
+                return;
+            }
+            
+            const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
+            if (!leagueInfo) {
+                console.error('No league info found for:', leagueKey);
+                return;
+            }
         if (leagueHeader) leagueHeader.innerText = leagueKey;
         const todayScheduleContent = document.getElementById('league-schedule-today-content');
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
@@ -4325,6 +4335,10 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Reusing the standings fetcher
         fetchLeagueStandings(leagueInfo.standingsUrl);
+        
+        } catch (error) {
+            console.error('Error in loadLeagueSpecificData:', error);
+        }
     };
 
     // Consolidated Soccer Data Loading Function
@@ -6177,31 +6191,75 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show specific column on mobile
     function showMobileColumn(columnType) {
-        // Hide all columns
-        document.querySelectorAll('.column').forEach(col => {
-            col.classList.remove('mobile-active');
-        });
-        
-        // Show the appropriate column based on current league and column type
-        if (columnType === 'games') {
-            if (currentMobileLeague === 'Home') {
-                document.getElementById('games-column')?.classList.add('mobile-active');
-            } else {
-                document.getElementById('league-specific-column')?.classList.add('mobile-active');
+        try {
+            console.log('Mobile: Switching to column:', columnType, 'Current league:', currentMobileLeague);
+            
+            // Hide all columns with error handling
+            const allColumns = document.querySelectorAll('.column');
+            if (allColumns) {
+                allColumns.forEach(col => {
+                    if (col && col.classList) {
+                        col.classList.remove('mobile-active');
+                    }
+                });
             }
-        } else if (columnType === 'news') {
-            document.querySelector('.column.news')?.classList.add('mobile-active');
-        } else if (columnType === 'social') {
-            document.querySelector('.column.social')?.classList.add('mobile-active');
-        } else if (columnType === 'videos') {
-            document.querySelector('.column.videos-column')?.classList.add('mobile-active');
+            
+            // Show the appropriate column based on current league and column type
+            if (columnType === 'games') {
+                if (currentMobileLeague === 'Home') {
+                    const gamesCol = document.getElementById('games-column');
+                    if (gamesCol && gamesCol.classList) {
+                        gamesCol.classList.add('mobile-active');
+                        console.log('Mobile: Showing games column for Home');
+                    }
+                } else {
+                    const leagueCol = document.getElementById('league-specific-column');
+                    if (leagueCol && leagueCol.classList) {
+                        leagueCol.classList.add('mobile-active');
+                        console.log('Mobile: Showing league-specific column for:', currentMobileLeague);
+                    }
+                }
+            } else if (columnType === 'news') {
+                const newsCol = document.querySelector('.column.news');
+                if (newsCol && newsCol.classList) {
+                    newsCol.classList.add('mobile-active');
+                    console.log('Mobile: Showing news column');
+                }
+            } else if (columnType === 'social') {
+                const socialCol = document.querySelector('.column.social');
+                if (socialCol && socialCol.classList) {
+                    socialCol.classList.add('mobile-active');
+                    console.log('Mobile: Showing social column');
+                }
+            } else if (columnType === 'videos') {
+                const videosCol = document.querySelector('.column.videos-column');
+                if (videosCol && videosCol.classList) {
+                    videosCol.classList.add('mobile-active');
+                    console.log('Mobile: Showing videos column');
+                }
+            }
+            
+            // Update toolbar button states with error handling
+            const toolbarBtns = document.querySelectorAll('.mobile-toolbar-btn');
+            if (toolbarBtns) {
+                toolbarBtns.forEach(btn => {
+                    if (btn && btn.classList) {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+            
+            const activeBtn = document.getElementById(`mobile-${columnType}-btn`);
+            if (activeBtn && activeBtn.classList) {
+                activeBtn.classList.add('active');
+            }
+            
+            console.log('Mobile: Column switch completed successfully');
+            
+        } catch (error) {
+            console.error('Error in showMobileColumn:', error);
+            // Don't show alert to user, just log the error
         }
-        
-        // Update toolbar button states
-        document.querySelectorAll('.mobile-toolbar-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.getElementById(`mobile-${columnType}-btn`)?.classList.add('active');
     }
     
     // Populate mobile league menu
@@ -6225,47 +6283,83 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Select league on mobile
     function selectMobileLeague(section, displayName) {
-        currentMobileLeague = section;
-        
-        // Update league button text
-        if (mobileLeagueBtn) {
-            const span = mobileLeagueBtn.querySelector('span:first-child');
-            if (span) {
-                span.textContent = displayName;
-            }
-        }
-        
-        // Directly handle the page switching logic (avoid clicking desktop elements)
         try {
+            currentMobileLeague = section;
+            
+            // Update league button text
+            if (mobileLeagueBtn) {
+                const span = mobileLeagueBtn.querySelector('span:first-child');
+                if (span) {
+                    span.textContent = displayName;
+                }
+            }
+            
+            // Directly handle the page switching logic (avoid clicking desktop elements)
+            console.log('Mobile: Switching to league:', section, displayName);
+            
             const gamesColumn = document.getElementById('games-column');
             const leagueSpecificColumn = document.getElementById('league-specific-column');
             
             if (section === 'Home') {
+                console.log('Mobile: Switching to Home');
                 if (gamesColumn) gamesColumn.style.display = 'block';
                 if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'none';
             } else {
+                console.log('Mobile: Switching to league:', section);
                 if (gamesColumn) gamesColumn.style.display = 'none';
                 if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'block';
-                // Load league data if function exists
-                if (typeof loadLeagueSpecificData === 'function') {
-                    loadLeagueSpecificData(section);
+                
+                // Load league data with error handling
+                if (typeof loadLeagueSpecificData === 'function' && typeof LEAGUE_DATA_CONFIG !== 'undefined') {
+                    console.log('Mobile: Loading league data for:', section);
+                    try {
+                        loadLeagueSpecificData(section);
+                    } catch (loadError) {
+                        console.error('Mobile: Error loading league data:', loadError);
+                    }
+                } else {
+                    console.log('Mobile: loadLeagueSpecificData function or LEAGUE_DATA_CONFIG not available');
                 }
             }
             
-            // Update news and social content
-            document.querySelectorAll(".news .content-section, #social-feed-container .content-section").forEach(s => s.style.display = "none");
-            const news = document.getElementById("news-" + section);
-            const social = document.getElementById("social-" + section);
-            if (news) news.style.display = "block";
-            if (social) social.style.display = "block";
+            // Update news and social content with error handling
+            console.log('Mobile: Updating news and social content');
+            try {
+                const contentSections = document.querySelectorAll(".news .content-section, #social-feed-container .content-section");
+                if (contentSections) {
+                    contentSections.forEach(s => {
+                        if (s && s.style) {
+                            s.style.display = "none";
+                        }
+                    });
+                }
+                
+                const news = document.getElementById("news-" + section);
+                const social = document.getElementById("social-" + section);
+                if (news && news.style) {
+                    news.style.display = "block";
+                    console.log('Mobile: Showed news for:', section);
+                }
+                if (social && social.style) {
+                    social.style.display = "block";
+                    console.log('Mobile: Showed social for:', section);
+                }
+            } catch (contentError) {
+                console.error('Mobile: Error updating content sections:', contentError);
+            }
+            
+            console.log('Mobile: League selection completed successfully');
+            
+            // Close menu and show games column
+            if (mobileLeagueMenu) {
+                mobileLeagueMenu.style.display = 'none';
+            }
+            showMobileColumn('games');
             
         } catch (error) {
             console.error('Error in mobile league selection:', error);
+            // Don't show alert to user, just log the error
         }
-        
-        // Close menu and show games column
-        mobileLeagueMenu.style.display = 'none';
-        showMobileColumn('games');
     }
     
     // Event listeners
