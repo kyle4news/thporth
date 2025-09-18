@@ -6364,9 +6364,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Trigger the same logic as desktop menu click
-        const desktopMenuItem = document.querySelector(`#menuList li[data-section="${section}"]`);
+        const desktopMenuItem = document.querySelector(`#menuList-123 li[data-section="${section}"]`);
         if (desktopMenuItem) {
             desktopMenuItem.click();
+        } else {
+            console.error('Could not find desktop menu item for:', section);
         }
         
         // Close menu and show games column
