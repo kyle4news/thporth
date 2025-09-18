@@ -3930,7 +3930,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // REPLACE THE OLD FUNCTION WITH THIS ONE
     async function fetchLeagueStandings(url, leagueKey) {
-        console.log('fetchLeagueStandings called with:', url, leagueKey);
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         try {
             if (!url || !url.startsWith('http')) {
