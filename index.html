@@ -6363,12 +6363,32 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Trigger the same logic as desktop menu click
-        const desktopMenuItem = document.querySelector(`#menuList-123 li[data-section="${section}"]`);
-        if (desktopMenuItem) {
-            desktopMenuItem.click();
-        } else {
-            console.error('Could not find desktop menu item for:', section);
+        // Directly handle the page switching logic (avoid clicking desktop elements)
+        try {
+            const gamesColumn = document.getElementById('games-column');
+            const leagueSpecificColumn = document.getElementById('league-specific-column');
+            
+            if (section === 'Home') {
+                if (gamesColumn) gamesColumn.style.display = 'block';
+                if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'none';
+            } else {
+                if (gamesColumn) gamesColumn.style.display = 'none';
+                if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'block';
+                // Load league data if function exists
+                if (typeof loadLeagueSpecificData === 'function') {
+                    loadLeagueSpecificData(section);
+                }
+            }
+            
+            // Update news and social content
+            document.querySelectorAll(".news .content-section, #social-feed-container .content-section").forEach(s => s.style.display = "none");
+            const news = document.getElementById("news-" + section);
+            const social = document.getElementById("social-" + section);
+            if (news) news.style.display = "block";
+            if (social) social.style.display = "block";
+            
+        } catch (error) {
+            console.error('Error in mobile league selection:', error);
         }
         
         // Close menu and show games column
