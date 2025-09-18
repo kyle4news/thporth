@@ -6290,21 +6290,51 @@ document.addEventListener('DOMContentLoaded', function() {
         
         mobileLeagueList.innerHTML = '';
         
-        // Get leagues from desktop menu, but exclude individual soccer leagues
-        const leagues = document.querySelectorAll('#menuList-123 li[data-section]');
-        const excludedSoccerLeagues = ['UEFAChampionsLeague', 'PremierLeague', 'MLS', 'LaLiga', 'SerieA', 'Bundesliga', 'FACup', 'LigaMX', 'NWSL', 'Ligue1', 'UEFAEuropaLeague', 'UEFAConferenceLeague'];
+        // Create mobile league list that matches desktop exactly (including individual soccer leagues)
+        const mobileLeagues = [
+            { section: 'Home', text: 'ALL' },
+            { section: 'Soccer', text: 'Soccer' },
+            { section: 'UEFAChampionsLeague', text: '    UEFA Champions League', indent: true },
+            { section: 'PremierLeague', text: '    Premier League', indent: true },
+            { section: 'MLS', text: '    MLS', indent: true },
+            { section: 'LaLiga', text: '    LaLiga', indent: true },
+            { section: 'SerieA', text: '    Serie A', indent: true },
+            { section: 'Bundesliga', text: '    Bundesliga', indent: true },
+            { section: 'FACup', text: '    FA Cup', indent: true },
+            { section: 'LigaMX', text: '    Liga MX', indent: true },
+            { section: 'NWSL', text: '    NWSL', indent: true },
+            { section: 'Ligue1', text: '    Ligue 1', indent: true },
+            { section: 'UEFAEuropaLeague', text: '    UEFA Europa League', indent: true },
+            { section: 'UEFAConferenceLeague', text: '    UEFA Conference League', indent: true },
+            { section: 'NFL', text: 'NFL' },
+            { section: 'NBA', text: 'NBA' },
+            { section: 'MLB', text: 'MLB' },
+            { section: 'NHL', text: 'NHL' },
+            { section: 'NCAAF', text: 'NCAAF' },
+            { section: 'NCAAM', text: 'NCAAM' },
+            { section: 'NCAAW', text: 'NCAAW' },
+            { section: 'WNBA', text: 'WNBA' },
+            { section: 'UFC', text: 'UFC' },
+            { section: 'Boxing', text: 'Boxing' },
+            { section: 'Tennis', text: 'Tennis' },
+            { section: 'FormulaOne', text: 'Formula One' },
+            { section: 'MotoGP', text: 'MotoGP' },
+            { section: 'IndyCar', text: 'IndyCar' },
+            { section: 'NASCARCupSeries', text: 'NASCAR Cup Series' },
+            { section: 'PGATour', text: 'PGA Tour' },
+            { section: 'LPGATour', text: 'LPGA Tour' },
+            { section: 'LIVGolf', text: 'LIV Golf' },
+            { section: 'TrackAndField', text: 'Track and Field' },
+            { section: 'NCAABaseball', text: 'NCAA Baseball' },
+            { section: 'NCAASoftball', text: 'NCAA Softball' }
+        ];
         
-        leagues.forEach(league => {
-            // Skip individual soccer leagues, keep only "Soccer"
-            if (excludedSoccerLeagues.includes(league.dataset.section)) {
-                return;
-            }
-            
+        mobileLeagues.forEach(league => {
             const li = document.createElement('li');
-            li.textContent = league.textContent;
-            li.dataset.section = league.dataset.section;
+            li.textContent = league.text;
+            li.dataset.section = league.section;
             li.addEventListener('click', () => {
-                selectMobileLeague(league.dataset.section, league.textContent);
+                selectMobileLeague(league.section, league.text);
             });
             mobileLeagueList.appendChild(li);
         });
