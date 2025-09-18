@@ -6237,7 +6237,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Select league on mobile
+    // Select league on mobile - use desktop functionality exactly
     function selectMobileLeague(section, displayName) {
         try {
             currentMobileLeague = section;
@@ -6250,42 +6250,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // Directly handle the page switching logic (avoid clicking desktop elements)
-            console.log('Mobile: Switching to league:', section, displayName);
-            
-            const gamesColumn = document.getElementById('games-column');
-            const leagueSpecificColumn = document.getElementById('league-specific-column');
-            
-            if (section === 'Home') {
-                console.log('Mobile: Switching to Home');
-                if (gamesColumn) gamesColumn.style.display = 'block';
-                if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'none';
+            // Use the exact same logic as desktop by simulating a click on the desktop menu item
+            const desktopMenuItem = document.querySelector(`#menuList-123 li[data-section="${section}"]`);
+            if (desktopMenuItem) {
+                console.log('Mobile: Triggering desktop functionality for:', section);
+                // Temporarily remove mobile-active classes to prevent conflicts
+                document.querySelectorAll('.column').forEach(col => col.classList.remove('mobile-active'));
+                // Trigger the desktop click handler
+                desktopMenuItem.click();
             } else {
-                console.log('Mobile: Switching to league:', section);
-                if (gamesColumn) gamesColumn.style.display = 'none';
-                if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'block';
-                
-                // Load league data if function exists
-                if (typeof loadLeagueSpecificData === 'function') {
-                    console.log('Mobile: Loading league data for:', section);
-                    loadLeagueSpecificData(section);
-                } else {
-                    console.log('Mobile: loadLeagueSpecificData function not found');
-                }
-            }
-            
-            // Update news and social content
-            console.log('Mobile: Updating news and social content');
-            document.querySelectorAll(".news .content-section, #social-feed-container .content-section").forEach(s => s.style.display = "none");
-            const news = document.getElementById("news-" + section);
-            const social = document.getElementById("social-" + section);
-            if (news) {
-                news.style.display = "block";
-                console.log('Mobile: Showed news for:', section);
-            }
-            if (social) {
-                social.style.display = "block";
-                console.log('Mobile: Showed social for:', section);
+                console.error('Mobile: Desktop menu item not found for:', section);
             }
             
             console.log('Mobile: League selection completed successfully');
