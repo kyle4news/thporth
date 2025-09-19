@@ -4218,10 +4218,62 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('=== EXAMINATION COMPLETE ===');
     }
 
+    // Fetch individual statistics to see actual player/team data
+    async function fetchIndividualStats() {
+        console.log('=== FETCHING INDIVIDUAL NFL STATISTICS ===');
+        
+        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        
+        try {
+            // First get the statistics list
+            const statsUrl = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics';
+            const finalUrl = proxyUrl + encodeURIComponent(statsUrl);
+            const response = await fetch(finalUrl);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Got statistics list, now fetching first 3 individual stats...');
+                
+                // Fetch first 3 individual statistics
+                for (let i = 0; i < Math.min(3, data.items.length); i++) {
+                    const statRef = data.items[i].$ref;
+                    console.log(`\nFetching stat ${i + 1}: ${statRef}`);
+                    
+                    try {
+                        const statUrl = proxyUrl + encodeURIComponent(statRef);
+                        const statResponse = await fetch(statUrl);
+                        
+                        if (statResponse.ok) {
+                            const statData = await statResponse.json();
+                            console.log(`✅ STAT ${i + 1} DATA:`, statData);
+                            
+                            // Log key information
+                            if (statData.displayName) console.log(`📊 Category: ${statData.displayName}`);
+                            if (statData.leaders) console.log(`🏆 Leaders:`, statData.leaders);
+                            if (statData.athletes) console.log(`👤 Athletes:`, statData.athletes);
+                            
+                        } else {
+                            console.log(`❌ STAT ${i + 1} FAILED: ${statResponse.status}`);
+                        }
+                    } catch (error) {
+                        console.log(`❌ STAT ${i + 1} ERROR:`, error.message);
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                }
+            }
+        } catch (error) {
+            console.log(`❌ ERROR:`, error.message);
+        }
+        
+        console.log('\n=== INDIVIDUAL STATS FETCH COMPLETE ===');
+    }
+
     // Run the tests
     window.testESPNStats = testESPNStatsData;
     window.testRemainingESPN = testRemainingESPNSports;
     window.examineESPNData = examineESPNStatsData;
+    window.fetchIndividualStats = fetchIndividualStats;
 
     // --- 3. OPTIMIZED FIRESTORE FUNCTIONS ---
     
