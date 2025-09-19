@@ -4169,9 +4169,59 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('\n=== REMAINING SPORTS TEST COMPLETE ===');
     }
 
+    // Test to see actual statistics data structure and content
+    async function examineESPNStatsData() {
+        console.log('=== EXAMINING ESPN STATISTICS DATA STRUCTURE ===');
+        
+        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        
+        // Test one league in detail to see data structure
+        const testUrl = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics';
+        
+        try {
+            console.log('Fetching detailed NFL statistics data...');
+            const finalUrl = proxyUrl + encodeURIComponent(testUrl);
+            const response = await fetch(finalUrl);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ FULL NFL STATISTICS DATA:', data);
+                
+                // Log specific parts of the data structure
+                if (data.items) {
+                    console.log('📊 Statistics Items:', data.items);
+                    console.log('📊 First Item Structure:', data.items[0]);
+                }
+                if (data.categories) {
+                    console.log('📂 Categories:', data.categories);
+                }
+                if (data.leaders) {
+                    console.log('🏆 Leaders:', data.leaders);
+                }
+                if (data.athletes) {
+                    console.log('👤 Athletes:', data.athletes);
+                }
+                if (data.teams) {
+                    console.log('🏈 Teams:', data.teams);
+                }
+                
+                // Log all available keys
+                console.log('🔑 All Available Keys:', Object.keys(data));
+                
+            } else {
+                console.log(`❌ FAILED: ${response.status} ${response.statusText}`);
+            }
+        } catch (error) {
+            console.log(`❌ ERROR:`, error.message);
+        }
+        
+        console.log('=== EXAMINATION COMPLETE ===');
+    }
+
     // Run the tests
     window.testESPNStats = testESPNStatsData;
     window.testRemainingESPN = testRemainingESPNSports;
+    window.examineESPNData = examineESPNStatsData;
 
     // --- 3. OPTIMIZED FIRESTORE FUNCTIONS ---
     
