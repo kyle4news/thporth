@@ -6551,8 +6551,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize mobile interface
     populateMobileLeagueMenu();
     
-    // Show news column by default on mobile
-    if (window.innerWidth <= 767) {
+    // Show news column by default on mobile (adjust breakpoint to match toolbar appearance)
+    if (window.innerWidth <= 780) {
         showMobileColumn('news');
     }
 });
