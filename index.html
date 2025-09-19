@@ -4086,11 +4086,19 @@ document.addEventListener('DOMContentLoaded', function () {
         
         const proxyUrl = 'https://api.allorigins.win/raw?url=';
         const testLeagues = [
-            { name: 'NFL', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/statistics/leaders' },
-            { name: 'NBA', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/statistics/leaders' },
-            { name: 'MLB', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/statistics/leaders' },
-            { name: 'NHL-basic', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl' },
-            { name: 'NFL-basic', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl' }
+            // Test basic endpoints for all leagues you mentioned
+            { name: 'NFL', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl' },
+            { name: 'NBA', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba' },
+            { name: 'MLB', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb' },
+            { name: 'NHL', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl' },
+            { name: 'WNBA', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/basketball/wnba' },
+            { name: 'NCAAF', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/football/college-football' },
+            { name: 'NCAAM', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball' },
+            { name: 'NCAAW', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball' },
+            { name: 'MLS', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1' },
+            { name: 'Tennis', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/tennis' },
+            { name: 'PGA Golf', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/golf/pga' },
+            { name: 'UFC', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/mma/ufc' }
         ];
         
         for (const league of testLeagues) {
