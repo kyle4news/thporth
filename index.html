@@ -4086,10 +4086,11 @@ document.addEventListener('DOMContentLoaded', function () {
         
         const proxyUrl = 'https://api.allorigins.win/raw?url=';
         const testLeagues = [
-            { name: 'NFL', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/leaders' },
-            { name: 'NBA', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/leaders' },
-            { name: 'MLB', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/leaders' },
-            { name: 'NHL', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/leaders' }
+            { name: 'NFL', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/statistics/leaders' },
+            { name: 'NBA', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/statistics/leaders' },
+            { name: 'MLB', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/statistics/leaders' },
+            { name: 'NHL-basic', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl' },
+            { name: 'NFL-basic', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl' }
         ];
         
         for (const league of testLeagues) {
