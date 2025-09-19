@@ -6565,8 +6565,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check immediately
     initializeMobileContent();
     
-    // Also check after a brief delay in case CSS is still loading
+    // Also check after delays in case CSS is still loading
     setTimeout(initializeMobileContent, 100);
+    setTimeout(initializeMobileContent, 500);
+    
+    // Add resize listener to handle window resizing
+    window.addEventListener('resize', () => {
+        setTimeout(initializeMobileContent, 50);
+    });
 });
 
 </script>
