@@ -6551,10 +6551,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize mobile interface
     populateMobileLeagueMenu();
     
-    // Show news column by default on mobile (adjust breakpoint to match toolbar appearance)
-    if (window.innerWidth <= 780) {
-        showMobileColumn('news');
+    // Show news column by default on mobile - more robust check
+    function initializeMobileContent() {
+        const toolbar = document.getElementById('mobile-bottom-toolbar');
+        const isToolbarVisible = toolbar && window.getComputedStyle(toolbar).display !== 'none';
+        
+        if (isToolbarVisible) {
+            console.log('Mobile toolbar detected, showing news content');
+            showMobileColumn('news');
+        }
     }
+    
+    // Check immediately
+    initializeMobileContent();
+    
+    // Also check after a brief delay in case CSS is still loading
+    setTimeout(initializeMobileContent, 100);
 });
 
 </script>
