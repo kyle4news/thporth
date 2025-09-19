@@ -4080,54 +4080,39 @@ document.addEventListener('DOMContentLoaded', function () {
     // Start periodic refresh
     startPeriodicRefresh();
 
-    // --- TEMPORARY: TEST FLASHLIVEAPI STATS DATA ---
-    async function testMLBStatsData() {
-        console.log('=== TESTING MLB STATS DATA ===');
+    // --- TEMPORARY: CHECK EXISTING GAME DATA FOR STATS ---
+    async function checkMLBGameDataForStats() {
+        console.log('=== CHECKING EXISTING MLB GAME DATA FOR STATS ===');
         
-        const apiKey = 'b4a8b8e7b8msh9c8f7e6d5c4b3a2918f'; // Your existing API key
-        const baseUrl = 'https://flashliveapi.p.rapidapi.com';
-        
-        // Test different potential endpoints for MLB stats
-        const testEndpoints = [
-            '/leagues/usa-mlb/statistics',
-            '/leagues/usa-mlb/teams/statistics', 
-            '/leagues/usa-mlb/players/statistics',
-            '/leagues/usa-mlb/leaders',
-            '/statistics/leagues/usa-mlb',
-            '/v1/leagues/usa-mlb/statistics',
-            '/v1/statistics/usa-mlb'
-        ];
-        
-        for (const endpoint of testEndpoints) {
-            try {
-                console.log(`Testing endpoint: ${endpoint}`);
-                const response = await fetch(baseUrl + endpoint, {
-                    method: 'GET',
-                    headers: {
-                        'X-RapidAPI-Key': apiKey,
-                        'X-RapidAPI-Host': 'flashliveapi.p.rapidapi.com'
-                    }
+        try {
+            const { DateTime } = luxon;
+            const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+            
+            // Get some recent MLB games to see what data fields are available
+            const snapshot = await gamesCollectionRef
+                .where('League', '==', 'USA: MLB')
+                .limit(5)
+                .get();
+            
+            if (!snapshot.empty) {
+                snapshot.docs.forEach((doc, index) => {
+                    const gameData = doc.data();
+                    console.log(`Game ${index + 1} data structure:`, gameData);
+                    console.log(`Game ${index + 1} available fields:`, Object.keys(gameData));
                 });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log(`✅ SUCCESS - ${endpoint}:`, data);
-                } else {
-                    console.log(`❌ FAILED - ${endpoint}: ${response.status} ${response.statusText}`);
-                }
-            } catch (error) {
-                console.log(`❌ ERROR - ${endpoint}:`, error.message);
+            } else {
+                console.log('No MLB games found in current data');
             }
             
-            // Small delay between requests
-            await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+            console.error('Error checking game data:', error);
         }
         
-        console.log('=== MLB STATS TEST COMPLETE ===');
+        console.log('=== GAME DATA CHECK COMPLETE ===');
     }
     
-    // Run the test (you can call this manually in console)
-    window.testMLBStats = testMLBStatsData;
+    // Run the test
+    window.checkMLBGameData = checkMLBGameDataForStats;
 
     // --- 3. ELEMENT REFERENCES ---
     const leagueHeader = document.getElementById('league-specific-header');
