@@ -4080,10 +4080,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Start periodic refresh
     startPeriodicRefresh();
 
-    // --- TEMPORARY: TEST ESPN API STATS DATA ---
+    // --- TEMPORARY: TEST ESPN API STATS DATA WITH CORS PROXY ---
     async function testESPNStatsData() {
-        console.log('=== TESTING ESPN API STATS DATA ===');
+        console.log('=== TESTING ESPN API STATS DATA (WITH CORS PROXY) ===');
         
+        const proxyUrl = 'https://api.allorigins.win/raw?url=';
         const testLeagues = [
             { name: 'NFL', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/leaders' },
             { name: 'NBA', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/leaders' },
@@ -4093,8 +4094,9 @@ document.addEventListener('DOMContentLoaded', function () {
         
         for (const league of testLeagues) {
             try {
-                console.log(`\n--- Testing ${league.name} Stats ---`);
-                const response = await fetch(league.endpoint);
+                console.log(`\n--- Testing ${league.name} Stats (via proxy) ---`);
+                const finalUrl = proxyUrl + encodeURIComponent(league.endpoint);
+                const response = await fetch(finalUrl);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -4102,10 +4104,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // Log structure for analysis
                     if (data.leaders) {
-                        console.log(`${league.name} Categories:`, data.leaders.map(cat => cat.displayName));
+                        console.log(`${league.name} Leaders Categories:`, data.leaders.map(cat => cat.displayName));
+                        console.log(`${league.name} Sample Leader Data:`, data.leaders[0]);
                     }
                     if (data.categories) {
                         console.log(`${league.name} Categories:`, data.categories.map(cat => cat.displayName));
+                    }
+                    if (data.statistics) {
+                        console.log(`${league.name} Statistics:`, data.statistics);
                     }
                 } else {
                     console.log(`❌ ${league.name} FAILED: ${response.status} ${response.statusText}`);
@@ -4114,11 +4120,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log(`❌ ${league.name} ERROR:`, error.message);
             }
             
-            // Small delay between requests
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Longer delay for proxy requests
+            await new Promise(resolve => setTimeout(resolve, 2000));
         }
         
-        console.log('\n=== ESPN STATS TEST COMPLETE ===');
+        console.log('\n=== ESPN STATS TEST (PROXY) COMPLETE ===');
     }
     
     // Run the test
