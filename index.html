@@ -4132,8 +4132,46 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('\n=== ESPN STATS TEST (PROXY) COMPLETE ===');
     }
     
-    // Run the test
+    // Test remaining sports that weren't completed
+    async function testRemainingESPNSports() {
+        console.log('=== TESTING REMAINING ESPN SPORTS ===');
+        
+        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        const remainingLeagues = [
+            { name: 'NCAAF-statistics', endpoint: 'https://sports.core.api.espn.com/v2/sports/football/leagues/college-football/statistics' },
+            { name: 'NCAAM-statistics', endpoint: 'https://sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/statistics' },
+            { name: 'NCAAW-statistics', endpoint: 'https://sports.core.api.espn.com/v2/sports/basketball/leagues/womens-college-basketball/statistics' },
+            { name: 'MLS-statistics', endpoint: 'https://sports.core.api.espn.com/v2/sports/soccer/leagues/usa.1/statistics' },
+            { name: 'Tennis-statistics', endpoint: 'https://sports.core.api.espn.com/v2/sports/tennis/leagues/atp/statistics' },
+            { name: 'Golf-statistics', endpoint: 'https://sports.core.api.espn.com/v2/sports/golf/leagues/pga/statistics' },
+            { name: 'UFC-statistics', endpoint: 'https://sports.core.api.espn.com/v2/sports/mma/leagues/ufc/statistics' }
+        ];
+        
+        for (const league of remainingLeagues) {
+            try {
+                console.log(`\n--- Testing ${league.name} (via proxy) ---`);
+                const finalUrl = proxyUrl + encodeURIComponent(league.endpoint);
+                const response = await fetch(finalUrl);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(`✅ ${league.name} SUCCESS:`, data);
+                } else {
+                    console.log(`❌ ${league.name} FAILED: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                console.log(`❌ ${league.name} ERROR:`, error.message);
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+        
+        console.log('\n=== REMAINING SPORTS TEST COMPLETE ===');
+    }
+
+    // Run the tests
     window.testESPNStats = testESPNStatsData;
+    window.testRemainingESPN = testRemainingESPNSports;
 
     // --- 3. OPTIMIZED FIRESTORE FUNCTIONS ---
     
