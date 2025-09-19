@@ -4080,12 +4080,51 @@ document.addEventListener('DOMContentLoaded', function () {
     // Start periodic refresh
     startPeriodicRefresh();
 
-    // --- 3. ELEMENT REFERENCES ---
-    const leagueHeader = document.getElementById('league-specific-header');
-    const scheduleContent = document.getElementById('league-schedule-content');
-    const standingsContent = document.getElementById('league-standings-content');
+    // --- TEMPORARY: TEST ESPN API STATS DATA ---
+    async function testESPNStatsData() {
+        console.log('=== TESTING ESPN API STATS DATA ===');
+        
+        const testLeagues = [
+            { name: 'NFL', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/leaders' },
+            { name: 'NBA', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/leaders' },
+            { name: 'MLB', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/leaders' },
+            { name: 'NHL', endpoint: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/leaders' }
+        ];
+        
+        for (const league of testLeagues) {
+            try {
+                console.log(`\n--- Testing ${league.name} Stats ---`);
+                const response = await fetch(league.endpoint);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(`✅ ${league.name} SUCCESS:`, data);
+                    
+                    // Log structure for analysis
+                    if (data.leaders) {
+                        console.log(`${league.name} Categories:`, data.leaders.map(cat => cat.displayName));
+                    }
+                    if (data.categories) {
+                        console.log(`${league.name} Categories:`, data.categories.map(cat => cat.displayName));
+                    }
+                } else {
+                    console.log(`❌ ${league.name} FAILED: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                console.log(`❌ ${league.name} ERROR:`, error.message);
+            }
+            
+            // Small delay between requests
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
+        console.log('\n=== ESPN STATS TEST COMPLETE ===');
+    }
     
-    // --- 4. OPTIMIZED FIRESTORE FUNCTIONS ---
+    // Run the test
+    window.testESPNStats = testESPNStatsData;
+
+    // --- 3. OPTIMIZED FIRESTORE FUNCTIONS ---
     
     // Cached version of Firestore queries to reduce costs
     async function getCachedGames(leagueId, gameDate) {
