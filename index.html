@@ -4507,16 +4507,27 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('schedule-tab-content').style.display = 'block';
         }
         
-        // Reset schedule sub-tabs (Today/Upcoming) 
+        // Reset schedule sub-tabs (Today/Upcoming) - but don't force Today active yet
         if (scheduleTabsContainer) {
             const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
             const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
             
-            // Set Today tab as active and show its content
-            if (todayScheduleTab) todayScheduleTab.classList.add('active');
-            if (upcomingScheduleTab) upcomingScheduleTab.classList.remove('active');
-            document.getElementById('league-schedule-today-content').style.display = 'block';
-            document.getElementById('league-schedule-upcoming-content').style.display = 'none';
+            // Reset both tabs to inactive state initially
+            if (todayScheduleTab) {
+                todayScheduleTab.classList.remove('active');
+                todayScheduleTab.style.backgroundColor = '#2a2a2a';
+                todayScheduleTab.style.color = '#ccc';
+                todayScheduleTab.style.borderBottom = 'none';
+            }
+            if (upcomingScheduleTab) {
+                upcomingScheduleTab.classList.remove('active');
+                upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
+                upcomingScheduleTab.style.color = '#ccc';
+                upcomingScheduleTab.style.borderBottom = 'none';
+            }
+            
+            // The existing logic in the data loading will determine which tab becomes active
+            // based on whether there are games today or not
         }
 
         // Load TODAY schedule - use FlashLiveAPI for MLB, individual collections for others
@@ -4534,13 +4545,41 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Switch to Upcoming tab if no games today
                     const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
                     const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
-                    if (todayScheduleTab) todayScheduleTab.classList.remove('active');
-                    if (upcomingScheduleTab) upcomingScheduleTab.classList.add('active');
+                    if (todayScheduleTab) {
+                        todayScheduleTab.classList.remove('active');
+                        todayScheduleTab.style.backgroundColor = '#2a2a2a';
+                        todayScheduleTab.style.color = '#ccc';
+                        todayScheduleTab.style.borderBottom = 'none';
+                    }
+                    if (upcomingScheduleTab) {
+                        upcomingScheduleTab.classList.add('active');
+                        upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
+                        upcomingScheduleTab.style.color = '#fff';
+                        upcomingScheduleTab.style.borderBottom = '2px solid #fff';
+                    }
                     document.getElementById('league-schedule-today-content').style.display = 'none';
                     document.getElementById('league-schedule-upcoming-content').style.display = 'block';
                     loadUpcomingSchedule(leagueKey); // Load upcoming when no today games
                     return;
                 }
+                
+                // If there ARE games today, activate Today tab with proper styling
+                const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+                const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
+                if (todayScheduleTab) {
+                    todayScheduleTab.classList.add('active');
+                    todayScheduleTab.style.backgroundColor = '#2a2a2a';
+                    todayScheduleTab.style.color = '#fff';
+                    todayScheduleTab.style.borderBottom = '2px solid #fff';
+                }
+                if (upcomingScheduleTab) {
+                    upcomingScheduleTab.classList.remove('active');
+                    upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
+                    upcomingScheduleTab.style.color = '#ccc';
+                    upcomingScheduleTab.style.borderBottom = 'none';
+                }
+                document.getElementById('league-schedule-today-content').style.display = 'block';
+                document.getElementById('league-schedule-upcoming-content').style.display = 'none';
                 
                 const sortedGames = gamesData.sort(sortGames);
                 renderGames(todayScheduleContent, sortedGames, false);
