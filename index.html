@@ -5414,13 +5414,15 @@ if (scheduleTabsContainer) {
         // Remove active class from all tabs and reset styling
         scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => {
             tab.classList.remove('active');
-            tab.style.backgroundColor = '#333';
+            tab.style.backgroundColor = '#2a2a2a';
             tab.style.color = '#ccc';
+            tab.style.borderBottom = 'none';
         });
         // Add active class and styling to clicked tab
         todayScheduleTab.classList.add('active');
-        todayScheduleTab.style.backgroundColor = '#fff';
-        todayScheduleTab.style.color = '#000';
+        todayScheduleTab.style.backgroundColor = '#2a2a2a';
+        todayScheduleTab.style.color = '#fff';
+        todayScheduleTab.style.borderBottom = '2px solid #fff';
         
         // Show today content, hide upcoming content
         document.getElementById('league-schedule-today-content').style.display = 'block';
@@ -5431,13 +5433,15 @@ if (scheduleTabsContainer) {
         // Remove active class from all tabs and reset styling
         scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => {
             tab.classList.remove('active');
-            tab.style.backgroundColor = '#333';
+            tab.style.backgroundColor = '#2a2a2a';
             tab.style.color = '#ccc';
+            tab.style.borderBottom = 'none';
         });
         // Add active class and styling to clicked tab
         upcomingScheduleTab.classList.add('active');
-        upcomingScheduleTab.style.backgroundColor = '#fff';
-        upcomingScheduleTab.style.color = '#000';
+        upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
+        upcomingScheduleTab.style.color = '#fff';
+        upcomingScheduleTab.style.borderBottom = '2px solid #fff';
 
         // Show upcoming content, hide today content
         document.getElementById('league-schedule-today-content').style.display = 'none';
