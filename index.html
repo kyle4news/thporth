@@ -4520,7 +4520,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 todayScheduleTab.style.borderBottom = 'none';
             }
             if (upcomingScheduleTab) {
-                upcomingScheduleTab.classList.remove('active');
+            upcomingScheduleTab.classList.remove('active');
                 upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
                 upcomingScheduleTab.style.color = '#ccc';
                 upcomingScheduleTab.style.borderBottom = 'none';
@@ -4997,11 +4997,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const upcomingCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
 
         upcomingCollectionRef.get().then(snapshot => {
+            console.log(`NHL Debug: Collection ${leagueInfo.upcomingCollectionName} returned ${snapshot.size} documents`);
             const now = luxon.DateTime.now().toMillis();
             const games = [];
         
             snapshot.forEach(doc => {
                 const data = doc.data();
+                if (leagueKey === 'NHL') {
+                    console.log('NHL game data:', data);
+                    console.log('NHL game fields:', Object.keys(data));
+                }
             
             // Get field names based on league type
             let awayField, homeField, timeField, dateField;
