@@ -4520,7 +4520,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 todayScheduleTab.style.borderBottom = 'none';
             }
             if (upcomingScheduleTab) {
-                upcomingScheduleTab.classList.remove('active');
+            upcomingScheduleTab.classList.remove('active');
                 upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
                 upcomingScheduleTab.style.color = '#ccc';
                 upcomingScheduleTab.style.borderBottom = 'none';
@@ -5022,7 +5022,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 timeField = 'time';
                 dateField = 'date';
             } else if (['Boxing'].includes(leagueKey)) {
-                awayField = 'event';
+                awayField = 'boxers';
                 homeField = 'boxers';
                 timeField = 'time';
                 dateField = 'date';
@@ -5140,8 +5140,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             });
         
+            console.log(`NHL: Processed ${games.length} games after filtering`);
             if (games.length === 0) {
                 upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
+                console.log('NHL: No games after processing - check date filtering logic');
                 return;
             }
         
@@ -5223,9 +5225,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
                 } else if (['Boxing'].includes(leagueKey)) {
-                    // Boxing: Group by event, show event as subheader, then all boxer matchups under it
-                    const currentEvent = game.away; // awayField = 'event'
-                    const lastEvent = gamesByDate[dateHeader][gamesByDate[dateHeader].indexOf(game) - 1]?.away;
+                    // Boxing: Group by event location, show event as subheader, then all boxer matchups under it
+                    const currentEvent = game.event || 'TBA'; // Use the actual event field
+                    const lastEvent = gamesByDate[dateHeader][gamesByDate[dateHeader].indexOf(game) - 1]?.event;
                     
                     // If this is a new event, add event header
                     if (currentEvent !== lastEvent) {
@@ -5236,9 +5238,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1; margin-right: 8px;">
-                                <div class="boxers" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
+                                <div class="boxers" style="color: white; font-size: 11px; line-height: 1.4;">${game.boxers}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;"></div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time || 'TBD'}</div>
                         </div>
                     `;
                 } else if (['Tennis'].includes(leagueKey)) {
