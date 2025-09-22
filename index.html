@@ -2124,11 +2124,11 @@ div[id^="breaking-content-"] a:hover {
         <!-- Player Stats Content (active by default) -->
         <div id="player-stats-content" class="stats-sub-content" style="display: flex; flex: 1; height: calc(100% - 18px); overflow: hidden;">
             <!-- Left Column: Category Menu (20% width) -->
-            <div id="player-category-menu" class="stats-category-menu" style="width: 20%; background-color: #000; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
-                <div class="stats-category-item active" data-category="batting" style="padding: 8px 12px; cursor: pointer; border-left: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 11px;">Batting</div>
-                <div class="stats-category-item" data-category="pitching" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Pitching</div>
-                <div class="stats-category-item" data-category="fielding" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Fielding</div>
-                <div class="stats-category-item" data-category="advanced" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Advanced</div>
+            <div id="player-category-menu" class="stats-category-menu" style="width: 20%; background-color: #1f1f1f; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
+                <div class="stats-category-item active" data-category="batting" style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 11px; margin-bottom: 1px;">Batting</div>
+                <div class="stats-category-item" data-category="pitching" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px; margin-bottom: 1px;">Pitching</div>
+                <div class="stats-category-item" data-category="fielding" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px; margin-bottom: 1px;">Fielding</div>
+                <div class="stats-category-item" data-category="advanced" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px; margin-bottom: 1px;">Advanced</div>
             </div>
             
             <!-- Right Column: Stats Display (80% width) -->
@@ -2140,11 +2140,11 @@ div[id^="breaking-content-"] a:hover {
         <!-- Team Stats Content (hidden by default) -->
         <div id="team-stats-content" class="stats-sub-content" style="display: none; flex: 1; height: calc(100% - 18px); overflow: hidden;">
             <!-- Left Column: Category Menu (20% width) -->
-            <div id="team-category-menu" class="stats-category-menu" style="width: 20%; background-color: #000; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
-                <div class="stats-category-item active" data-category="standings" style="padding: 8px 12px; cursor: pointer; border-left: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 11px;">Standings</div>
-                <div class="stats-category-item" data-category="offense" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Offense</div>
-                <div class="stats-category-item" data-category="defense" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Defense</div>
-                <div class="stats-category-item" data-category="pitching" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Pitching</div>
+            <div id="team-category-menu" class="stats-category-menu" style="width: 20%; background-color: #1f1f1f; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
+                <div class="stats-category-item active" data-category="standings" style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 11px; margin-bottom: 1px;">Standings</div>
+                <div class="stats-category-item" data-category="offense" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px; margin-bottom: 1px;">Offense</div>
+                <div class="stats-category-item" data-category="defense" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px; margin-bottom: 1px;">Defense</div>
+                <div class="stats-category-item" data-category="pitching" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px; margin-bottom: 1px;">Pitching</div>
             </div>
             
             <!-- Right Column: Stats Display (80% width) -->
@@ -5515,7 +5515,7 @@ function initializeStatsCategoryMenu(menuId, displayId) {
         // Update all category items in this menu
         categoryMenu.querySelectorAll('.stats-category-item').forEach(item => {
             item.classList.remove('active');
-            item.style.borderLeft = 'none';
+            item.style.borderBottom = 'none';
             item.style.backgroundColor = '#141414';
             item.style.color = '#BFBFBF';
             item.style.fontWeight = 'normal';
@@ -5523,7 +5523,7 @@ function initializeStatsCategoryMenu(menuId, displayId) {
         
         // Activate clicked item
         clickedItem.classList.add('active');
-        clickedItem.style.borderLeft = '1px solid #fff';
+        clickedItem.style.borderBottom = '1px solid #fff';
         clickedItem.style.backgroundColor = '#000';
         clickedItem.style.color = '#fff';
         clickedItem.style.fontWeight = 'bold';
@@ -5583,7 +5583,7 @@ function resetStatsTabsToDefault() {
         // Reset all category items
         playerCategoryMenu.querySelectorAll('.stats-category-item').forEach(item => {
             item.classList.remove('active');
-            item.style.borderLeft = 'none';
+            item.style.borderBottom = 'none';
             item.style.backgroundColor = '#141414';
             item.style.color = '#BFBFBF';
             item.style.fontWeight = 'normal';
@@ -5592,7 +5592,7 @@ function resetStatsTabsToDefault() {
         // Activate first category (Batting)
         if (firstCategoryItem) {
             firstCategoryItem.classList.add('active');
-            firstCategoryItem.style.borderLeft = '1px solid #fff';
+            firstCategoryItem.style.borderBottom = '1px solid #fff';
             firstCategoryItem.style.backgroundColor = '#000';
             firstCategoryItem.style.color = '#fff';
             firstCategoryItem.style.fontWeight = 'bold';
@@ -5607,7 +5607,7 @@ function resetStatsTabsToDefault() {
         // Reset all category items
         teamCategoryMenu.querySelectorAll('.stats-category-item').forEach(item => {
             item.classList.remove('active');
-            item.style.borderLeft = 'none';
+            item.style.borderBottom = 'none';
             item.style.backgroundColor = '#141414';
             item.style.color = '#BFBFBF';
             item.style.fontWeight = 'normal';
@@ -5616,7 +5616,7 @@ function resetStatsTabsToDefault() {
         // Activate first category (Standings)
         if (firstCategoryItem) {
             firstCategoryItem.classList.add('active');
-            firstCategoryItem.style.borderLeft = '1px solid #fff';
+            firstCategoryItem.style.borderBottom = '1px solid #fff';
             firstCategoryItem.style.backgroundColor = '#000';
             firstCategoryItem.style.color = '#fff';
             firstCategoryItem.style.fontWeight = 'bold';
