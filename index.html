@@ -2086,17 +2086,12 @@ div[id^="breaking-content-"] a:hover {
         League Info
     </div>
     
-    <!-- Main Tabs: Schedule | Standings | Stats -->
-    <div id="main-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; border-radius: 3px; overflow: hidden; flex-shrink: 0;">
-        <div class="main-tab active" data-main-tab="schedule" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #3c3c3c; color: #fff;">SCHEDULE</div>
-        <div class="main-tab" data-main-tab="standings" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #2a2a2a; color: #ccc;">STANDINGS</div>
-        <div class="main-tab" data-main-tab="stats" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">STATS</div>
-    </div>
-
-    <!-- Schedule Tab Content (active by default) -->
-    <div id="schedule-tab-content" class="main-tab-content" style="display: block; padding: 1px 1rem 1rem 1rem; height: calc(100% - 18px); flex-direction: column;">
-        <!-- Schedule Sub-Tabs (Today/Upcoming) -->
-        <div id="schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-bottom: 1px; border-radius: 3px; overflow: hidden; flex-shrink: 0;">
+    <!-- Container for Schedule -->
+    <div id="league-schedule-container" style="padding: 1rem; height: 50vh; display: flex; flex-direction: column;">
+        <h2 style="font-size: 1.125rem; font-weight: 700; color: #fff; margin-bottom: 1rem; flex-shrink: 0;">Schedule</h2>
+        
+        <!-- Schedule Tabs -->
+        <div id="schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-bottom: 1rem; border-radius: 3px; overflow: hidden; flex-shrink: 0;">
             <div class="schedule-tab active" data-schedule-tab="today" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f;">TODAY</div>
             <div class="schedule-tab" data-schedule-tab="upcoming" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer;">UPCOMING</div>
         </div>
@@ -2106,16 +2101,11 @@ div[id^="breaking-content-"] a:hover {
         <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
     </div>
 
-    <!-- Standings Tab Content (hidden by default) -->
-    <div id="standings-tab-content" class="main-tab-content" style="display: none; padding: 1rem; height: calc(100% - 18px); flex-direction: column; overflow-y: auto;">
-        <div id="league-standings-content" style="flex: 1;"><p style="color: #9ca3af;">Loading standings...</p></div>
+    <!-- Container for Standings -->
+    <div id="league-standings-container" style="padding: 1rem; border-top: 1px solid #374151; height: 50vh; display: flex; flex-direction: column;">
+        <h2 style="font-size: 1.125rem; font-weight: 700; color: #fff; margin-bottom: 1rem; flex-shrink: 0;">Standings</h2>
+        <div id="league-standings-content" style="flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading standings...</p></div>
     </div>
-
-    <!-- Stats Tab Content (hidden by default) -->
-    <div id="stats-tab-content" class="main-tab-content" style="display: none; padding: 1rem; height: calc(100% - 18px); flex-direction: column; overflow-y: auto;">
-        <div id="league-stats-content" style="flex: 1;"><p style="color: #9ca3af;">Stats will be loaded here...</p></div>
-    </div>
-
 </div>
 
 
@@ -4057,6 +4047,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (refreshInterval) clearInterval(refreshInterval);
         
         refreshInterval = setInterval(() => {
+            console.log('Periodic cache refresh...');
             cache.clear(); // Clear cache to force fresh data on next request
             
             // Only refresh if user is actively viewing the page
@@ -4103,9 +4094,11 @@ document.addEventListener('DOMContentLoaded', function () {
         let cachedData = cache.get(cacheKey);
         
         if (cachedData) {
+            console.log('Using cached games data for:', leagueId);
             return cachedData;
         }
         
+        console.log('Fetching fresh games data for:', leagueId);
         try {
             const snapshot = await gamesCollectionRef
                 .where('League', '==', leagueId)
@@ -4127,9 +4120,11 @@ document.addEventListener('DOMContentLoaded', function () {
         let cachedData = cache.get(cacheKey);
         
         if (cachedData) {
+            console.log('Using cached upcoming games for:', collectionName);
             return cachedData;
         }
         
+        console.log('Fetching fresh upcoming games for:', collectionName);
         try {
             const snapshot = await db.collection(collectionName).get();
             const upcomingData = snapshot.docs.map(doc => doc.data());
@@ -5346,33 +5341,6 @@ if (gamesTabsContainer) {
     if (todayTab) todayTab.click();
 }
 
-// --- MAIN TABS INITIALIZATION ---
-const mainTabsContainer = document.getElementById('main-tabs');
-if (mainTabsContainer) {
-    mainTabsContainer.addEventListener('click', (e) => {
-        const clickedTab = e.target.closest('.main-tab');
-        if (!clickedTab) return;
-        
-        const tabType = clickedTab.dataset.mainTab;
-        
-        // Update tab appearances
-        mainTabsContainer.querySelectorAll('.main-tab').forEach(tab => {
-            tab.classList.remove('active');
-            tab.style.backgroundColor = '#2a2a2a';
-            tab.style.color = '#ccc';
-        });
-        clickedTab.classList.add('active');
-        clickedTab.style.backgroundColor = '#3c3c3c';
-        clickedTab.style.color = '#fff';
-        
-        // Show/hide content
-        document.querySelectorAll('.main-tab-content').forEach(content => {
-            content.style.display = 'none';
-        });
-        document.getElementById(`${tabType}-tab-content`).style.display = 'block';
-    });
-}
-
 // --- SCHEDULE TABS INITIALIZATION ---
 const scheduleTabsContainer = document.getElementById('schedule-tabs');
 if (scheduleTabsContainer) {
@@ -6406,6 +6374,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show specific column on mobile
     function showMobileColumn(columnType) {
         try {
+            console.log('Mobile: Switching to column:', columnType, 'Current league:', currentMobileLeague);
             
             // Hide all columns
             document.querySelectorAll('.column').forEach(col => {
@@ -6416,15 +6385,20 @@ document.addEventListener('DOMContentLoaded', function() {
             if (columnType === 'games') {
                 if (currentMobileLeague === 'Home') {
                     document.getElementById('games-column')?.classList.add('mobile-active');
+                    console.log('Mobile: Showing games column for Home');
                 } else {
                     document.getElementById('league-specific-column')?.classList.add('mobile-active');
+                    console.log('Mobile: Showing league-specific column for:', currentMobileLeague);
                 }
             } else if (columnType === 'news') {
                 document.querySelector('.column.news')?.classList.add('mobile-active');
+                console.log('Mobile: Showing news column');
             } else if (columnType === 'social') {
                 document.querySelector('.column.social')?.classList.add('mobile-active');
+                console.log('Mobile: Showing social column');
             } else if (columnType === 'videos') {
                 document.querySelector('.column.videos-column')?.classList.add('mobile-active');
+                console.log('Mobile: Showing videos column');
             }
             
             // Update toolbar button states
@@ -6432,6 +6406,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 btn.classList.remove('active');
             });
             document.getElementById(`mobile-${columnType}-btn`)?.classList.add('active');
+            
+            console.log('Mobile: Column switch completed successfully');
             
         } catch (error) {
             console.error('Error in showMobileColumn:', error);
@@ -6510,11 +6486,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // Use the exact same logic as desktop by simulating a click on the desktop menu item
             const desktopMenuItem = document.querySelector(`#menuList-123 li[data-section="${section}"]`);
             if (desktopMenuItem) {
+                console.log('Mobile: Triggering desktop functionality for:', section);
                 // Temporarily remove mobile-active classes to prevent conflicts
                 document.querySelectorAll('.column').forEach(col => col.classList.remove('mobile-active'));
                 // Trigger the desktop click handler
                 desktopMenuItem.click();
+            } else {
+                console.error('Mobile: Desktop menu item not found for:', section);
             }
+            
+            console.log('Mobile: League selection completed successfully');
             
             // Close menu and show news column
             if (mobileLeagueMenu) {
@@ -6576,6 +6557,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const isToolbarVisible = toolbar && window.getComputedStyle(toolbar).display !== 'none';
         
         if (isToolbarVisible) {
+            console.log('Mobile toolbar detected, showing news content');
             showMobileColumn('news');
         }
     }
@@ -6597,4 +6579,5 @@ document.addEventListener('DOMContentLoaded', function() {
  
   </body>
 </html>
+
 
