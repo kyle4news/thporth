@@ -5178,6 +5178,17 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // Sort games by time within each date for ALL leagues
             const sortedGames = gamesByDate[dateHeader].sort((a, b) => {
+                // Special sorting for Boxing: group by event first, then by time
+                if (leagueKey === 'Boxing') {
+                    const eventA = a.away || ''; // awayField = 'event'
+                    const eventB = b.away || '';
+                    
+                    // First sort by event name
+                    if (eventA !== eventB) {
+                        return eventA.localeCompare(eventB);
+                    }
+                }
+                
                 // Parse time strings to compare them
                 const timeA = a.time || '';
                 const timeB = b.time || '';
@@ -5227,7 +5238,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (['Boxing'].includes(leagueKey)) {
                     // Boxing: Group by event, show event as subheader, then all boxer matchups under it
                     const currentEvent = game.away; // awayField = 'event' - this is the event name
-                    const lastEvent = gamesByDate[dateHeader][gamesByDate[dateHeader].indexOf(game) - 1]?.away;
+                    const currentGameIndex = gamesByDate[dateHeader].indexOf(game);
+                    const lastEvent = currentGameIndex > 0 ? gamesByDate[dateHeader][currentGameIndex - 1]?.away : null;
                     
                     // If this is a new event, add event header
                     if (currentEvent !== lastEvent) {
