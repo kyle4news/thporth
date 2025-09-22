@@ -5544,11 +5544,243 @@ function loadStatsCategory(category, displayElementId) {
     
     displayElement.innerHTML = `<p style="color: #9ca3af;">Loading ${category} statistics...</p>`;
     
-    // TODO: Implement actual stats loading based on category and league
-    setTimeout(() => {
-        displayElement.innerHTML = `<p style="color: #9ca3af;">${category} statistics will be implemented here...</p>`;
-    }, 500);
+    // Get current league to determine data source
+    const leagueHeader = document.getElementById('league-specific-header');
+    const currentLeague = leagueHeader ? leagueHeader.innerText : null;
+    
+    // Load stats based on league and category
+    if (currentLeague === 'MLB') {
+        loadMLBStats(category, displayElement);
+    } else {
+        // For other leagues, show placeholder
+        setTimeout(() => {
+            displayElement.innerHTML = `<p style="color: #9ca3af;">${category} statistics for ${currentLeague} will be implemented here...</p>`;
+        }, 500);
+    }
 }
+
+
+// --- PARSE BASEBALL REFERENCE DATA ---
+function parseBaseballReferenceData(html, category) {
+    try {
+        // Create a temporary DOM parser
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Find the 2025 Leaders section
+        const leadersSection = doc.querySelector('h2:contains("2025 Leaders")') || 
+                              Array.from(doc.querySelectorAll('h2')).find(h2 => h2.textContent.includes('2025 Leaders'));
+        
+        if (!leadersSection) {
+            console.log('2025 Leaders section not found');
+            return [];
+        }
+        
+        // Get all the leader entries
+        const leaderEntries = [];
+        let currentElement = leadersSection.nextElementSibling;
+        
+        while (currentElement && currentElement.tagName !== 'H2') {
+            if (currentElement.tagName === 'P' && currentElement.textContent.trim()) {
+                const text = currentElement.textContent.trim();
+                const match = text.match(/^\*\*(.+?)\*\*\s*(.+)$/);
+                
+                if (match) {
+                    const statName = match[1].trim();
+                    const leaderInfo = match[2].trim();
+                    
+                    // Categorize the stats
+                    if (shouldIncludeStat(statName, category)) {
+                        leaderEntries.push({
+                            stat: statName,
+                            leader: leaderInfo
+                        });
+                    }
+                }
+            }
+            currentElement = currentElement.nextElementSibling;
+        }
+        
+        return leaderEntries;
+        
+    } catch (error) {
+        console.error('Error parsing Baseball Reference data:', error);
+        return [];
+    }
+}
+
+// --- CATEGORIZE STATS ---
+function shouldIncludeStat(statName, category) {
+    const battingStats = [
+        'WAR Position Players', 'Offensive WAR', 'Defensive WAR', 'Batting Average', 'On-Base%', 
+        'Slugging %', 'On-Base Plus Slugging', 'Games Played', 'At Bats', 'Plate Appearances',
+        'Runs Scored', 'Hits', 'Total Bases', 'Doubles', 'Triples', 'Home Runs', 'Runs Batted In',
+        'Bases on Balls', 'Strikeouts', 'Stolen Bases', 'Singles', 'Adjusted OPS+', 'Runs Created',
+        'Adj. Batting Runs', 'Adj. Batting Wins', 'Extra Base Hits', 'Times On Base', 'Offensive Win %',
+        'Hit By Pitch', 'Sacrifice Hits', 'Sacrifice Flies', 'Intentional Bases on Balls',
+        'Double Plays Grounded Into', 'Caught Stealing', 'SB %', 'Power-Speed #', 'AB per SO',
+        'AB per HR', 'Outs Made', 'Base-Out Runs Added (RE24)', 'Win Probability Added (WPA)',
+        'Situ. Wins Added (WPA/LI)', 'Championship WPA (cWPA)', 'Base-Out Wins Added (REW)',
+        'rOBA', 'Rbat+'
+    ];
+    
+    const pitchingStats = [
+        'WAR for Pitchers', 'Earned Run Average', 'Wins', 'Win-Loss %', 'Walks & Hits per IP',
+        'Hits per 9 IP', 'Bases On Balls per 9 IP', 'Strikeouts per 9 IP', 'Games Played',
+        'Saves', 'Innings Pitched', 'Strikeouts', 'Games Started', 'Complete Games', 'Shutouts',
+        'Home Runs', 'Bases on Balls', 'Hits', 'Strikeouts / Base On Balls', 'Home Runs per 9 IP',
+        'Losses', 'Earned Runs', 'Wild Pitches', 'Hit By Pitch', 'Batters Faced', 'Games Finished',
+        'Adjusted ERA+', 'Fielding Independent Pitching', 'Adj. Pitching Runs', 'Adj. Pitching Wins',
+        'Base-Out Runs Saved (RE24)', 'Win Probability Added (WPA)', 'Sit. Wins Saved (WPA/LI)',
+        'Championship WPA (cWPA)', 'Base-Out Wins Saved (REW)'
+    ];
+    
+    const fieldingStats = [
+        'Putouts', 'Assists', 'Errors Committed', 'Total Zone Runs', 'Def. Games as C',
+        'Putouts as C', 'Assists as C', 'Errors Committed as C', 'Double Plays Turned as C',
+        'Passed Balls', 'Stolen Bases Allowed as C', 'Caught Stealing as C', 'Caught Stealing %'
+    ];
+    
+    const advancedStats = [
+        'Wins Above Replacement', 'WAR Position Players', 'WAR for Pitchers', 'Adjusted OPS+',
+        'Adjusted ERA+', 'Fielding Independent Pitching', 'Base-Out Runs Added (RE24)',
+        'Win Probability Added (WPA)', 'Situ. Wins Added (WPA/LI)', 'Championship WPA (cWPA)',
+        'Base-Out Wins Added (REW)', 'Base-Out Wins Saved (REW)', 'rOBA', 'Rbat+'
+    ];
+    
+    switch (category) {
+        case 'batting':
+            return battingStats.some(stat => statName.includes(stat));
+        case 'pitching':
+            return pitchingStats.some(stat => statName.includes(stat));
+        case 'fielding':
+            return fieldingStats.some(stat => statName.includes(stat));
+        case 'advanced':
+            return advancedStats.some(stat => statName.includes(stat));
+        default:
+            return true;
+    }
+}
+
+// --- DISPLAY MLB STATS ---
+function displayMLBStats(statsData, category, displayElement) {
+    let html = `<div style="color: white;">`;
+    html += `<h4 style="color: #fff; font-size: 12px; margin-bottom: 10px; border-bottom: 1px solid #4a4a4a; padding-bottom: 5px;">2025 MLB ${category.charAt(0).toUpperCase() + category.slice(1)} Leaders</h4>`;
+    
+    if (statsData.length > 0) {
+        html += `<table style="width: 100%; border-collapse: collapse; font-size: 10px;">`;
+        html += `<thead><tr style="border-bottom: 1px solid #4a4a4a;">`;
+        html += `<th style="padding: 4px; text-align: left; color: #ccc;">Statistic</th>`;
+        html += `<th style="padding: 4px; text-align: left; color: #ccc;">Leader</th>`;
+        html += `</tr></thead><tbody>`;
+        
+        statsData.forEach(stat => {
+            html += `<tr style="border-bottom: 1px solid #333;">`;
+            html += `<td style="padding: 4px; color: white; font-weight: 500;">${stat.stat}</td>`;
+            html += `<td style="padding: 4px; color: #ccc;">${stat.leader}</td>`;
+            html += `</tr>`;
+        });
+        
+        html += `</tbody></table>`;
+    } else {
+        html += `<p style="color: #9ca3af;">No ${category} statistics available.</p>`;
+    }
+    
+    html += `<p style="color: #666; font-size: 9px; margin-top: 10px;">Data from Baseball Reference • Updated daily</p>`;
+    html += `</div>`;
+    
+    displayElement.innerHTML = html;
+}
+
+// --- DAILY STATS REFRESH SYSTEM ---
+const statsCache = {
+    data: new Map(),
+    timestamps: new Map(),
+    CACHE_DURATION: 24 * 60 * 60 * 1000, // 24 hours cache for daily updates
+    
+    set(key, data) {
+        this.data.set(key, data);
+        this.timestamps.set(key, Date.now());
+    },
+    
+    get(key) {
+        const timestamp = this.timestamps.get(key);
+        if (!timestamp || Date.now() - timestamp > this.CACHE_DURATION) {
+            this.data.delete(key);
+            this.timestamps.delete(key);
+            return null;
+        }
+        return this.data.get(key);
+    },
+    
+    clear() {
+        this.data.clear();
+        this.timestamps.clear();
+    }
+};
+
+// --- ENHANCED MLB STATS LOADER WITH CACHING ---
+async function loadMLBStats(category, displayElement) {
+    const cacheKey = `mlb_stats_${category}`;
+    let cachedData = statsCache.get(cacheKey);
+    
+    if (cachedData) {
+        console.log('Using cached MLB stats for', category);
+        displayMLBStats(cachedData, category, displayElement);
+        return;
+    }
+    
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+    const baseballRefUrl = 'https://www.baseball-reference.com/leaders/';
+    
+    try {
+        console.log('Fetching fresh MLB stats from Baseball Reference...');
+        const response = await fetch(proxyUrl + encodeURIComponent(baseballRefUrl));
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch Baseball Reference data');
+        }
+        
+        const html = await response.text();
+        const statsData = parseBaseballReferenceData(html, category);
+        
+        if (statsData && statsData.length > 0) {
+            // Cache the data for 24 hours
+            statsCache.set(cacheKey, statsData);
+            displayMLBStats(statsData, category, displayElement);
+        } else {
+            displayElement.innerHTML = `<p style="color: #9ca3af;">No ${category} data available at this time.</p>`;
+        }
+        
+    } catch (error) {
+        console.error('Error loading MLB stats:', error);
+        displayElement.innerHTML = `<p style="color: #ef4444;">Error loading MLB statistics. Please try again later.</p>`;
+    }
+}
+
+// --- DAILY REFRESH SCHEDULER ---
+function startDailyStatsRefresh() {
+    // Clear cache at midnight every day
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0); // Next midnight
+    const msUntilMidnight = midnight.getTime() - now.getTime();
+    
+    setTimeout(() => {
+        console.log('Clearing MLB stats cache for daily refresh...');
+        statsCache.clear();
+        
+        // Set up daily refresh
+        setInterval(() => {
+            console.log('Daily MLB stats cache refresh...');
+            statsCache.clear();
+        }, 24 * 60 * 60 * 1000); // Every 24 hours
+        
+    }, msUntilMidnight);
+}
+
+// Start the daily refresh system
+startDailyStatsRefresh();
 
 // --- RESET STATS TABS TO DEFAULT ---
 function resetStatsTabsToDefault() {
