@@ -2086,12 +2086,13 @@ div[id^="breaking-content-"] a:hover {
         League Info
     </div>
     
-    <!-- Main Tabs: Schedule | Standings | Stats -->
-    <div id="main-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0;">
-        <div class="main-tab active" data-main-tab="schedule" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #fff; color: #000; font-weight: bold;">SCHEDULE</div>
-        <div class="main-tab" data-main-tab="standings" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #2a2a2a; color: #ccc;">STANDINGS</div>
-        <div class="main-tab" data-main-tab="stats" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">STATS</div>
-    </div>
+            <!-- Main Tabs: Schedule | Standings (Stats hidden for now) -->
+            <div id="main-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0;">
+                <div class="main-tab active" data-main-tab="schedule" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #fff; color: #000; font-weight: bold;">SCHEDULE</div>
+                <div class="main-tab" data-main-tab="standings" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">STANDINGS</div>
+                <!-- Stats tab hidden for now - keeping functionality intact -->
+                <div class="main-tab" data-main-tab="stats" style="display: none; flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">STATS</div>
+            </div>
 
     <!-- Schedule Tab Content (active by default) -->
     <div id="schedule-tab-content" class="main-tab-content" style="display: block; height: calc(100% - 18px); flex-direction: column;">
@@ -5715,7 +5716,7 @@ function displayMLBStats(statsData, category, displayElement) {
 const statsCache = {
     data: new Map(),
     timestamps: new Map(),
-    CACHE_DURATION: 24 * 60 * 60 * 1000, // 24 hours cache for daily updates
+    CACHE_DURATION: 12 * 60 * 60 * 1000, // 12 hours cache for cost efficiency
     
     set(key, data) {
         this.data.set(key, data);
@@ -5738,43 +5739,88 @@ const statsCache = {
     }
 };
 
-// --- ENHANCED MLB STATS LOADER WITH CACHING ---
+// --- ENHANCED MLB STATS LOADER FROM FIRESTORE ---
 async function loadMLBStats(category, displayElement) {
     const cacheKey = `mlb_stats_${category}`;
     let cachedData = statsCache.get(cacheKey);
     
     if (cachedData) {
         console.log('Using cached MLB stats for', category);
-        displayMLBStats(cachedData, category, displayElement);
+        displayMLBStatsFromFirestore(cachedData, category, displayElement);
         return;
     }
     
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const baseballRefUrl = 'https://www.baseball-reference.com/leaders/';
-    
     try {
-        console.log('Fetching fresh MLB stats from Baseball Reference...');
-        const response = await fetch(proxyUrl + encodeURIComponent(baseballRefUrl));
+        console.log('Fetching fresh MLB stats from Firestore for', category);
         
-        if (!response.ok) {
-            throw new Error('Failed to fetch Baseball Reference data');
-        }
-        
-        const html = await response.text();
-        const statsData = parseBaseballReferenceData(html, category);
+        // Load from Firestore
+        const statsData = await loadMLBStatsFromFirestore(category);
         
         if (statsData && statsData.length > 0) {
-            // Cache the data for 24 hours
+            // Cache the data for 12 hours
             statsCache.set(cacheKey, statsData);
-            displayMLBStats(statsData, category, displayElement);
+            displayMLBStatsFromFirestore(statsData, category, displayElement);
         } else {
-            displayElement.innerHTML = `<p style="color: #9ca3af;">No ${category} data available at this time.</p>`;
+            displayElement.innerHTML = `<p style="color: #9ca3af;">No ${category} data available. Please sync from Google Sheets.</p>`;
         }
         
     } catch (error) {
-        console.error('Error loading MLB stats:', error);
+        console.error('Error loading MLB stats from Firestore:', error);
         displayElement.innerHTML = `<p style="color: #ef4444;">Error loading MLB statistics. Please try again later.</p>`;
     }
+}
+
+// --- LOAD MLB STATS FROM FIRESTORE ---
+async function loadMLBStatsFromFirestore(category) {
+    try {
+        const docRef = db.collection('mlb_stats').doc(category);
+        const doc = await docRef.get();
+        
+        if (doc.exists) {
+            const data = doc.data();
+            const statsData = data.stats || [];
+            console.log('✅ Loaded', statsData.length, 'stats for', category);
+            return statsData;
+        } else {
+            console.log('❌ No stats found for category:', category);
+            return [];
+        }
+    } catch (error) {
+        console.error('❌ Error loading MLB stats from Firestore:', error);
+        return [];
+    }
+}
+
+// --- DISPLAY MLB STATS FROM FIRESTORE ---
+function displayMLBStatsFromFirestore(statsData, category, displayElement) {
+    let html = `<div style="color: white;">`;
+    html += `<h4 style="color: #fff; font-size: 12px; margin-bottom: 10px; border-bottom: 1px solid #4a4a4a; padding-bottom: 5px;">2025 MLB ${category.charAt(0).toUpperCase() + category.slice(1)} Leaders</h4>`;
+    
+    if (statsData && statsData.length > 0) {
+        html += `<table style="width: 100%; border-collapse: collapse; font-size: 10px;">`;
+        html += `<thead><tr style="border-bottom: 1px solid #4a4a4a;">`;
+        html += `<th style="padding: 4px; text-align: left; color: #ccc;">Statistic</th>`;
+        html += `<th style="padding: 4px; text-align: left; color: #ccc;">Leader</th>`;
+        html += `<th style="padding: 4px; text-align: left; color: #ccc;">Value</th>`;
+        html += `</tr></thead><tbody>`;
+        
+        statsData.forEach(stat => {
+            html += `<tr style="border-bottom: 1px solid #333;">`;
+            html += `<td style="padding: 4px; color: white; font-weight: 500;">${stat.statName}</td>`;
+            html += `<td style="padding: 4px; color: #ccc;">${stat.leaderName}</td>`;
+            html += `<td style="padding: 4px; color: #ccc;">${stat.value}</td>`;
+            html += `</tr>`;
+        });
+        
+        html += `</tbody></table>`;
+    } else {
+        html += `<p style="color: #9ca3af;">No ${category} statistics available.</p>`;
+    }
+    
+    html += `<p style="color: #666; font-size: 9px; margin-top: 10px;">Data from Google Sheets • Updated daily • Cached for 12 hours</p>`;
+    html += `</div>`;
+    
+    displayElement.innerHTML = html;
 }
 
 // --- DAILY REFRESH SCHEDULER ---
@@ -5800,6 +5846,139 @@ function startDailyStatsRefresh() {
 
 // Start the daily refresh system
 startDailyStatsRefresh();
+
+// --- TEST BASEBALL REFERENCE SCRAPER ---
+async function testBaseballReferenceScraper() {
+    console.log('=== TESTING BASEBALL REFERENCE SCRAPER ===');
+    
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+    const baseballRefUrl = 'https://www.baseball-reference.com/leaders/';
+    
+    try {
+        console.log('Fetching Baseball Reference data...');
+        const response = await fetch(proxyUrl + encodeURIComponent(baseballRefUrl));
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const html = await response.text();
+        console.log('✅ Successfully fetched HTML (length:', html.length, 'characters)');
+        
+        // Parse the HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Find all h2 elements to see what sections exist
+        const allH2s = Array.from(doc.querySelectorAll('h2'));
+        console.log('\n📋 All H2 sections found:');
+        allH2s.forEach((h2, index) => {
+            console.log(`${index + 1}. "${h2.textContent.trim()}"`);
+        });
+        
+        // Look for 2025 Leaders section
+        const leadersSection = allH2s.find(h2 => h2.textContent.includes('2025 Leaders'));
+        
+        if (leadersSection) {
+            console.log('\n✅ Found "2025 Leaders" section');
+            
+            // Get all content after this section until next h2
+            const leaderEntries = [];
+            let currentElement = leadersSection.nextElementSibling;
+            let elementCount = 0;
+            
+            console.log('\n📊 Parsing leader entries...');
+            
+            while (currentElement && currentElement.tagName !== 'H2' && elementCount < 50) {
+                if (currentElement.tagName === 'P' && currentElement.textContent.trim()) {
+                    const text = currentElement.textContent.trim();
+                    console.log(`Entry ${elementCount + 1}: "${text}"`);
+                    
+                    // Try different parsing patterns
+                    const patterns = [
+                        /^\*\*(.+?)\*\*\s*(.+)$/,  // **Stat** Leader info
+                        /^(.+?)\s+(.+)$/           // Stat Leader info
+                    ];
+                    
+                    for (const pattern of patterns) {
+                        const match = text.match(pattern);
+                        if (match) {
+                            const statName = match[1].trim();
+                            const leaderInfo = match[2].trim();
+                            
+                            if (statName && leaderInfo) {
+                                leaderEntries.push({
+                                    stat: statName,
+                                    leader: leaderInfo,
+                                    rawText: text
+                                });
+                                console.log(`  ✅ Parsed: "${statName}" -> "${leaderInfo}"`);
+                                break;
+                            }
+                        }
+                    }
+                }
+                currentElement = currentElement.nextElementSibling;
+                elementCount++;
+            }
+            
+            console.log(`\n📈 Total leader entries found: ${leaderEntries.length}`);
+            
+            // Show first 10 entries
+            console.log('\n🏆 First 10 leader entries:');
+            leaderEntries.slice(0, 10).forEach((entry, index) => {
+                console.log(`${index + 1}. ${entry.stat}: ${entry.leader}`);
+            });
+            
+            // Categorize by stat type
+            console.log('\n📊 Categorizing stats...');
+            const battingStats = leaderEntries.filter(entry => 
+                shouldIncludeStat(entry.stat, 'batting')
+            );
+            const pitchingStats = leaderEntries.filter(entry => 
+                shouldIncludeStat(entry.stat, 'pitching')
+            );
+            const fieldingStats = leaderEntries.filter(entry => 
+                shouldIncludeStat(entry.stat, 'fielding')
+            );
+            const advancedStats = leaderEntries.filter(entry => 
+                shouldIncludeStat(entry.stat, 'advanced')
+            );
+            
+            console.log(`Batting stats: ${battingStats.length}`);
+            console.log(`Pitching stats: ${pitchingStats.length}`);
+            console.log(`Fielding stats: ${fieldingStats.length}`);
+            console.log(`Advanced stats: ${advancedStats.length}`);
+            
+            // Show sample from each category
+            if (battingStats.length > 0) {
+                console.log('\n⚾ Sample Batting Stats:');
+                battingStats.slice(0, 3).forEach(entry => {
+                    console.log(`  ${entry.stat}: ${entry.leader}`);
+                });
+            }
+            
+            if (pitchingStats.length > 0) {
+                console.log('\n⚾ Sample Pitching Stats:');
+                pitchingStats.slice(0, 3).forEach(entry => {
+                    console.log(`  ${entry.stat}: ${entry.leader}`);
+                });
+            }
+            
+        } else {
+            console.log('❌ "2025 Leaders" section not found');
+            console.log('Available sections:', allH2s.map(h2 => h2.textContent.trim()));
+        }
+        
+    } catch (error) {
+        console.error('❌ Error testing scraper:', error);
+    }
+    
+    console.log('\n=== SCRAPER TEST COMPLETE ===');
+}
+
+// Make test function available globally
+window.testBaseballScraper = testBaseballReferenceScraper;
 
 // --- RESET STATS TABS TO DEFAULT ---
 function resetStatsTabsToDefault() {
