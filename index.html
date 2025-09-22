@@ -2123,32 +2123,32 @@ div[id^="breaking-content-"] a:hover {
         
         <!-- Player Stats Content (active by default) -->
         <div id="player-stats-content" class="stats-sub-content" style="display: flex; flex: 1; height: calc(100% - 18px); overflow: hidden;">
-            <!-- Left Column: Category Menu (15% width) -->
-            <div id="player-category-menu" class="stats-category-menu" style="width: 15%; background-color: #000; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
+            <!-- Left Column: Category Menu (20% width) -->
+            <div id="player-category-menu" class="stats-category-menu" style="width: 20%; background-color: #000; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
                 <div class="stats-category-item active" data-category="batting" style="padding: 8px 12px; cursor: pointer; border-left: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 11px;">Batting</div>
                 <div class="stats-category-item" data-category="pitching" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Pitching</div>
                 <div class="stats-category-item" data-category="fielding" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Fielding</div>
                 <div class="stats-category-item" data-category="advanced" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Advanced</div>
             </div>
             
-            <!-- Right Column: Stats Display (85% width) -->
-            <div id="player-stats-display" class="stats-display" style="width: 85%; background-color: #000; overflow-y: auto; padding: 1rem;">
+            <!-- Right Column: Stats Display (80% width) -->
+            <div id="player-stats-display" class="stats-display" style="width: 80%; background-color: #000; overflow-y: auto; padding: 1rem;">
                 <div id="player-stats-content-area" style="color: #9ca3af;">Player statistics will be loaded here...</div>
             </div>
         </div>
         
         <!-- Team Stats Content (hidden by default) -->
         <div id="team-stats-content" class="stats-sub-content" style="display: none; flex: 1; height: calc(100% - 18px); overflow: hidden;">
-            <!-- Left Column: Category Menu (15% width) -->
-            <div id="team-category-menu" class="stats-category-menu" style="width: 15%; background-color: #000; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
+            <!-- Left Column: Category Menu (20% width) -->
+            <div id="team-category-menu" class="stats-category-menu" style="width: 20%; background-color: #000; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
                 <div class="stats-category-item active" data-category="standings" style="padding: 8px 12px; cursor: pointer; border-left: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 11px;">Standings</div>
                 <div class="stats-category-item" data-category="offense" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Offense</div>
                 <div class="stats-category-item" data-category="defense" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Defense</div>
                 <div class="stats-category-item" data-category="pitching" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Pitching</div>
             </div>
             
-            <!-- Right Column: Stats Display (85% width) -->
-            <div id="team-stats-display" class="stats-display" style="width: 85%; background-color: #000; overflow-y: auto; padding: 1rem;">
+            <!-- Right Column: Stats Display (80% width) -->
+            <div id="team-stats-display" class="stats-display" style="width: 80%; background-color: #000; overflow-y: auto; padding: 1rem;">
                 <div id="team-stats-content-area" style="color: #9ca3af;">Team statistics will be loaded here...</div>
             </div>
         </div>
@@ -5550,6 +5550,80 @@ function loadStatsCategory(category, displayElementId) {
     }, 500);
 }
 
+// --- RESET STATS TABS TO DEFAULT ---
+function resetStatsTabsToDefault() {
+    // Reset Player/Team sub-tabs to Player active
+    const statsSubTabsContainer = document.getElementById('stats-sub-tabs');
+    if (statsSubTabsContainer) {
+        const playerStatsTab = statsSubTabsContainer.querySelector('.stats-sub-tab[data-stats-sub-tab="player"]');
+        const teamStatsTab = statsSubTabsContainer.querySelector('.stats-sub-tab[data-stats-sub-tab="team"]');
+        
+        // Reset all sub-tabs
+        statsSubTabsContainer.querySelectorAll('.stats-sub-tab').forEach(tab => {
+            tab.classList.remove('active');
+            tab.style.borderBottom = 'none';
+        });
+        
+        // Activate Player tab
+        if (playerStatsTab) {
+            playerStatsTab.classList.add('active');
+            playerStatsTab.style.borderBottom = '1px solid #fff';
+        }
+        
+        // Show player content, hide team content
+        document.getElementById('player-stats-content').style.display = 'flex';
+        document.getElementById('team-stats-content').style.display = 'none';
+    }
+    
+    // Reset Player category menu to first item (Batting) active
+    const playerCategoryMenu = document.getElementById('player-category-menu');
+    if (playerCategoryMenu) {
+        const firstCategoryItem = playerCategoryMenu.querySelector('.stats-category-item[data-category="batting"]');
+        
+        // Reset all category items
+        playerCategoryMenu.querySelectorAll('.stats-category-item').forEach(item => {
+            item.classList.remove('active');
+            item.style.borderLeft = 'none';
+            item.style.backgroundColor = '#141414';
+            item.style.color = '#BFBFBF';
+            item.style.fontWeight = 'normal';
+        });
+        
+        // Activate first category (Batting)
+        if (firstCategoryItem) {
+            firstCategoryItem.classList.add('active');
+            firstCategoryItem.style.borderLeft = '1px solid #fff';
+            firstCategoryItem.style.backgroundColor = '#000';
+            firstCategoryItem.style.color = '#fff';
+            firstCategoryItem.style.fontWeight = 'bold';
+        }
+    }
+    
+    // Reset Team category menu to first item (Standings) active
+    const teamCategoryMenu = document.getElementById('team-category-menu');
+    if (teamCategoryMenu) {
+        const firstCategoryItem = teamCategoryMenu.querySelector('.stats-category-item[data-category="standings"]');
+        
+        // Reset all category items
+        teamCategoryMenu.querySelectorAll('.stats-category-item').forEach(item => {
+            item.classList.remove('active');
+            item.style.borderLeft = 'none';
+            item.style.backgroundColor = '#141414';
+            item.style.color = '#BFBFBF';
+            item.style.fontWeight = 'normal';
+        });
+        
+        // Activate first category (Standings)
+        if (firstCategoryItem) {
+            firstCategoryItem.classList.add('active');
+            firstCategoryItem.style.borderLeft = '1px solid #fff';
+            firstCategoryItem.style.backgroundColor = '#000';
+            firstCategoryItem.style.color = '#fff';
+            firstCategoryItem.style.fontWeight = 'bold';
+        }
+    }
+}
+
 // --- MAIN TABS INITIALIZATION ---
 const mainTabsContainer = document.getElementById('main-tabs');
 if (mainTabsContainer) {
@@ -5576,6 +5650,11 @@ if (mainTabsContainer) {
             content.style.display = 'none';
         });
         document.getElementById(`${tabType}-tab-content`).style.display = 'block';
+        
+        // Reset stats tabs to default state when switching leagues
+        if (tabType === 'stats') {
+            resetStatsTabsToDefault();
+        }
     });
 }
 
