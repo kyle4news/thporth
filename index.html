@@ -5583,8 +5583,7 @@ function parseBaseballReferenceData(html, category) {
         const doc = parser.parseFromString(html, 'text/html');
         
         // Find the 2025 Leaders section
-        const leadersSection = doc.querySelector('h2:contains("2025 Leaders")') || 
-                              Array.from(doc.querySelectorAll('h2')).find(h2 => h2.textContent.includes('2025 Leaders'));
+        const leadersSection = Array.from(doc.querySelectorAll('h2')).find(h2 => h2.textContent.includes('2025 Leaders'));
         
         if (!leadersSection) {
             console.log('2025 Leaders section not found');
@@ -5598,18 +5597,23 @@ function parseBaseballReferenceData(html, category) {
         while (currentElement && currentElement.tagName !== 'H2') {
             if (currentElement.tagName === 'P' && currentElement.textContent.trim()) {
                 const text = currentElement.textContent.trim();
-                const match = text.match(/^\*\*(.+?)\*\*\s*(.+)$/);
+                // Look for bold text followed by leader info
+                const match = text.match(/^\*\*(.+?)\*\*\s*(.+)$/) || 
+                            text.match(/^(.+?)\s+(.+)$/);
                 
                 if (match) {
                     const statName = match[1].trim();
                     const leaderInfo = match[2].trim();
                     
-                    // Categorize the stats
-                    if (shouldIncludeStat(statName, category)) {
-                        leaderEntries.push({
-                            stat: statName,
-                            leader: leaderInfo
-                        });
+                    // Only include if it looks like a valid stat entry
+                    if (statName && leaderInfo && leaderInfo.includes('(')) {
+                        // Categorize the stats
+                        if (shouldIncludeStat(statName, category)) {
+                            leaderEntries.push({
+                                stat: statName,
+                                leader: leaderInfo
+                            });
+                        }
                     }
                 }
             }
