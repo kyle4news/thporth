@@ -4954,7 +4954,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 timeField = 'time';
                 dateField = 'date';
             } else if (['Boxing'].includes(leagueKey)) {
-                awayField = 'event';
+                awayField = 'boxers';
                 homeField = 'boxers';
                 timeField = 'time';
                 dateField = 'date';
@@ -5155,9 +5155,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
                 } else if (['Boxing'].includes(leagueKey)) {
-                    // Boxing: Group by event, show event as subheader, then all boxer matchups under it
-                    const currentEvent = game.away; // awayField = 'event'
-                    const lastEvent = gamesByDate[dateHeader][gamesByDate[dateHeader].indexOf(game) - 1]?.away;
+                    // Boxing: Group by event location, show event as subheader, then all boxer matchups under it
+                    const rawData = snapshot.docs[gamesByDate[dateHeader].indexOf(game)].data(); // Access raw data
+                    const currentEvent = rawData.event || 'TBA'; // Use the actual event field from raw data
+                    const lastGameIndex = gamesByDate[dateHeader].indexOf(game) - 1;
+                    const lastEvent = lastGameIndex >= 0 ? snapshot.docs[lastGameIndex].data().event : null;
                     
                     // If this is a new event, add event header
                     if (currentEvent !== lastEvent) {
@@ -5168,9 +5170,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1; margin-right: 8px;">
-                                <div class="boxers" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
+                                <div class="boxers" style="color: white; font-size: 11px; line-height: 1.4;">${rawData.boxers || 'TBA'}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;"></div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${rawData.time || 'TBD'}</div>
                         </div>
                     `;
                 } else if (['Tennis'].includes(leagueKey)) {
