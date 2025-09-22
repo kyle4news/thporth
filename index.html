@@ -5452,125 +5452,87 @@ async function loadNFLStats(container) {
     const proxyUrl = 'https://api.allorigins.win/raw?url=';
     
     try {
-        // Try multiple ESPN API endpoints for NFL stats
-        const endpoints = [
-            'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics',
-            'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics/leaders',
-            'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics/leaders?category=passing'
-        ];
-        
-        let statsData = null;
-        let workingEndpoint = null;
-        
-        // Try each endpoint until one works
-        for (const endpoint of endpoints) {
-            try {
-                console.log('Trying NFL stats endpoint:', endpoint);
-                const response = await fetch(proxyUrl + encodeURIComponent(endpoint));
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('NFL stats response:', data);
-                    
-                    if (data && (data.leaders || data.items || data.statistics)) {
-                        statsData = data;
-                        workingEndpoint = endpoint;
-                        break;
-                    }
-                }
-            } catch (err) {
-                console.log('Endpoint failed:', endpoint, err);
-                continue;
-            }
-        }
-        
-        if (!statsData) {
-            throw new Error('No working NFL stats endpoint found');
-        }
-        
         let html = '<div style="color: white;">';
         html += '<h3 style="color: #fff; font-size: 14px; margin-bottom: 10px; border-bottom: 1px solid #4a4a4a; padding-bottom: 5px;">NFL Statistics Leaders</h3>';
         
-        // Debug info
-        html += `<p style="color: #9ca3af; font-size: 10px; margin-bottom: 10px;">Working endpoint: ${workingEndpoint}</p>`;
-        html += `<p style="color: #9ca3af; font-size: 10px; margin-bottom: 10px;">Data keys: ${Object.keys(statsData).join(', ')}</p>`;
-        
-        // Try to display whatever data we got
-        if (statsData.leaders && statsData.leaders.length > 0) {
-            html += '<div style="margin-bottom: 20px;">';
-            html += '<h4 style="color: #ccc; font-size: 12px; margin-bottom: 8px;">Leaders</h4>';
-            html += '<table style="width: 100%; border-collapse: collapse; font-size: 11px;">';
-            html += '<thead><tr style="border-bottom: 1px solid #4a4a4a;">';
-            html += '<th style="padding: 4px; text-align: left; color: #ccc;">Player</th>';
-            html += '<th style="padding: 4px; text-align: right; color: #ccc;">Value</th>';
-            html += '</tr></thead><tbody>';
+        // Try to get NFL team stats first (more reliable)
+        try {
+            const teamsUrl = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/teams';
+            const teamsResponse = await fetch(proxyUrl + encodeURIComponent(teamsUrl));
             
-            statsData.leaders.slice(0, 10).forEach(leader => {
-                html += '<tr style="border-bottom: 1px solid #333;">';
-                html += `<td style="padding: 4px; color: white;">${leader.athlete?.displayName || leader.displayName || 'N/A'}</td>`;
-                html += `<td style="padding: 4px; text-align: right; color: white;">${leader.value || leader.stat || 'N/A'}</td>`;
-                html += '</tr>';
-            });
-            
-            html += '</tbody></table></div>';
-        } else if (statsData.items && statsData.items.length > 0) {
-            html += '<div style="margin-bottom: 20px;">';
-            html += '<h4 style="color: #ccc; font-size: 12px; margin-bottom: 8px;">Statistics Categories</h4>';
-            html += '<ul style="color: white; font-size: 11px;">';
-            
-            statsData.items.slice(0, 10).forEach((item, index) => {
-                const categoryName = item.displayName || item.name || item.$ref?.split('/').pop() || `Category ${index + 1}`;
-                html += `<li style="margin-bottom: 4px;">${categoryName}</li>`;
-            });
-            
-            html += '</ul></div>';
-            
-            // Try to fetch leaders for the first few categories
-            html += '<div style="margin-bottom: 20px;">';
-            html += '<h4 style="color: #ccc; font-size: 12px; margin-bottom: 8px;">Top Statistics Leaders</h4>';
-            
-            // Try to get leaders for passing, rushing, receiving
-            const leaderCategories = ['passing', 'rushing', 'receiving'];
-            
-            for (const category of leaderCategories) {
-                try {
-                    const leaderUrl = `https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics/leaders?category=${category}`;
-                    const leaderResponse = await fetch(proxyUrl + encodeURIComponent(leaderUrl));
+            if (teamsResponse.ok) {
+                const teamsData = await teamsResponse.json();
+                console.log('NFL teams data:', teamsData);
+                
+                if (teamsData.items && teamsData.items.length > 0) {
+                    html += '<div style="margin-bottom: 20px;">';
+                    html += '<h4 style="color: #ccc; font-size: 12px; margin-bottom: 8px;">NFL Teams</h4>';
+                    html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 10px;">';
                     
-                    if (leaderResponse.ok) {
-                        const leaderData = await leaderResponse.json();
-                        console.log(`${category} leaders:`, leaderData);
-                        
-                        if (leaderData.leaders && leaderData.leaders.length > 0) {
-                            html += `<div style="margin-bottom: 15px;">`;
-                            html += `<h5 style="color: #fff; font-size: 11px; margin-bottom: 5px; text-transform: capitalize;">${category} Leaders</h5>`;
-                            html += '<table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 10px;">';
-                            html += '<thead><tr style="border-bottom: 1px solid #4a4a4a;">';
-                            html += '<th style="padding: 3px; text-align: left; color: #ccc;">Player</th>';
-                            html += '<th style="padding: 3px; text-align: right; color: #ccc;">Value</th>';
-                            html += '</tr></thead><tbody>';
-                            
-                            leaderData.leaders.slice(0, 5).forEach(leader => {
-                                html += '<tr style="border-bottom: 1px solid #333;">';
-                                html += `<td style="padding: 3px; color: white;">${leader.athlete?.displayName || leader.displayName || 'N/A'}</td>`;
-                                html += `<td style="padding: 3px; text-align: right; color: white;">${leader.value || leader.stat || 'N/A'}</td>`;
-                                html += '</tr>';
-                            });
-                            
-                            html += '</tbody></table></div>';
-                        }
-                    }
-                } catch (err) {
-                    console.log(`Failed to fetch ${category} leaders:`, err);
+                    teamsData.items.slice(0, 16).forEach(team => {
+                        const teamName = team.displayName || team.name || 'Unknown Team';
+                        const teamRecord = team.record?.summary || '0-0';
+                        html += `<div style="color: white; padding: 4px; background-color: #2a2a2a; border-radius: 3px;">${teamName} (${teamRecord})</div>`;
+                    });
+                    
+                    html += '</div></div>';
                 }
             }
-            
-            html += '</div>';
-        } else {
-            html += '<p style="color: #9ca3af;">No statistics data available. Raw response:</p>';
-            html += `<pre style="color: #9ca3af; font-size: 10px; white-space: pre-wrap;">${JSON.stringify(statsData, null, 2)}</pre>`;
+        } catch (err) {
+            console.log('Failed to fetch teams:', err);
         }
         
+        // Try to get individual player stats using different approach
+        const statCategories = [
+            { name: 'Passing Yards', endpoint: 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics/leaders?category=passing&stat=yards' },
+            { name: 'Rushing Yards', endpoint: 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics/leaders?category=rushing&stat=yards' },
+            { name: 'Receiving Yards', endpoint: 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics/leaders?category=receiving&stat=yards' }
+        ];
+        
+        html += '<div style="margin-bottom: 20px;">';
+        html += '<h4 style="color: #ccc; font-size: 12px; margin-bottom: 8px;">Player Statistics Leaders</h4>';
+        
+        for (const category of statCategories) {
+            try {
+                console.log('Fetching:', category.name);
+                const response = await fetch(proxyUrl + encodeURIComponent(category.endpoint));
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(`${category.name} data:`, data);
+                    
+                    if (data.leaders && data.leaders.length > 0) {
+                        html += `<div style="margin-bottom: 15px;">`;
+                        html += `<h5 style="color: #fff; font-size: 11px; margin-bottom: 5px;">${category.name}</h5>`;
+                        html += '<table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 10px;">';
+                        html += '<thead><tr style="border-bottom: 1px solid #4a4a4a;">';
+                        html += '<th style="padding: 3px; text-align: left; color: #ccc;">Player</th>';
+                        html += '<th style="padding: 3px; text-align: right; color: #ccc;">Yards</th>';
+                        html += '</tr></thead><tbody>';
+                        
+                        data.leaders.slice(0, 5).forEach(leader => {
+                            const playerName = leader.athlete?.displayName || leader.displayName || 'N/A';
+                            const yards = leader.value || leader.stat || 'N/A';
+                            html += '<tr style="border-bottom: 1px solid #333;">';
+                            html += `<td style="padding: 3px; color: white;">${playerName}</td>`;
+                            html += `<td style="padding: 3px; text-align: right; color: white;">${yards}</td>`;
+                            html += '</tr>';
+                        });
+                        
+                        html += '</tbody></table></div>';
+                    } else {
+                        html += `<p style="color: #9ca3af; font-size: 10px;">No ${category.name} data available</p>`;
+                    }
+                } else {
+                    html += `<p style="color: #9ca3af; font-size: 10px;">Failed to load ${category.name}</p>`;
+                }
+            } catch (err) {
+                console.log(`Failed to fetch ${category.name}:`, err);
+                html += `<p style="color: #9ca3af; font-size: 10px;">Error loading ${category.name}</p>`;
+            }
+        }
+        
+        html += '</div>';
         html += '</div>';
         container.innerHTML = html;
         
