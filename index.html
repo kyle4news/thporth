@@ -5428,6 +5428,76 @@ if (gamesTabsContainer) {
     if (todayTab) todayTab.click();
 }
 
+// --- LEAGUE STATS FUNCTION ---
+async function loadLeagueStats(leagueKey) {
+    const statsContent = document.getElementById('league-stats-content');
+    if (!statsContent) return;
+    
+    statsContent.innerHTML = '<p style="color: #9ca3af;">Loading stats...</p>';
+    
+    try {
+        if (leagueKey === 'NFL') {
+            await loadNFLStats(statsContent);
+        } else {
+            statsContent.innerHTML = '<p style="color: #9ca3af;">Stats not available for this league yet.</p>';
+        }
+    } catch (error) {
+        console.error('Error loading stats:', error);
+        statsContent.innerHTML = '<p style="color: #ef4444;">Error loading stats.</p>';
+    }
+}
+
+// --- NFL STATS FUNCTION ---
+async function loadNFLStats(container) {
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+    
+    try {
+        // Fetch NFL passing leaders
+        const passingUrl = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics/leaders?category=passing';
+        const passingResponse = await fetch(proxyUrl + encodeURIComponent(passingUrl));
+        
+        if (!passingResponse.ok) {
+            throw new Error('Failed to fetch passing stats');
+        }
+        
+        const passingData = await passingResponse.json();
+        
+        let html = '<div style="color: white;">';
+        html += '<h3 style="color: #fff; font-size: 14px; margin-bottom: 10px; border-bottom: 1px solid #4a4a4a; padding-bottom: 5px;">NFL Statistics Leaders</h3>';
+        
+        // Display passing leaders
+        if (passingData.leaders && passingData.leaders.length > 0) {
+            html += '<div style="margin-bottom: 20px;">';
+            html += '<h4 style="color: #ccc; font-size: 12px; margin-bottom: 8px;">Passing Leaders</h4>';
+            html += '<table style="width: 100%; border-collapse: collapse; font-size: 11px;">';
+            html += '<thead><tr style="border-bottom: 1px solid #4a4a4a;">';
+            html += '<th style="padding: 4px; text-align: left; color: #ccc;">Player</th>';
+            html += '<th style="padding: 4px; text-align: right; color: #ccc;">Yards</th>';
+            html += '<th style="padding: 4px; text-align: right; color: #ccc;">TDs</th>';
+            html += '<th style="padding: 4px; text-align: right; color: #ccc;">INTs</th>';
+            html += '</tr></thead><tbody>';
+            
+            passingData.leaders.slice(0, 10).forEach(leader => {
+                html += '<tr style="border-bottom: 1px solid #333;">';
+                html += `<td style="padding: 4px; color: white;">${leader.athlete?.displayName || 'N/A'}</td>`;
+                html += `<td style="padding: 4px; text-align: right; color: white;">${leader.value || 'N/A'}</td>`;
+                html += `<td style="padding: 4px; text-align: right; color: white;">${leader.touchdowns || 'N/A'}</td>`;
+                html += `<td style="padding: 4px; text-align: right; color: white;">${leader.interceptions || 'N/A'}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table></div>';
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error loading NFL stats:', error);
+        container.innerHTML = '<p style="color: #ef4444;">Error loading NFL stats. Please try again later.</p>';
+    }
+}
+
 // --- MAIN TABS INITIALIZATION ---
 const mainTabsContainer = document.getElementById('main-tabs');
 if (mainTabsContainer) {
@@ -5454,6 +5524,13 @@ if (mainTabsContainer) {
             content.style.display = 'none';
         });
         document.getElementById(`${tabType}-tab-content`).style.display = 'block';
+        
+        // Load stats if stats tab is clicked
+        if (tabType === 'stats') {
+            const leagueHeader = document.getElementById('league-specific-header');
+            const currentLeague = leagueHeader ? leagueHeader.innerText : null;
+            loadLeagueStats(currentLeague);
+        }
     });
 }
 
