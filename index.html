@@ -5518,11 +5518,54 @@ async function loadNFLStats(container) {
             html += '<h4 style="color: #ccc; font-size: 12px; margin-bottom: 8px;">Statistics Categories</h4>';
             html += '<ul style="color: white; font-size: 11px;">';
             
-            statsData.items.slice(0, 10).forEach(item => {
-                html += `<li style="margin-bottom: 4px;">${item.displayName || item.name || 'Unknown'}</li>`;
+            statsData.items.slice(0, 10).forEach((item, index) => {
+                const categoryName = item.displayName || item.name || item.$ref?.split('/').pop() || `Category ${index + 1}`;
+                html += `<li style="margin-bottom: 4px;">${categoryName}</li>`;
             });
             
             html += '</ul></div>';
+            
+            // Try to fetch leaders for the first few categories
+            html += '<div style="margin-bottom: 20px;">';
+            html += '<h4 style="color: #ccc; font-size: 12px; margin-bottom: 8px;">Top Statistics Leaders</h4>';
+            
+            // Try to get leaders for passing, rushing, receiving
+            const leaderCategories = ['passing', 'rushing', 'receiving'];
+            
+            for (const category of leaderCategories) {
+                try {
+                    const leaderUrl = `https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/statistics/leaders?category=${category}`;
+                    const leaderResponse = await fetch(proxyUrl + encodeURIComponent(leaderUrl));
+                    
+                    if (leaderResponse.ok) {
+                        const leaderData = await leaderResponse.json();
+                        console.log(`${category} leaders:`, leaderData);
+                        
+                        if (leaderData.leaders && leaderData.leaders.length > 0) {
+                            html += `<div style="margin-bottom: 15px;">`;
+                            html += `<h5 style="color: #fff; font-size: 11px; margin-bottom: 5px; text-transform: capitalize;">${category} Leaders</h5>`;
+                            html += '<table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 10px;">';
+                            html += '<thead><tr style="border-bottom: 1px solid #4a4a4a;">';
+                            html += '<th style="padding: 3px; text-align: left; color: #ccc;">Player</th>';
+                            html += '<th style="padding: 3px; text-align: right; color: #ccc;">Value</th>';
+                            html += '</tr></thead><tbody>';
+                            
+                            leaderData.leaders.slice(0, 5).forEach(leader => {
+                                html += '<tr style="border-bottom: 1px solid #333;">';
+                                html += `<td style="padding: 3px; color: white;">${leader.athlete?.displayName || leader.displayName || 'N/A'}</td>`;
+                                html += `<td style="padding: 3px; text-align: right; color: white;">${leader.value || leader.stat || 'N/A'}</td>`;
+                                html += '</tr>';
+                            });
+                            
+                            html += '</tbody></table></div>';
+                        }
+                    }
+                } catch (err) {
+                    console.log(`Failed to fetch ${category} leaders:`, err);
+                }
+            }
+            
+            html += '</div>';
         } else {
             html += '<p style="color: #9ca3af;">No statistics data available. Raw response:</p>';
             html += `<pre style="color: #9ca3af; font-size: 10px; white-space: pre-wrap;">${JSON.stringify(statsData, null, 2)}</pre>`;
