@@ -2114,8 +2114,44 @@ div[id^="breaking-content-"] a:hover {
     </div>
 
     <!-- Stats Tab Content (hidden by default) -->
-    <div id="stats-tab-content" class="main-tab-content" style="display: none; padding: 1rem; height: calc(100% - 18px); flex-direction: column; overflow-y: auto;">
-        <div id="league-stats-content" style="flex: 1;"><p style="color: #9ca3af;">Stats will be loaded here...</p></div>
+    <div id="stats-tab-content" class="main-tab-content" style="display: none; height: calc(100% - 18px); flex-direction: column; overflow: hidden;">
+        <!-- Stats Sub-Tabs (Player/Team) -->
+        <div id="stats-sub-tabs" style="display: flex; height: 18px; background-color: #000; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%;">
+            <div class="stats-sub-tab active" data-stats-sub-tab="player" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #000; color: #fff; border-bottom: 1px solid #fff;">Player</div>
+            <div class="stats-sub-tab" data-stats-sub-tab="team" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #000; color: #fff;">Team</div>
+        </div>
+        
+        <!-- Player Stats Content (active by default) -->
+        <div id="player-stats-content" class="stats-sub-content" style="display: flex; flex: 1; height: calc(100% - 18px); overflow: hidden;">
+            <!-- Left Column: Category Menu (15% width) -->
+            <div id="player-category-menu" class="stats-category-menu" style="width: 15%; background-color: #000; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
+                <div class="stats-category-item active" data-category="batting" style="padding: 8px 12px; cursor: pointer; border-left: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 11px;">Batting</div>
+                <div class="stats-category-item" data-category="pitching" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Pitching</div>
+                <div class="stats-category-item" data-category="fielding" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Fielding</div>
+                <div class="stats-category-item" data-category="advanced" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Advanced</div>
+            </div>
+            
+            <!-- Right Column: Stats Display (85% width) -->
+            <div id="player-stats-display" class="stats-display" style="width: 85%; background-color: #000; overflow-y: auto; padding: 1rem;">
+                <div id="player-stats-content-area" style="color: #9ca3af;">Player statistics will be loaded here...</div>
+            </div>
+        </div>
+        
+        <!-- Team Stats Content (hidden by default) -->
+        <div id="team-stats-content" class="stats-sub-content" style="display: none; flex: 1; height: calc(100% - 18px); overflow: hidden;">
+            <!-- Left Column: Category Menu (15% width) -->
+            <div id="team-category-menu" class="stats-category-menu" style="width: 15%; background-color: #000; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
+                <div class="stats-category-item active" data-category="standings" style="padding: 8px 12px; cursor: pointer; border-left: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 11px;">Standings</div>
+                <div class="stats-category-item" data-category="offense" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Offense</div>
+                <div class="stats-category-item" data-category="defense" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Defense</div>
+                <div class="stats-category-item" data-category="pitching" style="padding: 8px 12px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 11px;">Pitching</div>
+            </div>
+            
+            <!-- Right Column: Stats Display (85% width) -->
+            <div id="team-stats-display" class="stats-display" style="width: 85%; background-color: #000; overflow-y: auto; padding: 1rem;">
+                <div id="team-stats-content-area" style="color: #9ca3af;">Team statistics will be loaded here...</div>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -5426,6 +5462,92 @@ if (gamesTabsContainer) {
 
     // Initial load
     if (todayTab) todayTab.click();
+}
+
+// --- STATS SUB-TABS INITIALIZATION ---
+const statsSubTabsContainer = document.getElementById('stats-sub-tabs');
+if (statsSubTabsContainer) {
+    const playerStatsTab = statsSubTabsContainer.querySelector('.stats-sub-tab[data-stats-sub-tab="player"]');
+    const teamStatsTab = statsSubTabsContainer.querySelector('.stats-sub-tab[data-stats-sub-tab="team"]');
+    
+    playerStatsTab.addEventListener('click', () => {
+        // Remove active class from all sub-tabs
+        statsSubTabsContainer.querySelectorAll('.stats-sub-tab').forEach(tab => {
+            tab.classList.remove('active');
+            tab.style.borderBottom = 'none';
+        });
+        // Add active class to clicked tab
+        playerStatsTab.classList.add('active');
+        playerStatsTab.style.borderBottom = '1px solid #fff';
+        
+        // Show player content, hide team content
+        document.getElementById('player-stats-content').style.display = 'flex';
+        document.getElementById('team-stats-content').style.display = 'none';
+    });
+    
+    teamStatsTab.addEventListener('click', () => {
+        // Remove active class from all sub-tabs
+        statsSubTabsContainer.querySelectorAll('.stats-sub-tab').forEach(tab => {
+            tab.classList.remove('active');
+            tab.style.borderBottom = 'none';
+        });
+        // Add active class to clicked tab
+        teamStatsTab.classList.add('active');
+        teamStatsTab.style.borderBottom = '1px solid #fff';
+        
+        // Show team content, hide player content
+        document.getElementById('player-stats-content').style.display = 'none';
+        document.getElementById('team-stats-content').style.display = 'flex';
+    });
+}
+
+// --- STATS CATEGORY MENU INITIALIZATION ---
+function initializeStatsCategoryMenu(menuId, displayId) {
+    const categoryMenu = document.getElementById(menuId);
+    if (!categoryMenu) return;
+    
+    categoryMenu.addEventListener('click', (e) => {
+        const clickedItem = e.target.closest('.stats-category-item');
+        if (!clickedItem) return;
+        
+        const category = clickedItem.dataset.category;
+        
+        // Update all category items in this menu
+        categoryMenu.querySelectorAll('.stats-category-item').forEach(item => {
+            item.classList.remove('active');
+            item.style.borderLeft = 'none';
+            item.style.backgroundColor = '#141414';
+            item.style.color = '#BFBFBF';
+            item.style.fontWeight = 'normal';
+        });
+        
+        // Activate clicked item
+        clickedItem.classList.add('active');
+        clickedItem.style.borderLeft = '1px solid #fff';
+        clickedItem.style.backgroundColor = '#000';
+        clickedItem.style.color = '#fff';
+        clickedItem.style.fontWeight = 'bold';
+        
+        // Load stats for this category
+        loadStatsCategory(category, displayId);
+    });
+}
+
+// Initialize both category menus
+initializeStatsCategoryMenu('player-category-menu', 'player-stats-content-area');
+initializeStatsCategoryMenu('team-category-menu', 'team-stats-content-area');
+
+// --- STATS CATEGORY LOADER ---
+function loadStatsCategory(category, displayElementId) {
+    const displayElement = document.getElementById(displayElementId);
+    if (!displayElement) return;
+    
+    displayElement.innerHTML = `<p style="color: #9ca3af;">Loading ${category} statistics...</p>`;
+    
+    // TODO: Implement actual stats loading based on category and league
+    setTimeout(() => {
+        displayElement.innerHTML = `<p style="color: #9ca3af;">${category} statistics will be implemented here...</p>`;
+    }, 500);
 }
 
 // --- MAIN TABS INITIALIZATION ---
