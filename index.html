@@ -630,7 +630,7 @@
     margin-top: 0;
     padding-top: 8px;
   }
-  
+
   .nested li {
     margin-left: 10px;
   }
@@ -4184,10 +4184,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         
         try {
-            const snapshot = await gamesCollectionRef
+            // Try exact match first
+            let snapshot = await gamesCollectionRef
                 .where('League', '==', leagueId)
                 .where('gameDate', '==', gameDate)
-                .get(); // Use .get() instead of .onSnapshot() to avoid persistent listeners
+                .get();
+            
+            // If no exact match, try case-insensitive search
+            if (snapshot.empty) {
+                console.log(`No exact match for leagueId: ${leagueId}, trying case-insensitive search...`);
+                const allGamesSnapshot = await gamesCollectionRef
+                    .where('gameDate', '==', gameDate)
+                    .get();
+                
+                const gamesData = allGamesSnapshot.docs
+                    .map(doc => doc.data())
+                    .filter(game => {
+                        const gameLeague = game.League || '';
+                        return gameLeague.toLowerCase().includes(leagueId.toLowerCase()) || 
+                               leagueId.toLowerCase().includes(gameLeague.toLowerCase());
+                    });
+                
+                cache.set(cacheKey, gamesData);
+                return gamesData;
+            }
             
             const gamesData = snapshot.docs.map(doc => doc.data());
             cache.set(cacheKey, gamesData);
