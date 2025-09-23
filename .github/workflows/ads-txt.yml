@@ -7,9 +7,11 @@ on:
 jobs:
   update-ads-txt:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # This fixes the permission issue
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Download ads.txt from Ezoic
         run: |
@@ -20,5 +22,9 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add ads.txt
-          git diff --staged --quiet || git commit -m "Update ads.txt"
-          git push
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update ads.txt"
+            git push
+          fi
