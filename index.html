@@ -32,35 +32,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Get the latest sports news, social buzz, and live scores for NFL, NBA, MLB, and more — all in one place.">
     <meta name="robots" content="index, follow" />
-    <meta name="ezoic-site-verification" content="Vha1VDLVHBpz3NMVVgQhwI6T855WAb" />
     <title>THPORTH | Breaking news. Highlights. Social. Videos.</title>
     
-    <!-- Ezoic Privacy Scripts (must load first) -->
-    <script src="https://cmp.gatekeeperconsent.com/min.js" data-cfasync="false"></script>
-    <script src="https://the.gatekeeperconsent.com/cmp.min.js" data-cfasync="false"></script>
     
-    <!-- Ezoic Header Script -->
-    <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
-    <script>
-        window.ezstandalone = window.ezstandalone || {};
-        ezstandalone.cmd = ezstandalone.cmd || [];
-        
-        // Initialize Ezoic ads when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            ezstandalone.cmd.push(function () {
-                ezstandalone.showAds(101, 102);
-            });
-        });
-
-        // Ezoic Dynamic Content Integration
-        function refreshEzoicAds() {
-            if (window.ezstandalone) {
-                ezstandalone.cmd.push(function () {
-                    ezstandalone.showAds(101, 102);
-                });
-            }
-        }
-    </script>
    
 <link rel="icon" type="image/png" href="https://github.com/kyle4news/thporth/blob/main/THPORTH%20logo.png?raw=true" />
   
@@ -1686,12 +1660,6 @@ div[id^="breaking-content-"] a:hover {
         </div>
     <div id="topDivider"></div>
     
-        <!-- Top Banner Ads (Ezoic) - HIDDEN UNTIL EZOIC APPROVAL -->
-        <div id="top-banner-ad" style="display: none;">
-            <!-- Ezoic Ad Placements -->
-            <div id="ezoic-pub-ad-placeholder-101" style="flex: 1; height: 80px;"></div>
-            <div id="ezoic-pub-ad-placeholder-102" style="flex: 1; height: 80px;"></div>
-        </div>
     
     <div class="container">
   
@@ -4725,8 +4693,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Reusing the standings fetcher
         fetchLeagueStandings(leagueInfo.standingsUrl);
         
-        // Refresh Ezoic ads when league changes
-        refreshEzoicAds();
     };
 
     // Consolidated Soccer Data Loading Function
@@ -4781,8 +4747,6 @@ document.addEventListener('DOMContentLoaded', function () {
             standingsContent.innerHTML = '<p style="color: #9ca3af;">Standings available on individual league pages.</p>';
         }
         
-        // Refresh Ezoic ads when soccer league changes
-        refreshEzoicAds();
     }
 
     function loadAllSoccerGames(soccerLeagues, container) {
@@ -7352,8 +7316,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             showMobileColumn('news');
             
-            // Refresh Ezoic ads when mobile league changes
-            refreshEzoicAds();
             
         } catch (error) {
             console.error('Error in mobile league selection:', error);
