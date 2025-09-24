@@ -4665,7 +4665,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const allGames = allGamesSnapshot.docs.map(doc => doc.data());
                 const gamesData = allGames.filter(game => {
                     const gameLeague = game.League || '';
-                    return gameLeague === leagueInfo.leagueId;
+                    // More flexible matching - check if league name contains the key parts
+                    return gameLeague.toLowerCase().includes(leagueInfo.leagueId.toLowerCase()) || 
+                           leagueInfo.leagueId.toLowerCase().includes(gameLeague.toLowerCase());
                 });
                 
                 if (gamesData.length === 0) {
