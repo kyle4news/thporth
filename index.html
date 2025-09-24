@@ -4630,10 +4630,43 @@ document.addEventListener('DOMContentLoaded', function () {
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
         
-        // Use cached data instead of real-time listeners to reduce costs
+        // Use the same approach as home page - get all games for today, then filter by league
         (async () => {
             try {
-                const gamesData = await getCachedGames(leagueInfo.leagueId, todayStr);
+                // Get all games for today (same as home page)
+                const allGamesSnapshot = await gamesCollectionRef
+                    .where('gameDate', '==', todayStr)
+                    .get();
+                
+                if (allGamesSnapshot.empty) {
+                    todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                    // Switch to Upcoming tab if no games today
+                    const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+                    const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
+                    if (todayScheduleTab) {
+                        todayScheduleTab.classList.remove('active');
+                        todayScheduleTab.style.backgroundColor = '#2a2a2a';
+                        todayScheduleTab.style.color = '#ccc';
+                        todayScheduleTab.style.borderBottom = 'none';
+                    }
+                    if (upcomingScheduleTab) {
+                        upcomingScheduleTab.classList.add('active');
+                        upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
+                        upcomingScheduleTab.style.color = '#fff';
+                        upcomingScheduleTab.style.borderBottom = '2px solid #fff';
+                    }
+                    document.getElementById('league-schedule-today-content').style.display = 'none';
+                    document.getElementById('league-schedule-upcoming-content').style.display = 'block';
+                    loadUpcomingSchedule(leagueKey); // Load upcoming when no today games
+                    return;
+                }
+                
+                // Filter games by league (same logic as home page)
+                const allGames = allGamesSnapshot.docs.map(doc => doc.data());
+                const gamesData = allGames.filter(game => {
+                    const gameLeague = game.League || '';
+                    return gameLeague === leagueInfo.leagueId;
+                });
                 
                 if (gamesData.length === 0) {
                     todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
