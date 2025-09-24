@@ -4242,6 +4242,66 @@ document.addEventListener('DOMContentLoaded', function () {
         return map[p] || p;
     }
     
+    // Granular Live Status Display Function
+    function getGranularLiveStatus(game) {
+        if (game.StageType !== "LIVE") return game.StageType;
+        
+        // Handle halftime/intermission for all sports
+        if (game.Stage === "HALF_TIME" || game.Stage === "HALF") {
+            return "Half";
+        }
+        if (game.Stage === "1ST_INTERMISSION" || game.Stage === "2ND_INTERMISSION") {
+            return "Int";
+        }
+        
+        // For sports with GAME_TIME (hockey, basketball, football)
+        if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
+            return `${game.Stage} ${game.GameTime}`;
+        }
+        
+        // For soccer - calculate minute from timestamps
+        if (game.Sport === 'Soccer') {
+            const minute = calculateSoccerMinute(game.StartTime, game.StageStartTime, game.Stage);
+            if (minute !== "LIVE") {
+                return `${minute}'`;
+            }
+        }
+        
+        // For other sports - just show stage
+        return game.Stage;
+    }
+    
+    // Calculate soccer minute from timestamps
+    function calculateSoccerMinute(startTime, stageStartTime, stage) {
+        if (!startTime) return "LIVE";
+        
+        const now = Math.floor(Date.now() / 1000); // Current time in seconds
+        
+        // If we have StageStartTime, use it for accurate calculation
+        if (stageStartTime) {
+            const halfStartTime = stageStartTime; // When current half started
+            const minutesElapsed = Math.floor((now - halfStartTime) / 60);
+            
+            // Add 45 minutes for second half
+            if (stage === "SECOND_HALF") {
+                return Math.min(minutesElapsed + 45, 90); // Cap at 90 minutes
+            }
+            
+            return Math.min(minutesElapsed, 45); // Cap at 45 minutes for first half
+        }
+        
+        // Fallback: estimate minute from game start time
+        const gameStartTime = startTime;
+        const minutesElapsed = Math.floor((now - gameStartTime) / 60);
+        
+        // Add 45 minutes for second half
+        if (stage === "SECOND_HALF") {
+            return Math.min(minutesElapsed + 45, 90); // Cap at 90 minutes
+        }
+        
+        return Math.min(minutesElapsed, 45); // Cap at 45 minutes for first half
+    }
+    
     // --- 5. CORE RENDERING FUNCTION ---
     function renderGames(container, gamesData, isGroupedByLeague) {
         container.innerHTML = "";
@@ -4294,13 +4354,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         const inningHalf = data.inningHalf || "";
                         const currentInning = data.currentInning || "";
                         if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
-                    } else if (displayLeague === "WNBA") {
-                        const status = data.Status || "";
-                        const quarterMatch = status.match(/Q(\d+)/i);
-                        if (quarterMatch) parsedStatus = `Q${quarterMatch[1]}`;
-                        else if (status.toUpperCase() === "HALF_TIME") parsedStatus = "Half";
-                    } else if (data.Sport === "Tennis") { 
-                        parsedStatus = data.Status || "Live";
+                    } else {
+                        // Use granular live status for ALL sports (including EFL Cup, Coppa Italia, etc.)
+                        parsedStatus = getGranularLiveStatus(data);
                     }
                     currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
                 } else if (isFinal) {
