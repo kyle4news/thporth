@@ -4679,6 +4679,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
+                } else if (leagueNameKey === "Liga MX") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://github.com/kyle4news/thporth/blob/main/ligamx.png?raw=true";
+                    logo.alt = "Liga MX Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    title.appendChild(logo);
                 }
                 
                 const textNode = document.createTextNode(leagueNameKey);
