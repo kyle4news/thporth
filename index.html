@@ -4597,7 +4597,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.loadLeagueSpecificData = function(leagueKey) {
         const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
         if (!leagueInfo) return;
-        if (leagueHeader) leagueHeader.innerText = leagueKey;
+        if (leagueHeader) leagueHeader.innerText = getLeagueDisplayName(leagueKey);
         const todayScheduleContent = document.getElementById('league-schedule-today-content');
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
         const standingsContent = document.getElementById('league-standings-content');
