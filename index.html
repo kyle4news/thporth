@@ -4143,9 +4143,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const scheduleContent = document.getElementById('league-schedule-content');
     const standingsContent = document.getElementById('league-standings-content');
     
-    // Store current league key for upcoming schedule
-    let currentLeagueKey = null;
-    
     // --- 4. OPTIMIZED FIRESTORE FUNCTIONS ---
     
     // Cached version of Firestore queries to reduce costs
@@ -4236,7 +4233,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- 5. HELPER FUNCTIONS ---
     function getLeagueDisplayName(name) {
-        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup","England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA Women's Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "LigaMX": "Liga MX", "NASCARCupSeries": "NASCAR Cup Series", "UEFAEuropaLeague": "UEFA Europa League", "UEFAConferenceLeague": "UEFA Conference League", "UEFAChampionsLeague": "UEFA Champions League", "PremierLeague": "Premier League", "SerieA": "Serie A", "Bundesliga": "Bundesliga", "Ligue1": "Ligue 1", "FormulaOne": "Formula One", "PGATour": "PGA Tour", "LPGATour": "LPGA Tour", "LIVGolf": "LIV Golf", "MotoGP": "MotoGP", "UFC": "UFC", "Boxing": "Boxing", "Tennis": "Tennis", "WNBA": "WNBA", "TrackAndField": "Track & Field" };
+        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup","England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA Women's Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League" };
         return map[name] || name;
     }
     function getTeamDisplayName(name) {
@@ -4600,8 +4597,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.loadLeagueSpecificData = function(leagueKey) {
         const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
         if (!leagueInfo) return;
-        currentLeagueKey = leagueKey; // Store the actual league key
-        if (leagueHeader) leagueHeader.innerText = getLeagueDisplayName(leagueKey);
+        if (leagueHeader) leagueHeader.innerText = leagueKey;
         const todayScheduleContent = document.getElementById('league-schedule-today-content');
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
         const standingsContent = document.getElementById('league-standings-content');
@@ -5698,17 +5694,19 @@ function loadStatsCategory(category, displayElementId) {
     displayElement.innerHTML = `<p style="color: #9ca3af;">Loading ${category} statistics...</p>`;
     
     // Get current league to determine data source
-    console.log('Current league detected:', currentLeagueKey);
+    const leagueHeader = document.getElementById('league-specific-header');
+    const currentLeague = leagueHeader ? leagueHeader.innerText : null;
+    console.log('Current league detected:', currentLeague);
     
     // Load stats based on league and category
-    if (currentLeagueKey === 'MLB') {
+    if (currentLeague === 'MLB') {
         console.log('Loading MLB stats for category:', category);
         loadMLBStats(category, displayElement);
     } else {
-        console.log('Non-MLB league, showing placeholder for:', currentLeagueKey);
+        console.log('Non-MLB league, showing placeholder for:', currentLeague);
         // For other leagues, show placeholder
         setTimeout(() => {
-            displayElement.innerHTML = `<p style="color: #9ca3af;">${category} statistics for ${currentLeagueKey} will be implemented here...</p>`;
+            displayElement.innerHTML = `<p style="color: #9ca3af;">${category} statistics for ${currentLeague} will be implemented here...</p>`;
         }, 500);
     }
 }
@@ -6269,9 +6267,13 @@ if (scheduleTabsContainer) {
         document.getElementById('league-schedule-today-content').style.display = 'none';
         document.getElementById('league-schedule-upcoming-content').style.display = 'block';
         
-        // Use the stored league key instead of trying to get it from header
-        if (currentLeagueKey) {
-            loadUpcomingSchedule(currentLeagueKey);
+        // Get the current league key from the header
+        const leagueHeader = document.getElementById('league-specific-header');
+        const leagueKey = leagueHeader ? leagueHeader.innerText : null;
+
+        // Call the new function to load the upcoming schedule, passing the current leagueKey
+        if (leagueKey) {
+            loadUpcomingSchedule(leagueKey);
         }
     });
 }
