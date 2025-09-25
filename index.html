@@ -4335,7 +4335,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 leagueSection.className = "league-section";
                 const title = document.createElement("div");
                 title.className = "league-title";
-                title.textContent = leagueNameKey;
+                
+                // Add NFL logo if the league is NFL
+                if (leagueNameKey === "NFL") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png";
+                    logo.alt = "NFL Logo";
+                    logo.style.width = "20px";
+                    logo.style.height = "20px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    title.appendChild(logo);
+                }
+                
+                const textNode = document.createTextNode(leagueNameKey);
+                title.appendChild(textNode);
                 leagueSection.appendChild(title);
             }
 
