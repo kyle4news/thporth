@@ -4330,13 +4330,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 const title = document.createElement("div");
                 title.className = "league-title";
                 
-                // Add NFL logo if the league is NFL
+                // Add league logo if applicable
                 if (leagueNameKey === "NFL") {
                     const logo = document.createElement("img");
                     logo.src = "https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png";
                     logo.alt = "NFL Logo";
                     logo.style.width = "14px";
                     logo.style.height = "14px";
+                    logo.style.marginLeft = "5px";
                     logo.style.marginRight = "8px";
                     logo.style.verticalAlign = "middle";
                     logo.style.display = "inline-block";
