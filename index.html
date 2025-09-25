@@ -4143,9 +4143,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const scheduleContent = document.getElementById('league-schedule-content');
     const standingsContent = document.getElementById('league-standings-content');
     
-    // Store current league key for upcoming schedule
-    let currentLeagueKey = null;
-    
     // --- 4. OPTIMIZED FIRESTORE FUNCTIONS ---
     
     // Cached version of Firestore queries to reduce costs
@@ -4240,10 +4237,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return map[name] || name;
     }
     
-    function getLeagueKeyDisplayName(leagueKey) {
-        const map = { "LigaMX": "Liga MX", "NASCARCupSeries": "NASCAR Cup Series", "UEFAEuropaLeague": "UEFA Europa League", "UEFAConferenceLeague": "UEFA Conference League", "UEFAChampionsLeague": "UEFA Champions League", "PremierLeague": "Premier League", "SerieA": "Serie A", "Bundesliga": "Bundesliga", "Ligue1": "Ligue 1", "FormulaOne": "Formula One", "PGATour": "PGA Tour", "LPGATour": "LPGA Tour", "LIVGolf": "LIV Golf", "MotoGP": "MotoGP", "UFC": "UFC", "Boxing": "Boxing", "Tennis": "Tennis", "WNBA": "WNBA", "TrackAndField": "Track & Field" };
-        return map[leagueKey] || leagueKey;
-    }
     function getTeamDisplayName(name) {
         let p = name.endsWith(" W") ? name.slice(0, -2) : name;
         const map = { "Arizona Diamondbacks": "Diamondbacks", "Atlanta Braves": "Braves", "Baltimore Orioles": "Orioles", "Boston Red Sox": "Red Sox", "Chicago Cubs": "Cubs", "Chicago White Sox": "White Sox", "Cincinnati Reds": "Reds", "Cleveland Guardians": "Guardians", "Colorado Rockies": "Rockies", "Detroit Tigers": "Tigers", "Houston Astros": "Astros", "Kansas City Royals": "Royals", "Los Angeles Angels": "Angels", "Los Angeles Dodgers": "Dodgers", "Miami Marlins": "Marlins", "Milwaukee Brewers": "Brewers", "Minnesota Twins": "Twins", "New York Mets": "Mets", "New York Yankees": "Yankees", "Athletics": "Athletics", "Philadelphia Phillies": "Phillies", "Pittsburgh Pirates": "Pirates", "San Diego Padres": "Padres", "San Francisco Giants": "Giants", "Seattle Mariners": "Mariners", "St. Louis Cardinals": "Cardinals", "Tampa Bay Rays": "Rays", "Texas Rangers": "Rangers", "Toronto Blue Jays": "Blue Jays", "Washington Nationals": "Nationals", "Atlanta Dream": "Dream", "Chicago Sky": "Sky", "Connecticut Sun": "Sun", "Dallas Wings": "Wings", "Indiana Fever": "Fever", "Las Vegas Aces": "Aces", "Los Angeles Sparks": "Sparks", "Minnesota Lynx": "Lynx", "New York Liberty": "Liberty", "Phoenix Mercury": "Mercury", "Seattle Storm": "Storm", "Washington Mystics": "Mystics" };
@@ -4605,8 +4598,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.loadLeagueSpecificData = function(leagueKey) {
         const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
         if (!leagueInfo) return;
-        currentLeagueKey = leagueKey; // Store the actual league key
-        if (leagueHeader) leagueHeader.innerText = getLeagueKeyDisplayName(leagueKey);
+        if (leagueHeader) leagueHeader.innerText = leagueKey;
         const todayScheduleContent = document.getElementById('league-schedule-today-content');
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
         const standingsContent = document.getElementById('league-standings-content');
@@ -5703,17 +5695,19 @@ function loadStatsCategory(category, displayElementId) {
     displayElement.innerHTML = `<p style="color: #9ca3af;">Loading ${category} statistics...</p>`;
     
     // Get current league to determine data source
-    console.log('Current league detected:', currentLeagueKey);
+    const leagueHeader = document.getElementById('league-specific-header');
+    const currentLeague = leagueHeader ? leagueHeader.innerText : null;
+    console.log('Current league detected:', currentLeague);
     
     // Load stats based on league and category
-    if (currentLeagueKey === 'MLB') {
+    if (currentLeague === 'MLB') {
         console.log('Loading MLB stats for category:', category);
         loadMLBStats(category, displayElement);
     } else {
-        console.log('Non-MLB league, showing placeholder for:', currentLeagueKey);
+        console.log('Non-MLB league, showing placeholder for:', currentLeague);
         // For other leagues, show placeholder
         setTimeout(() => {
-            displayElement.innerHTML = `<p style="color: #9ca3af;">${category} statistics for ${currentLeagueKey} will be implemented here...</p>`;
+            displayElement.innerHTML = `<p style="color: #9ca3af;">${category} statistics for ${currentLeague} will be implemented here...</p>`;
         }, 500);
     }
 }
@@ -6274,9 +6268,13 @@ if (scheduleTabsContainer) {
         document.getElementById('league-schedule-today-content').style.display = 'none';
         document.getElementById('league-schedule-upcoming-content').style.display = 'block';
         
-        // Use the stored league key instead of trying to get it from header
-        if (currentLeagueKey) {
-            loadUpcomingSchedule(currentLeagueKey);
+        // Get the current league key from the header
+        const leagueHeader = document.getElementById('league-specific-header');
+        const leagueKey = leagueHeader ? leagueHeader.innerText : null;
+
+        // Call the new function to load the upcoming schedule, passing the current leagueKey
+        if (leagueKey) {
+            loadUpcomingSchedule(leagueKey);
         }
     });
 }
