@@ -37,6 +37,13 @@
     <!-- Canonical URL to prevent mobile version indexing -->
     <link rel="canonical" href="https://thporth.com" />
     
+    <!-- Immediate redirect for mobile subdomain (executes before page loads) -->
+    <script>
+      if (window.location.hostname === 'm.thporth.com') {
+        window.location.replace('https://thporth.com' + window.location.pathname + window.location.search + window.location.hash);
+      }
+    </script>
+    
     <!-- Additional meta tags to help with mobile/desktop versioning -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1660,8 +1667,17 @@ div[id^="breaking-content-"] a:hover {
   <body>
     <!-- Redirect mobile subdomain to main domain -->
     <script>
+      // Immediate redirect for mobile subdomain
       if (window.location.hostname === 'm.thporth.com') {
+        // Use replace to avoid back button issues
         window.location.replace('https://thporth.com' + window.location.pathname + window.location.search + window.location.hash);
+      }
+    </script>
+    
+    <!-- Fallback meta refresh for mobile subdomain -->
+    <script>
+      if (window.location.hostname === 'm.thporth.com') {
+        document.write('<meta http-equiv="refresh" content="0; url=https://thporth.com' + window.location.pathname + window.location.search + window.location.hash + '">');
       }
     </script>
     
