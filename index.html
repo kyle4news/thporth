@@ -921,6 +921,11 @@
     transition: background-color 0.2s !important;
     margin: 0 !important;
 }
+
+/* More specific rule to override any conflicting padding */
+.headlines-tabs-column .headlines-tab[data-url] {
+    padding: 10px 2px !important;
+}
   
 .headlines-tabs-column .headlines-tab:hover {
     background-color: #555 !important;
