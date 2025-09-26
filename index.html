@@ -34,6 +34,14 @@
     <meta name="robots" content="index, follow" />
     <title>THPORTH | Breaking news. Highlights. Social. Videos.</title>
     
+    <!-- Canonical URL to prevent mobile version indexing -->
+    <link rel="canonical" href="https://thporth.com" />
+    
+    <!-- Additional meta tags to help with mobile/desktop versioning -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9711822949476525"
      crossorigin="anonymous"></script>
@@ -1650,6 +1658,13 @@ div[id^="breaking-content-"] a:hover {
 
   </head>
   <body>
+    <!-- Redirect mobile subdomain to main domain -->
+    <script>
+      if (window.location.hostname === 'm.thporth.com') {
+        window.location.replace('https://thporth.com' + window.location.pathname + window.location.search + window.location.hash);
+      }
+    </script>
+    
 	  <header id="resp-header">
   <button id="menu-toggle" aria-label="Open menu">
     <span class="hamburger"></span>
