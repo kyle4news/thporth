@@ -4600,6 +4600,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
+                } else if (leagueNameKey === "Premier League") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://github.com/kyle4news/thporth/blob/main/premierleague.png?raw=true";
+                    logo.alt = "Premier League Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    title.appendChild(logo);
                 } else if (leagueNameKey === "Bundesliga") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/fqltz6CO-4ATnefbq.png";
@@ -7882,4 +7894,3 @@ document.addEventListener('DOMContentLoaded', function() {
  
   </body>
 </html>
-
