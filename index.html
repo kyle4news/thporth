@@ -4286,7 +4286,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- 5. HELPER FUNCTIONS ---
     function getLeagueDisplayName(name) {
-        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup","England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA Women's Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie" };
+        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup","England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA Women's Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera División", "Argentina: Torneo Betano - Apertura": "Argentine Primera División", "Scotland: Scottish Cup": "Scottish Cup" };
         return map[name] || name;
     }
     
@@ -4865,6 +4865,45 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
+                } else if (leagueNameKey === "Argentine Primera División") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://github.com/kyle4news/thporth/blob/main/png-Argentina%20Torneo%20Betano.png?raw=true";
+                    logo.alt = "Argentine Primera División Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    title.appendChild(logo);
+                } else if (leagueNameKey === "Scottish Cup") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://github.com/kyle4news/thporth/blob/main/png-ScottishCup.png?raw=true";
+                    logo.alt = "Scottish Cup Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    title.appendChild(logo);
+                } else if (leagueNameKey === "Women's Super League") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://github.com/kyle4news/thporth/blob/main/png-WSL.png?raw=true";
+                    logo.alt = "Women's Super League Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    title.appendChild(logo);
                 }
                 
                 const textNode = document.createTextNode(leagueNameKey);
@@ -4926,8 +4965,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 const row2 = table.insertRow();
                 row2.className = "game-row game-separator";
                 
-                row1.innerHTML = `<td rowspan="2" style="width: 90px; text-align: left; font-size: 12px; vertical-align: top;">${displayTimeLabel}</td><td class="team-cell">${away}</td><td style="width: 40px; text-align: right;">${displayAwayScore}</td>`;
-                row2.innerHTML = `<td class="team-cell">${home}</td><td style="text-align: right;">${displayHomeScore}</td>`;
+                // Check if this is a soccer league - soccer leagues show home on top, away on bottom
+                const displayLeague = getLeagueDisplayName(data.League);
+                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'EFL Cup', 'Super Lig'].includes(displayLeague);
+                
+                if (isSoccerLeague) {
+                    // Soccer: home team on top, away team on bottom
+                    row1.innerHTML = `<td rowspan="2" style="width: 90px; text-align: left; font-size: 12px; vertical-align: top;">${displayTimeLabel}</td><td class="team-cell">${home}</td><td style="width: 40px; text-align: right;">${displayHomeScore}</td>`;
+                    row2.innerHTML = `<td class="team-cell">${away}</td><td style="text-align: right;">${displayAwayScore}</td>`;
+                } else {
+                    // All other leagues: away team on top, home team on bottom
+                    row1.innerHTML = `<td rowspan="2" style="width: 90px; text-align: left; font-size: 12px; vertical-align: top;">${displayTimeLabel}</td><td class="team-cell">${away}</td><td style="width: 40px; text-align: right;">${displayAwayScore}</td>`;
+                    row2.innerHTML = `<td class="team-cell">${home}</td><td style="text-align: right;">${displayHomeScore}</td>`;
+                }
 
                 let gameStatusClass = 'scheduled-game';
                 if (isLive) gameStatusClass = 'live-game';
