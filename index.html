@@ -126,9 +126,10 @@
     font-size: 12px; /* Set a single font size for all cells */
 }
 .game-table td:nth-child(1) { /* First column (time/status) */
-    width: 90px;
-    min-width: 90px;
+    width: 75px;
+    min-width: 75px;
     text-align: left;
+    padding-right: 5px;
 }
 .game-table td:nth-child(3) { /* Third column (score) */
     width: 40px;
@@ -4997,11 +4998,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="width: 90px; text-align: left; font-size: 12px; vertical-align: top;">${displayTimeLabel}</td><td class="team-cell">${home}</td><td style="width: 40px; text-align: right;">${displayHomeScore}</td>`;
+                    row1.innerHTML = `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 5px;">${displayTimeLabel}</td><td class="team-cell">${home}</td><td style="width: 40px; text-align: right;">${displayHomeScore}</td>`;
                     row2.innerHTML = `<td class="team-cell">${away}</td><td style="text-align: right;">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                row1.innerHTML = `<td rowspan="2" style="width: 90px; text-align: left; font-size: 12px; vertical-align: top;">${displayTimeLabel}</td><td class="team-cell">${away}</td><td style="width: 40px; text-align: right;">${displayAwayScore}</td>`;
+                row1.innerHTML = `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 5px;">${displayTimeLabel}</td><td class="team-cell">${away}</td><td style="width: 40px; text-align: right;">${displayAwayScore}</td>`;
                 row2.innerHTML = `<td class="team-cell">${home}</td><td style="text-align: right;">${displayHomeScore}</td>`;
                 }
 
