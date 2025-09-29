@@ -3379,9 +3379,9 @@ div[id^="breaking-content-"] a:hover {
                 } else {
                     gamesColumn.style.display = 'none';
                     leagueSpecificColumn.style.display = 'block';
-                    loadLeagueSpecificData(section);
-                    // Reset schedule tabs to default state when showing league column
+                    // Reset schedule tabs to default state BEFORE loading league data
                     resetScheduleTabs();
+                    loadLeagueSpecificData(section);
                 }
 
                 document.querySelectorAll(".news .content-section, #social-feed-container .content-section").forEach(s => s.style.display = "none");
