@@ -5098,10 +5098,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Filter games by league using getLeagueDisplayName (case insensitive)
                 const allGames = snapshot.docs.map(doc => doc.data());
+                console.log('All games in yesterdayScores:', allGames.map(g => g.League));
+                console.log('Looking for league:', leagueName);
                 const leagueGames = allGames.filter(game => {
                     const gameLeagueDisplay = getLeagueDisplayName(game.League);
+                    console.log('Game league:', game.League, '-> Display name:', gameLeagueDisplay, 'Match:', gameLeagueDisplay === leagueName);
                     return gameLeagueDisplay === leagueName;
                 });
+                console.log('Filtered league games:', leagueGames.length);
                 
                 if (leagueGames.length === 0) {
                     yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
