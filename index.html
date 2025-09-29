@@ -5081,14 +5081,30 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function fetchYesterdayScoresForLeague(leagueId, leagueName) {
+        console.log('=== fetchYesterdayScoresForLeague called ===');
+        console.log('leagueId:', leagueId);
+        console.log('leagueName:', leagueName);
+        
         const yesterdayScheduleContent = document.getElementById('league-schedule-yesterday-content');
-        if (!yesterdayScheduleContent) return;
+        if (!yesterdayScheduleContent) {
+            console.log('ERROR: yesterdayScheduleContent not found');
+            return;
+        }
         
         yesterdayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading yesterday\'s scores...</p>';
         
         console.log('Fetching yesterday scores for league:', leagueId, leagueName);
         
         const yesterdayScoresRef = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
+        
+        // First, let's check what's actually in the collection
+        console.log('Checking what leagues are in yesterdayScores collection...');
+        yesterdayScoresRef.limit(5).get().then(testSnapshot => {
+            console.log('Test snapshot size:', testSnapshot.size);
+            testSnapshot.docs.forEach(doc => {
+                console.log('Sample document:', doc.id, doc.data().League);
+            });
+        });
         
         yesterdayScoresRef
             .where('League', '==', leagueId)
