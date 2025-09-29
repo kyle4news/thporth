@@ -4106,7 +4106,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'MLS': { leagueId: 'USA: MLS', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQ-fXiJCsMWxpSzu9x_vE7DhdtHBBpL54Ue3vnPnk21OeTsGwZoQnJK7FNAZkT9Nfj8Ox8tuV21pwp/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'MLS' },
   'PremierLeague': { leagueId: 'England: Premier League', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8lEnnlz6Uhb47U4yOnsSUOcsfBS3TrpEXri3g6S2Yj2FUkq1rSSgE4SveKPoAJQsu6U2kkfdGtmhO/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'PremierLeague' },
   'LaLiga': { leagueId: 'Spain: LaLiga', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8ZGW33Hc9fDIq8mJZZqVj8GJdm3p08Jug6e5fTP0-KBtGpFB6BIXgDKkvHqyHnJRKZ9Ba24I3hekV/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LaLiga' },
-  'SerieA': { leagueId: 'ITALY: SERIE A', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaaFrDXpcgY4EiGwkYfT0zodrVA1GJU2A6qcrc1GcLxkPjHh43ksM3T4c4p5nFdqKJoj96eEpUKST3/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'SerieA' },
+  'SerieA': { leagueId: 'Italy: Serie A', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaaFrDXpcgY4EiGwkYfT0zodrVA1GJU2A6qcrc1GcLxkPjHh43ksM3T4c4p5nFdqKJoj96eEpUKST3/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'SerieA' },
   'Bundesliga': { leagueId: 'Germany: Bundesliga', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwpzErtNqiT5mq4kII0P1OxnY41WAgyY4fi7kiThIgNSgf6lr3kslZ9OBAP3-I2YJ4_aA0p0LNjsaH/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'Bundesliga' },
   'Ligue1': { leagueId: 'France: Ligue 1', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRD-758CxWtSSl1PCJRdVREjXqhrxTBjYBtnxx4ot8wUdEGfw7ONCzQNfTIdvntZoi1Kme0F7Nkt4Wa/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'Ligue1' },
   'NCAAF': { leagueId: 'USA: NCAA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRiThcO5BjAuw3818zbgA9WxlLQFK8T3n5LCPxAihwjANmnxme5ynsLG2EyD2RyPvACe4wGlY36ekF7/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'NCAAF' },
@@ -5096,9 +5096,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 
-                // Filter games by league in JavaScript (same as home page logic)
+                // Filter games by league using getLeagueDisplayName (case insensitive)
                 const allGames = snapshot.docs.map(doc => doc.data());
-                const leagueGames = allGames.filter(game => game.League === leagueId);
+                const leagueGames = allGames.filter(game => {
+                    const gameLeagueDisplay = getLeagueDisplayName(game.League);
+                    return gameLeagueDisplay === leagueName;
+                });
                 
                 if (leagueGames.length === 0) {
                     yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
