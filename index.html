@@ -5096,14 +5096,17 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(snapshot => {
                 console.log('Yesterday scores snapshot for', leagueId, ':', snapshot);
                 console.log('Snapshot size:', snapshot.size);
+                console.log('Snapshot empty:', snapshot.empty);
                 
                 if (snapshot.empty) {
+                    console.log('No games found for league:', leagueId);
                     yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
                     return;
                 }
                 
                 const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
                 console.log('Yesterday games data for', leagueId, ':', gamesData);
+                console.log('Number of games found:', gamesData.length);
                 renderGames(yesterdayScheduleContent, gamesData, false);
             }, err => { 
                 console.error('Error fetching yesterday scores for', leagueId, ':', err);
