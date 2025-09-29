@@ -2183,12 +2183,14 @@ div[id^="breaking-content-"] a:hover {
         <!-- Schedule Sub-Tabs (Today/Upcoming) - Full Column Width -->
         <div id="schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%;">
             <div class="schedule-tab active" data-schedule-tab="today" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Today</div>
+            <div class="schedule-tab" data-schedule-tab="yesterday" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #2a2a2a; color: #ccc;">Yesterday</div>
             <div class="schedule-tab" data-schedule-tab="upcoming" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Upcoming</div>
         </div>
         
         <!-- Schedule Content with padding -->
         <div style="padding: 0 1rem 1rem 1rem; flex: 1; display: flex; flex-direction: column;">
             <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
+            <div id="league-schedule-yesterday-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading yesterday's scores...</p></div>
             <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
         </div>
     </div>
@@ -5078,6 +5080,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }, err => { scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>'; });
     }
 
+    function fetchYesterdayScoresForLeague(leagueId, leagueName) {
+        const yesterdayScheduleContent = document.getElementById('league-schedule-yesterday-content');
+        if (!yesterdayScheduleContent) return;
+        
+        yesterdayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading yesterday\'s scores...</p>';
+        
+        const yesterdayScoresRef = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
+        
+        yesterdayScoresRef
+            .where('League', '==', leagueId)
+            .get()
+            .then(snapshot => {
+                if (snapshot.empty) {
+                    yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
+                    return;
+                }
+                
+                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                renderGames(yesterdayScheduleContent, gamesData, false);
+            }, err => { 
+                yesterdayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading yesterday\'s scores.</p>'; 
+            });
+    }
+
     // REPLACE THE OLD FUNCTION WITH THIS ONE
     async function fetchLeagueStandings(url, leagueKey) {
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
@@ -6861,6 +6887,7 @@ if (mainTabsContainer) {
 const scheduleTabsContainer = document.getElementById('schedule-tabs');
 if (scheduleTabsContainer) {
     const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+    const yesterdayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="yesterday"]');
     const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
     
     todayScheduleTab.addEventListener('click', () => {
@@ -6877,9 +6904,42 @@ if (scheduleTabsContainer) {
         todayScheduleTab.style.color = '#fff';
         todayScheduleTab.style.borderBottom = '2px solid #fff';
         
-        // Show today content, hide upcoming content
+        // Show today content, hide other content
         document.getElementById('league-schedule-today-content').style.display = 'block';
+        document.getElementById('league-schedule-yesterday-content').style.display = 'none';
         document.getElementById('league-schedule-upcoming-content').style.display = 'none';
+    });
+    
+    yesterdayScheduleTab.addEventListener('click', () => {
+        // Remove active class from all tabs and reset styling
+        scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => {
+            tab.classList.remove('active');
+            tab.style.backgroundColor = '#2a2a2a';
+            tab.style.color = '#ccc';
+            tab.style.borderBottom = 'none';
+        });
+        // Add active class and styling to clicked tab
+        yesterdayScheduleTab.classList.add('active');
+        yesterdayScheduleTab.style.backgroundColor = '#2a2a2a';
+        yesterdayScheduleTab.style.color = '#fff';
+        yesterdayScheduleTab.style.borderBottom = '2px solid #fff';
+        
+        // Show yesterday content, hide other content
+        document.getElementById('league-schedule-today-content').style.display = 'none';
+        document.getElementById('league-schedule-yesterday-content').style.display = 'block';
+        document.getElementById('league-schedule-upcoming-content').style.display = 'none';
+        
+        // Load yesterday's scores for the current league
+        const currentLeagueHeader = document.getElementById('league-specific-header');
+        if (currentLeagueHeader) {
+            const leagueName = currentLeagueHeader.innerText;
+            const leagueConfig = Object.values(LEAGUE_DATA_CONFIG).find(config => 
+                config.leagueId === leagueName || config.leagueName === leagueName
+            );
+            if (leagueConfig) {
+                fetchYesterdayScoresForLeague(leagueConfig.leagueId, leagueName);
+            }
+        }
     });
     
     upcomingScheduleTab.addEventListener('click', (event) => {
@@ -6896,8 +6956,9 @@ if (scheduleTabsContainer) {
         upcomingScheduleTab.style.color = '#fff';
         upcomingScheduleTab.style.borderBottom = '2px solid #fff';
 
-        // Show upcoming content, hide today content
+        // Show upcoming content, hide other content
         document.getElementById('league-schedule-today-content').style.display = 'none';
+        document.getElementById('league-schedule-yesterday-content').style.display = 'none';
         document.getElementById('league-schedule-upcoming-content').style.display = 'block';
         
         // Get the current league key from the header
