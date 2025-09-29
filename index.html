@@ -121,6 +121,7 @@
     border-spacing: 0 4px; /* 4px between all rows */
     width: 100%;
     table-layout: fixed;
+    max-width: 100%;
 }
 .game-table td {
     padding: 4px 10px; /* Default cell padding */
@@ -128,6 +129,7 @@
     font-size: 12px; /* Set a single font size for all cells */
 }
 .game-table td:nth-child(2) { /* Second column (teams) */
+    width: auto;
     min-width: 150px;
 }
 @media (max-width: 768px) {
@@ -159,9 +161,10 @@
 	font-size: 12px;
 }
 .game-table td:nth-child(4) { /* Fourth column (empty spacer) */
-    width: 1px;
-    min-width: 1px;
+    width: 0px;
+    min-width: 0px;
     padding: 0;
+    border: none;
 	font-size: 10px;
 }
 .game-row {
