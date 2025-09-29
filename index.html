@@ -5088,18 +5088,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
         yesterdayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading yesterday\'s scores...</p>';
 
-        // Use the same pattern as fetchLeagueSchedule but for yesterdayScores collection
+        // Use the same logic as the working home page fetchYesterdayScores function
         const yesterdayScoresRef = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
         
-        yesterdayScoresRef.where('League', '==', leagueId)
-            .get()
+        yesterdayScoresRef.get()
             .then(snapshot => {
                 if (snapshot.empty) {
                     yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
                     return;
                 }
                 
-                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                // Filter games by league in JavaScript (same as home page logic)
+                const allGames = snapshot.docs.map(doc => doc.data());
+                const leagueGames = allGames.filter(game => game.League === leagueId);
+                
+                if (leagueGames.length === 0) {
+                    yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
+                    return;
+                }
+                
+                const gamesData = leagueGames.sort(sortGames);
                 renderGames(yesterdayScheduleContent, gamesData, false);
             }, err => { 
                 console.error('Error fetching yesterday scores for', leagueId, ':', err);
