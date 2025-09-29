@@ -6945,9 +6945,7 @@ if (scheduleTabsContainer) {
             const leagueName = currentLeagueHeader.innerText;
             console.log('League name from header:', leagueName);
             
-            const leagueConfig = Object.values(LEAGUE_DATA_CONFIG).find(config => 
-                config.leagueId === leagueName || config.leagueName === leagueName
-            );
+            const leagueConfig = LEAGUE_DATA_CONFIG[leagueName];
             console.log('Found league config:', leagueConfig);
             
             if (leagueConfig) {
