@@ -6937,15 +6937,27 @@ if (scheduleTabsContainer) {
         document.getElementById('league-schedule-upcoming-content').style.display = 'none';
         
         // Load yesterday's scores for the current league
+        console.log('Yesterday tab clicked');
         const currentLeagueHeader = document.getElementById('league-specific-header');
+        console.log('Current league header:', currentLeagueHeader);
+        
         if (currentLeagueHeader) {
             const leagueName = currentLeagueHeader.innerText;
+            console.log('League name from header:', leagueName);
+            
             const leagueConfig = Object.values(LEAGUE_DATA_CONFIG).find(config => 
                 config.leagueId === leagueName || config.leagueName === leagueName
             );
+            console.log('Found league config:', leagueConfig);
+            
             if (leagueConfig) {
+                console.log('Calling fetchYesterdayScoresForLeague with:', leagueConfig.leagueId, leagueName);
                 fetchYesterdayScoresForLeague(leagueConfig.leagueId, leagueName);
+            } else {
+                console.log('No league config found for:', leagueName);
             }
+        } else {
+            console.log('No league header found');
         }
     });
     
