@@ -119,11 +119,16 @@
 .game-table {
     border-collapse: separate; /* Allow spacing between table rows for block effect */
     border-spacing: 0 4px; /* 4px between all rows */
+    width: 100%;
+    table-layout: fixed;
 }
 .game-table td {
     padding: 4px 10px; /* Default cell padding */
     vertical-align: top;
     font-size: 12px; /* Set a single font size for all cells */
+}
+.game-table td:nth-child(2) { /* Second column (teams) */
+    min-width: 200px;
 }
 .game-table td:nth-child(3) { /* Override default padding for score column */
     padding-left: 4px;
@@ -140,6 +145,7 @@
     min-width: 30px;
     text-align: right;
     padding-right: 0;
+    padding-left: 4px;
 	font-size: 12px;
 }
 .game-table td:nth-child(4) { /* Fourth column (empty spacer) */
