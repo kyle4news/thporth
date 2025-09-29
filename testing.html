@@ -5267,6 +5267,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
         if (!leagueInfo) return;
         if (leagueHeader) leagueHeader.innerText = leagueKey;
+        
+        // Hide yesterday content when loading new league
+        const yesterdayContent = document.getElementById('league-schedule-yesterday-content');
+        if (yesterdayContent) yesterdayContent.style.display = 'none';
         const todayScheduleContent = document.getElementById('league-schedule-today-content');
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
         const standingsContent = document.getElementById('league-standings-content');
