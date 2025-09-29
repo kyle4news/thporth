@@ -129,17 +129,18 @@
     font-size: 12px; /* Set a single font size for all cells */
 }
 .game-table td:nth-child(2) { /* Second column (teams) */
-    width: auto !important;
-    min-width: 150px !important;
+    width: 100% !important;
+    min-width: 250px !important;
+    max-width: none !important;
 }
 @media (max-width: 768px) {
     .game-table td:nth-child(2) { /* Responsive teams column */
-        min-width: 120px;
+        min-width: 200px !important;
     }
 }
 @media (max-width: 480px) {
     .game-table td:nth-child(2) { /* Mobile teams column */
-        min-width: 100px;
+        min-width: 150px !important;
     }
 }
 .game-table td:nth-child(3) { /* Override default padding for score column */
