@@ -5201,27 +5201,29 @@ document.addEventListener('DOMContentLoaded', function () {
         scoresError.style.display = 'none';
         scoresContainer.innerHTML = '';
 
-        // Use the same collection as today's games, but for yesterday's date
-        const { DateTime } = luxon;
-        const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
+        // Read from yesterdayScores collection (completed games from all leagues)
+        const yesterdayScoresRef = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
+        console.log('Attempting to read from collection:', "artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
 
-        gamesCollectionRef.where('gameDate', '==', yesterdayStr)
-            .get()
+        yesterdayScoresRef.get()
             .then(snapshot => {
-                scoresLoading.style.display = 'none';
+            scoresLoading.style.display = 'none';
+                console.log('Yesterday scores snapshot:', snapshot);
+                console.log('Snapshot size:', snapshot.size);
                 if (snapshot.empty) {
-                    scoresContainer.innerHTML = '<p style="padding: 10px;">No completed games found for yesterday.</p>';
+                    scoresContainer.innerHTML = '<p style="padding: 10px;">No completed games found. Check back after games finish.</p>';
                     return;
                 }
                 const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                console.log('Yesterday games data:', gamesData);
                 renderGames(scoresContainer, gamesData, true);
             })
             .catch(error => {
-                scoresLoading.style.display = 'none';
-                scoresError.style.display = 'block';
-                if(scoresErrorText) scoresErrorText.textContent = "An error occurred while loading scores.";
-                console.error("Error fetching yesterday's scores:", error);
-            });
+            scoresLoading.style.display = 'none';
+            scoresError.style.display = 'block';
+            if(scoresErrorText) scoresErrorText.textContent = "An error occurred while loading scores.";
+            console.error("Error fetching yesterday's scores:", error);
+        });
     }
     
     // START OF CORRECTED SECTION
