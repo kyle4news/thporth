@@ -128,7 +128,17 @@
     font-size: 12px; /* Set a single font size for all cells */
 }
 .game-table td:nth-child(2) { /* Second column (teams) */
-    min-width: 200px;
+    min-width: 150px;
+}
+@media (max-width: 768px) {
+    .game-table td:nth-child(2) { /* Responsive teams column */
+        min-width: 120px;
+    }
+}
+@media (max-width: 480px) {
+    .game-table td:nth-child(2) { /* Mobile teams column */
+        min-width: 100px;
+    }
 }
 .game-table td:nth-child(3) { /* Override default padding for score column */
     padding-left: 4px;
