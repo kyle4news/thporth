@@ -3379,8 +3379,6 @@ div[id^="breaking-content-"] a:hover {
                 } else {
                     gamesColumn.style.display = 'none';
                     leagueSpecificColumn.style.display = 'block';
-                    // Reset schedule tabs to default state BEFORE loading league data
-                    resetScheduleTabs();
                     loadLeagueSpecificData(section);
                 }
 
@@ -5263,21 +5261,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
-    // Function to reset schedule tabs to inactive state
-    function resetScheduleTabs() {
-        const scheduleTabsContainer = document.getElementById('schedule-tabs');
-        if (!scheduleTabsContainer) return;
-        
-        // Reset all tabs to inactive state
-        scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => {
-            tab.classList.remove('active');
-            tab.style.backgroundColor = '#2a2a2a';
-            tab.style.color = '#ccc';
-            tab.style.borderBottom = 'none';
-        });
-        
-        // Don't hide content - let loadLeagueSpecificData handle the tab selection
-    }
 
     // START OF CORRECTED SECTION
     window.loadLeagueSpecificData = function(leagueKey) {
