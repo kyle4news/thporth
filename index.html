@@ -5119,7 +5119,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
                     row1.innerHTML = `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 5px;">${displayTimeLabel}</td><td class="team-cell">${home}</td><td style="width: 30px; text-align: right; padding-right: 0;">${displayHomeScore}</td>`;
-                    row2.innerHTML = `<td class="team-cell">${away}</td><td style="text-align: right;">${displayAwayScore}</td>`;
+                    row2.innerHTML = `<td class="team-cell">${away}</td><td style="width: 30px; text-align: right; padding-right: 0;">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
                 row1.innerHTML = `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 5px;">${displayTimeLabel}</td><td class="team-cell">${away}</td><td style="width: 30px; text-align: right; padding-right: 0;">${displayAwayScore}</td>`;
