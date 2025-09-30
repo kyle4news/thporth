@@ -16,21 +16,37 @@
       margin-bottom: 0.5rem;
     }
 
-    #countdown {
+    #countdown-section {
       font-size: 1.2rem;
       margin-bottom: 1.5rem;
+    }
+
+    #stop-time-input {
+      padding: 0.3rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 0.5rem;
     }
 
     #input-section {
       margin-bottom: 1rem;
     }
 
-    input[type="text"] {
+    input[type="text"], input[type="time"] {
       padding: 0.5rem;
-      width: 300px;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 4px;
+    }
+
+    #todo-input {
+      width: 250px;
+    }
+
+    #deadline-input {
+      margin-left: 0.5rem;
+      width: 130px;
     }
 
     button {
@@ -54,6 +70,18 @@
     .todo-text {
       margin-left: 0.5rem;
       flex-grow: 1;
+    }
+
+    .deadline {
+      margin-left: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .deadline-countdown {
+      margin-left: 0.5rem;
+      font-size: 0.9rem;
+      color: #a00;
     }
 
     .done .todo-text {
@@ -85,72 +113,89 @@
 <body>
 
   <h1>Today's To-Do List</h1>
-  <div id="countdown">Time left today: --:--:--</div>
+  <div id="countdown-section">
+    <input type="time" id="stop-time-input" />
+    <button onclick="setStopTime()">Set Stop Time</button>
+    <div id="countdown"></div>
+  </div>
 
   <div id="input-section">
     <input type="text" id="todo-input" placeholder="Add a new task..." />
+    <input type="time" id="deadline-input" />
     <button onclick="addTodo()">Add</button>
   </div>
 
   <ul id="todo-list"></ul>
 
   <script>
-    // Countdown timer
-    function updateCountdown() {
-      const now = new Date();
-      const midnight = new Date();
-      midnight.setHours(24, 0, 0, 0); // Next midnight
+    let stopTime = null;
+    let countdownInterval = null;
 
-      const diff = midnight - now;
+    function setStopTime() {
+      const input = document.getElementById('stop-time-input').value;
+      if (!input) return;
+
+      const now = new Date();
+      const [hours, minutes] = input.split(":" ).map(Number);
+      stopTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0, 0);
+
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(updateCountdown, 1000);
+      updateCountdown();
+
+      document.getElementById('stop-time-input').style.display = 'none';
+      document.querySelector('#countdown-section button').style.display = 'none';
+    }
+
+    function updateCountdown() {
+      if (!stopTime) return;
+
+      const now = new Date();
+      const diff = stopTime - now;
+
+      if (diff <= 0) {
+        document.getElementById('countdown').textContent = "Work time is over!";
+        clearInterval(countdownInterval);
+        return;
+      }
 
       const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
       const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
       const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
 
       document.getElementById('countdown').textContent = `Time left today: ${hours}:${minutes}:${seconds}`;
-
-      if (diff <= 0) {
-        clearListAtMidnight();
-      }
     }
-
-    function clearListAtMidnight() {
-      document.getElementById('todo-list').innerHTML = '';
-      localStorage.removeItem('todos');
-    }
-
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
 
     // To-Do list logic
     const todoList = document.getElementById('todo-list');
     const todoInput = document.getElementById('todo-input');
+    const deadlineInput = document.getElementById('deadline-input');
 
     function loadTodos() {
-      const saved = JSON.parse(localStorage.getItem('todos')) || [];
-      saved.forEach(item => {
-        createTodoElement(item.text, item.done);
-      });
+      localStorage.setItem('todos', JSON.stringify([])); // wipe to-do list fresh
     }
 
     function saveTodos() {
       const items = Array.from(todoList.children).map(li => ({
         text: li.querySelector('.todo-text').textContent,
-        done: li.classList.contains('done')
+        done: li.classList.contains('done'),
+        deadline: li.querySelector('.deadline') ? li.querySelector('.deadline').dataset.time : ''
       }));
       localStorage.setItem('todos', JSON.stringify(items));
     }
 
     function addTodo() {
       const text = todoInput.value.trim();
+      const deadline = deadlineInput.value;
       if (text !== '') {
-        createTodoElement(text, false);
+        createTodoElement(text, false, deadline);
         todoInput.value = '';
+        deadlineInput.value = '';
         saveTodos();
       }
     }
 
-    function createTodoElement(text, done) {
+    function createTodoElement(text, done, deadline) {
       const li = document.createElement('li');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -159,12 +204,45 @@
       span.className = 'todo-text';
       span.textContent = text;
 
+      if (deadline) {
+        const deadlineSpan = document.createElement('span');
+        deadlineSpan.className = 'deadline';
+        deadlineSpan.dataset.time = deadline;
+        deadlineSpan.textContent = `Deadline: ${deadline}`;
+
+        const countdownSpan = document.createElement('span');
+        countdownSpan.className = 'deadline-countdown';
+
+        function updateDeadlineCountdown() {
+          const now = new Date();
+          const [hours, minutes] = deadline.split(":" ).map(Number);
+          const deadlineTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0, 0);
+          const diff = deadlineTime - now;
+
+          if (diff <= 0) {
+            countdownSpan.textContent = " (Past Due)";
+            return;
+          }
+
+          const h = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+          const m = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+          const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+          countdownSpan.textContent = ` (${h}:${m}:${s})`;
+        }
+
+        setInterval(updateDeadlineCountdown, 1000);
+        updateDeadlineCountdown();
+
+        deadlineSpan.appendChild(countdownSpan);
+        span.appendChild(deadlineSpan);
+      }
+
       checkbox.addEventListener('change', () => {
         li.classList.toggle('done');
         if (checkbox.checked) {
-          todoList.appendChild(li); // Move to bottom
+          todoList.appendChild(li); // done goes to bottom
         } else {
-          todoList.insertBefore(li, todoList.firstChild); // Move to top
+          todoList.insertBefore(li, null); // undone stays in order
         }
         saveTodos();
       });
@@ -175,10 +253,9 @@
       if (done) {
         li.classList.add('done');
         checkbox.checked = true;
-        todoList.appendChild(li);
-      } else {
-        todoList.insertBefore(li, todoList.firstChild);
       }
+
+      todoList.appendChild(li); // always add to bottom
     }
 
     loadTodos();
