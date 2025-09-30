@@ -165,6 +165,9 @@
       endTime = endTimeInput;
       localStorage.setItem('endTime', endTime);
       
+      // Hide input section and show countdown
+      document.getElementById('countdown-section').style.display = 'none';
+      
       // Start countdown timer
       if (countdownInterval) clearInterval(countdownInterval);
       countdownInterval = setInterval(updateCountdown, 1000);
@@ -187,11 +190,20 @@
         const minutesLeft = Math.floor((diff / (1000 * 60)) % 60);
         const secondsLeft = Math.floor((diff / 1000) % 60);
 
-        const hoursStr = String(hoursLeft).padStart(2, '0');
-        const minutesStr = String(minutesLeft).padStart(2, '0');
-        const secondsStr = String(secondsLeft).padStart(2, '0');
+        // Format time remaining
+        let timeRemaining = '';
+        if (hoursLeft > 0) {
+          timeRemaining = `${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''} ${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''} and ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}`;
+        } else {
+          timeRemaining = `${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''} and ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}`;
+        }
 
-        document.getElementById('countdown').textContent = `Time left today: ${hoursStr}:${minutesStr}:${secondsStr}`;
+        // Format deadline time for display
+        const endTimeDisplay = new Date();
+        endTimeDisplay.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        const deadlineTimeStr = endTimeDisplay.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+
+        document.getElementById('countdown').textContent = `${timeRemaining} until ${deadlineTimeStr}`;
       } else {
         clearListAtEndTime();
       }
@@ -213,7 +225,8 @@
         countdownInterval = null;
       }
       
-      // Reset end time input
+      // Reset to input mode
+      document.getElementById('countdown-section').style.display = 'block';
       document.getElementById('end-time-input').value = '';
       document.getElementById('countdown').textContent = 'Time left today: --:--:--';
     }
