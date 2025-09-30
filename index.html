@@ -2183,12 +2183,14 @@ div[id^="breaking-content-"] a:hover {
         <!-- Schedule Sub-Tabs (Today/Upcoming) - Full Column Width -->
         <div id="schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%;">
             <div class="schedule-tab active" data-schedule-tab="today" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Today</div>
+            <div class="schedule-tab" data-schedule-tab="yesterday" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #2a2a2a; color: #ccc;">Yesterday</div>
             <div class="schedule-tab" data-schedule-tab="upcoming" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Upcoming</div>
         </div>
         
         <!-- Schedule Content with padding -->
         <div style="padding: 0 1rem 1rem 1rem; flex: 1; display: flex; flex-direction: column;">
             <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
+            <div id="league-schedule-yesterday-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading yesterday's scores...</p></div>
             <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
         </div>
     </div>
@@ -4102,9 +4104,9 @@ document.addEventListener('DOMContentLoaded', function () {
   'MLB': { leagueId: 'USA: MLB', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQHOSDTxfJ554E0MhgZPfmnarCUunnYmxDBSZ78APQ3QfvPWBnn1i68JPSuNCNByd1IzYEbj-6AVAZ/pub?gid=1312763847&single=true&output=csv', upcomingCollectionName: 'MLB' },
   'NHL': { leagueId: 'USA: NHL', standingsUrl: 'YOUR_NHL_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'NHL' },
   'MLS': { leagueId: 'USA: MLS', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQ-fXiJCsMWxpSzu9x_vE7DhdtHBBpL54Ue3vnPnk21OeTsGwZoQnJK7FNAZkT9Nfj8Ox8tuV21pwp/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'MLS' },
-  'PremierLeague': { leagueId: 'ENGLAND: PREMIER LEAGUE', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8lEnnlz6Uhb47U4yOnsSUOcsfBS3TrpEXri3g6S2Yj2FUkq1rSSgE4SveKPoAJQsu6U2kkfdGtmhO/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'PremierLeague' },
+  'PremierLeague': { leagueId: 'England: Premier League', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8lEnnlz6Uhb47U4yOnsSUOcsfBS3TrpEXri3g6S2Yj2FUkq1rSSgE4SveKPoAJQsu6U2kkfdGtmhO/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'PremierLeague' },
   'LaLiga': { leagueId: 'Spain: LaLiga', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8ZGW33Hc9fDIq8mJZZqVj8GJdm3p08Jug6e5fTP0-KBtGpFB6BIXgDKkvHqyHnJRKZ9Ba24I3hekV/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LaLiga' },
-  'SerieA': { leagueId: 'ITALY: SERIE A', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaaFrDXpcgY4EiGwkYfT0zodrVA1GJU2A6qcrc1GcLxkPjHh43ksM3T4c4p5nFdqKJoj96eEpUKST3/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'SerieA' },
+  'SerieA': { leagueId: 'Italy: Serie A', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaaFrDXpcgY4EiGwkYfT0zodrVA1GJU2A6qcrc1GcLxkPjHh43ksM3T4c4p5nFdqKJoj96eEpUKST3/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'SerieA' },
   'Bundesliga': { leagueId: 'Germany: Bundesliga', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwpzErtNqiT5mq4kII0P1OxnY41WAgyY4fi7kiThIgNSgf6lr3kslZ9OBAP3-I2YJ4_aA0p0LNjsaH/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'Bundesliga' },
   'Ligue1': { leagueId: 'France: Ligue 1', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRD-758CxWtSSl1PCJRdVREjXqhrxTBjYBtnxx4ot8wUdEGfw7ONCzQNfTIdvntZoi1Kme0F7Nkt4Wa/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'Ligue1' },
   'NCAAF': { leagueId: 'USA: NCAA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRiThcO5BjAuw3818zbgA9WxlLQFK8T3n5LCPxAihwjANmnxme5ynsLG2EyD2RyPvACe4wGlY36ekF7/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'NCAAF' },
@@ -4313,7 +4315,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- 5. HELPER FUNCTIONS ---
     function getLeagueDisplayName(name) {
-        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup","England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA Women's Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera División", "Argentina: Torneo Betano - Apertura": "Argentine Primera División", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership" };
+        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup","England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA Women's Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera División", "Argentina: Torneo Betano - Apertura": "Argentine Primera División", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership" };
         return map[name] || name;
     }
     
@@ -5078,6 +5080,41 @@ document.addEventListener('DOMContentLoaded', function () {
             }, err => { scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>'; });
     }
 
+    function fetchYesterdayScoresForLeague(leagueId, leagueName) {
+        const yesterdayScheduleContent = document.getElementById('league-schedule-yesterday-content');
+        if (!yesterdayScheduleContent) return;
+
+        yesterdayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading yesterday\'s scores...</p>';
+
+        // Use the same logic as the working home page fetchYesterdayScores function
+        const yesterdayScoresRef = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
+        
+        yesterdayScoresRef.get()
+            .then(snapshot => {
+                if (snapshot.empty) {
+                    yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
+                    return;
+                }
+                
+                // Filter games by league using leagueId (exact match)
+                const allGames = snapshot.docs.map(doc => doc.data());
+                const leagueGames = allGames.filter(game => {
+                    return game.League === leagueId;
+                });
+                
+                if (leagueGames.length === 0) {
+                    yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
+                    return;
+                }
+                
+                const gamesData = leagueGames.sort(sortGames);
+                renderGames(yesterdayScheduleContent, gamesData, false);
+            }, err => { 
+                console.error('Error fetching yesterday scores for', leagueId, ':', err);
+                yesterdayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading yesterday\'s scores.</p>'; 
+            });
+    }
+
     // REPLACE THE OLD FUNCTION WITH THIS ONE
     async function fetchLeagueStandings(url, leagueKey) {
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
@@ -5226,11 +5263,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
+
     // START OF CORRECTED SECTION
     window.loadLeagueSpecificData = function(leagueKey) {
         const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
         if (!leagueInfo) return;
         if (leagueHeader) leagueHeader.innerText = leagueKey;
+        
+        // Hide yesterday content when loading new league
+        const yesterdayContent = document.getElementById('league-schedule-yesterday-content');
+        if (yesterdayContent) yesterdayContent.style.display = 'none';
         const todayScheduleContent = document.getElementById('league-schedule-today-content');
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
         const standingsContent = document.getElementById('league-standings-content');
@@ -5276,24 +5318,19 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('schedule-tab-content').style.display = 'block';
         }
         
-        // Reset schedule sub-tabs (Today/Upcoming) - but don't force Today active yet
+        // Reset schedule sub-tabs (Today/Yesterday/Upcoming) - reset ALL tabs to inactive state
         if (scheduleTabsContainer) {
             const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+            const yesterdayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="yesterday"]');
             const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
             
-            // Reset both tabs to inactive state initially
-            if (todayScheduleTab) {
-                todayScheduleTab.classList.remove('active');
-                todayScheduleTab.style.backgroundColor = '#2a2a2a';
-                todayScheduleTab.style.color = '#ccc';
-                todayScheduleTab.style.borderBottom = 'none';
-            }
-            if (upcomingScheduleTab) {
-            upcomingScheduleTab.classList.remove('active');
-                upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
-                upcomingScheduleTab.style.color = '#ccc';
-                upcomingScheduleTab.style.borderBottom = 'none';
-            }
+            // Reset ALL tabs to inactive state (both classes and inline styles)
+            scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.backgroundColor = '#2a2a2a';
+                tab.style.color = '#ccc';
+                tab.style.borderBottom = 'none';
+            });
             
             // The existing logic in the data loading will determine which tab becomes active
             // based on whether there are games today or not
@@ -6861,6 +6898,7 @@ if (mainTabsContainer) {
 const scheduleTabsContainer = document.getElementById('schedule-tabs');
 if (scheduleTabsContainer) {
     const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+    const yesterdayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="yesterday"]');
     const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
     
     todayScheduleTab.addEventListener('click', () => {
@@ -6877,9 +6915,40 @@ if (scheduleTabsContainer) {
         todayScheduleTab.style.color = '#fff';
         todayScheduleTab.style.borderBottom = '2px solid #fff';
         
-        // Show today content, hide upcoming content
+        // Show today content, hide other content
         document.getElementById('league-schedule-today-content').style.display = 'block';
+        document.getElementById('league-schedule-yesterday-content').style.display = 'none';
         document.getElementById('league-schedule-upcoming-content').style.display = 'none';
+    });
+    
+    yesterdayScheduleTab.addEventListener('click', () => {
+        // Remove active class from all tabs and reset styling
+        scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => {
+            tab.classList.remove('active');
+            tab.style.backgroundColor = '#2a2a2a';
+            tab.style.color = '#ccc';
+            tab.style.borderBottom = 'none';
+        });
+        // Add active class and styling to clicked tab
+        yesterdayScheduleTab.classList.add('active');
+        yesterdayScheduleTab.style.backgroundColor = '#2a2a2a';
+        yesterdayScheduleTab.style.color = '#fff';
+        yesterdayScheduleTab.style.borderBottom = '2px solid #fff';
+        
+        // Show yesterday content, hide other content
+        document.getElementById('league-schedule-today-content').style.display = 'none';
+        document.getElementById('league-schedule-yesterday-content').style.display = 'block';
+        document.getElementById('league-schedule-upcoming-content').style.display = 'none';
+        
+        // Load yesterday's scores for the current league
+        const currentLeagueHeader = document.getElementById('league-specific-header');
+        if (currentLeagueHeader) {
+            const leagueName = currentLeagueHeader.innerText;
+            const leagueConfig = LEAGUE_DATA_CONFIG[leagueName];
+            if (leagueConfig) {
+                fetchYesterdayScoresForLeague(leagueConfig.leagueId, leagueName);
+            }
+        }
     });
     
     upcomingScheduleTab.addEventListener('click', (event) => {
@@ -6896,8 +6965,9 @@ if (scheduleTabsContainer) {
         upcomingScheduleTab.style.color = '#fff';
         upcomingScheduleTab.style.borderBottom = '2px solid #fff';
 
-        // Show upcoming content, hide today content
+        // Show upcoming content, hide other content
         document.getElementById('league-schedule-today-content').style.display = 'none';
+        document.getElementById('league-schedule-yesterday-content').style.display = 'none';
         document.getElementById('league-schedule-upcoming-content').style.display = 'block';
         
         // Get the current league key from the header
@@ -8098,4 +8168,3 @@ document.addEventListener('DOMContentLoaded', function() {
  
   </body>
 </html>
-
