@@ -18,6 +18,21 @@ You said:
       margin-bottom: 0.5rem;
     }
 
+    #countdown-section {
+      margin-bottom: 1rem;
+    }
+
+    #countdown-section input[type="time"] {
+      width: 150px;
+      margin-right: 0.5rem;
+      margin-bottom: 0;
+      display: inline-block;
+    }
+
+    #countdown-section button {
+      margin-left: 0;
+    }
+
     #countdown {
       font-size: 1.2rem;
       margin-bottom: 0.5rem;
@@ -44,7 +59,7 @@ You said:
     }
 
     input[type="time"] {
-      width: 150px;
+      width: 200px;
     }
 
     button {
@@ -105,6 +120,10 @@ You said:
 <body>
 
   <h1>Today's To-Do List</h1>
+  <div id="countdown-section">
+    <input type="time" id="end-time-input" placeholder="End time" />
+    <button onclick="setEndTime()">Set End Time</button>
+  </div>
   <div id="countdown">Time left today: --:--:--</div>
   <div id="time-back">Time you get back: 0 minutes</div>
 
@@ -120,37 +139,77 @@ You said:
     // Global variables
     let totalTimeBack = parseInt(localStorage.getItem('timeBack')) || 0;
     let deadlineTimers = new Map();
+    let endTime = localStorage.getItem('endTime');
+    let countdownInterval = null;
 
-    // Countdown timer
-    function updateCountdown() {
-      const now = new Date();
-      const midnight = new Date();
-      midnight.setHours(24, 0, 0, 0); // Next midnight
-
-      const diff = midnight - now;
-
-      const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
-      const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
-      const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-
-      document.getElementById('countdown').textContent = `Time left today: ${hours}:${minutes}:${seconds}`;
-      document.getElementById('time-back').textContent = `Time you get back: ${totalTimeBack} minutes`;
-
-      if (diff <= 0) {
-        clearListAtMidnight();
+    // Load saved end time
+    function loadEndTime() {
+      if (endTime) {
+        document.getElementById('end-time-input').value = endTime;
+        setEndTime();
       }
     }
 
-    function clearListAtMidnight() {
+    // Set end time and start countdown
+    function setEndTime() {
+      const endTimeInput = document.getElementById('end-time-input').value;
+      if (!endTimeInput) return;
+      
+      endTime = endTimeInput;
+      localStorage.setItem('endTime', endTime);
+      
+      // Start countdown timer
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(updateCountdown, 1000);
+      updateCountdown();
+    }
+
+    // Countdown timer
+    function updateCountdown() {
+      if (!endTime) return;
+      
+      const now = new Date();
+      const [hours, minutes] = endTime.split(':');
+      const endTimeDate = new Date();
+      endTimeDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+      const diff = endTimeDate - now;
+
+      if (diff > 0) {
+        const hoursLeft = Math.floor(diff / (1000 * 60 * 60));
+        const minutesLeft = Math.floor((diff / (1000 * 60)) % 60);
+        const secondsLeft = Math.floor((diff / 1000) % 60);
+
+        const hoursStr = String(hoursLeft).padStart(2, '0');
+        const minutesStr = String(minutesLeft).padStart(2, '0');
+        const secondsStr = String(secondsLeft).padStart(2, '0');
+
+        document.getElementById('countdown').textContent = `Time left today: ${hoursStr}:${minutesStr}:${secondsStr}`;
+      } else {
+        clearListAtEndTime();
+      }
+      
+      document.getElementById('time-back').textContent = `Time you get back: ${totalTimeBack} minutes`;
+    }
+
+    function clearListAtEndTime() {
       document.getElementById('todo-list').innerHTML = '';
       localStorage.removeItem('todos');
       localStorage.removeItem('timeBack');
+      localStorage.removeItem('endTime');
       totalTimeBack = 0;
+      endTime = null;
       deadlineTimers.clear();
+      
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+      
+      // Reset end time input
+      document.getElementById('end-time-input').value = '';
+      document.getElementById('countdown').textContent = 'Time left today: --:--:--';
     }
-
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
 
     // To-Do list logic
     const todoList = document.getElementById('todo-list');
@@ -188,8 +247,13 @@ You said:
     }
 
     function updateTaskDeadlineCountdown(li, deadline) {
+      if (!deadline || !li.querySelector('.deadline-info')) return;
+      
       const deadlineTime = new Date();
       const [hours, minutes] = deadline.split(':');
+      
+      if (!hours || !minutes) return;
+      
       deadlineTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
       const now = new Date();
@@ -240,6 +304,12 @@ You said:
             localStorage.setItem('timeBack', totalTimeBack.toString());
           }
           
+          // Clear the timer for this task
+          if (deadlineTimers.has(li)) {
+            clearInterval(deadlineTimers.get(li));
+            deadlineTimers.delete(li);
+          }
+          
           li.classList.add('done');
           todoList.appendChild(li); // Move to bottom
           saveTodos();
@@ -273,6 +343,7 @@ You said:
     }
 
     loadTodos();
+    loadEndTime();
   </script>
 
 </body>
