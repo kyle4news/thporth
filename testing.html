@@ -5096,11 +5096,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 
-                // Filter games by league using getLeagueDisplayName (case insensitive)
+                // Filter games by league using leagueId (exact match)
                 const allGames = snapshot.docs.map(doc => doc.data());
                 const leagueGames = allGames.filter(game => {
-                    const gameLeagueDisplay = getLeagueDisplayName(game.League);
-                    return gameLeagueDisplay === leagueName;
+                    return game.League === leagueId;
                 });
                 
                 if (leagueGames.length === 0) {
