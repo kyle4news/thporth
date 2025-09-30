@@ -5973,24 +5973,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Determine if it's today or upcoming for formatting
                     const isGameToday = game.isToday;
                     
-                    // Match the exact styling from the image - teams stacked vertically, time right-aligned
-                    html += `<tr class="game-row">`;
-                    html += `<td style="text-align: left; vertical-align: middle; width: 80px; font-size: 12px;">${displayTimeLabel}</td>`;
-                    html += `<td style="vertical-align: middle; padding: 4px 0;">`;
-                    html += `<div style="font-size: 12px; line-height: 1.2;">${awayTeam}</div>`;
-                    html += `<div style="font-size: 12px; line-height: 1.2;">${homeTeam}</div>`;
-                    html += `</td>`;
-                    html += `<td style="text-align: right; vertical-align: middle; width: 30px; font-size: 12px; padding-right: 0;">`;
-                    if (isLive || isFinal) {
-                        const awayScoreDisplay = awayScore !== '' ? awayScore : '';
-                        const homeScoreDisplay = homeScore !== '' ? homeScore : '';
-                        html += `<div style="font-size: 12px; line-height: 1.2;">${awayScoreDisplay}</div>`;
-                        html += `<div style="font-size: 12px; line-height: 1.2;">${homeScoreDisplay}</div>`;
-                    } else {
-                        html += `<div style="font-size: 12px; line-height: 1.2;"></div>`;
-                        html += `<div style="font-size: 12px; line-height: 1.2;"></div>`;
-                    }
-                    html += `</td>`;
+                    // Use the exact same structure as home page renderGames function
+                    const row1 = `<tr class="game-row">`;
+                    const row2 = `<tr class="game-row game-separator">`;
+                    
+                    // Soccer: home team on top, away team on bottom (same as home page)
+                    const homeScoreDisplay = (isLive || isFinal) ? (homeScore !== '' ? homeScore : '') : '';
+                    const awayScoreDisplay = (isLive || isFinal) ? (awayScore !== '' ? awayScore : '') : '';
+                    
+                    html += row1;
+                    html += `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 5px;">${displayTimeLabel}</td>`;
+                    html += `<td class="team-cell">${homeTeam}</td>`;
+                    html += `<td style="width: 30px; text-align: right; padding-right: 0;">${homeScoreDisplay}</td>`;
+                    html += `</tr>`;
+                    
+                    html += row2;
+                    html += `<td class="team-cell">${awayTeam}</td>`;
+                    html += `<td style="text-align: right;">${awayScoreDisplay}</td>`;
                     html += `</tr>`;
                 });
                 
