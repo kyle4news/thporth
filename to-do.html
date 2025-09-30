@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Daily To-Do List</title>
+  <style>
+    body {
+      background-color: #f8f2eb;
+      font-family: "Helvetica Neue", sans-serif;
+      color: black;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    #countdown {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    #input-section {
+      margin-bottom: 1rem;
+    }
+
+    input[type="text"] {
+      padding: 0.5rem;
+      width: 300px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      margin-left: 0.5rem;
+      cursor: pointer;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .todo-text {
+      margin-left: 0.5rem;
+      flex-grow: 1;
+    }
+
+    .done .todo-text {
+      color: gray;
+      text-decoration: line-through;
+    }
+
+    input[type="checkbox"] {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid black;
+      border-radius: 2px;
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"]:checked::after {
+      content: "✔";
+      position: absolute;
+      top: -2px;
+      left: 2px;
+      font-size: 14px;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Today's To-Do List</h1>
+  <div id="countdown">Time left today: --:--:--</div>
+
+  <div id="input-section">
+    <input type="text" id="todo-input" placeholder="Add a new task..." />
+    <button onclick="addTodo()">Add</button>
+  </div>
+
+  <ul id="todo-list"></ul>
+
+  <script>
+    // Countdown timer
+    function updateCountdown() {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0); // Next midnight
+
+      const diff = midnight - now;
+
+      const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+      const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+      const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+
+      document.getElementById('countdown').textContent = `Time left today: ${hours}:${minutes}:${seconds}`;
+
+      if (diff <= 0) {
+        clearListAtMidnight();
+      }
+    }
+
+    function clearListAtMidnight() {
+      document.getElementById('todo-list').innerHTML = '';
+      localStorage.removeItem('todos');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // To-Do list logic
+    const todoList = document.getElementById('todo-list');
+    const todoInput = document.getElementById('todo-input');
+
+    function loadTodos() {
+      const saved = JSON.parse(localStorage.getItem('todos')) || [];
+      saved.forEach(item => {
+        createTodoElement(item.text, item.done);
+      });
+    }
+
+    function saveTodos() {
+      const items = Array.from(todoList.children).map(li => ({
+        text: li.querySelector('.todo-text').textContent,
+        done: li.classList.contains('done')
+      }));
+      localStorage.setItem('todos', JSON.stringify(items));
+    }
+
+    function addTodo() {
+      const text = todoInput.value.trim();
+      if (text !== '') {
+        createTodoElement(text, false);
+        todoInput.value = '';
+        saveTodos();
+      }
+    }
+
+    function createTodoElement(text, done) {
+      const li = document.createElement('li');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+
+      const span = document.createElement('span');
+      span.className = 'todo-text';
+      span.textContent = text;
+
+      checkbox.addEventListener('change', () => {
+        li.classList.toggle('done');
+        if (checkbox.checked) {
+          todoList.appendChild(li); // Move to bottom
+        } else {
+          todoList.insertBefore(li, todoList.firstChild); // Move to top
+        }
+        saveTodos();
+      });
+
+      li.appendChild(checkbox);
+      li.appendChild(span);
+
+      if (done) {
+        li.classList.add('done');
+        checkbox.checked = true;
+        todoList.appendChild(li);
+      } else {
+        todoList.insertBefore(li, todoList.firstChild);
+      }
+    }
+
+    loadTodos();
+  </script>
+
+</body>
+</html>
