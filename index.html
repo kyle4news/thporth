@@ -5892,6 +5892,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     return timeA - timeB;
                 });
                 
+                let lastDisplayedTimeLabel = null;
+                
                 games.forEach(game => {
                     const homeTeam = getTeamDisplayName(game['Home Team'] || '');
                     const awayTeam = getTeamDisplayName(game['Away Team'] || '');
@@ -5965,12 +5967,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                     
+                    // Prevent duplicate time display (same logic as renderGames function)
+                    let displayTimeLabel = timeDisplay;
+                    if (!isLive && !isFinal && timeDisplay !== "TBD") {
+                        if (timeDisplay === lastDisplayedTimeLabel) displayTimeLabel = "";
+                        else lastDisplayedTimeLabel = timeDisplay;
+                    }
+                    
                     // Determine if it's today or upcoming for formatting
                     const isGameToday = game.isToday;
                     
                     // Match the exact styling from the image - teams stacked vertically, time right-aligned
                     html += `<tr class="game-row">`;
-                    html += `<td style="text-align: left; vertical-align: middle; width: 80px; font-size: 12px;">${timeDisplay}</td>`;
+                    html += `<td style="text-align: left; vertical-align: middle; width: 80px; font-size: 12px;">${displayTimeLabel}</td>`;
                     html += `<td style="vertical-align: middle; padding: 4px 0;">`;
                     html += `<div style="font-size: 12px; line-height: 1.2;">${awayTeam}</div>`;
                     html += `<div style="font-size: 12px; line-height: 1.2;">${homeTeam}</div>`;
