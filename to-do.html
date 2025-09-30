@@ -144,17 +144,18 @@
 
   <script>
     // Global variables
-    let totalTimeBack = parseInt(localStorage.getItem('timeBack')) || 0;
+    let totalTimeBack = 0; // Start fresh each time
     let deadlineTimers = new Map();
-    let endTime = localStorage.getItem('endTime');
+    let endTime = null; // Start fresh each time
     let countdownInterval = null;
 
     // Load saved end time
     function loadEndTime() {
-      if (endTime) {
-        document.getElementById('end-time-input').value = endTime;
-        setEndTime();
-      }
+      // Don't load saved end time - start fresh each time
+      // if (endTime) {
+      //   document.getElementById('end-time-input').value = endTime;
+      //   setEndTime();
+      // }
     }
 
     // Set end time and start countdown
@@ -237,10 +238,11 @@
     const deadlineInput = document.getElementById('deadline-input');
 
     function loadTodos() {
-      const saved = JSON.parse(localStorage.getItem('todos')) || [];
-      saved.forEach(item => {
-        createTodoElement(item.text, item.deadline, item.done, item.timeBack || 0);
-      });
+      // Don't load saved todos - start fresh each time
+      // const saved = JSON.parse(localStorage.getItem('todos')) || [];
+      // saved.forEach(item => {
+      //   createTodoElement(item.text, item.deadline, item.done, item.timeBack || 0);
+      // });
     }
 
     function saveTodos() {
