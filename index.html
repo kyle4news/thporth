@@ -4112,7 +4112,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'NCAAF': { leagueId: 'USA: NCAA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRiThcO5BjAuw3818zbgA9WxlLQFK8T3n5LCPxAihwjANmnxme5ynsLG2EyD2RyPvACe4wGlY36ekF7/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'NCAAF' },
   'WNBA': { leagueId: 'USA: WNBA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWPTh0lOh89-qkXYbx63Vs8FQ7gUoT0333Pa9ZgPg4WWBMgB-xERDMM_U2yIUgS3TSPOXOD5M7sVl/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'WNBA' },
   'Soccer': { leagueId: 'WORLD: SOCCER', standingsUrl: 'YOUR_SOCCER_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'Soccer' },
-  'UEFAChampionsLeague': { leagueId: 'EUROPE: UEFA CHAMPIONS LEAGUE', standingsUrl: 'YOUR_UEFACHAMPIONSLEAGUE_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'UEFAChampionsLeague' },
+  'UEFAChampionsLeague': { leagueId: 'Europe: Champions League - League phase', standingsUrl: 'YOUR_UEFACHAMPIONSLEAGUE_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'UEFAChampionsLeague' },
   'FACup': { leagueId: 'ENGLAND: FA CUP', standingsUrl: 'YOUR_FACUP_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'FACup' },
   'LigaMX': { leagueId: 'MEXICO: LIGA MX', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSL_7HJC0jqhF1jy4tiIrrh5RLewsiH9RezMKDx6TpZtz2JHB8D7Dlx7yyZRWZ7rU5txoTasyiHk7M4/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LigaMX' },
   'NWSL': { leagueId: 'USA: NWSL Women', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJn_hnVeNfnXsDpeer_hgh6dxOcL2VOJzHKsE8cv-OTaX8EzWRYIGNLqLztvuAeuJbM4oEElA-LoiU/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'NWSL' },
@@ -4317,6 +4317,98 @@ document.addEventListener('DOMContentLoaded', function () {
     function getLeagueDisplayName(name) {
         const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup","England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA Women's Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera División", "Argentina: Torneo Betano - Apertura": "Argentine Primera División", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership" };
         return map[name] || name;
+    }
+
+    // Function to match league names based on partial matches
+    function getLeagueKeyFromDatabaseName(databaseLeagueName) {
+        const leagueMatches = {
+            // UEFA Champions League variations
+            'UEFAChampionsLeague': ['Europe: Champions League', 'Champions League'],
+            // UEFA Europa League variations  
+            'UEFAEuropaLeague': ['Europe: Europa League', 'Europa League'],
+            // UEFA Conference League variations
+            'UEFAConferenceLeague': ['Europe: Conference League', 'Conference League'],
+            // Premier League variations
+            'PremierLeague': ['England: Premier League', 'Premier League'],
+            // LaLiga variations
+            'LaLiga': ['Spain: LaLiga', 'LaLiga'],
+            // Serie A variations
+            'SerieA': ['Italy: Serie A', 'Serie A'],
+            // Bundesliga variations
+            'Bundesliga': ['Germany: Bundesliga', 'Bundesliga'],
+            // Ligue 1 variations
+            'Ligue1': ['France: Ligue 1', 'Ligue 1'],
+            // MLS variations
+            'MLS': ['USA: MLS', 'MLS'],
+            // NFL variations
+            'NFL': ['USA: NFL', 'NFL'],
+            // NBA variations
+            'NBA': ['USA: NBA', 'NBA'],
+            // MLB variations
+            'MLB': ['USA: MLB', 'MLB'],
+            // NHL variations
+            'NHL': ['USA: NHL', 'NHL'],
+            // WNBA variations
+            'WNBA': ['USA: WNBA', 'WNBA'],
+            // NCAAF variations
+            'NCAAF': ['USA: NCAA', 'NCAA'],
+            // NWSL variations
+            'NWSL': ['USA: NWSL Women', 'NWSL'],
+            // Liga MX variations
+            'LigaMX': ['Mexico: Liga MX', 'Liga MX'],
+            // Saudi Pro League variations
+            'SaudiProLeague': ['Saudi Arabia: Saudi Professional League', 'Saudi Pro League'],
+            // Brasileirão variations
+            'Brasileirao': ['Brazil: Serie A Betano', 'Serie A Betano'],
+            // Copa Libertadores variations
+            'CopaLibertadores': ['South America: Copa Libertadores', 'Copa Libertadores'],
+            // Copa Sudamericana variations
+            'CopaSudamericana': ['South America: Copa Sudamericana', 'Copa Sudamericana'],
+            // Leagues Cup variations
+            'LeaguesCup': ['North & Central America: Leagues Cup', 'Leagues Cup'],
+            // DFB-Pokal variations
+            'DFBPokal': ['Germany: DFB Pokal', 'DFB Pokal'],
+            // Coppa Italia variations
+            'CoppaItalia': ['Italy: Coppa Italia', 'Coppa Italia'],
+            // EFL Cup variations
+            'EFLCup': ['England: EFL Cup', 'EFL Cup'],
+            // Super Lig variations
+            'SuperLig': ['Turkey: Super Lig', 'Super Lig'],
+            // Eredivisie variations
+            'Eredivisie': ['Netherlands: Eredivisie', 'Eredivisie'],
+            // Liga Portugal variations
+            'LigaPortugal': ['Portugal: Liga Portugal', 'Liga Portugal'],
+            // Scottish Premiership variations
+            'ScottishPremiership': ['Scotland: Premiership', 'Scottish Premiership'],
+            // Scottish Cup variations
+            'ScottishCup': ['Scotland: Scottish Cup', 'Scottish Cup'],
+            // Women's Super League variations
+            'WomensSuperLeague': ['England: WSL', 'WSL', 'Women\'s Super League'],
+            // Argentine Primera División variations
+            'ArgentinePrimeraDivision': ['Argentina: Torneo Betano', 'Argentine Primera División'],
+            // EFL Championship variations
+            'EFLChampionship': ['England: Championship', 'EFL Championship']
+        };
+
+        // Check for exact matches first
+        for (const [leagueKey, patterns] of Object.entries(leagueMatches)) {
+            for (const pattern of patterns) {
+                if (databaseLeagueName === pattern) {
+                    return leagueKey;
+                }
+            }
+        }
+
+        // Check for partial matches
+        for (const [leagueKey, patterns] of Object.entries(leagueMatches)) {
+            for (const pattern of patterns) {
+                if (databaseLeagueName.includes(pattern)) {
+                    return leagueKey;
+                }
+            }
+        }
+
+        return null;
     }
     
     function getTeamDisplayName(name) {
@@ -5096,10 +5188,37 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 
-                // Filter games by league using leagueId (exact match)
+                // Filter games by league using flexible matching
                 const allGames = snapshot.docs.map(doc => doc.data());
                 const leagueGames = allGames.filter(game => {
-                    return game.League === leagueId;
+                    // First try exact match
+                    if (game.League === leagueId) {
+                        return true;
+                    }
+                    
+                    // Then try flexible matching based on league key
+                    const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League);
+                    const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId);
+                    
+                    // If both have matching league keys, include the game
+                    if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) {
+                        return true;
+                    }
+                    
+                    // Fallback: check if the database league name contains the target league name
+                    const targetLeagueName = leagueName.toLowerCase();
+                    const gameLeagueName = game.League.toLowerCase();
+                    
+                    // For UEFA Champions League, check for "champions league" in the name
+                    if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) {
+                        return true;
+                    }
+                    // For other leagues, check for partial matches
+                    if (gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName)) {
+                        return true;
+                    }
+                    
+                    return false;
                 });
                 
                 if (leagueGames.length === 0) {
@@ -5372,13 +5491,39 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 
-                // Filter games by league (same logic as home page)
+                // Filter games by league using flexible matching
                 const allGames = allGamesSnapshot.docs.map(doc => doc.data());
                 const gamesData = allGames.filter(game => {
                     const gameLeague = game.League || '';
-                    // More flexible matching - check if league name contains the key parts
-                    return gameLeague.toLowerCase().includes(leagueInfo.leagueId.toLowerCase()) || 
-                           leagueInfo.leagueId.toLowerCase().includes(gameLeague.toLowerCase());
+                    
+                    // First try exact match
+                    if (gameLeague === leagueInfo.leagueId) {
+                        return true;
+                    }
+                    
+                    // Then try flexible matching based on league key
+                    const gameLeagueKey = getLeagueKeyFromDatabaseName(gameLeague);
+                    const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueInfo.leagueId);
+                    
+                    // If both have matching league keys, include the game
+                    if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) {
+                        return true;
+                    }
+                    
+                    // Fallback: check if the database league name contains the target league name
+                    const targetLeagueName = leagueInfo.leagueId.toLowerCase();
+                    const gameLeagueName = gameLeague.toLowerCase();
+                    
+                    // For UEFA Champions League, check for "champions league" in the name
+                    if (targetLeagueName.includes('champions league') && gameLeagueName.includes('champions league')) {
+                        return true;
+                    }
+                    // For other leagues, check for partial matches
+                    if (gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName)) {
+                        return true;
+                    }
+                    
+                    return false;
                 });
                 
                 if (gamesData.length === 0) {
