@@ -1,5 +1,3 @@
-Skip to content
-You said:
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,15 +81,21 @@ You said:
       margin-bottom: 0.5rem;
     }
 
-    .todo-text {
+    .todo-content {
       margin-left: 0.5rem;
       flex-grow: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .todo-text {
+      margin-right: 0.5rem;
     }
 
     .deadline-info {
-      margin-left: 0.5rem;
       font-size: 0.9rem;
       color: #666;
+      white-space: nowrap;
     }
 
     .done .todo-text {
@@ -286,6 +290,9 @@ You said:
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
 
+      const todoContent = document.createElement('div');
+      todoContent.className = 'todo-content';
+
       const span = document.createElement('span');
       span.className = 'todo-text';
       span.textContent = text;
@@ -319,9 +326,10 @@ You said:
         }
       });
 
+      todoContent.appendChild(span);
+      todoContent.appendChild(deadlineSpan);
       li.appendChild(checkbox);
-      li.appendChild(span);
-      li.appendChild(deadlineSpan);
+      li.appendChild(todoContent);
 
       // Update deadline countdown
       updateTaskDeadlineCountdown(li, deadline);
