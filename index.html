@@ -5974,20 +5974,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     const isGameToday = game.isToday;
                     
                     // Use the exact same structure as home page renderGames function
-                    const row1 = `<tr class="game-row">`;
-                    const row2 = `<tr class="game-row game-separator">`;
-                    
-                    // Soccer: home team on top, away team on bottom (same as home page)
                     const homeScoreDisplay = (isLive || isFinal) ? (homeScore !== '' ? homeScore : '') : '';
                     const awayScoreDisplay = (isLive || isFinal) ? (awayScore !== '' ? awayScore : '') : '';
                     
-                    html += row1;
+                    // Soccer: home team on top, away team on bottom (same as home page)
+                    html += `<tr class="game-row">`;
                     html += `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 5px;">${displayTimeLabel}</td>`;
                     html += `<td class="team-cell">${homeTeam}</td>`;
                     html += `<td style="width: 30px; text-align: right; padding-right: 0;">${homeScoreDisplay}</td>`;
                     html += `</tr>`;
                     
-                    html += row2;
+                    html += `<tr class="game-row game-separator">`;
                     html += `<td class="team-cell">${awayTeam}</td>`;
                     html += `<td style="text-align: right;">${awayScoreDisplay}</td>`;
                     html += `</tr>`;
