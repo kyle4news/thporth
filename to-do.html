@@ -269,12 +269,13 @@
       if (diff > 0) {
         const hoursLeft = Math.floor(diff / (1000 * 60 * 60));
         const minutesLeft = Math.floor((diff / (1000 * 60)) % 60);
+        const secondsLeft = Math.floor((diff / 1000) % 60);
         
         let timeLeftText = '';
         if (hoursLeft > 0) {
-          timeLeftText = `${hoursLeft}h ${minutesLeft}m`;
+          timeLeftText = `${hoursLeft}h ${minutesLeft}m ${secondsLeft}s`;
         } else {
-          timeLeftText = `${minutesLeft}m`;
+          timeLeftText = `${minutesLeft}m ${secondsLeft}s`;
         }
         
         li.querySelector('.deadline-info').textContent = `Deadline: ${deadline} (${timeLeftText} left)`;
@@ -339,7 +340,7 @@
         if (!li.classList.contains('done')) {
           updateTaskDeadlineCountdown(li, deadline);
         }
-      }, 60000); // Update every minute
+      }, 1000); // Update every second
       
       deadlineTimers.set(li, timer);
 
