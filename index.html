@@ -5914,13 +5914,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             const inningHalf = game.inningHalf || "";
                             const currentInning = game.currentInning || "";
                             parsedStatus = `${inningHalf} ${currentInning}`.trim();
-                        } else if (displayLeague === "NBA" || displayLeague === "NCAAM" || displayLeague === "NCAAW") {
-                            const status = game['Match Status'] || "";
-                            const quarterMatch = status.match(/Q(\d+)/);
-                            if (quarterMatch) parsedStatus = `Q${quarterMatch[1]}`;
-                            else if (status.toUpperCase() === "HALF_TIME") parsedStatus = "Half";
-                        } else if (game.Sport === "Tennis") { 
-                            parsedStatus = game.Status || "Live";
+                        } else {
+                            // Use granular live status for ALL sports (including soccer)
+                            parsedStatus = getGranularLiveStatus(game);
                         }
                         timeDisplay = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
                     } else if (isFinal) {
