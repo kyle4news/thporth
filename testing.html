@@ -5319,24 +5319,19 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('schedule-tab-content').style.display = 'block';
         }
         
-        // Reset schedule sub-tabs (Today/Upcoming) - but don't force Today active yet
+        // Reset schedule sub-tabs (Today/Yesterday/Upcoming) - reset ALL tabs to inactive state
         if (scheduleTabsContainer) {
             const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+            const yesterdayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="yesterday"]');
             const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
             
-            // Reset both tabs to inactive state initially
-            if (todayScheduleTab) {
-                todayScheduleTab.classList.remove('active');
-                todayScheduleTab.style.backgroundColor = '#2a2a2a';
-                todayScheduleTab.style.color = '#ccc';
-                todayScheduleTab.style.borderBottom = 'none';
-            }
-            if (upcomingScheduleTab) {
-            upcomingScheduleTab.classList.remove('active');
-                upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
-                upcomingScheduleTab.style.color = '#ccc';
-                upcomingScheduleTab.style.borderBottom = 'none';
-            }
+            // Reset ALL tabs to inactive state (both classes and inline styles)
+            scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.backgroundColor = '#2a2a2a';
+                tab.style.color = '#ccc';
+                tab.style.borderBottom = 'none';
+            });
             
             // The existing logic in the data loading will determine which tab becomes active
             // based on whether there are games today or not
