@@ -5604,13 +5604,14 @@ document.addEventListener('DOMContentLoaded', function () {
             upcomingScheduleContent.style.display = 'none';
         }
         
-        // Get both today's and upcoming soccer games using the consolidated approach
+        // Get only today's soccer games using the consolidated approach
         const { DateTime } = luxon;
         const today = DateTime.now().setZone('America/New_York');
         const todayStr = today.toISODate();
         
-        // Get all games for today and future dates
-        gamesCollectionRef.where('gameDate', '>=', todayStr).get()
+        // Get only today's games
+        console.log('Fetching soccer games for date =', todayStr);
+        gamesCollectionRef.where('gameDate', '==', todayStr).get()
             .then(snapshot => {
                 if (snapshot.empty) {
                     todayScheduleContent.innerHTML = '<p>No soccer games found.</p>';
@@ -5804,8 +5805,20 @@ document.addEventListener('DOMContentLoaded', function () {
             html += `<div class="date-section" style="margin-bottom: 20px;">`;
             html += `<div class="date-header" style="background-color: #d1d5db; color: black; padding: 2px 16px; font-weight: bold; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; border: none;">${dateHeader}</div>`;
             
-            // Sort leagues within each date
-            const leagues = Object.keys(gamesByDate[dateStr]).sort();
+            // Sort leagues within each date using LEAGUE_DISPLAY_ORDER
+            const leagues = Object.keys(gamesByDate[dateStr]).sort((a, b) => {
+                const indexA = LEAGUE_DISPLAY_ORDER.indexOf(a);
+                const indexB = LEAGUE_DISPLAY_ORDER.indexOf(b);
+                // If both leagues are in the order, sort by their position
+                if (indexA !== -1 && indexB !== -1) {
+                    return indexA - indexB;
+                }
+                // If only one is in the order, prioritize it
+                if (indexA !== -1) return -1;
+                if (indexB !== -1) return 1;
+                // If neither is in the order, sort alphabetically
+                return a.localeCompare(b);
+            });
             leagues.forEach(leagueName => {
                 const games = gamesByDate[dateStr][leagueName];
                 
