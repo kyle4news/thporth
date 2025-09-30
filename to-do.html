@@ -363,7 +363,13 @@
         todoList.appendChild(li);
         clearInterval(timer);
       } else {
-        todoList.insertBefore(li, todoList.firstChild);
+        // Add new tasks to bottom (but above completed tasks)
+        const completedTasks = Array.from(todoList.children).filter(li => li.classList.contains('done'));
+        if (completedTasks.length > 0) {
+          todoList.insertBefore(li, completedTasks[0]);
+        } else {
+          todoList.appendChild(li);
+        }
       }
     }
 
