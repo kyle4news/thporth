@@ -20,19 +20,31 @@ You said:
 
     #countdown {
       font-size: 1.2rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    #time-back {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: #666;
     }
 
     #input-section {
       margin-bottom: 1rem;
     }
 
-    input[type="text"] {
+    input[type="text"], input[type="time"] {
       padding: 0.5rem;
       width: 300px;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 4px;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    input[type="time"] {
+      width: 150px;
     }
 
     button {
@@ -56,6 +68,12 @@ You said:
     .todo-text {
       margin-left: 0.5rem;
       flex-grow: 1;
+    }
+
+    .deadline-info {
+      margin-left: 0.5rem;
+      font-size: 0.9rem;
+      color: #666;
     }
 
     .done .todo-text {
@@ -88,15 +106,21 @@ You said:
 
   <h1>Today's To-Do List</h1>
   <div id="countdown">Time left today: --:--:--</div>
+  <div id="time-back">Time you get back: 0 minutes</div>
 
   <div id="input-section">
     <input type="text" id="todo-input" placeholder="Add a new task..." />
+    <input type="time" id="deadline-input" placeholder="Deadline" />
     <button onclick="addTodo()">Add</button>
   </div>
 
   <ul id="todo-list"></ul>
 
   <script>
+    // Global variables
+    let totalTimeBack = parseInt(localStorage.getItem('timeBack')) || 0;
+    let deadlineTimers = new Map();
+
     // Countdown timer
     function updateCountdown() {
       const now = new Date();
@@ -110,6 +134,7 @@ You said:
       const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
 
       document.getElementById('countdown').textContent = `Time left today: ${hours}:${minutes}:${seconds}`;
+      document.getElementById('time-back').textContent = `Time you get back: ${totalTimeBack} minutes`;
 
       if (diff <= 0) {
         clearListAtMidnight();
@@ -119,6 +144,9 @@ You said:
     function clearListAtMidnight() {
       document.getElementById('todo-list').innerHTML = '';
       localStorage.removeItem('todos');
+      localStorage.removeItem('timeBack');
+      totalTimeBack = 0;
+      deadlineTimers.clear();
     }
 
     setInterval(updateCountdown, 1000);
@@ -127,32 +155,66 @@ You said:
     // To-Do list logic
     const todoList = document.getElementById('todo-list');
     const todoInput = document.getElementById('todo-input');
+    const deadlineInput = document.getElementById('deadline-input');
 
     function loadTodos() {
       const saved = JSON.parse(localStorage.getItem('todos')) || [];
       saved.forEach(item => {
-        createTodoElement(item.text, item.done);
+        createTodoElement(item.text, item.deadline, item.done, item.timeBack || 0);
       });
     }
 
     function saveTodos() {
       const items = Array.from(todoList.children).map(li => ({
         text: li.querySelector('.todo-text').textContent,
-        done: li.classList.contains('done')
+        deadline: li.dataset.deadline,
+        done: li.classList.contains('done'),
+        timeBack: parseInt(li.dataset.timeBack) || 0
       }));
       localStorage.setItem('todos', JSON.stringify(items));
+      localStorage.setItem('timeBack', totalTimeBack.toString());
     }
 
     function addTodo() {
       const text = todoInput.value.trim();
-      if (text !== '') {
-        createTodoElement(text, false);
+      const deadline = deadlineInput.value;
+      
+      if (text !== '' && deadline !== '') {
+        createTodoElement(text, deadline, false, 0);
         todoInput.value = '';
+        deadlineInput.value = '';
         saveTodos();
       }
     }
 
-    function createTodoElement(text, done) {
+    function updateTaskDeadlineCountdown(li, deadline) {
+      const deadlineTime = new Date();
+      const [hours, minutes] = deadline.split(':');
+      deadlineTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+      const now = new Date();
+      const diff = deadlineTime - now;
+
+      if (diff > 0) {
+        const hoursLeft = Math.floor(diff / (1000 * 60 * 60));
+        const minutesLeft = Math.floor((diff / (1000 * 60)) % 60);
+        
+        let timeLeftText = '';
+        if (hoursLeft > 0) {
+          timeLeftText = `${hoursLeft}h ${minutesLeft}m`;
+        } else {
+          timeLeftText = `${minutesLeft}m`;
+        }
+        
+        li.querySelector('.deadline-info').textContent = `Deadline: ${deadline} (${timeLeftText} left)`;
+        li.dataset.timeLeft = Math.floor(diff / (1000 * 60));
+      } else {
+        li.querySelector('.deadline-info').textContent = `Deadline: ${deadline} (OVERDUE)`;
+        li.dataset.timeLeft = 0;
+      }
+    }
+
+    function createTodoElement(text, deadline, done, timeBack) {
       const li = document.createElement('li');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -161,8 +223,23 @@ You said:
       span.className = 'todo-text';
       span.textContent = text;
 
+      const deadlineSpan = document.createElement('span');
+      deadlineSpan.className = 'deadline-info';
+
+      li.dataset.deadline = deadline;
+      li.dataset.timeBack = timeBack;
+
       checkbox.addEventListener('change', () => {
         if (checkbox.checked) {
+          // Calculate time saved
+          const timeLeft = parseInt(li.dataset.timeLeft) || 0;
+          if (timeLeft > 0) {
+            totalTimeBack += timeLeft;
+            li.dataset.timeBack = (parseInt(li.dataset.timeBack) + timeLeft).toString();
+            document.getElementById('time-back').textContent = `Time you get back: ${totalTimeBack} minutes`;
+            localStorage.setItem('timeBack', totalTimeBack.toString());
+          }
+          
           li.classList.add('done');
           todoList.appendChild(li); // Move to bottom
           saveTodos();
@@ -171,11 +248,25 @@ You said:
 
       li.appendChild(checkbox);
       li.appendChild(span);
+      li.appendChild(deadlineSpan);
+
+      // Update deadline countdown
+      updateTaskDeadlineCountdown(li, deadline);
+
+      // Set up timer for this task's deadline countdown
+      const timer = setInterval(() => {
+        if (!li.classList.contains('done')) {
+          updateTaskDeadlineCountdown(li, deadline);
+        }
+      }, 60000); // Update every minute
+      
+      deadlineTimers.set(li, timer);
 
       if (done) {
         li.classList.add('done');
         checkbox.checked = true;
         todoList.appendChild(li);
+        clearInterval(timer);
       } else {
         todoList.insertBefore(li, todoList.firstChild);
       }
@@ -186,152 +277,3 @@ You said:
 
 </body>
 </html>
-
-preview in canvas
-ChatGPT said:
-
-Here’s the live preview of your to-do list app — countdown, input field, and tasks with checkboxes that move based on status.
-
-You said:
-Daily Todo List
-add one more input, for deadline:  this is the time of day by which this task has to be done
-ChatGPT said:
-
-I added a new input for deadlines (time of day). Each task now shows its deadline next to the text, and deadlines are saved and restored from local storage.
-
-You said:
-Daily Todo List
-Now where it says "time left today: [timer]" please put an input where the user can input the time of day they will stop working today.  Once they input that, this part is replaced by the timer that counts down from point A, the user's local time currently, to point B, the time they put in here.
-ChatGPT said:
-
-I added an input field where the user can set their end-of-day work time. Once entered, it replaces that section with a live countdown from the current time to the chosen end time.
-
-You said:
-Daily Todo List
-wipe the two items from the to do list that's already in there so i can start over pleaes
-ChatGPT said:
-
-I’ve cleared out the old to-do items — your list will now start fresh and empty when you load it.
-
-You said:
-Daily Todo List
-Wipe the to-do list so we can start fresh.  for each task, when user adds the deadline, instead of having just "Deadline: [time]",  put Deadline: [time] and next to that a countdown from user's current time to the deadline for this task. When a new task is added, it goes to the bottom of the list (not the top)
-ChatGPT said:
-
-I cleared the to-do list so it always starts fresh. Now, each task shows a live countdown to its deadline, and new tasks are added to the bottom of the list.
-
-You said:
-Daily Todo List
-a couple changes:
-
-first off, let's start over, meaning wipe the to do list that's in there.
-
-Secondly, add this: under Time left today put, in smaller font, Time you get back: [number of minutes].  This time you get back is the time added up of all the time you gained when you completed a task before deadline.  (so if there were 18 minutes left on the timer for task one when i marked it complete, i get 18 minutes back; if another task I completed 13 minutes before deadline, i get that 13 minutes added to the 18 minutes for a total of 31 minutes I get back.)
-ChatGPT said:
-
-Here’s the updated version — I wiped the tasks again so you’re starting fresh, and I added the “Time you get back” tracker under “Time left today”.
-
-When you complete a task before its deadline, the leftover time gets added up and displayed there.
-
-I wiped the list again so it’s completely fresh, and added the “Time you get back” tracker that accumulates leftover time when you finish tasks early.
-
-You said:
-Daily Todo List
-hold the fuck up.  you changed literally every single thing about the styling.  revert back to how it was before, but just add the new "time i get back. wow!  what a complete fuck up you are
-ChatGPT said:
-
-I reverted the styling back to the way it was before — nothing else changed.
-The only new thing is the “Time you get back” tracker under “Time left today”, which accumulates the extra minutes you save by finishing tasks before their deadlines.
-
-You said:
-preview in canvas
-ChatGPT said:
-
-Here’s the fresh version in Canvas — the styling is back to how it was, and now you also have “Time you get back” showing under the daily timer.
-
-
-
-
-No file chosenNo file chosen
-ChatGPT can make mistakes. Check important info.
-
-
-Daily Todo List
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Daily To-Do List</title>
-  <style>
-    body {
-      background-color: #f8f2eb;
-      font-family: "Helvetica Neue", sans-serif;
-      color: black;
-      margin: 0;
-      padding: 2rem;
-    }
-
-    h1 {
-      margin-bottom: 0.5rem;
-    }
-
-    #countdown-section {
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
-    }
-
-    #stop-time-input {
-      padding: 0.3rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-right: 0.5rem;
-    }
-
-    #input-section {
-      margin-bottom: 1rem;
-    }
-
-    input[type="text"], input[type="time"] {
-You are viewing a previous version
-Restore this version to make edits
-
-Restore this version
-
-Back to latest version
