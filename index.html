@@ -5604,7 +5604,7 @@ document.addEventListener('DOMContentLoaded', function () {
             upcomingScheduleContent.style.display = 'none';
         }
         
-        // Get both today's and upcoming soccer games
+        // Get both today's and upcoming soccer games using the consolidated approach
         const { DateTime } = luxon;
         const today = DateTime.now().setZone('America/New_York');
         const todayStr = today.toISODate();
@@ -5617,7 +5617,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 
-                // Filter for soccer games only
+                // Filter for soccer games only and format them for consolidated display
                 const allGames = snapshot.docs.map(doc => doc.data());
                 const soccerGames = allGames.filter(game => {
                     const displayLeague = getLeagueDisplayName(game.League);
@@ -5630,9 +5630,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 
-                // Sort and render the games
-                const gamesData = soccerGames.sort(sortGames);
-                renderGames(todayScheduleContent, gamesData, false);
+                // Format games for consolidated display (add league display name)
+                const formattedGames = soccerGames.map(game => ({
+                    ...game,
+                    leagueDisplayName: getLeagueDisplayName(game.League),
+                    isToday: game.gameDate === todayStr
+                }));
+                
+                // Use the consolidated rendering function that shows league titles
+                renderConsolidatedSoccerGames(todayScheduleContent, formattedGames, today);
             })
             .catch(error => {
                 console.error('Error loading soccer games:', error);
