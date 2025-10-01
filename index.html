@@ -5515,9 +5515,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                 html += '<tr style="' + rowStyle + '">';
                 html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.W + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.L + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.T || 0) + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.Ties || 0) + '</td>';
                 html += '</tr>';
             });
             
@@ -5571,8 +5571,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                 html += '<tr style="' + rowStyle + '">';
                 html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.W + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.L + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
                 html += '</tr>';
             });
             
@@ -5618,8 +5618,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
             html += '<tr style="' + rowStyle + '">';
             html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.W + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.L + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
             html += '</tr>';
         });
         
@@ -5678,11 +5678,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                 html += '<tr style="' + rowStyle + '">';
                 html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Pts + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.GP + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.W + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.L + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.OTL || 0) + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Points + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.GamesPlayed + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.OvertimeLosses || 0) + '</td>';
                 html += '</tr>';
             });
             
@@ -5718,8 +5718,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
             html += '<tr style="' + rowStyle + '">';
             html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.W + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.L + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
             html += '</tr>';
         });
         
@@ -5742,8 +5742,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
             html += '<tr style="' + rowStyle + '">';
             html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.W + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.L + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
             html += '</tr>';
         });
         
