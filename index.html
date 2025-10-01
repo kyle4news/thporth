@@ -5308,31 +5308,90 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += '</tr>';
                 });
             } else {
-                // US Sports standings: Rank, Team, W, L, PCT
-                html += '<thead><tr style="background-color: #374151; font-size: 11px;">';
-                html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
-                html += '<th style="padding: 8px; text-align: left;">Team</th>';
-                html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
-                html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
-                html += '<th style="padding: 8px; text-align: center; width: 60px;">PCT</th>';
-                html += '</tr></thead><tbody>';
+                // US Sports standings: Need to check if we need to group by Conference/Division
+                const hasConference = teams[0].Conference !== undefined;
+                const hasDivision = teams[0].Division !== undefined;
                 
-                teams.forEach((team, index) => {
-                    const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-                    const pct = team.Wins && team.Losses !== undefined ? 
-                        (team.Wins / (team.Wins + team.Losses)).toFixed(3) : '0.000';
+                if (hasConference && hasDivision) {
+                    // Group by Conference and Division (NFL, MLB, NBA, etc.)
+                    const grouped = {};
                     
-                    html += `<tr style="${rowStyle}">`;
-                    html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank}</td>`;
-                    html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>`;
-                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>`;
-                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses || 0}</td>`;
-                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${pct}</td>`;
-                    html += '</tr>';
-                });
+                    teams.forEach(team => {
+                        const conf = team.Conference || 'Unknown';
+                        const div = team.Division || 'Unknown';
+                        
+                        if (!grouped[conf]) grouped[conf] = {};
+                        if (!grouped[conf][div]) grouped[conf][div] = [];
+                        
+                        grouped[conf][div].push(team);
+                    });
+                    
+                    // Render grouped standings
+                    html += '<tbody>';
+                    
+                    Object.keys(grouped).sort().forEach(conference => {
+                        Object.keys(grouped[conference]).sort().forEach(division => {
+                            const divisionTeams = grouped[conference][division];
+                            
+                            // Division header
+                            html += `<tr style="background-color: #d1d5db; color: #000;">`;
+                            html += `<td colspan="5" style="padding: 6px 8px; font-weight: bold; font-size: 11px; text-transform: uppercase;">${conference} - ${division}</td>`;
+                            html += '</tr>';
+                            
+                            // Table headers for this division
+                            html += '<tr style="background-color: #374151; font-size: 11px;">';
+                            html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
+                            html += '<th style="padding: 8px; text-align: left;">Team</th>';
+                            html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
+                            html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
+                            html += '<th style="padding: 8px; text-align: center; width: 60px;">PCT</th>';
+                            html += '</tr>';
+                            
+                            // Teams in this division
+                            divisionTeams.forEach((team, index) => {
+                                const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                                const pct = team.Wins && team.Losses !== undefined ? 
+                                    (team.Wins / (team.Wins + (team.Losses || 0) + (team.Ties || 0))).toFixed(3) : '0.000';
+                                
+                                html += `<tr style="${rowStyle}">`;
+                                html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank}</td>`;
+                                html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>`;
+                                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>`;
+                                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses || 0}</td>`;
+                                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${pct}</td>`;
+                                html += '</tr>';
+                            });
+                        });
+                    });
+                    
+                    html += '</tbody>';
+                } else {
+                    // Simple list without grouping
+                    html += '<thead><tr style="background-color: #374151; font-size: 11px;">';
+                    html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
+                    html += '<th style="padding: 8px; text-align: left;">Team</th>';
+                    html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
+                    html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
+                    html += '<th style="padding: 8px; text-align: center; width: 60px;">PCT</th>';
+                    html += '</tr></thead><tbody>';
+                    
+                    teams.forEach((team, index) => {
+                        const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                        const pct = team.Wins && team.Losses !== undefined ? 
+                            (team.Wins / (team.Wins + team.Losses)).toFixed(3) : '0.000';
+                        
+                        html += `<tr style="${rowStyle}">`;
+                        html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank}</td>`;
+                        html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>`;
+                        html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>`;
+                        html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses || 0}</td>`;
+                        html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${pct}</td>`;
+                        html += '</tr>';
+                    });
+                }
             }
             
-            html += '</tbody></table>';
+            html += '</table>';
             standingsContent.innerHTML = html;
             return true;
             
