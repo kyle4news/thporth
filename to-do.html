@@ -475,17 +475,17 @@
       const deadlineInput = document.getElementById('deadline-input');
       
       [endTimeInput, deadlineInput].forEach(input => {
-        input.addEventListener('input', function() {
+        input.addEventListener('keyup', function(e) {
           const value = this.value;
-          const cursorPos = this.selectionStart;
           
-          // Auto-add colon after 2 digits
+          // Auto-add colon after typing 2 digits
           if (value.length === 2 && !value.includes(':')) {
             this.value = value + ':';
-            // Move cursor to after the colon
+            // Focus and position cursor after colon
             setTimeout(() => {
+              this.focus();
               this.setSelectionRange(3, 3);
-            }, 0);
+            }, 10);
           }
           
           // Validate time is in future (only for deadline input)
@@ -500,32 +500,15 @@
           }
         });
         
-        input.addEventListener('keypress', function(e) {
-          // Only handle number keys
-          if (e.key >= '0' && e.key <= '9') {
-            const value = this.value;
-            const cursorPos = this.selectionStart;
-            
-            // If at position 2 and no colon yet, add colon first
-            if (cursorPos === 2 && value.length === 2 && !value.includes(':')) {
-              e.preventDefault();
-              this.value = value + ':' + e.key;
-              this.setSelectionRange(4, 4);
-            }
-          }
-        });
-        
-        input.addEventListener('keydown', function(e) {
-          // Handle backspace to remove colon if needed
-          if (e.key === 'Backspace') {
-            const value = this.value;
-            const cursorPos = this.selectionStart;
-            
-            // If cursor is right after colon, remove the colon too
-            if (cursorPos === 3 && value.charAt(2) === ':') {
-              e.preventDefault();
-              this.value = value.substring(0, 2) + value.substring(3);
-              this.setSelectionRange(2, 2);
+        input.addEventListener('blur', function() {
+          // Also validate on blur
+          if (input === deadlineInput && this.value.length === 5) {
+            if (!isTimeInFuture(this.value)) {
+              this.style.borderColor = 'red';
+              this.title = 'Please enter a time in the future';
+            } else {
+              this.style.borderColor = '';
+              this.title = '';
             }
           }
         });
