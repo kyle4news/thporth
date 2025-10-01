@@ -1699,73 +1699,6 @@ div[id^="breaking-content-"] a:hover {
   cursor: pointer;
 }
 
-/* Standings Tabs Styling */
-.standings-tabs {
-    display: flex;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #374151;
-}
-
-.tab-button {
-    background: none;
-    border: none;
-    padding: 10px 20px;
-    color: #9ca3af;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
-}
-
-.tab-button:hover {
-    color: #e5e7eb;
-    background-color: #374151;
-}
-
-.tab-button.active {
-    color: #ffffff;
-    border-bottom-color: #3b82f6;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-.division-section {
-    margin-bottom: 30px;
-}
-
-.division-header {
-    color: #e5e7eb;
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    padding: 8px 0;
-    border-bottom: 1px solid #374151;
-}
-
-.conference-header {
-    color: #e5e7eb;
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 15px;
-    padding: 10px 0;
-    border-bottom: 2px solid #3b82f6;
-}
-
-.conference-section {
-    margin-bottom: 30px;
-}
-
-.wnba-standings .conference-section:last-child {
-    margin-bottom: 0;
-}
-
 </style>
 
 <!-- Add this snippet above closing </head> or integrate into your existing <style> section -->
@@ -5408,19 +5341,65 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += '</tr>';
                 });
             } else {
-                // US Sports standings: Use specific tabbed layouts for each league
-                if (leagueKey === 'NFL') {
-                    html = createNFLStandings(teams);
-                } else if (leagueKey === 'MLB') {
-                    html = createMLBStandings(teams);
-                } else if (leagueKey === 'NBA') {
-                    html = createNBAStandings(teams);
-                } else if (leagueKey === 'NHL') {
-                    html = createNHLStandings(teams);
-                } else if (leagueKey === 'WNBA') {
-                    html = createWNBAStandings(teams);
+                // US Sports standings: Need to check if we need to group by Conference/Division
+                const hasConference = teams[0].Conference !== undefined;
+                const hasDivision = teams[0].Division !== undefined;
+                
+                if (hasConference && hasDivision) {
+                    // Group by Conference and Division (NFL, MLB, NBA, etc.)
+                    const grouped = {};
+                    
+                    teams.forEach(team => {
+                        const conf = team.Conference || 'Unknown';
+                        const div = team.Division || 'Unknown';
+                        
+                        if (!grouped[conf]) grouped[conf] = {};
+                        if (!grouped[conf][div]) grouped[conf][div] = [];
+                        
+                        grouped[conf][div].push(team);
+                    });
+                    
+                    // Render grouped standings
+                    html += '<tbody>';
+                    
+                    Object.keys(grouped).sort().forEach(conference => {
+                        Object.keys(grouped[conference]).sort().forEach(division => {
+                            const divisionTeams = grouped[conference][division];
+                            
+                            // Division header
+                            html += `<tr style="background-color: #d1d5db; color: #000;">`;
+                            html += `<td colspan="5" style="padding: 6px 8px; font-weight: bold; font-size: 11px; text-transform: uppercase;">${conference} - ${division}</td>`;
+                            html += '</tr>';
+                            
+                            // Table headers for this division
+                            html += '<tr style="background-color: #374151; font-size: 11px;">';
+                            html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
+                            html += '<th style="padding: 8px; text-align: left;">Team</th>';
+                            html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
+                            html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
+                            html += '<th style="padding: 8px; text-align: center; width: 60px;">PCT</th>';
+                            html += '</tr>';
+                            
+                            // Teams in this division
+                            divisionTeams.forEach((team, index) => {
+                                const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                                const pct = team.Wins && team.Losses !== undefined ? 
+                                    (team.Wins / (team.Wins + (team.Losses || 0) + (team.Ties || 0))).toFixed(3) : '0.000';
+                                
+                                html += `<tr style="${rowStyle}">`;
+                                html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank}</td>`;
+                                html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>`;
+                                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>`;
+                                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses || 0}</td>`;
+                                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${pct}</td>`;
+                                html += '</tr>';
+                            });
+                        });
+                    });
+                    
+                    html += '</tbody>';
                 } else {
-                    // Fallback to simple list for other leagues
+                    // Simple list without grouping
                     html += '<thead><tr style="background-color: #374151; font-size: 11px;">';
                     html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
                     html += '<th style="padding: 8px; text-align: left;">Team</th>';
@@ -5442,7 +5421,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${pct}</td>`;
                         html += '</tr>';
                     });
-                    html += '</tbody></table>';
                 }
             }
             
@@ -5454,364 +5432,6 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error(`Error loading Firestore standings for ${leagueKey}:`, error);
             return false;
         }
-    }
-
-    // NFL Standings: AFC/NFC tabs with divisions
-    function createNFLStandings(teams) {
-        const afcTeams = teams.filter(team => team.Conference === 'AFC');
-        const nfcTeams = teams.filter(team => team.Conference === 'NFC');
-        
-        let html = `
-            <div class="standings-tabs">
-                <button class="tab-button active" onclick="showNFLTab('afc')" id="nfl-afc-tab">AFC</button>
-                <button class="tab-button" onclick="showNFLTab('nfc')" id="nfl-nfc-tab">NFC</button>
-            </div>
-            
-            <div id="nfl-afc-content" class="tab-content active">
-                ${createNFLConferenceStandings(afcTeams, 'AFC')}
-            </div>
-            
-            <div id="nfl-nfc-content" class="tab-content">
-                ${createNFLConferenceStandings(nfcTeams, 'NFC')}
-            </div>
-            
-            <script>
-                function showNFLTab(conference) {
-                    document.getElementById('nfl-afc-content').classList.remove('active');
-                    document.getElementById('nfl-nfc-content').classList.remove('active');
-                    document.getElementById('nfl-afc-tab').classList.remove('active');
-                    document.getElementById('nfl-nfc-tab').classList.remove('active');
-                    
-                    document.getElementById('nfl-' + conference + '-content').classList.add('active');
-                    document.getElementById('nfl-' + conference + '-tab').classList.add('active');
-                }
-            </script>
-        `;
-        
-        return html;
-    }
-    
-    function createNFLConferenceStandings(teams, conference) {
-        const divisions = ['East', 'West', 'North', 'South'];
-        let html = '';
-        
-        divisions.forEach(division => {
-            const divisionTeams = teams.filter(team => team.Division === division);
-            if (divisionTeams.length === 0) return;
-            
-            html += `
-                <div class="division-section">
-                    <h3 class="division-header">${conference} ${division}</h3>
-                    <table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb; margin-bottom: 20px;">
-                        <thead>
-                            <tr style="background-color: #374151; font-size: 11px;">
-                                <th style="padding: 8px; text-align: left; width: 40px;">Team</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">W</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">L</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">T</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            divisionTeams.forEach((team, index) => {
-                const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-                html += `
-                    <tr style="${rowStyle}">
-                        <td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>
-                        <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>
-                        <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses}</td>
-                        <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Ties || 0}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table></div>';
-        });
-        
-        return html;
-    }
-
-    // MLB Standings: AL/NL tabs with divisions
-    function createMLBStandings(teams) {
-        const alTeams = teams.filter(team => team.League === 'AL');
-        const nlTeams = teams.filter(team => team.League === 'NL');
-        
-        let html = `
-            <div class="standings-tabs">
-                <button class="tab-button active" onclick="showMLBTab('al')" id="mlb-al-tab">AL</button>
-                <button class="tab-button" onclick="showMLBTab('nl')" id="mlb-nl-tab">NL</button>
-            </div>
-            
-            <div id="mlb-al-content" class="tab-content active">
-                ${createMLBLeagueStandings(alTeams, 'AL')}
-            </div>
-            
-            <div id="mlb-nl-content" class="tab-content">
-                ${createMLBLeagueStandings(nlTeams, 'NL')}
-            </div>
-            
-            <script>
-                function showMLBTab(league) {
-                    document.getElementById('mlb-al-content').classList.remove('active');
-                    document.getElementById('mlb-nl-content').classList.remove('active');
-                    document.getElementById('mlb-al-tab').classList.remove('active');
-                    document.getElementById('mlb-nl-tab').classList.remove('active');
-                    
-                    document.getElementById('mlb-' + league + '-content').classList.add('active');
-                    document.getElementById('mlb-' + league + '-tab').classList.add('active');
-                }
-            </script>
-        `;
-        
-        return html;
-    }
-    
-    function createMLBLeagueStandings(teams, league) {
-        const divisions = ['East', 'Central', 'West'];
-        let html = '';
-        
-        divisions.forEach(division => {
-            const divisionTeams = teams.filter(team => team.Division === division);
-            if (divisionTeams.length === 0) return;
-            
-            html += `
-                <div class="division-section">
-                    <h3 class="division-header">${league} ${division}</h3>
-                    <table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb; margin-bottom: 20px;">
-                        <thead>
-                            <tr style="background-color: #374151; font-size: 11px;">
-                                <th style="padding: 8px; text-align: left; width: 40px;">Team</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">W</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">L</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            divisionTeams.forEach((team, index) => {
-                const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-                html += `
-                    <tr style="${rowStyle}">
-                        <td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>
-                        <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>
-                        <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table></div>';
-        });
-        
-        return html;
-    }
-
-    // NBA Standings: East/West tabs
-    function createNBAStandings(teams) {
-        const eastTeams = teams.filter(team => team.Conference === 'East');
-        const westTeams = teams.filter(team => team.Conference === 'West');
-        
-        let html = `
-            <div class="standings-tabs">
-                <button class="tab-button active" onclick="showNBATab('east')" id="nba-east-tab">East</button>
-                <button class="tab-button" onclick="showNBATab('west')" id="nba-west-tab">West</button>
-            </div>
-            
-            <div id="nba-east-content" class="tab-content active">
-                ${createNBAConferenceStandings(eastTeams, 'Eastern Conference')}
-            </div>
-            
-            <div id="nba-west-content" class="tab-content">
-                ${createNBAConferenceStandings(westTeams, 'Western Conference')}
-            </div>
-            
-            <script>
-                function showNBATab(conference) {
-                    document.getElementById('nba-east-content').classList.remove('active');
-                    document.getElementById('nba-west-content').classList.remove('active');
-                    document.getElementById('nba-east-tab').classList.remove('active');
-                    document.getElementById('nba-west-tab').classList.remove('active');
-                    
-                    document.getElementById('nba-' + conference + '-content').classList.add('active');
-                    document.getElementById('nba-' + conference + '-tab').classList.add('active');
-                }
-            </script>
-        `;
-        
-        return html;
-    }
-    
-    function createNBAConferenceStandings(teams, conference) {
-        let html = `
-            <div class="conference-section">
-                <table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb;">
-                    <thead>
-                        <tr style="background-color: #374151; font-size: 11px;">
-                            <th style="padding: 8px; text-align: left; width: 40px;">Team</th>
-                            <th style="padding: 8px; text-align: center; width: 40px;">W</th>
-                            <th style="padding: 8px; text-align: center; width: 40px;">L</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-        
-        teams.forEach((team, index) => {
-            const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-            html += `
-                <tr style="${rowStyle}">
-                    <td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>
-                    <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>
-                    <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses}</td>
-                </tr>
-            `;
-        });
-        
-        html += '</tbody></table></div>';
-        return html;
-    }
-
-    // NHL Standings: East/West tabs with divisions
-    function createNHLStandings(teams) {
-        const eastTeams = teams.filter(team => team.Conference === 'East');
-        const westTeams = teams.filter(team => team.Conference === 'West');
-        
-        let html = `
-            <div class="standings-tabs">
-                <button class="tab-button active" onclick="showNHLTab('east')" id="nhl-east-tab">East</button>
-                <button class="tab-button" onclick="showNHLTab('west')" id="nhl-west-tab">West</button>
-            </div>
-            
-            <div id="nhl-east-content" class="tab-content active">
-                ${createNHLConferenceStandings(eastTeams, 'Eastern Conference')}
-            </div>
-            
-            <div id="nhl-west-content" class="tab-content">
-                ${createNHLConferenceStandings(westTeams, 'Western Conference')}
-            </div>
-            
-            <script>
-                function showNHLTab(conference) {
-                    document.getElementById('nhl-east-content').classList.remove('active');
-                    document.getElementById('nhl-west-content').classList.remove('active');
-                    document.getElementById('nhl-east-tab').classList.remove('active');
-                    document.getElementById('nhl-west-tab').classList.remove('active');
-                    
-                    document.getElementById('nhl-' + conference + '-content').classList.add('active');
-                    document.getElementById('nhl-' + conference + '-tab').classList.add('active');
-                }
-            </script>
-        `;
-        
-        return html;
-    }
-    
-    function createNHLConferenceStandings(teams, conference) {
-        const divisions = conference === 'Eastern Conference' ? ['Atlantic', 'Metropolitan'] : ['Central', 'Pacific'];
-        let html = '';
-        
-        divisions.forEach(division => {
-            const divisionTeams = teams.filter(team => team.Division === division);
-            if (divisionTeams.length === 0) return;
-            
-            html += `
-                <div class="division-section">
-                    <h3 class="division-header">${division}</h3>
-                    <table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb; margin-bottom: 20px;">
-                        <thead>
-                            <tr style="background-color: #374151; font-size: 11px;">
-                                <th style="padding: 8px; text-align: left; width: 40px;">Team</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">Pts</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">GP</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">W</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">L</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">OTL</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            divisionTeams.forEach((team, index) => {
-                const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-                html += `
-                    <tr style="${rowStyle}">
-                        <td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>
-                        <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Points}</td>
-                        <td style="padding: 8px; text-align: center; font-size: 12px;">${team.GamesPlayed}</td>
-                        <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>
-                        <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses}</td>
-                        <td style="padding: 8px; text-align: center; font-size: 12px;">${team.OTL || 0}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table></div>';
-        });
-        
-        return html;
-    }
-
-    // WNBA Standings: Conference headers (no tabs)
-    function createWNBAStandings(teams) {
-        const eastTeams = teams.filter(team => team.Conference === 'East');
-        const westTeams = teams.filter(team => team.Conference === 'West');
-        
-        let html = `
-            <div class="wnba-standings">
-                <div class="conference-section">
-                    <h3 class="conference-header">Eastern Conference</h3>
-                    <table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb; margin-bottom: 30px;">
-                        <thead>
-                            <tr style="background-color: #374151; font-size: 11px;">
-                                <th style="padding: 8px; text-align: left; width: 40px;">Team</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">W</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">L</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-        `;
-        
-        eastTeams.forEach((team, index) => {
-            const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-            html += `
-                <tr style="${rowStyle}">
-                    <td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>
-                    <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>
-                    <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses}</td>
-                </tr>
-            `;
-        });
-        
-        html += `
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="conference-section">
-                    <h3 class="conference-header">Western Conference</h3>
-                    <table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb;">
-                        <thead>
-                            <tr style="background-color: #374151; font-size: 11px;">
-                                <th style="padding: 8px; text-align: left; width: 40px;">Team</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">W</th>
-                                <th style="padding: 8px; text-align: center; width: 40px;">L</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-        `;
-        
-        westTeams.forEach((team, index) => {
-            const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-            html += `
-                <tr style="${rowStyle}">
-                    <td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>
-                    <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>
-                    <td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses}</td>
-                </tr>
-            `;
-        });
-        
-        html += '</tbody></table></div></div>';
-        return html;
     }
 
     // REPLACE THE OLD FUNCTION WITH THIS ONE
