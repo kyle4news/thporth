@@ -122,6 +122,58 @@
       font-size: 14px;
       color: black;
     }
+
+    .accomplished-missed {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .accomplished-section, .missed-section {
+      flex: 1;
+    }
+
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .accomplished-section .section-title {
+      color: green;
+    }
+
+    .missed-section .section-title {
+      color: red;
+    }
+
+    .accomplished-list, .missed-list {
+      list-style: none;
+      padding: 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      min-height: 100px;
+      padding: 0.5rem;
+    }
+
+    .accomplished-item {
+      color: green;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .missed-item {
+      color: red;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .accomplished-check, .missed-check {
+      margin-right: 0.5rem;
+      font-size: 1.1rem;
+    }
   </style>
 </head>
 <body>
@@ -141,6 +193,17 @@
   </div>
 
   <ul id="todo-list"></ul>
+
+  <div class="accomplished-missed">
+    <div class="accomplished-section">
+      <div class="section-title">Accomplished</div>
+      <ul id="accomplished-list" class="accomplished-list"></ul>
+    </div>
+    <div class="missed-section">
+      <div class="section-title">Missed Deadline</div>
+      <ul id="missed-list" class="missed-list"></ul>
+    </div>
+  </div>
 
   <script>
     // Global variables
@@ -330,14 +393,21 @@
             localStorage.setItem('timeBack', totalTimeBack.toString());
           }
           
-          // Clear the timer for this task
-          if (deadlineTimers.has(li)) {
-            clearInterval(deadlineTimers.get(li));
-            deadlineTimers.delete(li);
+          // Check if completed before deadline
+          const deadline = li.dataset.deadline;
+          const now = new Date();
+          const [hours, minutes] = deadline.split(':');
+          const deadlineTime = new Date();
+          deadlineTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+          
+          if (now < deadlineTime) {
+            // Completed before deadline - move to accomplished
+            moveToAccomplishedList(li);
+          } else {
+            // Completed after deadline - move to missed
+            moveToMissedList(li);
           }
           
-          li.classList.add('done');
-          todoList.appendChild(li); // Move to bottom
           saveTodos();
         }
       });
@@ -375,8 +445,101 @@
       }
     }
 
+    // Auto-advance time input functionality
+    function setupTimeInputAutoAdvance() {
+      const endTimeInput = document.getElementById('end-time-input');
+      const deadlineInput = document.getElementById('deadline-input');
+      
+      [endTimeInput, deadlineInput].forEach(input => {
+        input.addEventListener('input', function() {
+          const value = this.value;
+          if (value.length === 2 && !value.includes(':')) {
+            // Auto-add colon after 2 digits
+            this.value = value + ':';
+          }
+        });
+        
+        input.addEventListener('keydown', function(e) {
+          const value = this.value;
+          const cursorPos = this.selectionStart;
+          
+          if (e.key >= '0' && e.key <= '9') {
+            // If typing in hour position and hour is 2 digits
+            if (cursorPos === 2 && value.length === 2) {
+              setTimeout(() => {
+                this.value = value + ':';
+                this.setSelectionRange(3, 3);
+              }, 0);
+            }
+          }
+        });
+      });
+    }
+
+    // Check deadlines and move tasks to appropriate sections
+    function checkDeadlines() {
+      const now = new Date();
+      const tasks = Array.from(todoList.children);
+      
+      tasks.forEach(task => {
+        if (task.classList.contains('done')) return; // Skip completed tasks
+        
+        const deadline = task.dataset.deadline;
+        if (!deadline) return;
+        
+        const [hours, minutes] = deadline.split(':');
+        const deadlineTime = new Date();
+        deadlineTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        
+        if (now >= deadlineTime) {
+          // Deadline has passed, move to missed list
+          moveToMissedList(task);
+        }
+      });
+    }
+
+    function moveToAccomplishedList(task) {
+      const text = task.querySelector('.todo-text').textContent;
+      const deadline = task.dataset.deadline;
+      
+      const accomplishedItem = document.createElement('li');
+      accomplishedItem.className = 'accomplished-item';
+      accomplishedItem.innerHTML = `<span class="accomplished-check">✅</span>${text} (${deadline})`;
+      
+      document.getElementById('accomplished-list').appendChild(accomplishedItem);
+      
+      // Remove from main list
+      task.remove();
+      if (deadlineTimers.has(task)) {
+        clearInterval(deadlineTimers.get(task));
+        deadlineTimers.delete(task);
+      }
+    }
+
+    function moveToMissedList(task) {
+      const text = task.querySelector('.todo-text').textContent;
+      const deadline = task.dataset.deadline;
+      
+      const missedItem = document.createElement('li');
+      missedItem.className = 'missed-item';
+      missedItem.innerHTML = `<span class="missed-check">❌</span>${text} (${deadline})`;
+      
+      document.getElementById('missed-list').appendChild(missedItem);
+      
+      // Remove from main list
+      task.remove();
+      if (deadlineTimers.has(task)) {
+        clearInterval(deadlineTimers.get(task));
+        deadlineTimers.delete(task);
+      }
+    }
+
     loadTodos();
     loadEndTime();
+    setupTimeInputAutoAdvance();
+    
+    // Check deadlines every minute
+    setInterval(checkDeadlines, 60000);
   </script>
 
 </body>
