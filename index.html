@@ -5275,11 +5275,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 return true;
             }
             
+            console.log(`Standings for ${firestoreKey}:`, teams.length, 'teams');
+            console.log('Sample team data:', teams[0]);
+            console.log('Has Conference?', teams[0].Conference);
+            console.log('Has Division?', teams[0].Division);
+            
             // Build standings table
             let html = '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb;">';
             
             // Determine if this is a soccer league (uses Points) or US sports (uses Wins/Losses)
             const isSoccerLeague = teams[0].Points !== undefined && teams[0].Points !== 0;
+            
+            console.log('Is soccer league?', isSoccerLeague);
             
             if (isSoccerLeague) {
                 // Soccer standings: Rank, Team, MP, W, D, L, GF-GA, Pts
