@@ -477,9 +477,15 @@
       [endTimeInput, deadlineInput].forEach(input => {
         input.addEventListener('input', function() {
           const value = this.value;
+          const cursorPos = this.selectionStart;
+          
+          // Auto-add colon after 2 digits
           if (value.length === 2 && !value.includes(':')) {
-            // Auto-add colon after 2 digits
             this.value = value + ':';
+            // Move cursor to after the colon
+            setTimeout(() => {
+              this.setSelectionRange(3, 3);
+            }, 0);
           }
           
           // Validate time is in future (only for deadline input)
@@ -494,17 +500,32 @@
           }
         });
         
-        input.addEventListener('keydown', function(e) {
-          const value = this.value;
-          const cursorPos = this.selectionStart;
-          
+        input.addEventListener('keypress', function(e) {
+          // Only handle number keys
           if (e.key >= '0' && e.key <= '9') {
-            // If typing in hour position and hour is 2 digits
-            if (cursorPos === 2 && value.length === 2) {
-              setTimeout(() => {
-                this.value = value + ':';
-                this.setSelectionRange(3, 3);
-              }, 0);
+            const value = this.value;
+            const cursorPos = this.selectionStart;
+            
+            // If at position 2 and no colon yet, add colon first
+            if (cursorPos === 2 && value.length === 2 && !value.includes(':')) {
+              e.preventDefault();
+              this.value = value + ':' + e.key;
+              this.setSelectionRange(4, 4);
+            }
+          }
+        });
+        
+        input.addEventListener('keydown', function(e) {
+          // Handle backspace to remove colon if needed
+          if (e.key === 'Backspace') {
+            const value = this.value;
+            const cursorPos = this.selectionStart;
+            
+            // If cursor is right after colon, remove the colon too
+            if (cursorPos === 3 && value.charAt(2) === ':') {
+              e.preventDefault();
+              this.value = value.substring(0, 2) + value.substring(3);
+              this.setSelectionRange(2, 2);
             }
           }
         });
