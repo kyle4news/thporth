@@ -324,9 +324,18 @@
       const deadline = deadlineInput.value;
       
       if (text !== '' && deadline !== '') {
+        // Check if deadline is in the future
+        if (!isTimeInFuture(deadline)) {
+          alert('Please enter a deadline time that is in the future.');
+          deadlineInput.style.borderColor = 'red';
+          deadlineInput.focus();
+          return;
+        }
+        
         createTodoElement(text, deadline, false, 0);
         todoInput.value = '';
         deadlineInput.value = '';
+        deadlineInput.style.borderColor = ''; // Reset border color
         saveTodos();
       }
     }
@@ -403,7 +412,7 @@
           if (now < deadlineTime) {
             // Completed before deadline - move to accomplished
             moveToAccomplishedList(li);
-          } else {
+        } else {
             // Completed after deadline - move to missed
             moveToMissedList(li);
           }
@@ -445,6 +454,21 @@
       }
     }
 
+    // Check if time is in the future
+    function isTimeInFuture(timeString) {
+      if (!timeString || timeString.length < 5) return true; // Allow incomplete times
+      
+      const now = new Date();
+      const [hours, minutes] = timeString.split(':');
+      
+      if (!hours || !minutes) return true;
+      
+      const inputTime = new Date();
+      inputTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      
+      return inputTime > now;
+    }
+
     // Auto-advance time input functionality
     function setupTimeInputAutoAdvance() {
       const endTimeInput = document.getElementById('end-time-input');
@@ -456,6 +480,17 @@
           if (value.length === 2 && !value.includes(':')) {
             // Auto-add colon after 2 digits
             this.value = value + ':';
+          }
+          
+          // Validate time is in future (only for deadline input)
+          if (input === deadlineInput && value.length === 5) {
+            if (!isTimeInFuture(value)) {
+              this.style.borderColor = 'red';
+              this.title = 'Please enter a time in the future';
+            } else {
+              this.style.borderColor = '';
+              this.title = '';
+            }
           }
         });
         
