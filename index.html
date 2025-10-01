@@ -5329,6 +5329,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // New function to load standings from Firestore (FlashLive API data)
     async function fetchLeagueStandingsFromFirestore(leagueKey) {
+        console.log('fetchLeagueStandingsFromFirestore called with leagueKey:', leagueKey);
         const standingsContent = document.getElementById('league-standings-content');
         if (!standingsContent) return;
         
@@ -5412,7 +5413,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             } else {
                 // US Sports standings: Use specific tabbed layouts for each league
+                console.log('Processing US Sports standings for leagueKey:', leagueKey);
                 if (leagueKey === 'NFL') {
+                    console.log('Calling createNFLStandings with teams:', teams);
                     html = createNFLStandings(teams);
                 } else if (leagueKey === 'MLB') {
                     html = createMLBStandings(teams);
