@@ -5468,6 +5468,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function createNFLStandings(teams) {
         console.log('createNFLStandings received teams:', teams);
         console.log('Sample team:', teams[0]);
+        console.log('All team conferences:', teams.map(t => t.Conference));
         const afcTeams = teams.filter(team => team.Conference === 'AFC');
         const nfcTeams = teams.filter(team => team.Conference === 'NFC');
         console.log('AFC teams:', afcTeams.length);
@@ -5628,8 +5629,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // NHL Standings: East/West tabs with divisions
     function createNHLStandings(teams) {
+        console.log('createNHLStandings received teams:', teams);
+        console.log('Sample NHL team:', teams[0]);
         const eastTeams = teams.filter(team => team.Conference === 'East');
         const westTeams = teams.filter(team => team.Conference === 'West');
+        console.log('East teams:', eastTeams.length);
+        console.log('West teams:', westTeams.length);
         
         let html = '<div class="standings-tabs">';
         html += '<button class="tab-button active" onclick="showNHLTab(\'east\')" id="nhl-east-tab">East</button>';
@@ -5689,8 +5694,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // WNBA Standings: Conference headers (no tabs)
     function createWNBAStandings(teams) {
+        console.log('createWNBAStandings received teams:', teams);
+        console.log('Sample WNBA team:', teams[0]);
         const eastTeams = teams.filter(team => team.Conference === 'East');
         const westTeams = teams.filter(team => team.Conference === 'West');
+        console.log('East teams:', eastTeams.length);
+        console.log('West teams:', westTeams.length);
         
         let html = '<div class="wnba-standings">';
         html += '<div class="conference-section">';
