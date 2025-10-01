@@ -5594,12 +5594,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // NBA Standings: East/West tabs
     function createNBAStandings(teams) {
-        const eastTeams = teams.filter(team => team.Conference === 'East');
-        const westTeams = teams.filter(team => team.Conference === 'West');
+        const eastTeams = teams.filter(team => team.Conference === 'Eastern Conference');
+        const westTeams = teams.filter(team => team.Conference === 'Western Conference');
         
         let html = '<div class="standings-tabs">';
-        html += '<button class="tab-button active" onclick="showNBATab(\'east\')" id="nba-east-tab">East</button>';
-        html += '<button class="tab-button" onclick="showNBATab(\'west\')" id="nba-west-tab">West</button>';
+        html += '<button class="tab-button active" onclick="showNBATab(\'east\')" id="nba-east-tab">Eastern Conference</button>';
+        html += '<button class="tab-button" onclick="showNBATab(\'west\')" id="nba-west-tab">Western Conference</button>';
         html += '</div>';
         html += '<div id="nba-east-content" class="tab-content active">';
         html += createNBAConferenceStandings(eastTeams, 'Eastern Conference');
@@ -5607,7 +5607,6 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '<div id="nba-west-content" class="tab-content">';
         html += createNBAConferenceStandings(westTeams, 'Western Conference');
         html += '</div>';
-        // JavaScript functions will be defined elsewhere
         
         return html;
     }
@@ -5639,16 +5638,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // NHL Standings: East/West tabs with divisions
     function createNHLStandings(teams) {
-        console.log('createNHLStandings received teams:', teams);
-        console.log('Sample NHL team:', teams[0]);
-        const eastTeams = teams.filter(team => team.Conference === 'East');
-        const westTeams = teams.filter(team => team.Conference === 'West');
-        console.log('East teams:', eastTeams.length);
-        console.log('West teams:', westTeams.length);
+        const eastTeams = teams.filter(team => team.Conference === 'Eastern Conference');
+        const westTeams = teams.filter(team => team.Conference === 'Western Conference');
         
         let html = '<div class="standings-tabs">';
-        html += '<button class="tab-button active" onclick="showNHLTab(\'east\')" id="nhl-east-tab">East</button>';
-        html += '<button class="tab-button" onclick="showNHLTab(\'west\')" id="nhl-west-tab">West</button>';
+        html += '<button class="tab-button active" onclick="showNHLTab(\'east\')" id="nhl-east-tab">Eastern Conference</button>';
+        html += '<button class="tab-button" onclick="showNHLTab(\'west\')" id="nhl-west-tab">Western Conference</button>';
         html += '</div>';
         html += '<div id="nhl-east-content" class="tab-content active">';
         html += createNHLConferenceStandings(eastTeams, 'Eastern Conference');
@@ -5656,13 +5651,12 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '<div id="nhl-west-content" class="tab-content">';
         html += createNHLConferenceStandings(westTeams, 'Western Conference');
         html += '</div>';
-        // JavaScript functions will be defined elsewhere
         
         return html;
     }
     
     function createNHLConferenceStandings(teams, conference) {
-        const divisions = conference === 'Eastern Conference' ? ['Atlantic', 'Metropolitan'] : ['Central', 'Pacific'];
+        const divisions = conference === 'Eastern Conference' ? ['Atlantic Division', 'Metropolitan Division'] : ['Central Division', 'Pacific Division'];
         let html = '';
         
         divisions.forEach(division => {
@@ -5706,8 +5700,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function createWNBAStandings(teams) {
         console.log('createWNBAStandings received teams:', teams);
         console.log('Sample WNBA team:', teams[0]);
-        const eastTeams = teams.filter(team => team.Conference === 'East');
-        const westTeams = teams.filter(team => team.Conference === 'West');
+        const eastTeams = teams.filter(team => team.Conference === 'Eastern Conference');
+        const westTeams = teams.filter(team => team.Conference === 'Western Conference');
         console.log('East teams:', eastTeams.length);
         console.log('West teams:', westTeams.length);
         
