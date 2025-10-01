@@ -8857,6 +8857,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Standings tab functions
 function showNFLTab(conference) {
+    console.log('showNFLTab called with conference:', conference);
     document.getElementById('nfl-afc-content').classList.remove('active');
     document.getElementById('nfl-nfc-content').classList.remove('active');
     document.getElementById('nfl-afc-tab').classList.remove('active');
@@ -8864,6 +8865,7 @@ function showNFLTab(conference) {
     
     document.getElementById('nfl-' + conference + '-content').classList.add('active');
     document.getElementById('nfl-' + conference + '-tab').classList.add('active');
+    console.log('Tab switching completed');
 }
 
 function showMLBTab(league) {
