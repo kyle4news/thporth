@@ -5234,8 +5234,108 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    // New function to load standings from Firestore (FlashLive API data)
+    async function fetchLeagueStandingsFromFirestore(leagueKey) {
+        const standingsContent = document.getElementById('league-standings-content');
+        if (!standingsContent) return;
+        
+        standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
+        
+        try {
+            const standingsDoc = await db.collection('standings').doc(leagueKey).get();
+            
+            if (!standingsDoc.exists) {
+                // Fallback to CSV if no Firestore data
+                return false;
+            }
+            
+            const standingsData = standingsDoc.data();
+            const teams = standingsData.data || [];
+            
+            if (teams.length === 0) {
+                standingsContent.innerHTML = '<p>No standings data available.</p>';
+                return true;
+            }
+            
+            // Build standings table
+            let html = '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb;">';
+            
+            // Determine if this is a soccer league (uses Points) or US sports (uses Wins/Losses)
+            const isSoccerLeague = teams[0].Points !== undefined && teams[0].Points !== 0;
+            
+            if (isSoccerLeague) {
+                // Soccer standings: Rank, Team, MP, W, D, L, GF-GA, Pts
+                html += '<thead><tr style="background-color: #374151; font-size: 11px;">';
+                html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
+                html += '<th style="padding: 8px; text-align: left;">Team</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 40px;">MP</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 40px;">D</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 70px;">GF-GA</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 50px;">Pts</th>';
+                html += '</tr></thead><tbody>';
+                
+                teams.forEach((team, index) => {
+                    const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                    html += `<tr style="${rowStyle}">`;
+                    html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank}</td>`;
+                    html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>`;
+                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.MatchesPlayed}</td>`;
+                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>`;
+                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Draws || 0}</td>`;
+                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses || 0}</td>`;
+                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Goals}</td>`;
+                    html += `<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">${Math.round(team.Points)}</td>`;
+                    html += '</tr>';
+                });
+            } else {
+                // US Sports standings: Rank, Team, W, L, PCT
+                html += '<thead><tr style="background-color: #374151; font-size: 11px;">';
+                html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
+                html += '<th style="padding: 8px; text-align: left;">Team</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 60px;">PCT</th>';
+                html += '</tr></thead><tbody>';
+                
+                teams.forEach((team, index) => {
+                    const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                    const pct = team.Wins && team.Losses !== undefined ? 
+                        (team.Wins / (team.Wins + team.Losses)).toFixed(3) : '0.000';
+                    
+                    html += `<tr style="${rowStyle}">`;
+                    html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank}</td>`;
+                    html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>`;
+                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>`;
+                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses || 0}</td>`;
+                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${pct}</td>`;
+                    html += '</tr>';
+                });
+            }
+            
+            html += '</tbody></table>';
+            standingsContent.innerHTML = html;
+            return true;
+            
+        } catch (error) {
+            console.error(`Error loading Firestore standings for ${leagueKey}:`, error);
+            return false;
+        }
+    }
+
     // REPLACE THE OLD FUNCTION WITH THIS ONE
     async function fetchLeagueStandings(url, leagueKey) {
+        const standingsContent = document.getElementById('league-standings-content');
+        if (!standingsContent) return;
+        
+        // First try to load from Firestore (FlashLive API data)
+        const loadedFromFirestore = await fetchLeagueStandingsFromFirestore(leagueKey);
+        if (loadedFromFirestore) {
+            return; // Successfully loaded from Firestore
+        }
+        
+        // Fallback to CSV if not in Firestore
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         try {
             if (!url || !url.startsWith('http')) {
