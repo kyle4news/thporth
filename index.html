@@ -5469,10 +5469,13 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('createNFLStandings received teams:', teams);
         console.log('Sample team:', teams[0]);
         console.log('All team conferences:', teams.map(t => t.Conference));
+        console.log('Sample team properties:', Object.keys(teams[0] || {}));
+        console.log('Sample team values:', teams[0]);
         const afcTeams = teams.filter(team => team.Conference === 'AFC');
         const nfcTeams = teams.filter(team => team.Conference === 'NFC');
         console.log('AFC teams:', afcTeams.length);
         console.log('NFC teams:', nfcTeams.length);
+        console.log('AFC sample team:', afcTeams[0]);
         
         let html = '<div class="standings-tabs">';
         html += '<button class="tab-button active" onclick="showNFLTab(\'afc\')" id="nfl-afc-tab">AFC</button>';
@@ -5494,8 +5497,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const divisions = ['East', 'West', 'North', 'South'];
         let html = '';
         
+        console.log('createNFLConferenceStandings called with teams:', teams.length, 'conference:', conference);
+        console.log('Sample team division:', teams[0]?.Division);
+        
         divisions.forEach(division => {
-            const divisionTeams = teams.filter(team => team.Division === division);
+            const divisionTeams = teams.filter(team => team.Division === conference + ' ' + division);
+            console.log(conference + ' ' + division + ' teams:', divisionTeams.length);
+            console.log('All divisions in this conference:', teams.map(t => t.Division));
+            console.log('Sample division team:', divisionTeams[0]);
             if (divisionTeams.length === 0) return;
             
             html += '<div class="division-section">';
@@ -5512,6 +5521,7 @@ document.addEventListener('DOMContentLoaded', function () {
             html += '<tbody>';
             
             divisionTeams.forEach((team, index) => {
+                console.log('Processing team:', team.Team, 'Wins:', team.Wins, 'Losses:', team.Losses, 'Ties:', team.Ties);
                 const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                 html += '<tr style="' + rowStyle + '">';
                 html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
