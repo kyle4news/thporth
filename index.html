@@ -5453,7 +5453,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             html += '</table>';
+            console.log('Final HTML being inserted:', html);
             standingsContent.innerHTML = html;
+            console.log('Content inserted into DOM. Element content:', standingsContent.innerHTML.substring(0, 200) + '...');
             return true;
             
         } catch (error) {
@@ -5483,6 +5485,7 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '</div>';
         // JavaScript functions will be defined elsewhere
         
+        console.log('Generated NFL HTML:', html);
         return html;
     }
     
