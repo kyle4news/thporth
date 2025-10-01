@@ -4134,7 +4134,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'WORLD: LPGA TOUR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "MLB", "NHL", "Premier League", "NCAAF", "UEFA Champions League", "ATP", "WTA", "MLS", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "UEFA Europa League", "UEFA Conference League", "EFL Cup", "Leagues Cup", "NWSL", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera División", "Liga Portugal", "Brasileirão", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "FIFA U-20 World Cup", "NHL Preseason", "Women's Super League", "Club Friendly"]; 
+    const LEAGUE_DISPLAY_ORDER = ["NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "MLB", "NHL", "Premier League", "NCAAF", "UEFA Champions League", "ATP", "WTA", "MLS", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "UEFA Europa League", "UEFA Conference League", "Campeones Cup", "EFL Cup", "Leagues Cup", "NWSL", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera División", "Liga Portugal", "Brasileirão", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "FIFA U-20 World Cup", "NHL Preseason", "Women's Super League", "Club Friendly"]; 
 
     // --- 2. FIREBASE INITIALIZATION (SINGLETON) + CACHING ---
     if (!firebase.apps.length) {
@@ -4315,7 +4315,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- 5. HELPER FUNCTIONS ---
     function getLeagueDisplayName(name) {
-        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup","England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA Women's Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera División", "Argentina: Torneo Betano - Apertura": "Argentine Primera División", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership", "World: World Cup U20": "FIFA U-20 World Cup" };
+        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup","England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA Women's Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera División", "Argentina: Torneo Betano - Apertura": "Argentine Primera División", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership", "World: World Cup U20": "FIFA U-20 World Cup", "North & Central America: Campeones Cup": "Campeones Cup" };
         return map[name] || name;
     }
 
@@ -5051,6 +5051,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
+                } else if (leagueNameKey === "Campeones Cup") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://github.com/kyle4news/thporth/blob/main/CampeonesCup.png?raw=true";
+                    logo.alt = "Campeones Cup Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    title.appendChild(logo);
                 }
                 
                 const textNode = document.createTextNode(leagueNameKey);
@@ -5114,7 +5127,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Check if this is a soccer league - soccer leagues show home on top, away on bottom
                 const displayLeague = getLeagueDisplayName(data.League);
-                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup'].includes(displayLeague);
+                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup'].includes(displayLeague);
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
@@ -5807,7 +5820,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const soccerGames = allGames.filter(game => {
                     const displayLeague = getLeagueDisplayName(game.League);
                     // Check if it's a soccer league
-                    return ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup'].includes(displayLeague);
+                    return ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup'].includes(displayLeague);
                 });
                 
                 if (soccerGames.length === 0) {
