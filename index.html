@@ -5241,8 +5241,26 @@ document.addEventListener('DOMContentLoaded', function () {
         
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         
+        // Map league keys to Firestore document names
+        const firestoreKeyMap = {
+            'PremierLeague': 'Premier League',
+            'LaLiga': 'LaLiga',
+            'SerieA': 'Serie A',
+            'Bundesliga': 'Bundesliga',
+            'Ligue1': 'Ligue 1',
+            'MLS': 'MLS',
+            'NFL': 'NFL',
+            'MLB': 'MLB',
+            'NBA': 'NBA',
+            'NHL': 'NHL',
+            'WNBA': 'WNBA'
+        };
+        
+        const firestoreKey = firestoreKeyMap[leagueKey] || leagueKey;
+        console.log(`Looking for standings in Firestore: ${firestoreKey} (from leagueKey: ${leagueKey})`);
+        
         try {
-            const standingsDoc = await db.collection('standings').doc(leagueKey).get();
+            const standingsDoc = await db.collection('standings').doc(firestoreKey).get();
             
             if (!standingsDoc.exists) {
                 // Fallback to CSV if no Firestore data
@@ -5482,7 +5500,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
-
+    
     // START OF CORRECTED SECTION
     window.loadLeagueSpecificData = function(leagueKey) {
         const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
@@ -5653,19 +5671,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
                 const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
                 if (todayScheduleTab) {
-                    todayScheduleTab.classList.add('active');
+            todayScheduleTab.classList.add('active');
                     todayScheduleTab.style.backgroundColor = '#2a2a2a';
                     todayScheduleTab.style.color = '#fff';
                     todayScheduleTab.style.borderBottom = '2px solid #fff';
                 }
                 if (upcomingScheduleTab) {
-                    upcomingScheduleTab.classList.remove('active');
+            upcomingScheduleTab.classList.remove('active');
                     upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
                     upcomingScheduleTab.style.color = '#ccc';
                     upcomingScheduleTab.style.borderBottom = 'none';
                 }
-                document.getElementById('league-schedule-today-content').style.display = 'block';
-                document.getElementById('league-schedule-upcoming-content').style.display = 'none';
+            document.getElementById('league-schedule-today-content').style.display = 'block';
+            document.getElementById('league-schedule-upcoming-content').style.display = 'none';
                 
                 const sortedGames = gamesData.sort(sortGames);
                 renderGames(todayScheduleContent, sortedGames, false);
@@ -5678,8 +5696,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Load UPCOMING schedule
         loadUpcomingSchedule(leagueKey);
         
-        // Reusing the standings fetcher
-        fetchLeagueStandings(leagueInfo.standingsUrl);
+        // Reusing the standings fetcher - pass leagueKey for Firestore lookup
+        fetchLeagueStandings(leagueInfo.standingsUrl, leagueKey);
         
     };
 
