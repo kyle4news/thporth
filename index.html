@@ -5361,7 +5361,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             const standingsData = standingsDoc.data();
+            console.log('Raw Firestore data:', standingsData);
             const teams = standingsData.data || [];
+            console.log('Teams array:', teams);
             
             if (teams.length === 0) {
                 standingsContent.innerHTML = '<p>No standings data available.</p>';
@@ -5372,6 +5374,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Sample team data:', teams[0]);
             console.log('Has Conference?', teams[0].Conference);
             console.log('Has Division?', teams[0].Division);
+            console.log('All teams:', teams);
             
             // Build standings table
             let html = '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb;">';
@@ -5458,8 +5461,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // NFL Standings: AFC/NFC tabs with divisions
     function createNFLStandings(teams) {
+        console.log('createNFLStandings received teams:', teams);
+        console.log('Sample team:', teams[0]);
         const afcTeams = teams.filter(team => team.Conference === 'AFC');
         const nfcTeams = teams.filter(team => team.Conference === 'NFC');
+        console.log('AFC teams:', afcTeams.length);
+        console.log('NFC teams:', nfcTeams.length);
         
         let html = '<div class="standings-tabs">';
         html += '<button class="tab-button active" onclick="showNFLTab(\'afc\')" id="nfl-afc-tab">AFC</button>';
