@@ -5064,6 +5064,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
+                } else if (leagueNameKey === "FIFA U-20 World Cup") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/4/43/2025_FIFA_U-20_World_Cup_logo.svg/315px-2025_FIFA_U-20_World_Cup_logo.svg.png";
+                    logo.alt = "FIFA U-20 World Cup Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    title.appendChild(logo);
                 }
                 
                 const textNode = document.createTextNode(leagueNameKey);
