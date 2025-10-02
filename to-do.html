@@ -176,34 +176,123 @@
       margin-right: 0.5rem;
       font-size: 1.1rem;
     }
+
+    /* Persistent List Styles */
+    .main-container {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
+    .daily-section {
+      flex: 1;
+    }
+
+    .persistent-section {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .persistent-section h2 {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    .persistent-input-section {
+      margin-bottom: 1rem;
+    }
+
+    .persistent-input-section input[type="text"] {
+      width: 200px;
+      margin-right: 0.5rem;
+    }
+
+    .persistent-list {
+      list-style: none;
+      padding: 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      min-height: 200px;
+      padding: 0.5rem;
+    }
+
+    .persistent-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      padding: 0.25rem;
+    }
+
+    .persistent-item.done .persistent-text {
+      color: gray;
+      text-decoration: line-through;
+    }
+
+    .persistent-text {
+      margin-left: 0.5rem;
+      flex-grow: 1;
+    }
+
+    .persistent-checkbox {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid black;
+      border-radius: 2px;
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .persistent-checkbox:checked::after {
+      content: "✔";
+      position: absolute;
+      top: -2px;
+      left: 2px;
+      font-size: 14px;
+      color: black;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Today's To-Do List</h1>
-  <div id="countdown-section">
-    <input type="text" id="end-time-input" class="time-input" placeholder="HH:MM" maxlength="5" />
-    <button onclick="setEndTime()">Set End Time</button>
-  </div>
-  <div id="countdown">Time left today: --:--:--</div>
-  <div id="time-back">Time you get back: 0 minutes</div>
+  <div class="main-container">
+    <div class="daily-section">
+      <h1>Today's To-Do List</h1>
+      <div id="countdown-section">
+        <input type="text" id="end-time-input" class="time-input" placeholder="HH:MM" maxlength="5" />
+        <button onclick="setEndTime()">Set End Time</button>
+      </div>
+      <div id="countdown">Time left today: --:--:--</div>
+      <div id="time-back">Time you get back: 0 minutes</div>
 
-  <div id="input-section">
-    <input type="text" id="todo-input" placeholder="Add a new task..." />
-    <input type="text" id="deadline-input" class="time-input" placeholder="HH:MM" maxlength="5" />
-    <button onclick="addTodo()">Add</button>
-  </div>
+      <div id="input-section">
+        <input type="text" id="todo-input" placeholder="Add a new task..." />
+        <input type="text" id="deadline-input" class="time-input" placeholder="HH:MM" maxlength="5" />
+        <button onclick="addTodo()">Add</button>
+      </div>
 
-  <ul id="todo-list"></ul>
+      <ul id="todo-list"></ul>
 
-  <div class="accomplished-missed">
-    <div class="accomplished-section">
-      <div class="section-title">Accomplished</div>
-      <ul id="accomplished-list" class="accomplished-list"></ul>
+      <div class="accomplished-missed">
+        <div class="accomplished-section">
+          <div class="section-title">Accomplished</div>
+          <ul id="accomplished-list" class="accomplished-list"></ul>
+        </div>
+        <div class="missed-section">
+          <div class="section-title">Missed Deadline</div>
+          <ul id="missed-list" class="missed-list"></ul>
+        </div>
+      </div>
     </div>
-    <div class="missed-section">
-      <div class="section-title">Missed Deadline</div>
-      <ul id="missed-list" class="missed-list"></ul>
+
+    <div class="persistent-section">
+      <h2>My Tasks</h2>
+      <div class="persistent-input-section">
+        <input type="text" id="persistent-input" placeholder="Add a task..." />
+        <button onclick="addPersistentTask()">Add</button>
+      </div>
+      <ul id="persistent-list" class="persistent-list"></ul>
     </div>
   </div>
 
@@ -596,8 +685,88 @@
       }
     }
 
+    // Persistent List functionality
+    const persistentList = document.getElementById('persistent-list');
+    const persistentInput = document.getElementById('persistent-input');
+
+    function loadPersistentTasks() {
+      const saved = JSON.parse(localStorage.getItem('persistentTasks')) || [];
+      saved.forEach(task => {
+        createPersistentTaskElement(task.text, task.done);
+      });
+    }
+
+    function savePersistentTasks() {
+      const items = Array.from(persistentList.children).map(li => ({
+        text: li.querySelector('.persistent-text').textContent,
+        done: li.classList.contains('done')
+      }));
+      localStorage.setItem('persistentTasks', JSON.stringify(items));
+    }
+
+    function addPersistentTask() {
+      const text = persistentInput.value.trim();
+      if (text !== '') {
+        createPersistentTaskElement(text, false);
+        persistentInput.value = '';
+        savePersistentTasks();
+      }
+    }
+
+    function createPersistentTaskElement(text, done) {
+      const li = document.createElement('li');
+      li.className = 'persistent-item';
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'persistent-checkbox';
+      
+      const span = document.createElement('span');
+      span.className = 'persistent-text';
+      span.textContent = text;
+      
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          li.classList.add('done');
+          // Move to accomplished section
+          movePersistentToAccomplished(li, text);
+        } else {
+          li.classList.remove('done');
+        }
+        savePersistentTasks();
+      });
+      
+      if (done) {
+        li.classList.add('done');
+        checkbox.checked = true;
+      }
+      
+      li.appendChild(checkbox);
+      li.appendChild(span);
+      persistentList.appendChild(li);
+    }
+
+    function movePersistentToAccomplished(li, text) {
+      const accomplishedItem = document.createElement('li');
+      accomplishedItem.className = 'accomplished-item';
+      accomplishedItem.innerHTML = `<span class="accomplished-check">✅</span>${text}`;
+      
+      document.getElementById('accomplished-list').appendChild(accomplishedItem);
+      
+      // Remove from persistent list
+      li.remove();
+    }
+
+    // Allow Enter key to add persistent tasks
+    persistentInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        addPersistentTask();
+      }
+    });
+
     loadTodos();
     loadEndTime();
+    loadPersistentTasks();
     setupTimeInputAutoAdvance();
     
     // Check deadlines every minute
