@@ -1699,33 +1699,37 @@ div[id^="breaking-content-"] a:hover {
   cursor: pointer;
 }
 
-/* Standings Tabs Styling */
+/* Standings Tabs Styling - Updated to match site design */
 .standings-tabs {
     display: flex;
     margin-bottom: 20px;
-    border-bottom: 1px solid #374151;
+    background-color: #2a2a2a;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 .tab-button {
-    background: none;
+    background: #2a2a2a;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 24px;
     color: #9ca3af;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
-    border-bottom: 2px solid transparent;
+    font-weight: 600;
     transition: all 0.2s ease;
+    flex: 1;
+    text-align: center;
 }
 
 .tab-button:hover {
-    color: #e5e7eb;
+    color: #ffffff;
     background-color: #374151;
 }
 
 .tab-button.active {
-    color: #ffffff;
-    border-bottom-color: #3b82f6;
+    background-color: #ffffff;
+    color: #000000;
+    font-weight: 700;
 }
 
 .tab-content {
@@ -1737,29 +1741,29 @@ div[id^="breaking-content-"] a:hover {
 }
 
 .division-section {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .division-header {
-    color: #e5e7eb;
+    color: #ffffff;
     font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 10px;
+    font-weight: 700;
+    margin-bottom: 8px;
     padding: 8px 0;
-    border-bottom: 1px solid #374151;
+    border-bottom: 1px solid #4a4a4a;
 }
 
 .conference-header {
-    color: #e5e7eb;
+    color: #ffffff;
     font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
     padding: 10px 0;
-    border-bottom: 2px solid #3b82f6;
+    border-bottom: 1px solid #4a4a4a;
 }
 
 .conference-section {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .wnba-standings .conference-section:last-child {
@@ -2221,7 +2225,7 @@ div[id^="breaking-content-"] a:hover {
     </div>
     </div>
 
-  <div id="f1-column-content" style="display: none; height: 100%; flex-direction: column; background-color: #1f1f1f; color: #e5e7eb;">
+  <div id="f1-column-content" style="display: none; height: 100%; flex-direction: column; background-color: #1f1f1f; color: #ffffff;">
       
       <div style="padding: 0.5rem; border-bottom: 0px; background-color: #3c3c3c;">
           <h2 style="font-size: 12px; font-weight: normal; color: #fff;">Schedule</h2>
@@ -2283,7 +2287,7 @@ div[id^="breaking-content-"] a:hover {
 
 
 <!-- ─── LEAGUE-SPECIFIC COLUMN (New, Initially Hidden) ────────────────────────── -->
-<div class="column" id="league-specific-column" style="display: none; flex: 0 0 250px; background-color: #1f1f1f; color: #e5e7eb; padding: 0;">
+<div class="column" id="league-specific-column" style="display: none; flex: 0 0 250px; background-color: #1f1f1f; color: #ffffff; padding: 0;">
     <!-- Header will be dynamically set -->
     <div id="league-specific-header" style="position: sticky; top: 0; width: 100%; height: 18px; background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif; font-size: 10px; display: flex; align-items: center; padding-left: 10px; z-index: 11; border-bottom: 1px solid #1f1f1f; font-weight: bold;">
         League Info
@@ -5430,7 +5434,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('All teams:', teams);
             
             // Build standings table
-            let html = '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb;">';
+            let html = '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
             
             // Determine if this is a soccer league (uses Points) or US sports (uses Wins/Losses)
             const isSoccerLeague = teams[0].Points !== undefined && teams[0].Points !== 0;
@@ -5439,7 +5443,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (isSoccerLeague) {
                 // Soccer standings: Rank, Team, MP, W, D, L, GF-GA, Pts
-                html += '<thead><tr style="background-color: #374151; font-size: 11px;">';
+                html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
                 html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
                 html += '<th style="padding: 8px; text-align: left;">Team</th>';
                 html += '<th style="padding: 8px; text-align: center; width: 40px;">MP</th>';
@@ -5479,7 +5483,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     html = createWNBAStandings(teams);
                 } else {
                     // Fallback to simple list for other leagues
-                    html += '<thead><tr style="background-color: #374151; font-size: 11px;">';
+                    html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
                     html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
                     html += '<th style="padding: 8px; text-align: left;">Team</th>';
                     html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
@@ -5561,13 +5565,13 @@ document.addEventListener('DOMContentLoaded', function () {
             
             html += '<div class="division-section">';
             html += '<h3 class="division-header">' + conference + ' ' + division + '</h3>';
-            html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb; margin-bottom: 20px;">';
+            html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; margin-bottom: 15px;">';
             html += '<thead>';
-            html += '<tr style="background-color: #374151; font-size: 11px;">';
-            html += '<th style="padding: 8px; text-align: left; width: 40px;">Team</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 40px;">T</th>';
+            html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
+            html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
+            html += '<th style="padding: 8px; text-align: center; border-bottom: 1px solid #666;">W</th>';
+            html += '<th style="padding: 8px; text-align: center; border-bottom: 1px solid #666;">L</th>';
+            html += '<th style="padding: 8px; text-align: center; border-bottom: 1px solid #666;">T</th>';
             html += '</tr>';
             html += '</thead>';
             html += '<tbody>';
@@ -5576,10 +5580,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('Processing team:', team.Team, 'Wins:', team.Wins, 'Losses:', team.Losses, 'Ties:', team.Ties);
                 const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                 html += '<tr style="' + rowStyle + '">';
-                html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.Ties || 0) + '</td>';
+                html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + team.Team + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Wins + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Losses + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + (team.Ties || 0) + '</td>';
                 html += '</tr>';
             });
             
@@ -5619,12 +5623,12 @@ document.addEventListener('DOMContentLoaded', function () {
             
             html += '<div class="division-section">';
             html += '<h3 class="division-header">' + league + ' ' + division + '</h3>';
-            html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb; margin-bottom: 20px;">';
+            html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; margin-bottom: 20px;">';
             html += '<thead>';
-            html += '<tr style="background-color: #374151; font-size: 11px;">';
-            html += '<th style="padding: 8px; text-align: left; width: 40px;">Team</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
+            html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
+            html += '<th style="padding: 8px; text-align: left; width: 40px; border-bottom: 1px solid #666;">Team</th>';
+            html += '<th style="padding: 8px; text-align: center; width: 40px; border-bottom: 1px solid #666;">W</th>';
+            html += '<th style="padding: 8px; text-align: center; width: 40px; border-bottom: 1px solid #666;">L</th>';
             html += '</tr>';
             html += '</thead>';
             html += '<tbody>';
@@ -5632,9 +5636,9 @@ document.addEventListener('DOMContentLoaded', function () {
             divisionTeams.forEach((team, index) => {
                 const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                 html += '<tr style="' + rowStyle + '">';
-                html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
+                html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + team.Team + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Wins + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Losses + '</td>';
                 html += '</tr>';
             });
             
@@ -5665,9 +5669,9 @@ document.addEventListener('DOMContentLoaded', function () {
     
     function createNBAConferenceStandings(teams, conference) {
         let html = '<div class="conference-section">';
-        html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb;">';
+        html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
         html += '<thead>';
-        html += '<tr style="background-color: #374151; font-size: 11px;">';
+        html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
         html += '<th style="padding: 8px; text-align: left; width: 40px;">Team</th>';
         html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
         html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
@@ -5717,9 +5721,9 @@ document.addEventListener('DOMContentLoaded', function () {
             
             html += '<div class="division-section">';
             html += '<h3 class="division-header">' + division + '</h3>';
-            html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb; margin-bottom: 20px;">';
+            html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; margin-bottom: 20px;">';
             html += '<thead>';
-            html += '<tr style="background-color: #374151; font-size: 11px;">';
+            html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
             html += '<th style="padding: 8px; text-align: left; width: 40px;">Team</th>';
             html += '<th style="padding: 8px; text-align: center; width: 40px;">Pts</th>';
             html += '<th style="padding: 8px; text-align: center; width: 40px;">GP</th>';
@@ -5760,9 +5764,9 @@ document.addEventListener('DOMContentLoaded', function () {
         let html = '<div class="wnba-standings">';
         html += '<div class="conference-section">';
         html += '<h3 class="conference-header">Eastern Conference</h3>';
-        html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb; margin-bottom: 30px;">';
+        html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; margin-bottom: 30px;">';
         html += '<thead>';
-        html += '<tr style="background-color: #374151; font-size: 11px;">';
+        html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
         html += '<th style="padding: 8px; text-align: left; width: 40px;">Team</th>';
         html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
         html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
@@ -5784,9 +5788,9 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '</div>';
         html += '<div class="conference-section">';
         html += '<h3 class="conference-header">Western Conference</h3>';
-        html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #e5e7eb;">';
+        html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
         html += '<thead>';
-        html += '<tr style="background-color: #374151; font-size: 11px;">';
+        html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
         html += '<th style="padding: 8px; text-align: left; width: 40px;">Team</th>';
         html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
         html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
