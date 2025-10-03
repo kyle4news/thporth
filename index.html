@@ -4539,10 +4539,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Check for partial matches
+        // Check for partial matches (but avoid overlaps like NBA vs WNBA)
         for (const [leagueKey, patterns] of Object.entries(leagueMatches)) {
             for (const pattern of patterns) {
-                if (databaseLeagueName.includes(pattern)) {
+                // More specific matching to avoid NBA vs WNBA overlap
+                if (pattern === 'NBA' && databaseLeagueName === 'USA: NBA') {
+                    return leagueKey;
+                } else if (pattern === 'WNBA' && databaseLeagueName === 'USA: WNBA') {
+                    return leagueKey;
+                } else if (pattern !== 'NBA' && pattern !== 'WNBA' && databaseLeagueName.includes(pattern)) {
                     return leagueKey;
                 }
             }
