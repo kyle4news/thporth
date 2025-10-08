@@ -8815,6 +8815,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function showMobileColumn(columnType) {
         try {
             
+            // Scroll to top when switching columns on mobile
+            window.scrollTo(0, 0);
+            
             // Hide all columns
             document.querySelectorAll('.column').forEach(col => {
                 col.classList.remove('mobile-active');
@@ -8906,6 +8909,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectMobileLeague(section, displayName) {
         try {
             currentMobileLeague = section;
+            
+            // Scroll to top when switching leagues on mobile
+            window.scrollTo(0, 0);
             
             // Update league button text
             if (mobileLeagueBtn) {
