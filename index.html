@@ -3457,6 +3457,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     return;
                 }
                 e.stopPropagation();
+                
+                // Scroll to top when navigating to a new page
+                window.scrollTo(0, 0);
+                
                 if (item.dataset.section) {
                     selectedSection = item.dataset.section;
                 }
@@ -4836,6 +4840,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://www.flashscore.com/res/image/data/QPJ3alWI-pS3BMXxt.png";
                     logo.alt = "MLB Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    title.appendChild(logo);
+                } else if (leagueNameKey === "MLS") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/82tQHwgU-r9l5Je0r.png";
+                    logo.alt = "MLS Logo";
                     logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
