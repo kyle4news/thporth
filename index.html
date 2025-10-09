@@ -1541,6 +1541,23 @@ div[id^="breaking-content-"] a:hover {
     padding-bottom: 80px !important;
   }
   
+  /* Add bottom padding to all content columns to prevent toolbar overlap */
+  .column {
+    padding-bottom: 60px !important;
+  }
+  
+  /* Ensure content areas have proper spacing */
+  .column .content-section,
+  .column .news-main-container,
+  .column .news-section,
+  .column .news-feed-content,
+  .column .schedule-content,
+  .column .standings-content,
+  .column .social-feed-container,
+  .column .videos-container {
+    padding-bottom: 60px !important;
+  }
+  
   /* Mobile News Section Height Allocation */
   .column.news .news-main-container {
     height: 100% !important;
