@@ -5343,16 +5343,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const displayLeague = getLeagueDisplayName(data.League);
                 const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup', 'USL Championship', 'UEFA W Champions League'].includes(displayLeague);
                 
-                const channelDisplay = data.channel ? `<td rowspan="2" style="width: 50px; text-align: right; font-size: 10px; color: #9ca3af; vertical-align: top; padding-right: 5px;">${data.channel}</td>` : '<td rowspan="2" style="width: 50px;"></td>';
+                const channelDisplay = data.channel ? `<td rowspan="2" style="width: 60px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: top; padding-right: 8px;">${data.channel}</td>` : '<td rowspan="2" style="width: 60px; padding-right: 8px;"></td>';
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 5px;">${displayTimeLabel}</td><td class="team-cell">${home}</td><td style="width: 30px; text-align: right; padding-right: 0;">${displayHomeScore}</td>${channelDisplay}`;
-                    row2.innerHTML = `<td class="team-cell">${away}</td><td style="width: 30px; text-align: right; padding-right: 0;">${displayAwayScore}</td>`;
+                    row1.innerHTML = `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 2px;">${displayTimeLabel}</td><td class="team-cell" style="padding-left: 2px; padding-right: 3px;">${home}</td><td style="width: 35px; text-align: right; padding-right: 3px;">${displayHomeScore}</td>${channelDisplay}`;
+                    row2.innerHTML = `<td class="team-cell" style="padding-left: 2px; padding-right: 3px;">${away}</td><td style="width: 35px; text-align: right; padding-right: 3px;">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                row1.innerHTML = `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 5px;">${displayTimeLabel}</td><td class="team-cell">${away}</td><td style="width: 30px; text-align: right; padding-right: 0;">${displayAwayScore}</td>${channelDisplay}`;
-                row2.innerHTML = `<td class="team-cell">${home}</td><td style="width: 30px; text-align: right; padding-right: 0;">${displayHomeScore}</td>`;
+                row1.innerHTML = `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 2px;">${displayTimeLabel}</td><td class="team-cell" style="padding-left: 2px; padding-right: 3px;">${away}</td><td style="width: 35px; text-align: right; padding-right: 3px;">${displayAwayScore}</td>${channelDisplay}`;
+                row2.innerHTML = `<td class="team-cell" style="padding-left: 2px; padding-right: 3px;">${home}</td><td style="width: 35px; text-align: right; padding-right: 3px;">${displayHomeScore}</td>`;
                 }
 
                 let gameStatusClass = 'scheduled-game';
