@@ -6894,26 +6894,32 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             
             sortedGames.forEach(game => {
-                // Format for specified leagues: away team on top, home team on bottom, time on right
+                // Format for specified leagues: Time on left, Teams on two lines in middle, Channel on right
                 if (['NFL', 'NBA', 'MLB', 'NHL', 'NCAAF', 'WNBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball'].includes(leagueKey)) {
+                    const timeDisplay = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
+                    const channelDisplay = game.channel || '';
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1; margin-right: 8px;">
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; min-width: 70px; margin-top: 4px;">${timeDisplay}</div>
+                            <div class="teams" style="flex: 1; margin: 0 8px;">
                                 <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.away}</div>
                                 <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
+                            <div class="channel" style="color: #9ca3af; font-size: 10px; font-weight: normal; min-width: 50px; text-align: right; margin-top: 4px;">${channelDisplay}</div>
                         </div>
                     `;
                 } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'Ligue1', 'MLS', 'NWSL', 'PremierLeague', 'SerieA', 'UEFAEuropaLeague', 'UEFAChampionsLeague', 'UEFAConferenceLeague'].includes(leagueKey)) {
-                    // Format for soccer leagues: home team on top, away team on bottom, time on right
+                    // Format for soccer leagues: Time on left, Teams on two lines (home on top, away on bottom), Channel on right
+                    const timeDisplay = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
+                    const channelDisplay = game.channel || '';
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1; margin-right: 8px;">
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; min-width: 70px; margin-top: 4px;">${timeDisplay}</div>
+                            <div class="teams" style="flex: 1; margin: 0 8px;">
                                 <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
+                            <div class="channel" style="color: #9ca3af; font-size: 10px; font-weight: normal; min-width: 50px; text-align: right; margin-top: 4px;">${channelDisplay}</div>
                         </div>
                     `;
                 } else if (['Boxing'].includes(leagueKey)) {
