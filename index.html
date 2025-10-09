@@ -5321,9 +5321,9 @@ document.addEventListener('DOMContentLoaded', function () {
             
             let lastDisplayedTimeLabel = null;
 
-            // Add spacer row for 15px top padding
+            // Add spacer row for 5px top padding
             const spacerRow = table.insertRow();
-            spacerRow.innerHTML = '<td colspan="4" style="height: 15px; padding: 0; border: none;"></td>';
+            spacerRow.innerHTML = '<td colspan="4" style="height: 5px; padding: 0; border: none;"></td>';
 
             games.forEach(data => {
                 const home = getTeamDisplayName(data["Home Team"] || "");
