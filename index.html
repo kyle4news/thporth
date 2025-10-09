@@ -5302,131 +5302,146 @@ document.addEventListener('DOMContentLoaded', function () {
                 leagueSection.appendChild(title);
             }
 
-            const table = document.createElement("table");
-table.className = "game-table";
-table.style.width = "250px";
-table.style.maxWidth = "250px";
-table.style.borderCollapse = "collapse";
+            // ======== Robust game table renderer (no rowspan) ========
+            (function renderGamesTable() {
+              // scoped styles (won't overwrite other .game-table-* names)
+              const STYLE_ID = 'game-table-ajs-styles';
+              if (!document.getElementById(STYLE_ID)) {
+                const s = document.createElement('style');
+                s.id = STYLE_ID;
+                s.textContent = `
+                  .game-table-ajs { width:250px; max-width:250px; border-collapse:collapse; table-layout:fixed; font-family: inherit; }
+                  .game-table-ajs col.time { width:70px; }
+                  .game-table-ajs col.team { width:130px; }
+                  .game-table-ajs col.score { width:30px; }
+                  .game-table-ajs col.channel { width:50px; }
+                  .game-table-ajs td { box-sizing:border-box; padding:4px 6px; vertical-align:middle; }
+                  .game-table-ajs .time-cell { text-align:left; font-size:12px; white-space:nowrap; }
+                  .game-table-ajs .team-cell { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; }
+                  .game-table-ajs .score-cell { text-align:right; font-variant-numeric: tabular-nums; }
+                  .game-table-ajs .channel-cell { text-align:center; font-size:11px; color:#9ca3af; }
+                  .game-table-ajs .live .time-cell span { color: red; font-weight:600; }
+                  .game-table-ajs .final .time-cell { color: #9ca3af; font-weight:600; }
+                  /* small separator if you used game-separator previously */
+                  .game-table-ajs .game-separator td { padding-top: 2px; padding-bottom: 6px; }
+                `;
+                document.head.appendChild(s);
+              }
 
-// Add fixed column widths
-const colgroup = document.createElement("colgroup");
-colgroup.innerHTML = `
-  <col style="width:70px;">   <!-- Time -->
-  <col style="width:130px;">  <!-- Team -->
-  <col style="width:30px;">   <!-- Score -->
-  <col style="width:50px;">   <!-- Channel -->
-`;
-table.appendChild(colgroup);
+              // create table
+              const table = document.createElement('table');
+              table.className = "game-table-ajs";
+              table.style.width = "250px";
+              table.style.maxWidth = "250px";
+              table.style.borderCollapse = "collapse";
 
-let lastDisplayedTimeLabel = null;
+              // stable columns
+              const colgroup = document.createElement('colgroup');
+              colgroup.innerHTML = `
+                <col class="time">
+                <col class="team">
+                <col class="score">
+                <col class="channel">
+              `;
+              table.appendChild(colgroup);
 
-games.forEach(data => {
-  const home = getTeamDisplayName(data["Home Team"] || "");
-  const away = getTeamDisplayName(data["Away Team"] || "");
-  const homeScore = data["Home Score"];
-  const awayScore = data["Away Score"];
-  const matchStatus = (data["Match Status"] || "").toUpperCase();
-  const rawStart = data["Start Time"];
-  const displayLeague = getLeagueDisplayName(data.League);
+              let lastDisplayedTimeLabel = null;
 
-  const isLive =
-    matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE");
-  const isFinal =
-    matchStatus.includes("FINISHED") ||
-    matchStatus.includes("FINAL") ||
-    matchStatus.includes("GAME OVER");
+              // helper: list of soccer-style leagues (home on top)
+              const soccerLeagues = new Set([
+                "Premier League","LaLiga","Serie A","Bundesliga","Ligue 1","MLS",
+                "UEFA Champions League","UEFA Europa League","UEFA Conference League",
+                "NWSL","FA Cup","Coppa Italia","DFB-Pokal","Carabao Cup","Super Cup",
+                "Eredivisie","Liga Portugal","EFL Championship","Brasileirão",
+                "Women's Super League","Argentine Primera División","Scottish Cup",
+                "Liga MX","Saudi Pro League","Scottish Premiership","EFL Cup",
+                "Super Lig","FIFA U-20 World Cup","Campeones Cup","USL Championship",
+                "UEFA W Champions League"
+              ]);
 
-  let currentTimeLabel = "";
+              games.forEach(data => {
+                const home = getTeamDisplayName(data["Home Team"] || "");
+                const away = getTeamDisplayName(data["Away Team"] || "");
+                const homeScore = data["Home Score"];
+                const awayScore = data["Away Score"];
+                const matchStatus = (data["Match Status"] || "").toUpperCase();
+                const rawStart = data["Start Time"];
+                const displayLeague = getLeagueDisplayName(data.League);
+                const isSoccerLeague = soccerLeagues.has(displayLeague);
 
-  if (isLive) {
-    let parsedStatus = "";
-    if (displayLeague === "MLB") {
-      const inningHalf = data.inningHalf || "";
-      const currentInning = data.currentInning || "";
-      if (inningHalf && currentInning)
-        parsedStatus = `${inningHalf.slice(0, 3)} ${currentInning}`;
-    } else {
-      parsedStatus = getGranularLiveStatus(data);
-    }
-    currentTimeLabel = parsedStatus
-      ? `<span style="color:red;">${parsedStatus}</span>`
-      : '<span style="color:red;">Live</span>';
-  } else if (isFinal) {
-    currentTimeLabel = "F";
-  } else if (rawStart && rawStart.toDate) {
-    currentTimeLabel = luxon.DateTime.fromJSDate(rawStart.toDate()).toFormat("h:mm a");
-  } else {
-    currentTimeLabel = "TBD";
-  }
+                const isLive = matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE");
+                const isFinal = matchStatus.includes("FINISHED") || matchStatus.includes("FINAL") || matchStatus.includes("GAME OVER");
 
-  let displayTimeLabel = currentTimeLabel;
-  if (!isLive && !isFinal && currentTimeLabel !== "TBD") {
-    if (currentTimeLabel === lastDisplayedTimeLabel) displayTimeLabel = "";
-    else lastDisplayedTimeLabel = currentTimeLabel;
-  }
+                // compute time label
+                let currentTimeLabel = "";
+                if (isLive) {
+                  let parsedStatus = "";
+                  if (displayLeague === "MLB") {
+                    const inningHalf = data.inningHalf || "";
+                    const currentInning = data.currentInning || "";
+                    if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
+                  } else {
+                    parsedStatus = getGranularLiveStatus(data);
+                  }
+                  currentTimeLabel = parsedStatus ? `<span>${parsedStatus}</span>` : `<span>Live</span>`;
+                } else if (isFinal) {
+                  currentTimeLabel = "F";
+                } else if (rawStart && rawStart.toDate) {
+                  currentTimeLabel = luxon.DateTime.fromJSDate(rawStart.toDate()).toFormat('h:mm a');
+                } else {
+                  currentTimeLabel = "TBD";
+                }
 
-  let displayAwayScore = awayScore ?? "";
-  let displayHomeScore = homeScore ?? "";
-  if (!isLive && !isFinal) {
-    displayAwayScore = "";
-    displayHomeScore = "";
-  }
+                // dedupe identical times display
+                let displayTimeLabel = currentTimeLabel;
+                if (!isLive && !isFinal && currentTimeLabel !== "TBD") {
+                  if (currentTimeLabel === lastDisplayedTimeLabel) displayTimeLabel = "";
+                  else lastDisplayedTimeLabel = currentTimeLabel;
+                }
 
-  // Two table rows per game
-  const row1 = table.insertRow();
-  row1.className = "game-row";
-  const row2 = table.insertRow();
-  row2.className = "game-row game-separator";
+                // scores shown only for live/final
+                const showScores = isLive || isFinal;
+                const displayAwayScore = showScores ? (awayScore ?? '') : '';
+                const displayHomeScore = showScores ? (homeScore ?? '') : '';
 
-  const isSoccerLeague = [
-    "Premier League", "LaLiga", "Serie A", "Bundesliga", "Ligue 1", "MLS",
-    "UEFA Champions League", "UEFA Europa League", "UEFA Conference League",
-    "NWSL", "FA Cup", "Coppa Italia", "DFB-Pokal", "Carabao Cup", "Super Cup",
-    "Eredivisie", "Liga Portugal", "EFL Championship", "Brasileirão",
-    "Women's Super League", "Argentine Primera División", "Scottish Cup",
-    "Liga MX", "Saudi Pro League", "Scottish Premiership", "EFL Cup",
-    "Super Lig", "FIFA U-20 World Cup", "Campeones Cup", "USL Championship",
-    "UEFA W Champions League"
-  ].includes(displayLeague);
+                // choose team/score ordering per league type
+                const topTeam = isSoccerLeague ? home : away;
+                const topScore = isSoccerLeague ? displayHomeScore : displayAwayScore;
+                const bottomTeam = isSoccerLeague ? away : home;
+                const bottomScore = isSoccerLeague ? displayAwayScore : displayHomeScore;
 
-  const channelCell = `<td rowspan="2" style="text-align:center; font-size:11px; color:#9ca3af; vertical-align:middle; padding:0;">${data.channel || ''}</td>`;
+                // build two rows (both rows have 4 cells — no rowspan)
+                const row1 = table.insertRow();
+                row1.className = `game-row ${isLive ? 'live' : isFinal ? 'final' : 'scheduled'}`;
+                row1.innerHTML = `
+                  <td class="time-cell">${displayTimeLabel}</td>
+                  <td class="team-cell">${escapeHtml(topTeam)}</td>
+                  <td class="score-cell">${escapeHtml(topScore)}</td>
+                  <td class="channel-cell">${escapeHtml(data.channel || '')}</td>
+                `;
 
-  if (isSoccerLeague) {
-    // Soccer: home team top, away team bottom
-    row1.innerHTML = `
-      <td rowspan="2" style="text-align:left; font-size:12px; vertical-align:top;">${displayTimeLabel}</td>
-      <td class="team-cell" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${home}</td>
-      <td style="text-align:right;">${displayHomeScore}</td>
-      ${channelCell}
-    `;
-    row2.innerHTML = `
-      <td class="team-cell" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${away}</td>
-      <td style="text-align:right;">${displayAwayScore}</td>
-    `;
-  } else {
-    // Other sports: away top, home bottom
-    row1.innerHTML = `
-      <td rowspan="2" style="text-align:left; font-size:12px; vertical-align:top;">${displayTimeLabel}</td>
-      <td class="team-cell" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${away}</td>
-      <td style="text-align:right;">${displayAwayScore}</td>
-      ${channelCell}
-    `;
-    row2.innerHTML = `
-      <td class="team-cell" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${home}</td>
-      <td style="text-align:right;">${displayHomeScore}</td>
-    `;
-  }
+                const row2 = table.insertRow();
+                row2.className = `game-row game-separator ${isLive ? 'live' : isFinal ? 'final' : 'scheduled'}`;
+                row2.innerHTML = `
+                  <td class="time-cell"></td>
+                  <td class="team-cell">${escapeHtml(bottomTeam)}</td>
+                  <td class="score-cell">${escapeHtml(bottomScore)}</td>
+                  <td class="channel-cell"></td>
+                `;
+              });
 
-  let gameStatusClass = "scheduled-game";
-  if (isLive) gameStatusClass = "live-game";
-  if (isFinal) gameStatusClass = "final-game";
+              // append the table to your existing DOM nodes (same as original)
+              leagueSection.appendChild(table);
 
-  row1.classList.add(gameStatusClass);
-  row2.classList.add(gameStatusClass);
-});
-
-leagueSection.appendChild(table);
-container.appendChild(leagueSection);
+              // small utility to avoid accidental HTML injection (keeps safety, also preserves numbers)
+              function escapeHtml(v) {
+                if (v === null || v === undefined) return '';
+                return String(v)
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;');
+              }
+            })();
 
         });
     }
