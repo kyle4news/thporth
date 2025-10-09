@@ -5379,9 +5379,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="channel" style="color: #9ca3af; font-size: 10px; font-weight: normal; min-width: 50px; text-align: right; margin-top: 4px;">${data.channel || ''}</div>
                 `;
                 
-                leagueSection.appendChild(gameRow);
+                // Append to the appropriate container based on context
+                if (isGroupedByLeague) {
+                    leagueSection.appendChild(gameRow);
+                } else {
+                    container.appendChild(gameRow);
+                }
             });
-            container.appendChild(leagueSection);
+            if (isGroupedByLeague) {
+                container.appendChild(leagueSection);
+            }
         });
     }
 
