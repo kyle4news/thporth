@@ -5302,23 +5302,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 leagueSection.appendChild(title);
             }
 
-            const table = document.createElement("table");
-            table.className = "game-table";
-            table.style.width = "250px";
-            table.style.maxWidth = "250px";
-            table.style.borderCollapse = "collapse";
-            table.style.tableLayout = "fixed";
-            
-            // Add colgroup to force consistent column widths
-            const colgroup = document.createElement("colgroup");
-            colgroup.innerHTML = `
-                <col style="width: 70px;">   <!-- time -->
-                <col style="width: 130px;">  <!-- team -->
-                <col style="width: 30px;">   <!-- score -->
-                <col style="width: 50px;">   <!-- channel -->
-            `;
-            table.appendChild(colgroup);
-            
             let lastDisplayedTimeLabel = null;
 
             games.forEach(data => {
@@ -5366,32 +5349,51 @@ document.addEventListener('DOMContentLoaded', function () {
                    displayHomeScore = '';
                 }
 
-                const row1 = table.insertRow();
-                row1.className = "game-row";
-                const row2 = table.insertRow();
-                row2.className = "game-row game-separator";
-                
                 // Check if this is a soccer league - soccer leagues show home on top, away on bottom
                 const displayLeague = getLeagueDisplayName(data.League);
                 const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup', 'USL Championship', 'UEFA W Champions League'].includes(displayLeague);
                 
-                const channelDisplay = data.channel ? `<td rowspan="2" style="width: 50px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: top; padding-left: 2px; padding-right: 2px;">${data.channel}</td>` : '<td rowspan="2" style="width: 50px; padding-left: 2px; padding-right: 2px;"></td>';
+                // Use the same flexbox layout as upcoming schedule
+                const gameRow = document.createElement("div");
+                gameRow.className = "match-row";
+                gameRow.style.cssText = "display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;";
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="text-align: left; font-size: 12px; vertical-align: top; padding-right: 2px;">${displayTimeLabel}</td><td class="team-cell" style="padding-left: 2px; padding-right: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${home}</td><td style="text-align: right; padding-left: 2px; padding-right: 2px;">${displayHomeScore}</td><td rowspan="2" style="text-align: center; font-size: 11px; color: #9ca3af; vertical-align: middle; padding-left: 2px; padding-right: 2px;">${data.channel || ''}</td>`;
-                    row2.innerHTML = `<td class="team-cell" style="padding-left: 2px; padding-right: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${away}</td><td style="text-align: right; padding-left: 2px; padding-right: 2px;">${displayAwayScore}</td>`;
+                    gameRow.innerHTML = `
+                        <div class="time" style="color: white; font-size: 11px; font-weight: normal; min-width: 70px; margin-top: 4px;">${displayTimeLabel}</div>
+                        <div class="teams" style="flex: 1; margin: 0 8px;">
+                            <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${home}</div>
+                            <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4;">${away}</div>
+                        </div>
+                        <div class="scores" style="min-width: 30px; text-align: right; margin-right: 8px;">
+                            <div style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${displayHomeScore}</div>
+                            <div style="color: white; font-size: 11px; line-height: 1.4;">${displayAwayScore}</div>
+                        </div>
+                        <div class="channel" style="color: #9ca3af; font-size: 10px; font-weight: normal; min-width: 50px; text-align: right; margin-top: 4px;">${data.channel || ''}</div>
+                    `;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                row1.innerHTML = `<td rowspan="2" style="text-align: left; font-size: 12px; vertical-align: top; padding-right: 2px;">${displayTimeLabel}</td><td class="team-cell" style="padding-left: 2px; padding-right: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${away}</td><td style="text-align: right; padding-left: 2px; padding-right: 2px;">${displayAwayScore}</td><td rowspan="2" style="text-align: center; font-size: 11px; color: #9ca3af; vertical-align: middle; padding-left: 2px; padding-right: 2px;">${data.channel || ''}</td>`;
-                row2.innerHTML = `<td class="team-cell" style="padding-left: 2px; padding-right: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${home}</td><td style="text-align: right; padding-left: 2px; padding-right: 2px;">${displayHomeScore}</td>`;
+                    gameRow.innerHTML = `
+                        <div class="time" style="color: white; font-size: 11px; font-weight: normal; min-width: 70px; margin-top: 4px;">${displayTimeLabel}</div>
+                        <div class="teams" style="flex: 1; margin: 0 8px;">
+                            <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${away}</div>
+                            <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4;">${home}</div>
+                        </div>
+                        <div class="scores" style="min-width: 30px; text-align: right; margin-right: 8px;">
+                            <div style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${displayAwayScore}</div>
+                            <div style="color: white; font-size: 11px; line-height: 1.4;">${displayHomeScore}</div>
+                        </div>
+                        <div class="channel" style="color: #9ca3af; font-size: 10px; font-weight: normal; min-width: 50px; text-align: right; margin-top: 4px;">${data.channel || ''}</div>
+                    `;
                 }
 
                 let gameStatusClass = 'scheduled-game';
                 if (isLive) gameStatusClass = 'live-game';
                 if (isFinal) gameStatusClass = 'final-game';
-                row1.classList.add(gameStatusClass);
-                row2.classList.add(gameStatusClass);
+                gameRow.classList.add(gameStatusClass);
+                
+                table.appendChild(gameRow);
             });
             leagueSection.appendChild(table);
             container.appendChild(leagueSection);
