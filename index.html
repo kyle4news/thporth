@@ -5304,16 +5304,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const table = document.createElement("table");
             table.className = "game-table";
-            table.style.width = "250px";
-            table.style.maxWidth = "250px";
+            table.style.width = "240px";
+            table.style.maxWidth = "240px";
             table.style.borderCollapse = "collapse";
             table.style.tableLayout = "fixed";
             
-            // Add colgroup to force consistent column widths (total = 250px)
+            // Add colgroup to force consistent column widths (total = 240px)
             const colgroup = document.createElement("colgroup");
             colgroup.innerHTML = `
-                <col style="width: 60px;">   <!-- time -->
-                <col style="width: 110px;">  <!-- team -->
+                <col style="width: 55px;">   <!-- time -->
+                <col style="width: 105px;">  <!-- team -->
                 <col style="width: 35px;">   <!-- score -->
                 <col style="width: 45px;">   <!-- channel -->
             `;
@@ -5379,12 +5379,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="width: 60px; text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="width: 110px; padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="width: 35px; text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="width: 45px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: middle; padding: 2px 1px; box-sizing: border-box;">${data.channel || ''}</td>`;
-                    row2.innerHTML = `<td class="team-cell" style="width: 110px; padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="width: 35px; text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td>`;
+                    row1.innerHTML = `<td rowspan="2" style="width: 55px; text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="width: 105px; padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="width: 35px; text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="width: 45px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: middle; padding: 2px 1px; box-sizing: border-box;">${data.channel || ''}</td>`;
+                    row2.innerHTML = `<td class="team-cell" style="width: 105px; padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="width: 35px; text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                row1.innerHTML = `<td rowspan="2" style="width: 60px; text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="width: 110px; padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="width: 35px; text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="width: 45px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: middle; padding: 2px 1px; box-sizing: border-box;">${data.channel || ''}</td>`;
-                row2.innerHTML = `<td class="team-cell" style="width: 110px; padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="width: 35px; text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td>`;
+                row1.innerHTML = `<td rowspan="2" style="width: 55px; text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="width: 105px; padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="width: 35px; text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="width: 45px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: middle; padding: 2px 1px; box-sizing: border-box;">${data.channel || ''}</td>`;
+                row2.innerHTML = `<td class="team-cell" style="width: 105px; padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="width: 35px; text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td>`;
                 }
 
                 let gameStatusClass = 'scheduled-game';
