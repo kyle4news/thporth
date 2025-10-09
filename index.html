@@ -5304,7 +5304,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const table = document.createElement("table");
             table.className = "game-table";
-            table.style.width = "100%";
+            table.style.width = "250px";
+            table.style.maxWidth = "250px";
             table.style.borderCollapse = "collapse";
             table.style.tableLayout = "fixed";
             let lastDisplayedTimeLabel = null;
@@ -5363,18 +5364,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 const displayLeague = getLeagueDisplayName(data.League);
                 const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup', 'USL Championship', 'UEFA W Champions League'].includes(displayLeague);
                 
-                const channelDisplay = data.channel ? `<td rowspan="2" style="width: 60px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: top; padding-left: 3px; padding-right: 0;">${data.channel}</td>` : '<td rowspan="2" style="width: 60px; padding-left: 3px; padding-right: 0;"></td>';
+                const channelDisplay = data.channel ? `<td rowspan="2" style="width: 50px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: top; padding-left: 2px; padding-right: 2px;">${data.channel}</td>` : '<td rowspan="2" style="width: 50px; padding-left: 2px; padding-right: 2px;"></td>';
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    // Time (70px) | Teams (flexible) | Score (35px with 3px left padding) | Channel (60px with 3px left padding)
-                    row1.innerHTML = `<td rowspan="2" style="width: 70px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 2px;">${displayTimeLabel}</td><td class="team-cell" style="padding-left: 2px; padding-right: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${home}</td><td style="width: 35px; text-align: right; padding-left: 3px; padding-right: 0;">${displayHomeScore}</td>${channelDisplay}`;
-                    row2.innerHTML = `<td class="team-cell" style="padding-left: 2px; padding-right: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${away}</td><td style="width: 35px; text-align: right; padding-left: 3px; padding-right: 0;">${displayAwayScore}</td>`;
+                    // Time (70px) | Teams (130px) | Score (30px) | Channel (50px) = 280px total, but constrained to 250px
+                    row1.innerHTML = `<td rowspan="2" style="width: 70px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 2px;">${displayTimeLabel}</td><td class="team-cell" style="width: 130px; padding-left: 2px; padding-right: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${home}</td><td style="width: 30px; text-align: right; padding-left: 2px; padding-right: 2px;">${displayHomeScore}</td>${channelDisplay}`;
+                    row2.innerHTML = `<td class="team-cell" style="width: 130px; padding-left: 2px; padding-right: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${away}</td><td style="width: 30px; text-align: right; padding-left: 2px; padding-right: 2px;">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                    // Time (70px) | Teams (flexible) | Score (35px with 3px left padding) | Channel (60px with 3px left padding)
-                row1.innerHTML = `<td rowspan="2" style="width: 70px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 2px;">${displayTimeLabel}</td><td class="team-cell" style="padding-left: 2px; padding-right: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${away}</td><td style="width: 35px; text-align: right; padding-left: 3px; padding-right: 0;">${displayAwayScore}</td>${channelDisplay}`;
-                row2.innerHTML = `<td class="team-cell" style="padding-left: 2px; padding-right: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${home}</td><td style="width: 35px; text-align: right; padding-left: 3px; padding-right: 0;">${displayHomeScore}</td>`;
+                    // Time (70px) | Teams (130px) | Score (30px) | Channel (50px) = 280px total, but constrained to 250px
+                row1.innerHTML = `<td rowspan="2" style="width: 70px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 2px;">${displayTimeLabel}</td><td class="team-cell" style="width: 130px; padding-left: 2px; padding-right: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${away}</td><td style="width: 30px; text-align: right; padding-left: 2px; padding-right: 2px;">${displayAwayScore}</td>${channelDisplay}`;
+                row2.innerHTML = `<td class="team-cell" style="width: 130px; padding-left: 2px; padding-right: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${home}</td><td style="width: 30px; text-align: right; padding-left: 2px; padding-right: 2px;">${displayHomeScore}</td>`;
                 }
 
                 let gameStatusClass = 'scheduled-game';
