@@ -5308,7 +5308,6 @@ document.addEventListener('DOMContentLoaded', function () {
             table.style.maxWidth = "100%";
             table.style.borderCollapse = "collapse";
             table.style.tableLayout = "fixed";
-            table.style.paddingTop = "15px";
             
             // Add colgroup with percentage widths to work in both contexts
             const colgroup = document.createElement("colgroup");
@@ -5321,6 +5320,10 @@ document.addEventListener('DOMContentLoaded', function () {
             table.appendChild(colgroup);
             
             let lastDisplayedTimeLabel = null;
+
+            // Add spacer row for 15px top padding
+            const spacerRow = table.insertRow();
+            spacerRow.innerHTML = '<td colspan="4" style="height: 15px; padding: 0; border: none;"></td>';
 
             games.forEach(data => {
                 const home = getTeamDisplayName(data["Home Team"] || "");
