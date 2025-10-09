@@ -4638,8 +4638,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         sortedLeagueNames.forEach(leagueNameKey => {
             const games = leagueGroups[leagueNameKey];
-            const leagueSection = document.createElement("div");
+            let leagueSection = null;
             if(isGroupedByLeague) {
+                leagueSection = document.createElement("div");
                 leagueSection.className = "league-section";
                 const title = document.createElement("div");
                 title.className = "league-title";
