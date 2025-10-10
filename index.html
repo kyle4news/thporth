@@ -5426,8 +5426,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         
         // All leagues use FlashLiveAPI (gamesCollectionRef)
-        gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr)
-            .onSnapshot(snapshot => {
+        // For NCAAF, also filter by Sport to exclude hockey games
+        let query = gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr);
+        if (leagueKey === 'NCAAF') {
+            query = query.where('Sport', '==', 'American Football');
+        }
+        
+        query.onSnapshot(snapshot => {
                 if (snapshot.empty) {
                     scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
                     return;
@@ -6382,8 +6387,13 @@ document.addEventListener('DOMContentLoaded', function () {
             
             
             // 1. Get TODAY'S games from FlashLiveAPI
-            gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr)
-                .get()
+            // For NCAAF, also filter by Sport to exclude hockey games
+            let todayQuery = gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr);
+            if (leagueKey === 'NCAAF') {
+                todayQuery = todayQuery.where('Sport', '==', 'American Football');
+            }
+            
+            todayQuery.get()
                 .then(snapshot => {
                     snapshot.forEach(doc => {
                         const data = doc.data();
