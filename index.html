@@ -101,8 +101,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 /* --- CSS FROM testing_testing-3.html (Live Games Viewer) --- */
 .league-section {
-    margin-top: 1px;
-    margin-bottom: 1px;
+    margin-top: 1px !important;
+    margin-bottom: 1px !important;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
 }
 .league-title { /* Renamed from .league-header to .league-title for clarity within this context */
     font-size: 14px;
@@ -5415,47 +5417,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const textNode = document.createTextNode(leagueNameKey);
                 title.appendChild(textNode);
                 
-                // Create a flex container for the title content
-                const titleContainer = document.createElement("div");
-                titleContainer.style.display = "flex";
-                titleContainer.style.alignItems = "center";
-                titleContainer.style.width = "100%";
-                
-                // Create left column for league name (90%)
-                const nameColumn = document.createElement("div");
-                nameColumn.style.flex = "0 0 90%";
-                nameColumn.style.overflow = "hidden";
-                nameColumn.style.wordWrap = "break-word";
-                
-                // Create right column for arrow (10%)
-                const arrowColumn = document.createElement("div");
-                arrowColumn.style.flex = "0 0 10%";
-                arrowColumn.style.textAlign = "center";
-                arrowColumn.style.display = "flex";
-                arrowColumn.style.alignItems = "center";
-                arrowColumn.style.justifyContent = "center";
-                
-                // Move text node to name column
-                nameColumn.appendChild(textNode);
-                
-                // Add collapse/expand arrow
-                const arrow = document.createElement("span");
-                arrow.className = "collapse-arrow";
-                arrow.innerHTML = "▶"; // Right arrow (default state)
-                arrow.style.cursor = "pointer";
-                arrow.style.fontSize = "10px";
-                arrow.style.transition = "transform 0.2s ease";
-                arrow.style.userSelect = "none";
-                arrowColumn.appendChild(arrow);
-                
-                // Add columns to container
-                titleContainer.appendChild(nameColumn);
-                titleContainer.appendChild(arrowColumn);
-                
-                // Replace text node with container
-                title.innerHTML = "";
-                title.appendChild(titleContainer);
-                
                 leagueSection.appendChild(title);
             }
 
@@ -5558,27 +5519,57 @@ document.addEventListener('DOMContentLoaded', function () {
             // Add collapse functionality for grouped leagues
             if (isGroupedByLeague) {
                 const isCollapsed = COLLAPSED_LEAGUES.includes(leagueNameKey);
+                const title = leagueSection.querySelector('.league-title');
                 
-                // Initially hide table if league is in collapsed list
+                // Only add arrow and two-column layout for leagues that can be collapsed
                 if (isCollapsed) {
+                    // Create two-column layout for collapsed leagues
+                    const titleContainer = document.createElement("div");
+                    titleContainer.style.display = "flex";
+                    titleContainer.style.alignItems = "center";
+                    titleContainer.style.width = "100%";
+                    
+                    // Create left column for league name (90%)
+                    const nameColumn = document.createElement("div");
+                    nameColumn.style.flex = "0 0 90%";
+                    nameColumn.style.overflow = "hidden";
+                    nameColumn.style.wordWrap = "break-word";
+                    
+                    // Create right column for arrow (10%)
+                    const arrowColumn = document.createElement("div");
+                    arrowColumn.style.flex = "0 0 10%";
+                    arrowColumn.style.textAlign = "center";
+                    arrowColumn.style.display = "flex";
+                    arrowColumn.style.alignItems = "center";
+                    arrowColumn.style.justifyContent = "center";
+                    
+                    // Move existing content to name column
+                    nameColumn.innerHTML = title.innerHTML;
+                    
+                    // Add collapse/expand arrow
+                    const arrow = document.createElement("span");
+                    arrow.className = "collapse-arrow";
+                    arrow.innerHTML = "▶"; // Right arrow (collapsed state)
+                    arrow.style.cursor = "pointer";
+                    arrow.style.fontSize = "10px";
+                    arrow.style.transition = "transform 0.2s ease";
+                    arrow.style.userSelect = "none";
+                    arrowColumn.appendChild(arrow);
+                    
+                    // Add columns to container
+                    titleContainer.appendChild(nameColumn);
+                    titleContainer.appendChild(arrowColumn);
+                    
+                    // Replace title content with container
+                    title.innerHTML = "";
+                    title.appendChild(titleContainer);
+                    
+                    // Initially hide table if league is in collapsed list
                     table.style.display = "none";
-                    const arrow = leagueSection.querySelector('.collapse-arrow');
-                    if (arrow) {
-                        arrow.innerHTML = "▶"; // Right arrow (collapsed state)
-                        arrow.style.transform = "rotate(0deg)";
-                    }
-                } else {
-                    // Expanded state - arrow points down
-                    const arrow = leagueSection.querySelector('.collapse-arrow');
-                    if (arrow) {
-                        arrow.innerHTML = "▼";
-                        arrow.style.transform = "rotate(0deg)";
-                    }
                 }
                 
-                // Add click handler to title for toggling
-                const title = leagueSection.querySelector('.league-title');
-                if (title) {
+                // Add click handler to title for toggling (only for leagues that can collapse)
+                if (isCollapsed && title) {
                     title.style.cursor = "pointer";
                     title.addEventListener('click', function() {
                         const arrow = this.querySelector('.collapse-arrow');
@@ -5587,14 +5578,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             table.style.display = "";
                             if (arrow) {
                                 arrow.innerHTML = "▼";
-                                arrow.style.transform = "rotate(0deg)";
                             }
                         } else {
                             // Collapse
                             table.style.display = "none";
                             if (arrow) {
                                 arrow.innerHTML = "▶";
-                                arrow.style.transform = "rotate(0deg)";
                             }
                         }
                     });
