@@ -7140,12 +7140,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (['NFL', 'NBA', 'MLB', 'NHL', 'NCAAF', 'WNBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball'].includes(leagueKey)) {
                     const timeDisplay = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
                     const channelDisplay = game.channel || '';
+                    
+                    // For NHL, strip city names to show only mascots
+                    let awayTeam = game.away;
+                    let homeTeam = game.home;
+                    if (leagueKey === 'NHL') {
+                        awayTeam = game.away.split(' ').slice(-1)[0]; // Get last word (mascot)
+                        homeTeam = game.home.split(' ').slice(-1)[0]; // Get last word (mascot)
+                    }
+                    
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
                             <div class="time" style="color: white; font-size: 11px; font-weight: normal; min-width: 70px; margin-top: 4px;">${timeDisplay}</div>
                             <div class="teams" style="flex: 1; margin: 0 8px;">
-                                <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.away}</div>
-                                <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
+                                <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${awayTeam}</div>
+                                <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4;">${homeTeam}</div>
                             </div>
                             <div class="channel" style="color: #9ca3af; font-size: 10px; font-weight: normal; min-width: 50px; text-align: right; margin-top: 4px;">${channelDisplay}</div>
                         </div>
