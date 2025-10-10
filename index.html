@@ -4270,6 +4270,14 @@ document.addEventListener('DOMContentLoaded', function () {
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
     const LEAGUE_DISPLAY_ORDER = ["NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "MLB", "NHL", "Premier League", "NCAAF", "UEFA Champions League", "ATP", "WTA", "MLS", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "FIFA World Cup European Qualifiers", "FIFA World Cup CONCACAF Qualifiers", "Campeones Cup", "EFL Cup", "Leagues Cup", "NWSL", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera División", "Liga Portugal", "Brasileirão", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "UEFA W Champions League", "Women's Cricket World Cup", "FIFA U-20 World Cup", "FIFA World Cup Asian Qualifiers", "FIFA World Cup African Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "Club Friendly"]; 
+    
+    // Leagues that should be collapsed by default on the home page
+    const COLLAPSED_LEAGUES = [
+    "Club Friendly",
+    "FIFA World Cup African Qualifiers",
+    "T20 International",
+    "OHL"
+    ];
 
     // --- 2. FIREBASE INITIALIZATION (SINGLETON) + CACHING ---
     if (!firebase.apps.length) {
@@ -5399,6 +5407,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 const textNode = document.createTextNode(leagueNameKey);
                 title.appendChild(textNode);
+                
+                // Add collapse/expand arrow
+                const arrow = document.createElement("span");
+                arrow.className = "collapse-arrow";
+                arrow.innerHTML = "▼"; // Down arrow (expanded state)
+                arrow.style.float = "right";
+                arrow.style.cursor = "pointer";
+                arrow.style.fontSize = "10px";
+                arrow.style.marginRight = "8px";
+                arrow.style.transition = "transform 0.2s ease";
+                arrow.style.userSelect = "none";
+                title.appendChild(arrow);
+                
                 leagueSection.appendChild(title);
             }
 
@@ -5497,6 +5518,46 @@ document.addEventListener('DOMContentLoaded', function () {
                 row1.classList.add(gameStatusClass);
                 row2.classList.add(gameStatusClass);
             });
+            
+            // Add collapse functionality for grouped leagues
+            if (isGroupedByLeague) {
+                const isCollapsed = COLLAPSED_LEAGUES.includes(leagueNameKey);
+                
+                // Initially hide table if league is in collapsed list
+                if (isCollapsed) {
+                    table.style.display = "none";
+                    const arrow = leagueSection.querySelector('.collapse-arrow');
+                    if (arrow) {
+                        arrow.innerHTML = "▶"; // Right arrow (collapsed state)
+                        arrow.style.transform = "rotate(-90deg)";
+                    }
+                }
+                
+                // Add click handler to title for toggling
+                const title = leagueSection.querySelector('.league-title');
+                if (title) {
+                    title.style.cursor = "pointer";
+                    title.addEventListener('click', function() {
+                        const arrow = this.querySelector('.collapse-arrow');
+                        if (table.style.display === "none") {
+                            // Expand
+                            table.style.display = "";
+                            if (arrow) {
+                                arrow.innerHTML = "▼";
+                                arrow.style.transform = "rotate(0deg)";
+                            }
+                        } else {
+                            // Collapse
+                            table.style.display = "none";
+                            if (arrow) {
+                                arrow.innerHTML = "▶";
+                                arrow.style.transform = "rotate(-90deg)";
+                            }
+                        }
+                    });
+                }
+            }
+            
             leagueSection.appendChild(table);
             container.appendChild(leagueSection);
         });
