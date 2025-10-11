@@ -4650,29 +4650,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const leagueGroups = {};
 
         if (isGroupedByLeague) {
-            console.log('Processing games for rendering, total games:', gamesData.length);
-            
             gamesData.forEach(game => {
                 // Check if this is a featured game (has a special property or is in featured games list)
                 const isFeatured = game.isFeatured || false;
-                console.log(`Game: ${game['Away Team']} vs ${game['Home Team']}, isFeatured: ${isFeatured}, League: ${game.League}`);
                 
                 if (isFeatured) {
                     // Group featured games under "FEATURED"
                     if (!leagueGroups['FEATURED']) leagueGroups['FEATURED'] = [];
                     leagueGroups['FEATURED'].push(game);
-                    console.log('Added to FEATURED group');
                 } else {
                     // Group regular games by their league
                     const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
                     if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
                     leagueGroups[leagueDisplayName].push(game);
-                    console.log(`Added to ${leagueDisplayName} group`);
                 }
             });
-            
-            console.log('Final league groups:', Object.keys(leagueGroups));
-            console.log('FEATURED group games:', leagueGroups['FEATURED'] ? leagueGroups['FEATURED'].length : 0);
         } else {
             leagueGroups['singleLeague'] = gamesData;
         }
@@ -6262,17 +6254,16 @@ document.addEventListener('DOMContentLoaded', function () {
     
 async function fetchFeaturedGames() {
     try {
-        console.log('Fetching featured games...');
-        const response = await fetch('/getFeaturedGames');
-        console.log('Featured games response status:', response.status);
+        console.log('Fetching featured games from Firestore...');
+        const db = firebase.firestore();
+        const featuredRef = db.collection("artifacts/flashlive-daily-scraper/public/data/Featured");
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const snapshot = await featuredRef.get();
+        const featuredGames = snapshot.docs.map(doc => doc.data());
         
-        const data = await response.json();
-        console.log('Featured games data:', data);
-        return data.games || [];
+        console.log(`Found ${featuredGames.length} featured games from Firestore`);
+        console.log('Featured games data:', featuredGames);
+        return featuredGames;
     } catch (error) {
         console.error('Error fetching featured games:', error);
         return [];
@@ -6281,20 +6272,17 @@ async function fetchFeaturedGames() {
 
     async function fetchFeaturedGamesForDate(dateStr) {
         try {
-            console.log(`Fetching featured games for date: ${dateStr}`);
-            // Convert ISO date (YYYY-MM-DD) to MM/DD/YYYY format for the backend
-            const [year, month, day] = dateStr.split('-');
-            const mmddyyyyDate = `${month}/${day}/${year}`;
-            const response = await fetch(`/getFeaturedGames?date=${encodeURIComponent(mmddyyyyDate)}`);
-            console.log(`Featured games for ${mmddyyyyDate} response status:`, response.status);
+            console.log(`Fetching featured games for date: ${dateStr} from Firestore`);
+            const db = firebase.firestore();
+            const featuredRef = db.collection("artifacts/flashlive-daily-scraper/public/data/Featured");
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            // Filter by date if needed (for now, get all featured games)
+            const snapshot = await featuredRef.get();
+            const featuredGames = snapshot.docs.map(doc => doc.data());
             
-            const data = await response.json();
-            console.log(`Featured games data for ${mmddyyyyDate}:`, data);
-            return data.games || [];
+            console.log(`Found ${featuredGames.length} featured games from Firestore for date ${dateStr}`);
+            console.log(`Featured games data for ${dateStr}:`, featuredGames);
+            return featuredGames;
         } catch (error) {
             console.error(`Error fetching featured games for ${dateStr}:`, error);
             return [];
@@ -6324,8 +6312,6 @@ async function fetchFeaturedGames() {
                 let featuredGames = [];
                 try {
                     featuredGames = await fetchFeaturedGames();
-                    console.log(`Found ${featuredGames.length} featured games for today`);
-                    console.log('Featured games data:', featuredGames);
                     
                     // Mark featured games
                     featuredGames.forEach(game => {
