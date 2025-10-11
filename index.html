@@ -6282,15 +6282,18 @@ async function fetchFeaturedGames() {
     async function fetchFeaturedGamesForDate(dateStr) {
         try {
             console.log(`Fetching featured games for date: ${dateStr}`);
-            const response = await fetch(`/getFeaturedGames?date=${dateStr}`);
-            console.log(`Featured games for ${dateStr} response status:`, response.status);
+            // Convert ISO date (YYYY-MM-DD) to MM/DD/YYYY format for the backend
+            const [year, month, day] = dateStr.split('-');
+            const mmddyyyyDate = `${month}/${day}/${year}`;
+            const response = await fetch(`/getFeaturedGames?date=${encodeURIComponent(mmddyyyyDate)}`);
+            console.log(`Featured games for ${mmddyyyyDate} response status:`, response.status);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             const data = await response.json();
-            console.log(`Featured games data for ${dateStr}:`, data);
+            console.log(`Featured games data for ${mmddyyyyDate}:`, data);
             return data.games || [];
         } catch (error) {
             console.error(`Error fetching featured games for ${dateStr}:`, error);
