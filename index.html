@@ -4272,7 +4272,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'WORLD: LPGA TOUR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "MLB", "NHL", "Premier League", "NCAAF", "UEFA Champions League", "ATP", "WTA", "MLS", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA European Qualifiers", "CONCACAF Qualifiers", "Campeones Cup", "EFL Cup", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera División", "Liga Portugal", "Brasileirão", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "UEFA W Champions League", "Women's Cricket World Cup", "FIFA U-20 World Cup", "AFC Qualifiers", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "MLB", "NHL", "Premier League", "NCAAF", "UEFA Champions League", "ATP", "WTA", "MLS", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA European Qualifiers", "CONCACAF Qualifiers", "Campeones Cup", "EFL Cup", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera División", "Liga Portugal", "Brasileirão", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "UEFA W Champions League", "Women's Cricket World Cup", "FIFA U-20 World Cup", "AFC Qualifiers", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
     
     // Leagues that should be collapsed by default on the home page
     const COLLAPSED_LEAGUES = [
@@ -4651,9 +4651,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (isGroupedByLeague) {
             gamesData.forEach(game => {
-                const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
-                if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
-                leagueGroups[leagueDisplayName].push(game);
+                // Check if this is a featured game (has a special property or is in featured games list)
+                const isFeatured = game.isFeatured || false;
+                
+                if (isFeatured) {
+                    // Group featured games under "FEATURED"
+                    if (!leagueGroups['FEATURED']) leagueGroups['FEATURED'] = [];
+                    leagueGroups['FEATURED'].push(game);
+                } else {
+                    // Group regular games by their league
+                    const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
+                    if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
+                    leagueGroups[leagueDisplayName].push(game);
+                }
             });
         } else {
             leagueGroups['singleLeague'] = gamesData;
@@ -6242,6 +6252,28 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (error) { standingsContent.innerHTML = `<p style="color: #ef4444;">Error loading standings.</p>`; }
     }
     
+    async function fetchFeaturedGames() {
+        try {
+            const response = await fetch('/getFeaturedGames');
+            const data = await response.json();
+            return data.games || [];
+        } catch (error) {
+            console.error('Error fetching featured games:', error);
+            return [];
+        }
+    }
+
+    async function fetchFeaturedGamesForDate(dateStr) {
+        try {
+            const response = await fetch(`/getFeaturedGames?date=${dateStr}`);
+            const data = await response.json();
+            return data.games || [];
+        } catch (error) {
+            console.error(`Error fetching featured games for ${dateStr}:`, error);
+            return [];
+        }
+    }
+
     function fetchTodayGames(callback) {
         const todayContainer = document.getElementById('games');
         const errorDiv = document.getElementById('error');
@@ -6252,13 +6284,27 @@ document.addEventListener('DOMContentLoaded', function () {
         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
 
         return gamesCollectionRef.where('gameDate', '==', todayStr)
-            .onSnapshot(snapshot => {
+            .onSnapshot(async snapshot => {
                 if (snapshot.empty) {
                     todayContainer.innerHTML = `<p style="padding: 10px;">No games found for today.</p>`;
                     return;
                 }
+                
+                // Get regular games
                 const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
-                renderGames(todayContainer, gamesData, true);
+                
+                // Get featured games
+                const featuredGames = await fetchFeaturedGames();
+                
+                // Mark featured games
+                featuredGames.forEach(game => {
+                    game.isFeatured = true;
+                });
+                
+                // Combine games with featured games first
+                const allGames = [...featuredGames, ...gamesData];
+                
+                renderGames(todayContainer, allGames, true);
                 if (callback) {
                     callback();
                 }
@@ -6285,7 +6331,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Attempting to read from collection:', "artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
 
         yesterdayScoresRef.get()
-            .then(snapshot => {
+            .then(async snapshot => {
             scoresLoading.style.display = 'none';
                 console.log('Yesterday scores snapshot:', snapshot);
                 console.log('Snapshot size:', snapshot.size);
@@ -6293,9 +6339,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     scoresContainer.innerHTML = '<p style="padding: 10px;">No completed games found. Check back after games finish.</p>';
                     return;
                 }
+                
+                // Get yesterday's games
                 const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                
+                // Get yesterday's featured games
+                const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
+                const yesterdayFeaturedGames = await fetchFeaturedGamesForDate(yesterdayStr);
+                
+                // Mark yesterday's featured games
+                yesterdayFeaturedGames.forEach(game => {
+                    game.isFeatured = true;
+                });
+                
+                // Combine games with yesterday's featured games first
+                const allGames = [...yesterdayFeaturedGames, ...gamesData];
+                
                 console.log('Yesterday games data:', gamesData);
-                renderGames(scoresContainer, gamesData, true);
+                renderGames(scoresContainer, allGames, true);
             })
             .catch(error => {
             scoresLoading.style.display = 'none';
