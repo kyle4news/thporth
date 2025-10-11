@@ -4650,21 +4650,29 @@ document.addEventListener('DOMContentLoaded', function () {
         const leagueGroups = {};
 
         if (isGroupedByLeague) {
+            console.log('Processing games for rendering, total games:', gamesData.length);
+            
             gamesData.forEach(game => {
                 // Check if this is a featured game (has a special property or is in featured games list)
                 const isFeatured = game.isFeatured || false;
+                console.log(`Game: ${game['Away Team']} vs ${game['Home Team']}, isFeatured: ${isFeatured}, League: ${game.League}`);
                 
                 if (isFeatured) {
                     // Group featured games under "FEATURED"
                     if (!leagueGroups['FEATURED']) leagueGroups['FEATURED'] = [];
                     leagueGroups['FEATURED'].push(game);
+                    console.log('Added to FEATURED group');
                 } else {
                     // Group regular games by their league
                     const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
                     if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
                     leagueGroups[leagueDisplayName].push(game);
+                    console.log(`Added to ${leagueDisplayName} group`);
                 }
             });
+            
+            console.log('Final league groups:', Object.keys(leagueGroups));
+            console.log('FEATURED group games:', leagueGroups['FEATURED'] ? leagueGroups['FEATURED'].length : 0);
         } else {
             leagueGroups['singleLeague'] = gamesData;
         }
@@ -6314,6 +6322,7 @@ async function fetchFeaturedGames() {
                 try {
                     featuredGames = await fetchFeaturedGames();
                     console.log(`Found ${featuredGames.length} featured games for today`);
+                    console.log('Featured games data:', featuredGames);
                     
                     // Mark featured games
                     featuredGames.forEach(game => {
