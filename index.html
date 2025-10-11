@@ -6435,7 +6435,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     return false;
                 });
                 
-                if (gamesData.length === 0) {
+                // For NCAAF, filter out hockey games
+                const filteredGamesData = gamesData.filter(game => {
+                    if (leagueKey === 'NCAAF' && game.League === 'USA: NCAA') {
+                        return game.Sport === 'American Football';
+                    }
+                    return true;
+                });
+                
+                if (filteredGamesData.length === 0) {
                     todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
                     // Switch to Upcoming tab if no games today
                     const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
@@ -6476,7 +6484,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('league-schedule-today-content').style.display = 'block';
             document.getElementById('league-schedule-upcoming-content').style.display = 'none';
                 
-                const sortedGames = gamesData.sort(sortGames);
+                const sortedGames = filteredGamesData.sort(sortGames);
                 renderGames(todayScheduleContent, sortedGames, false);
             } catch (error) {
                 console.error('Error loading today\'s schedule:', error);
