@@ -5621,7 +5621,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // All leagues use FlashLiveAPI (gamesCollectionRef)
         // For NCAAF, also filter by Sport to exclude hockey games
         let query = gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr);
-        if (leagueKey === 'NCAAF') {
+        if (leagueId === 'USA: NCAA') {
             query = query.where('Sport', '==', 'American Football');
         }
         
@@ -5684,12 +5684,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     return false;
                 });
                 
-                if (leagueGames.length === 0) {
+                // For NCAAF, filter out hockey games from yesterday's scores
+                const filteredLeagueGames = leagueGames.filter(game => {
+                    if (leagueId === 'USA: NCAA') {
+                        return game.Sport === 'American Football';
+                    }
+                    return true;
+                });
+                
+                if (filteredLeagueGames.length === 0) {
                     yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
                     return;
                 }
                 
-                const gamesData = leagueGames.sort(sortGames);
+                const gamesData = filteredLeagueGames.sort(sortGames);
                 renderGames(yesterdayScheduleContent, gamesData, false);
             }, err => { 
                 console.error('Error fetching yesterday scores for', leagueId, ':', err);
