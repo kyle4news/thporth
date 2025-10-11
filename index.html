@@ -8916,7 +8916,6 @@ const VIDEOS_CONFIG = {
         'Home': '_S4vCO7EXWQbgfcVZ',
         'MLS': 'TTfWQ2SKVZMPKGD9',
         'NBA': '6TVMNSk3afZmhsLi',
-        'NHL': 'Rj2KNuQXoY7IdWW8',
         'LaLiga': 'dbiFC60cU9Yj94dT',
         'UFC': 'IlJbcKJuWHSyc7ZV',
         'Bundesliga': 'mPIKuLJkRaEWJJ5b',
@@ -8961,6 +8960,10 @@ const VIDEOS_CONFIG = {
         'MLB': {
             highlights: 'VTAPXtLpRtEGkfzO',
             allVideos: '0r7sMjvCjaspA2dD'
+        },
+        'NHL': {
+            highlights: '6hslZAxd7onqWIfw',
+            allVideos: 'Rj2KNuQXoY7IdWW8'
         }
         // Add more two-tab configurations as needed
     }
@@ -9008,6 +9011,24 @@ function loadVideosWithTabs(section) {
     // Set up tab event listeners
     const highlightsTab = document.querySelector('.videos-tab[data-tab="highlights"]');
     const allVideosTab = document.querySelector('.videos-tab[data-tab="all-videos"]');
+    
+    // Customize tab labels for NHL, reset for others
+    if (section === 'NHL') {
+        if (highlightsTab) {
+            highlightsTab.textContent = 'QUICK RECAPS';
+        }
+        if (allVideosTab) {
+            allVideosTab.textContent = 'ALL VIDEOS';
+        }
+    } else {
+        // Reset to default labels for other sections
+        if (highlightsTab) {
+            highlightsTab.textContent = 'HIGHLIGHTS';
+        }
+        if (allVideosTab) {
+            allVideosTab.textContent = 'ALL VIDEOS';
+        }
+    }
     
     if (highlightsTab) {
         highlightsTab.addEventListener('click', () => {
