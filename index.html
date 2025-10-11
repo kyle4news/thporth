@@ -6252,21 +6252,37 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (error) { standingsContent.innerHTML = `<p style="color: #ef4444;">Error loading standings.</p>`; }
     }
     
-    async function fetchFeaturedGames() {
-        try {
-            const response = await fetch('/getFeaturedGames');
-            const data = await response.json();
-            return data.games || [];
-        } catch (error) {
-            console.error('Error fetching featured games:', error);
-            return [];
+async function fetchFeaturedGames() {
+    try {
+        console.log('Fetching featured games...');
+        const response = await fetch('/getFeaturedGames');
+        console.log('Featured games response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const data = await response.json();
+        console.log('Featured games data:', data);
+        return data.games || [];
+    } catch (error) {
+        console.error('Error fetching featured games:', error);
+        return [];
     }
+}
 
     async function fetchFeaturedGamesForDate(dateStr) {
         try {
+            console.log(`Fetching featured games for date: ${dateStr}`);
             const response = await fetch(`/getFeaturedGames?date=${dateStr}`);
+            console.log(`Featured games for ${dateStr} response status:`, response.status);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
+            console.log(`Featured games data for ${dateStr}:`, data);
             return data.games || [];
         } catch (error) {
             console.error(`Error fetching featured games for ${dateStr}:`, error);
@@ -6293,13 +6309,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Get regular games
                 const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
                 
-                // Get featured games
-                const featuredGames = await fetchFeaturedGames();
-                
-                // Mark featured games
-                featuredGames.forEach(game => {
-                    game.isFeatured = true;
-                });
+                // Try to get featured games, but don't fail if it doesn't work
+                let featuredGames = [];
+                try {
+                    featuredGames = await fetchFeaturedGames();
+                    console.log(`Found ${featuredGames.length} featured games for today`);
+                    
+                    // Mark featured games
+                    featuredGames.forEach(game => {
+                        game.isFeatured = true;
+                    });
+                } catch (error) {
+                    console.error('Error fetching featured games:', error);
+                    // Continue without featured games if there's an error
+                }
                 
                 // Combine games with featured games first
                 const allGames = [...featuredGames, ...gamesData];
@@ -6343,14 +6366,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Get yesterday's games
                 const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
                 
-                // Get yesterday's featured games
-                const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
-                const yesterdayFeaturedGames = await fetchFeaturedGamesForDate(yesterdayStr);
-                
-                // Mark yesterday's featured games
-                yesterdayFeaturedGames.forEach(game => {
-                    game.isFeatured = true;
-                });
+                // Try to get yesterday's featured games, but don't fail if it doesn't work
+                let yesterdayFeaturedGames = [];
+                try {
+                    const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
+                    yesterdayFeaturedGames = await fetchFeaturedGamesForDate(yesterdayStr);
+                    console.log(`Found ${yesterdayFeaturedGames.length} featured games for yesterday`);
+                    
+                    // Mark yesterday's featured games
+                    yesterdayFeaturedGames.forEach(game => {
+                        game.isFeatured = true;
+                    });
+                } catch (error) {
+                    console.error('Error fetching yesterday\'s featured games:', error);
+                    // Continue without featured games if there's an error
+                }
                 
                 // Combine games with yesterday's featured games first
                 const allGames = [...yesterdayFeaturedGames, ...gamesData];
