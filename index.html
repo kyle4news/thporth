@@ -4650,31 +4650,167 @@ document.addEventListener('DOMContentLoaded', function () {
         const leagueGroups = {};
 
         if (isGroupedByLeague) {
+            // Separate featured games from regular games
+            const featuredGames = [];
+            const regularGames = [];
+            
             gamesData.forEach(game => {
-                // Check if this is a featured game (has a special property or is in featured games list)
                 const isFeatured = game.isFeatured || false;
-                
                 if (isFeatured) {
-                    // Group featured games under "FEATURED"
-                    if (!leagueGroups['FEATURED']) leagueGroups['FEATURED'] = [];
-                    leagueGroups['FEATURED'].push(game);
+                    featuredGames.push(game);
                 } else {
-                    // Group regular games by their league
-                    const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
-                    if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
-                    leagueGroups[leagueDisplayName].push(game);
+                    regularGames.push(game);
                 }
+            });
+            
+            // If there are featured games, create a single FEATURED group
+            if (featuredGames.length > 0) {
+                leagueGroups['FEATURED'] = featuredGames;
+            }
+            
+            // Group regular games by their league
+            regularGames.forEach(game => {
+                const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
+                if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
+                leagueGroups[leagueDisplayName].push(game);
             });
         } else {
             leagueGroups['singleLeague'] = gamesData;
         }
 
         const sortedLeagueNames = isGroupedByLeague 
-            ? Object.keys(leagueGroups).sort((a, b) => (LEAGUE_DISPLAY_ORDER.indexOf(a) === -1 ? 99 : LEAGUE_DISPLAY_ORDER.indexOf(a)) - (LEAGUE_DISPLAY_ORDER.indexOf(b) === -1 ? 99 : LEAGUE_DISPLAY_ORDER.indexOf(b)))
+            ? Object.keys(leagueGroups).sort((a, b) => {
+                // FEATURED should always come first
+                if (a === 'FEATURED' && b !== 'FEATURED') return -1;
+                if (a !== 'FEATURED' && b === 'FEATURED') return 1;
+                
+                // For regular leagues, use display order
+                const aIndex = LEAGUE_DISPLAY_ORDER.indexOf(a) === -1 ? 99 : LEAGUE_DISPLAY_ORDER.indexOf(a);
+                const bIndex = LEAGUE_DISPLAY_ORDER.indexOf(b) === -1 ? 99 : LEAGUE_DISPLAY_ORDER.indexOf(b);
+                return aIndex - bIndex;
+            })
             : ['singleLeague'];
 
         sortedLeagueNames.forEach(leagueNameKey => {
             const games = leagueGroups[leagueNameKey];
+            
+            // Special handling for FEATURED section
+            if (leagueNameKey === 'FEATURED') {
+                // Create main FEATURED title
+                const featuredSection = document.createElement("div");
+                featuredSection.className = "league-section";
+                
+                const mainTitle = document.createElement("div");
+                mainTitle.className = "league-title";
+                const titleText = document.createTextNode("FEATURED");
+                mainTitle.appendChild(titleText);
+                featuredSection.appendChild(mainTitle);
+                
+                // Group featured games by league
+                const gamesByLeague = {};
+                games.forEach(game => {
+                    const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
+                    if (!gamesByLeague[leagueDisplayName]) gamesByLeague[leagueDisplayName] = [];
+                    gamesByLeague[leagueDisplayName].push(game);
+                });
+                
+                // Render each league's games with sub-headers
+                Object.keys(gamesByLeague).forEach(leagueName => {
+                    const leagueGames = gamesByLeague[leagueName];
+                    
+                    // Create sub-header (bold, all-caps, no box)
+                    const subHeader = document.createElement("div");
+                    subHeader.style.fontWeight = "bold";
+                    subHeader.style.textTransform = "uppercase";
+                    subHeader.style.fontSize = "11px";
+                    subHeader.style.color = "#e5e7eb";
+                    subHeader.style.padding = "8px 5px 4px 5px";
+                    subHeader.textContent = leagueName;
+                    featuredSection.appendChild(subHeader);
+                    
+                    // Create table for this league's games
+                    const table = document.createElement("table");
+                    table.className = "game-table";
+                    table.style.width = "100%";
+                    table.style.maxWidth = "100%";
+                    table.style.borderCollapse = "collapse";
+                    table.style.tableLayout = "fixed";
+                    
+                    const colgroup = document.createElement("colgroup");
+                    const col1 = document.createElement("col");
+                    col1.style.width = "40px";
+                    const col2 = document.createElement("col");
+                    col2.style.width = "auto";
+                    const col3 = document.createElement("col");
+                    col3.style.width = "25px";
+                    const col4 = document.createElement("col");
+                    col4.style.width = "50px";
+                    colgroup.appendChild(col1);
+                    colgroup.appendChild(col2);
+                    colgroup.appendChild(col3);
+                    colgroup.appendChild(col4);
+                    table.appendChild(colgroup);
+                    
+                    const tbody = document.createElement("tbody");
+                    
+                    // Check if this is a soccer league
+                    const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup', 'USL Championship', 'UEFA W Champions League', 'CAF Qualifiers', 'UEFA European Qualifiers', '2027 AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(leagueName);
+                    
+                    leagueGames.forEach(data => {
+                        const home = data['Home Team'] || '';
+                        const away = data['Away Team'] || '';
+                        const homeScore = data['Home Score'] || '';
+                        const awayScore = data['Away Score'] || '';
+                        const startTime = data['Start Time'];
+                        const status = data['Status'] || '';
+                        const matchStatus = data['Match Status'] || data['StageType'] || '';
+                        
+                        const isLive = matchStatus === 'LIVE';
+                        const isFinal = matchStatus === 'FINISHED';
+                        
+                        let displayHomeScore = homeScore;
+                        let displayAwayScore = awayScore;
+                        let displayTimeLabel = '';
+                        
+                        if (isLive) {
+                            displayTimeLabel = status || 'LIVE';
+                        } else if (isFinal) {
+                            displayTimeLabel = 'FT';
+                        } else if (startTime) {
+                            const dt = luxon.DateTime.fromMillis(startTime.seconds ? startTime.seconds * 1000 : startTime);
+                            displayTimeLabel = dt.setZone('America/New_York').toFormat('h:mm a');
+                        }
+                        
+                        const row1 = document.createElement("tr");
+                        const row2 = document.createElement("tr");
+                        
+                        if (isSoccerLeague) {
+                            row1.innerHTML = `<td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${data.channel || ''}</div></td>`;
+                            row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td>`;
+                        } else {
+                            row1.innerHTML = `<td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${data.channel || ''}</div></td>`;
+                            row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td>`;
+                        }
+                        
+                        let gameStatusClass = 'scheduled-game';
+                        if (isLive) gameStatusClass = 'live-game';
+                        if (isFinal) gameStatusClass = 'final-game';
+                        row1.classList.add(gameStatusClass);
+                        row2.classList.add(gameStatusClass);
+                        
+                        tbody.appendChild(row1);
+                        tbody.appendChild(row2);
+                    });
+                    
+                    table.appendChild(tbody);
+                    featuredSection.appendChild(table);
+                });
+                
+                container.appendChild(featuredSection);
+                return; // Skip the rest of the loop for FEATURED
+            }
+            
+            // Regular league rendering (non-featured)
             const leagueSection = document.createElement("div");
             if(isGroupedByLeague) {
                 leagueSection.className = "league-section";
@@ -4695,7 +4831,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Ligue 1") {
+                } else if (actualLeagueName === "Ligue 1") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/tOAXV6hU-QJIQNuDK.png";
                     logo.alt = "Ligue 1 Logo";
@@ -4708,7 +4844,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "CFL") {
+                } else if (actualLeagueName === "CFL") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/CFL.png?raw=true";
                     logo.alt = "CFL Logo";
@@ -4721,7 +4857,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Super Lig") {
+                } else if (actualLeagueName === "Super Lig") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Super%20lig.png?raw=true";
                     logo.alt = "Super Lig Logo";
@@ -4734,7 +4870,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "UEFA Europa League") {
+                } else if (actualLeagueName === "UEFA Europa League") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png";
                     logo.alt = "UEFA Europa League Logo";
@@ -4747,7 +4883,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "UEFA Conference League") {
+                } else if (actualLeagueName === "UEFA Conference League") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/6a9THkA7-fmGCnzrf.png";
                     logo.alt = "UEFA Conference League Logo";
@@ -4760,7 +4896,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Formula One") {
+                } else if (actualLeagueName === "Formula One") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/f1.png?raw=true";
                     logo.alt = "Formula One Logo";
@@ -4773,7 +4909,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "NCAAF") {
+                } else if (actualLeagueName === "NCAAF") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/ncaaf.png?raw=true";
                     logo.alt = "NCAAF Logo";
@@ -4786,7 +4922,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "ATP" || leagueNameKey === "WTA") {
+                } else if (actualLeagueName === "ATP" || leagueNameKey === "WTA") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/atp.png?raw=true";
                     logo.alt = "Tennis Logo";
@@ -4799,7 +4935,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "WNBA") {
+                } else if (actualLeagueName === "WNBA") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/WNBA.png?raw=true";
                     logo.alt = "WNBA Logo";
@@ -4812,7 +4948,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "LIV Golf") {
+                } else if (actualLeagueName === "LIV Golf") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/LIVGolf.png?raw=true";
                     logo.alt = "LIV Golf Logo";
@@ -4825,7 +4961,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "IndyCar") {
+                } else if (actualLeagueName === "IndyCar") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/indycar.png?raw=true";
                     logo.alt = "IndyCar Logo";
@@ -4838,7 +4974,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "NCAAM" || leagueNameKey === "NCAAW" || leagueNameKey === "NCAA Baseball" || leagueNameKey === "NCAA Softball") {
+                } else if (actualLeagueName === "NCAAM" || leagueNameKey === "NCAAW" || leagueNameKey === "NCAA Baseball" || leagueNameKey === "NCAA Softball") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png";
                     logo.alt = "NCAA Logo";
@@ -4851,7 +4987,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "MotoGP") {
+                } else if (actualLeagueName === "MotoGP") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/motogp.png?raw=true";
                     logo.alt = "MotoGP Logo";
@@ -4864,7 +5000,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "LPGA Tour") {
+                } else if (actualLeagueName === "LPGA Tour") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/LPGATour.png?raw=true";
                     logo.alt = "LPGA Tour Logo";
@@ -4877,7 +5013,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "NBA" || leagueNameKey === "NBA Preseason") {
+                } else if (actualLeagueName === "NBA" || leagueNameKey === "NBA Preseason") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/OhgQNlXI-nyYPIw0n.png";
                     logo.alt = "NBA Logo";
@@ -4890,7 +5026,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "MLB") {
+                } else if (actualLeagueName === "MLB") {
                     const logo = document.createElement("img");
                     logo.src = "https://www.flashscore.com/res/image/data/QPJ3alWI-pS3BMXxt.png";
                     logo.alt = "MLB Logo";
@@ -4903,7 +5039,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "MLS") {
+                } else if (actualLeagueName === "MLS") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/82tQHwgU-r9l5Je0r.png";
                     logo.alt = "MLS Logo";
@@ -4916,7 +5052,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "LaLiga") {
+                } else if (actualLeagueName === "LaLiga") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/6aNYx0jD-A3tOPy9B.png";
                     logo.alt = "LaLiga Logo";
@@ -4929,7 +5065,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Serie A") {
+                } else if (actualLeagueName === "Serie A") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/rFHMayEO-2exwJQks.png";
                     logo.alt = "Serie A Logo";
@@ -4942,7 +5078,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Premier League") {
+                } else if (actualLeagueName === "Premier League") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/premierleague.png?raw=true";
                     logo.alt = "Premier League Logo";
@@ -4955,7 +5091,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Bundesliga") {
+                } else if (actualLeagueName === "Bundesliga") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/fqltz6CO-4ATnefbq.png";
                     logo.alt = "Bundesliga Logo";
@@ -4968,7 +5104,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Women's Cricket World Cup") {
+                } else if (actualLeagueName === "Women's Cricket World Cup") {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/b/b5/2025_Women%27s_Cricket_World_Cup_logo.svg/500px-2025_Women%27s_Cricket_World_Cup_logo.svg.png";
                     logo.alt = "Women's Cricket World Cup Logo";
@@ -4981,7 +5117,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "ICC Test Series") {
+                } else if (actualLeagueName === "ICC Test Series") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-icc.png?raw=true";
                     logo.alt = "ICC Test Series Logo";
@@ -4994,7 +5130,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "T20 International") {
+                } else if (actualLeagueName === "T20 International") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-t20.png?raw=true";
                     logo.alt = "T20 International Logo";
@@ -5007,7 +5143,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "UEFA W Champions League") {
+                } else if (actualLeagueName === "UEFA W Champions League") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/URiA2CjD-tGWdkkzC.png";
                     logo.alt = "UEFA Women's Champions League Logo";
@@ -5020,7 +5156,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "USL Championship") {
+                } else if (actualLeagueName === "USL Championship") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/rHzeKoXI-nN00V7HJ.png";
                     logo.alt = "USL Championship Logo";
@@ -5033,7 +5169,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "NCAA Men's Hockey") {
+                } else if (actualLeagueName === "NCAA Men's Hockey") {
                     const logo = document.createElement("img");
                     logo.src = "https://www.ncaa.com/modules/custom/casablanca_core/img/sportbanners/icehockey-men.png";
                     logo.alt = "NCAA Men's Hockey Logo";
@@ -5046,7 +5182,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "OHL") {
+                } else if (actualLeagueName === "OHL") {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/8/8f/OHL_Logo.svg/500px-OHL_Logo.svg.png";
                     logo.alt = "OHL Logo";
@@ -5059,7 +5195,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "CAF Qualifiers") {
+                } else if (actualLeagueName === "CAF Qualifiers") {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/7/72/Confederation_of_African_Football_logo.svg/410px-Confederation_of_African_Football_logo.svg.png";
                     logo.alt = "CAF Qualifiers Logo";
@@ -5072,7 +5208,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "UEFA European Qualifiers") {
+                } else if (actualLeagueName === "UEFA European Qualifiers") {
                     const logo = document.createElement("img");
                     logo.src = "https://a4.espncdn.com/combiner/i?img=%2Fi%2Fleaguelogos%2Fsoccer%2F500%2F67.png";
                     logo.alt = "UEFA European Qualifiers Logo";
@@ -5085,7 +5221,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "2027 AFC Asian Cup Qualifiers" || leagueNameKey === "AFC Qualifiers") {
+                } else if (actualLeagueName === "2027 AFC Asian Cup Qualifiers" || leagueNameKey === "AFC Qualifiers") {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/2/28/Asian_Football_Confederation_logo_2025.svg/500px-Asian_Football_Confederation_logo_2025.svg.png";
                     logo.alt = leagueNameKey + " Logo";
@@ -5098,7 +5234,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "CONCACAF Qualifiers") {
+                } else if (actualLeagueName === "CONCACAF Qualifiers") {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Concacaf_logo.svg/500px-Concacaf_logo.svg.png";
                     logo.alt = "CONCACAF Qualifiers Logo";
@@ -5111,7 +5247,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Club Friendly") {
+                } else if (actualLeagueName === "Club Friendly") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Soccer.png?raw=true";
                     logo.alt = "Club Friendly Logo";
@@ -5124,7 +5260,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "International Friendly") {
+                } else if (actualLeagueName === "International Friendly") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Soccer.png?raw=true";
                     logo.alt = "International Friendly Logo";
@@ -5137,7 +5273,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "NHL" || leagueNameKey === "NHL Preseason") {
+                } else if (actualLeagueName === "NHL" || leagueNameKey === "NHL Preseason") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/nhl.png?raw=true";
                     logo.alt = "NHL Logo";
@@ -5150,7 +5286,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "NWSL") {
+                } else if (actualLeagueName === "NWSL") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/nwsl.png?raw=true";
                     logo.alt = "NWSL Logo";
@@ -5163,7 +5299,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "NASCAR Cup Series") {
+                } else if (actualLeagueName === "NASCAR Cup Series") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/nascar.png?raw=true";
                     logo.alt = "NASCAR Cup Series Logo";
@@ -5176,7 +5312,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "UFC") {
+                } else if (actualLeagueName === "UFC") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/ufc.png?raw=true";
                     logo.alt = "UFC Logo";
@@ -5189,7 +5325,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "MLS") {
+                } else if (actualLeagueName === "MLS") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/mls.png?raw=true";
                     logo.alt = "MLS Logo";
@@ -5202,7 +5338,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Copa Sudamericana") {
+                } else if (actualLeagueName === "Copa Sudamericana") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/CopaSudamericana.png?raw=true";
                     logo.alt = "Copa Sudamericana Logo";
@@ -5215,7 +5351,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "FA Cup") {
+                } else if (actualLeagueName === "FA Cup") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/FACup.png?raw=true";
                     logo.alt = "FA Cup Logo";
@@ -5228,7 +5364,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "UEFA Champions League") {
+                } else if (actualLeagueName === "UEFA Champions League") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/UCL.png?raw=true";
                     logo.alt = "UEFA Champions League Logo";
@@ -5241,7 +5377,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Coppa Italia") {
+                } else if (actualLeagueName === "Coppa Italia") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/CoppaItalia.png?raw=true";
                     logo.alt = "Coppa Italia Logo";
@@ -5254,7 +5390,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Copa Libertadores") {
+                } else if (actualLeagueName === "Copa Libertadores") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/CopaLibertadores.png?raw=true";
                     logo.alt = "Copa Libertadores Logo";
@@ -5267,7 +5403,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Saudi Pro League") {
+                } else if (actualLeagueName === "Saudi Pro League") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/RSL.png?raw=true";
                     logo.alt = "Saudi Pro League Logo";
@@ -5280,7 +5416,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Liga MX") {
+                } else if (actualLeagueName === "Liga MX") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/ligamx.png?raw=true";
                     logo.alt = "Liga MX Logo";
@@ -5293,7 +5429,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Ryder Cup") {
+                } else if (actualLeagueName === "Ryder Cup") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Ryder%20Cup.png?raw=true";
                     logo.alt = "Ryder Cup Logo";
@@ -5306,7 +5442,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Eredivisie") {
+                } else if (actualLeagueName === "Eredivisie") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Eredivisie.png?raw=true";
                     logo.alt = "Eredivisie Logo";
@@ -5319,7 +5455,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "EFL Championship") {
+                } else if (actualLeagueName === "EFL Championship") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/EFL%20Championship.png?raw=true";
                     logo.alt = "EFL Championship Logo";
@@ -5332,7 +5468,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Brasileirão") {
+                } else if (actualLeagueName === "Brasileirão") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Brasileirao.png?raw=true";
                     logo.alt = "Brasileirão Logo";
@@ -5345,7 +5481,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Argentine Primera División") {
+                } else if (actualLeagueName === "Argentine Primera División") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-Argentina%20Torneo%20Betano.png?raw=true";
                     logo.alt = "Argentine Primera División Logo";
@@ -5358,7 +5494,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Scottish Cup") {
+                } else if (actualLeagueName === "Scottish Cup") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-ScottishCup.png?raw=true";
                     logo.alt = "Scottish Cup Logo";
@@ -5371,7 +5507,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Women's Super League") {
+                } else if (actualLeagueName === "Women's Super League") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-WSL.png?raw=true";
                     logo.alt = "Women's Super League Logo";
@@ -5384,7 +5520,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Liga Portugal") {
+                } else if (actualLeagueName === "Liga Portugal") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-Liga%20Portugal.png?raw=true";
                     logo.alt = "Liga Portugal Logo";
@@ -5397,7 +5533,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Scottish Premiership") {
+                } else if (actualLeagueName === "Scottish Premiership") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-SPFL.png?raw=true";
                     logo.alt = "Scottish Premiership Logo";
@@ -5410,7 +5546,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "Campeones Cup") {
+                } else if (actualLeagueName === "Campeones Cup") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/CampeonesCup.png?raw=true";
                     logo.alt = "Campeones Cup Logo";
@@ -5423,7 +5559,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     title.appendChild(logo);
-                } else if (leagueNameKey === "FIFA U-20 World Cup") {
+                } else if (actualLeagueName === "FIFA U-20 World Cup") {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/4/43/2025_FIFA_U-20_World_Cup_logo.svg/315px-2025_FIFA_U-20_World_Cup_logo.svg.png";
                     logo.alt = "FIFA U-20 World Cup Logo";
@@ -6366,6 +6502,7 @@ async function fetchFeaturedGames() {
                 // Try to get yesterday's featured games, but don't fail if it doesn't work
                 let yesterdayFeaturedGames = [];
                 try {
+                    const { DateTime } = luxon;
                     const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
                     yesterdayFeaturedGames = await fetchFeaturedGamesForDate(yesterdayStr);
                     console.log(`Found ${yesterdayFeaturedGames.length} featured games for yesterday`);
