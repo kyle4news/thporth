@@ -6255,15 +6255,11 @@ document.addEventListener('DOMContentLoaded', function () {
 async function fetchFeaturedGames() {
     try {
         console.log('Fetching featured games from Firestore...');
-        const db = firebase.firestore();
-        const featuredRef = db.collection("artifacts/flashlive-daily-scraper/public/data/Featured");
+        const { DateTime } = luxon;
+        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
         
-        const snapshot = await featuredRef.get();
-        const featuredGames = snapshot.docs.map(doc => doc.data());
-        
-        console.log(`Found ${featuredGames.length} featured games from Firestore`);
-        console.log('Featured games data:', featuredGames);
-        return featuredGames;
+        // Use the date-specific function to get today's featured games
+        return await fetchFeaturedGamesForDate(todayStr);
     } catch (error) {
         console.error('Error fetching featured games:', error);
         return [];
@@ -6276,9 +6272,12 @@ async function fetchFeaturedGames() {
             const db = firebase.firestore();
             const featuredRef = db.collection("artifacts/flashlive-daily-scraper/public/data/Featured");
             
-            // Filter by date if needed (for now, get all featured games)
+            // Get all featured games and filter by date
             const snapshot = await featuredRef.get();
-            const featuredGames = snapshot.docs.map(doc => doc.data());
+            const allFeaturedGames = snapshot.docs.map(doc => doc.data());
+            
+            // Filter games that match the requested date
+            const featuredGames = allFeaturedGames.filter(game => game.gameDate === dateStr);
             
             console.log(`Found ${featuredGames.length} featured games from Firestore for date ${dateStr}`);
             console.log(`Featured games data for ${dateStr}:`, featuredGames);
