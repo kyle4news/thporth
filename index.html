@@ -4754,7 +4754,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const tbody = document.createElement("tbody");
                     
                     // Check if this is a soccer league
-                    const isSoccerLeague = isSoccer(leagueGames[0]?.League, leagueGames[0]?.Sport);
+                    const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup', 'USL Championship', 'UEFA W Champions League', 'CAF Qualifiers', 'UEFA European Qualifiers', '2027 AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(leagueName);
                     
                     leagueGames.forEach(data => {
                         const home = data['Home Team'] || '';
