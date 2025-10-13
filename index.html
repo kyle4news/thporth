@@ -6412,6 +6412,78 @@ async function fetchFeaturedGames() {
         }
     }
 
+    async function getChannelDataForGames(games) {
+        try {
+            const db = firebase.firestore();
+            const gamesWithChannels = [];
+            
+            for (const game of games) {
+                let channelData = null;
+                
+                // Try to find channel data in upcoming schedule collections
+                const leagueName = game.League;
+                const gameId = game['Game ID'];
+                
+                // Map league names to collection names
+                const collectionMap = {
+                    'USA: NFL': 'NFL',
+                    'NFL': 'NFL',
+                    'USA: NBA': 'NBA',
+                    'NBA': 'NBA', 
+                    'USA: MLB': 'MLB',
+                    'MLB': 'MLB',
+                    'USA: NHL': 'NHL',
+                    'NHL': 'NHL',
+                    'USA: NCAA': 'NCAAF',
+                    'NCAAF': 'NCAAF',
+                    'England: Premier League': 'Premier League',
+                    'Premier League': 'Premier League',
+                    'Spain: LaLiga': 'LaLiga',
+                    'LaLiga': 'LaLiga',
+                    'Italy: Serie A': 'Serie A',
+                    'Serie A': 'Serie A',
+                    'Germany: Bundesliga': 'Bundesliga',
+                    'Bundesliga': 'Bundesliga',
+                    'France: Ligue 1': 'Ligue 1',
+                    'Ligue 1': 'Ligue 1'
+                };
+                
+                const collectionName = collectionMap[leagueName];
+                if (collectionName) {
+                    try {
+                        console.log(`Looking for channel data for ${leagueName} game ${gameId} in collection ${collectionName}`);
+                        const scheduleRef = db.collection(`artifacts/flashlive-daily-scraper/public/data/${collectionName}`);
+                        const querySnapshot = await scheduleRef.where('Game ID', '==', gameId).get();
+                        
+                        console.log(`Found ${querySnapshot.size} matching documents for ${leagueName} game ${gameId}`);
+                        
+                        if (!querySnapshot.empty) {
+                            const scheduleData = querySnapshot.docs[0].data();
+                            console.log(`Channel data found: ${scheduleData.channel}`);
+                            channelData = {
+                                ...game,
+                                channel: scheduleData.channel || game.channel
+                            };
+                        } else {
+                            console.log(`No documents found for ${leagueName} game ${gameId}`);
+                        }
+                    } catch (error) {
+                        console.log(`Error looking up channel data for ${leagueName} game ${gameId}:`, error);
+                    }
+                } else {
+                    console.log(`No collection mapping found for league: ${leagueName}`);
+                }
+                
+                gamesWithChannels.push(channelData || game);
+            }
+            
+            return gamesWithChannels;
+        } catch (error) {
+            console.error('Error fetching channel data:', error);
+            return games;
+        }
+    }
+
     function fetchTodayGames(callback) {
         const todayContainer = document.getElementById('games');
         const errorDiv = document.getElementById('error');
@@ -6430,6 +6502,23 @@ async function fetchFeaturedGames() {
                 
                 // Get regular games
                 const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                
+                // Try to get channel data for games that don't have it
+                try {
+                    console.log('Fetching channel data for games...');
+                    const gamesWithChannels = await getChannelDataForGames(gamesData);
+                    gamesData.forEach((game, index) => {
+                        if (gamesWithChannels[index] && gamesWithChannels[index].channel) {
+                            console.log(`Found channel data for ${game.League} game: ${game['Home Team']} vs ${game['Away Team']} - Channel: ${gamesWithChannels[index].channel}`);
+                            game.channel = gamesWithChannels[index].channel;
+                        } else {
+                            console.log(`No channel data found for ${game.League} game: ${game['Home Team']} vs ${game['Away Team']}`);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching channel data:', error);
+                    // Continue without channel data if there's an error
+                }
                 
                 // Try to get featured games, but don't fail if it doesn't work
                 let featuredGames = [];
