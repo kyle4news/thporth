@@ -5454,8 +5454,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     featuredByLeague[leagueDisplayName].push(game);
                 });
                 
+                // Sort sub-leagues by the order games appear in Google Sheets
+                // Create a map of league names to their first appearance index in the original games array
+                const leagueOrderMap = {};
+                games.forEach((game, index) => {
+                    const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
+                    if (!leagueOrderMap.hasOwnProperty(leagueDisplayName)) {
+                        leagueOrderMap[leagueDisplayName] = index;
+                    }
+                });
+                
+                const sortedSubLeagues = Object.keys(featuredByLeague).sort((a, b) => 
+                    (leagueOrderMap[a] || 999) - (leagueOrderMap[b] || 999)
+                );
+                
                 // Render each sub-league within FEATURED
-                Object.keys(featuredByLeague).forEach(subLeagueName => {
+                sortedSubLeagues.forEach(subLeagueName => {
                     const subLeagueGames = featuredByLeague[subLeagueName];
                     
                     // Create sub-header (bold, all-caps, no box background)
