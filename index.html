@@ -5443,6 +5443,127 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 leagueSection.appendChild(title);
             }
+            
+            // Special handling for FEATURED section - group by sub-leagues
+            if (leagueNameKey === 'FEATURED' && isGroupedByLeague) {
+                // Group featured games by their actual league
+                const featuredByLeague = {};
+                games.forEach(game => {
+                    const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
+                    if (!featuredByLeague[leagueDisplayName]) featuredByLeague[leagueDisplayName] = [];
+                    featuredByLeague[leagueDisplayName].push(game);
+                });
+                
+                // Render each sub-league within FEATURED
+                Object.keys(featuredByLeague).forEach(subLeagueName => {
+                    const subLeagueGames = featuredByLeague[subLeagueName];
+                    
+                    // Create sub-header (bold, all-caps, no box background)
+                    const subHeader = document.createElement("div");
+                    subHeader.style.fontWeight = "bold";
+                    subHeader.style.textTransform = "uppercase";
+                    subHeader.style.fontSize = "11px";
+                    subHeader.style.color = "#e5e7eb";
+                    subHeader.style.padding = "8px 5px 4px 5px";
+                    subHeader.style.marginTop = "0px";
+                    subHeader.textContent = subLeagueName;
+                    leagueSection.appendChild(subHeader);
+                    
+                    // Now render games for this sub-league
+                    const subTable = document.createElement("table");
+                    subTable.className = "game-table";
+                    subTable.style.width = "100%";
+                    subTable.style.maxWidth = "100%";
+                    subTable.style.borderCollapse = "collapse";
+                    subTable.style.tableLayout = "fixed";
+                    
+                    const subColgroup = document.createElement("colgroup");
+                    subColgroup.innerHTML = `
+                        <col style="width: 23%;">
+                        <col style="width: 44%;">
+                        <col style="width: 15%;">
+                        <col style="width: 18%;">
+                    `;
+                    subTable.appendChild(subColgroup);
+                    
+                    let lastDisplayedTimeLabel = null;
+                    
+                    const spacerRow = subTable.insertRow();
+                    spacerRow.innerHTML = '<td colspan="4" style="height: 5px; padding: 0; border: none;"></td>';
+                    
+                    subLeagueGames.forEach(data => {
+                        const home = getTeamDisplayName(data["Home Team"] || "");
+                        const away = getTeamDisplayName(data["Away Team"] || "");
+                        const homeScore = data["Home Score"], awayScore = data["Away Score"];
+                        const matchStatus = (data["Match Status"] || "").toUpperCase();
+                        const rawStart = data["Start Time"];
+                        
+                        const isLive = matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE");
+                        const isFinal = matchStatus.includes("FINISHED") || matchStatus.includes("FINAL") || matchStatus.includes("GAME OVER");
+                        let currentTimeLabel = "";
+
+                        if (isLive) {
+                            let parsedStatus = '';
+                            const displayLeague = getLeagueDisplayName(data.League, data.Sport);
+                            if (displayLeague === "MLB") {
+                                const inningHalf = data.inningHalf || "";
+                                const currentInning = data.currentInning || "";
+                                if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
+                            } else {
+                                parsedStatus = getGranularLiveStatus(data);
+                            }
+                            currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
+                        } else if (isFinal) {
+                            currentTimeLabel = "F";
+                        } else if (rawStart && rawStart.toDate) {
+                            currentTimeLabel = luxon.DateTime.fromJSDate(rawStart.toDate()).toFormat('h:mm a');
+                        } else {
+                            currentTimeLabel = "TBD";
+                        }
+
+                        let displayTimeLabel = currentTimeLabel;
+                        if (!isLive && !isFinal && currentTimeLabel !== "TBD") {
+                            if (currentTimeLabel === lastDisplayedTimeLabel) displayTimeLabel = "";
+                            else lastDisplayedTimeLabel = currentTimeLabel;
+                        }
+                        
+                        let displayAwayScore = awayScore ?? '';
+                        let displayHomeScore = homeScore ?? '';
+                        
+                        if (!isLive && !isFinal) {
+                           displayAwayScore = '';
+                           displayHomeScore = '';
+                        }
+
+                        const row1 = subTable.insertRow();
+                        row1.className = "game-row";
+                        const row2 = subTable.insertRow();
+                        row2.className = "game-row game-separator";
+                        
+                        const displayLeagueForCheck = getLeagueDisplayName(data.League, data.Sport);
+                        const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup', 'USL Championship', 'UEFA W Champions League', 'CAF Qualifiers', 'UEFA European Qualifiers', '2027 AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(displayLeagueForCheck);
+                        
+                        if (isSoccerLeague) {
+                            row1.innerHTML = `<td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${data.channel || ''}</div></td>`;
+                            row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td>`;
+                        } else {
+                            row1.innerHTML = `<td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${data.channel || ''}</div></td>`;
+                            row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td>`;
+                        }
+
+                        let gameStatusClass = 'scheduled-game';
+                        if (isLive) gameStatusClass = 'live-game';
+                        if (isFinal) gameStatusClass = 'final-game';
+                        row1.classList.add(gameStatusClass);
+                        row2.classList.add(gameStatusClass);
+                    });
+                    
+                    leagueSection.appendChild(subTable);
+                });
+                
+                container.appendChild(leagueSection);
+                return; // Skip normal rendering for FEATURED
+            }
 
             const table = document.createElement("table");
             table.className = "game-table";
