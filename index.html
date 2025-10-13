@@ -4350,7 +4350,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const leagueInfo = LEAGUE_DATA_CONFIG[currentLeague];
                     if (leagueInfo) {
                         const { DateTime } = luxon;
-                        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+                        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
                         getCachedGames(leagueInfo.leagueId, todayStr); // Pre-cache fresh data
                     }
                 }
@@ -5754,7 +5754,7 @@ document.addEventListener('DOMContentLoaded', function () {
      function fetchLeagueSchedule(leagueId, leagueName) {
         scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
         
         // Find the league config to get the collection name
         const leagueConfig = Object.values(LEAGUE_DATA_CONFIG).find(config => config.leagueId === leagueId);
@@ -6377,7 +6377,7 @@ async function fetchFeaturedGames() {
     try {
         console.log('Fetching featured games from Firestore...');
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
         
         // Use the date-specific function to get only today's featured games
         return await fetchFeaturedGamesForDate(todayStr);
@@ -6419,7 +6419,7 @@ async function fetchFeaturedGames() {
 
         errorDiv.textContent = "";
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
 
         return gamesCollectionRef.where('gameDate', '==', todayStr)
             .onSnapshot(async snapshot => {
@@ -6491,7 +6491,7 @@ async function fetchFeaturedGames() {
                 let yesterdayFeaturedGames = [];
                 try {
                     const { DateTime } = luxon;
-                    const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
+                    const yesterdayStr = DateTime.now().setZone('America/Denver').minus({ days: 1 }).toISODate();
                     yesterdayFeaturedGames = await fetchFeaturedGamesForDate(yesterdayStr);
                     console.log(`Found ${yesterdayFeaturedGames.length} featured games for yesterday`);
                     
@@ -6594,7 +6594,7 @@ async function fetchFeaturedGames() {
         // Load TODAY schedule - use FlashLiveAPI for MLB, individual collections for others
         todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
         
         // Use the same approach as home page - get all games for today, then filter by league
         (async () => {
@@ -6750,7 +6750,7 @@ async function fetchFeaturedGames() {
         
         // Get only today's soccer games using the consolidated approach
         const { DateTime } = luxon;
-        const today = DateTime.now().setZone('America/New_York');
+        const today = DateTime.now().setZone('America/Denver');
         const todayStr = today.toISODate();
         
         // Get only today's games
@@ -6798,7 +6798,7 @@ async function fetchFeaturedGames() {
 
     function loadAllSoccerGames(soccerLeagues, container) {
         const { DateTime } = luxon;
-        const today = DateTime.now().setZone('America/New_York');
+        const today = DateTime.now().setZone('America/Denver');
         const todayStr = today.toISODate();
         
         
