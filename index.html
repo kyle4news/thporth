@@ -6460,9 +6460,13 @@ async function fetchFeaturedGames() {
                                 ...game,
                                 channel: scheduleData.channel || game.channel
                             };
+                        } else if (leagueName === 'USA: NFL') {
+                            console.log(`No NFL collection document found for Game ID: ${gameId}`);
                         }
                     } catch (error) {
-                        // Silently continue if channel data not found
+                        if (leagueName === 'USA: NFL') {
+                            console.log(`Error looking up NFL Game ID ${gameId}:`, error);
+                        }
                     }
                 }
                 
