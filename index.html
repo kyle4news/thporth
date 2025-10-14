@@ -4682,6 +4682,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const title = document.createElement("div");
                 title.className = "league-title";
                 
+                // Add left padding to FEATURED title to match logo spacing
+                if (leagueNameKey === 'FEATURED') {
+                    title.style.paddingLeft = '5px';
+                }
+                
                 // Add league logo if applicable
                 if (leagueNameKey === "NFL") {
                     const logo = document.createElement("img");
@@ -5475,15 +5480,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 sortedTitles.forEach(titleText => {
                     const titleGames = featuredByTitle[titleText];
                     
-                    // Create sub-header (normal weight, preserve case, no box background)
+                    // Sort games within this title group by their order field
+                    titleGames.sort((a, b) => (a.order || 999) - (b.order || 999));
+                    
+                    // Create sub-header (normal weight, preserve case, black box background)
                     const subHeader = document.createElement("div");
                     subHeader.style.fontWeight = "normal";
                     subHeader.style.textTransform = "none";
                     subHeader.style.fontSize = "11px";
                     subHeader.style.color = "#e5e7eb";
-                    subHeader.style.padding = "8px 0px 4px 0px";
+                    subHeader.style.padding = "8px 5px 4px 5px";
                     subHeader.style.marginTop = "0px";
                     subHeader.style.textAlign = "left";
+                    subHeader.style.display = "flex";
+                    subHeader.style.alignItems = "center";
+                    subHeader.style.backgroundColor = "#000000";
+                    subHeader.style.width = "100%";
+                    subHeader.style.boxSizing = "border-box";
                     subHeader.textContent = titleText;
                     leagueSection.appendChild(subHeader);
                     
@@ -6391,14 +6404,38 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (error) { standingsContent.innerHTML = `<p style="color: #ef4444;">Error loading standings.</p>`; }
     }
     
+// Cache for featured games
+let featuredGamesCache = {
+    data: [],
+    timestamp: 0,
+    date: null
+};
+
 async function fetchFeaturedGames() {
     try {
-        console.log('Fetching featured games from Firestore...');
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/Denver').toISODate();
+        const now = Date.now();
         
-        // Use the date-specific function to get only today's featured games
-        return await fetchFeaturedGamesForDate(todayStr);
+        // Cache for 5 minutes to match live game update frequency
+        if (featuredGamesCache.date === todayStr && 
+            featuredGamesCache.timestamp > 0 && 
+            (now - featuredGamesCache.timestamp) < 300000) {
+            console.log('Using cached featured games');
+            return featuredGamesCache.data;
+        }
+        
+        console.log('Fetching featured games from Firestore...');
+        const games = await fetchFeaturedGamesForDate(todayStr);
+        
+        // Update cache
+        featuredGamesCache = {
+            data: games,
+            timestamp: now,
+            date: todayStr
+        };
+        
+        return games;
     } catch (error) {
         console.error('Error fetching featured games:', error);
         return [];
@@ -6407,24 +6444,17 @@ async function fetchFeaturedGames() {
 
     async function fetchFeaturedGamesForDate(dateStr) {
         try {
-            console.log(`Fetching featured games for date: ${dateStr} from Firestore`);
             const db = firebase.firestore();
             const featuredRef = db.collection("artifacts/flashlive-daily-scraper/public/data/Featured");
             
-            // Get all featured games and filter by the requested date and extract game IDs
-            const snapshot = await featuredRef.get();
-            const allFeaturedGames = snapshot.docs.map(doc => doc.data());
+            // Query only featured games for the specific date
+            const snapshot = await featuredRef.where('gameDate', '==', dateStr).get();
             
-            const featuredGameIds = allFeaturedGames
-                .filter(game => {
-                    const gameDate = game.gameDate || game.date;
-                    return gameDate === dateStr;
-                })
-                .map(game => game['Game ID']);
-            
-            if (featuredGameIds.length === 0) {
+            if (snapshot.empty) {
                 return [];
             }
+            
+            const featuredGamesForDate = snapshot.docs.map(doc => doc.data());
             
             // Now fetch the LIVE data for these game IDs from sportsGames or yesterdayScores
             const { DateTime } = luxon;
@@ -6438,23 +6468,29 @@ async function fetchFeaturedGames() {
             const gamesRef = db.collection(collectionName);
             
             // Separate MLB games from other games
-            const mlbFeaturedGames = allFeaturedGames.filter(game => game.Sport === 'Baseball');
-            const nonMlbFeaturedGames = allFeaturedGames.filter(game => game.Sport !== 'Baseball');
+            const mlbFeaturedGames = featuredGamesForDate.filter(game => game.Sport === 'Baseball');
+            const nonMlbFeaturedGames = featuredGamesForDate.filter(game => game.Sport !== 'Baseball');
             
-            // Only fetch all games if we have MLB games to match
-            let allGames = [];
+            // Only fetch MLB games from the collection if we have MLB featured games
+            let mlbGamesFromCollection = [];
             if (mlbFeaturedGames.length > 0) {
-                const allGamesSnapshot = await gamesRef.get();
-                allGames = allGamesSnapshot.docs.map(doc => doc.data());
+                const mlbSnapshot = await gamesRef.where('Sport', '==', 'Baseball').get();
+                mlbGamesFromCollection = mlbSnapshot.docs.map(doc => doc.data());
             }
             
             let liveFeaturedGames = [];
             
-            // Create a map of game IDs to their title from Featured collection
+            // Create a map of game IDs to their title and order from Featured collection
             const gameIdToTitleMap = {};
-            allFeaturedGames.forEach(game => {
-                if (game['Game ID'] && game.title) {
-                    gameIdToTitleMap[game['Game ID']] = game.title;
+            const gameIdToOrderMap = {};
+            featuredGamesForDate.forEach(game => {
+                if (game['Game ID']) {
+                    if (game.title) {
+                        gameIdToTitleMap[game['Game ID']] = game.title;
+                    }
+                    if (game.order !== undefined) {
+                        gameIdToOrderMap[game['Game ID']] = game.order;
+                    }
                 }
             });
             
@@ -6465,8 +6501,9 @@ async function fetchFeaturedGames() {
                     const gamesSnapshot = await gamesRef.where('Game ID', 'in', nonMlbGameIds).get();
                     liveFeaturedGames = gamesSnapshot.docs.map(doc => {
                         const gameData = doc.data();
-                        // Add title from Featured collection
+                        // Add title and order from Featured collection
                         gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
+                        gameData.order = gameIdToOrderMap[gameData['Game ID']];
                         return gameData;
                     });
                 } else {
@@ -6476,8 +6513,9 @@ async function fetchFeaturedGames() {
                         const gamesSnapshot = await gamesRef.where('Game ID', 'in', batch).get();
                         const batchGames = gamesSnapshot.docs.map(doc => {
                             const gameData = doc.data();
-                            // Add title from Featured collection
+                            // Add title and order from Featured collection
                             gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
+                            gameData.order = gameIdToOrderMap[gameData['Game ID']];
                             return gameData;
                         });
                         liveFeaturedGames = liveFeaturedGames.concat(batchGames);
@@ -6491,9 +6529,7 @@ async function fetchFeaturedGames() {
                 const featuredAway = (featuredGame['Away Team'] || '').toLowerCase().trim();
                 
                 // Find matching game in live data
-                const matchingGame = allGames.find(game => {
-                    if (game.Sport !== 'Baseball') return false;
-                    
+                const matchingGame = mlbGamesFromCollection.find(game => {
                     const gameHome = (game['Home Team'] || '').toLowerCase().trim();
                     const gameAway = (game['Away Team'] || '').toLowerCase().trim();
                     
@@ -6503,8 +6539,9 @@ async function fetchFeaturedGames() {
                 });
                 
                 if (matchingGame) {
-                    // Add title from Featured collection
+                    // Add title and order from Featured collection
                     matchingGame.title = featuredGame.title || '';
+                    matchingGame.order = featuredGame.order;
                     liveFeaturedGames.push(matchingGame);
                 } else {
                     // Fall back to static data if no match found
@@ -6539,7 +6576,6 @@ async function fetchFeaturedGames() {
                 // Get regular games
                 const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
                 
-                
                 // Try to get featured games, but don't fail if it doesn't work
                 let featuredGames = [];
                 try {
@@ -6558,6 +6594,7 @@ async function fetchFeaturedGames() {
                 const allGames = [...featuredGames, ...gamesData];
                 
                 renderGames(todayContainer, allGames, true);
+                
                 if (callback) {
                     callback();
                 }
