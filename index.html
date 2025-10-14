@@ -5445,44 +5445,46 @@ document.addEventListener('DOMContentLoaded', function () {
                 leagueSection.appendChild(title);
             }
             
-            // Special handling for FEATURED section - group by sub-leagues
+            // Special handling for FEATURED section - group by title or league
             if (leagueNameKey === 'FEATURED' && isGroupedByLeague) {
-                // Group featured games by their actual league
-                const featuredByLeague = {};
+                // Group featured games by title (if present) or by their actual league
+                const featuredByTitle = {};
                 games.forEach(game => {
-                    const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
-                    if (!featuredByLeague[leagueDisplayName]) featuredByLeague[leagueDisplayName] = [];
-                    featuredByLeague[leagueDisplayName].push(game);
+                    // Use title if present, otherwise fall back to league name
+                    const groupingKey = game.title || getLeagueDisplayName(game.League, game.Sport) || "Other";
+                    if (!featuredByTitle[groupingKey]) featuredByTitle[groupingKey] = [];
+                    featuredByTitle[groupingKey].push(game);
                 });
                 
-                // Sort sub-leagues by the order field from Google Sheets
-                // Create a map of league names to their minimum order value
-                const leagueOrderMap = {};
+                // Sort groups by the order field from Google Sheets
+                // Create a map of titles to their minimum order value
+                const titleOrderMap = {};
                 games.forEach((game) => {
-                    const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
+                    const groupingKey = game.title || getLeagueDisplayName(game.League, game.Sport) || "Other";
                     const gameOrder = game.order || 999;
-                    if (!leagueOrderMap.hasOwnProperty(leagueDisplayName) || gameOrder < leagueOrderMap[leagueDisplayName]) {
-                        leagueOrderMap[leagueDisplayName] = gameOrder;
+                    if (!titleOrderMap.hasOwnProperty(groupingKey) || gameOrder < titleOrderMap[groupingKey]) {
+                        titleOrderMap[groupingKey] = gameOrder;
                     }
                 });
                 
-                const sortedSubLeagues = Object.keys(featuredByLeague).sort((a, b) => 
-                    (leagueOrderMap[a] || 999) - (leagueOrderMap[b] || 999)
+                const sortedTitles = Object.keys(featuredByTitle).sort((a, b) => 
+                    (titleOrderMap[a] || 999) - (titleOrderMap[b] || 999)
                 );
                 
-                // Render each sub-league within FEATURED
-                sortedSubLeagues.forEach(subLeagueName => {
-                    const subLeagueGames = featuredByLeague[subLeagueName];
+                // Render each title group within FEATURED
+                sortedTitles.forEach(titleText => {
+                    const titleGames = featuredByTitle[titleText];
                     
-                    // Create sub-header (bold, all-caps, no box background)
+                    // Create sub-header (normal weight, preserve case, no box background)
                     const subHeader = document.createElement("div");
-                    subHeader.style.fontWeight = "bold";
-                    subHeader.style.textTransform = "uppercase";
+                    subHeader.style.fontWeight = "normal";
+                    subHeader.style.textTransform = "none";
                     subHeader.style.fontSize = "11px";
                     subHeader.style.color = "#e5e7eb";
-                    subHeader.style.padding = "8px 5px 4px 5px";
+                    subHeader.style.padding = "8px 0px 4px 0px";
                     subHeader.style.marginTop = "0px";
-                    subHeader.textContent = subLeagueName;
+                    subHeader.style.textAlign = "left";
+                    subHeader.textContent = titleText;
                     leagueSection.appendChild(subHeader);
                     
                     // Now render games for this sub-league
@@ -5507,7 +5509,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const spacerRow = subTable.insertRow();
                     spacerRow.innerHTML = '<td colspan="4" style="height: 5px; padding: 0; border: none;"></td>';
                     
-                    subLeagueGames.forEach(data => {
+                    titleGames.forEach(data => {
                         const home = getTeamDisplayName(data["Home Team"] || "");
                         const away = getTeamDisplayName(data["Away Team"] || "");
                         const homeScore = data["Home Score"], awayScore = data["Away Score"];
@@ -6409,19 +6411,108 @@ async function fetchFeaturedGames() {
             const db = firebase.firestore();
             const featuredRef = db.collection("artifacts/flashlive-daily-scraper/public/data/Featured");
             
-            // Get all featured games and filter by the requested date
+            // Get all featured games and filter by the requested date and extract game IDs
             const snapshot = await featuredRef.get();
             const allFeaturedGames = snapshot.docs.map(doc => doc.data());
             
-            // Filter to only games matching the requested date
-            const featuredGames = allFeaturedGames.filter(game => {
-                const gameDate = game.gameDate || game.date;
-                return gameDate === dateStr;
+            const featuredGameIds = allFeaturedGames
+                .filter(game => {
+                    const gameDate = game.gameDate || game.date;
+                    return gameDate === dateStr;
+                })
+                .map(game => game['Game ID']);
+            
+            if (featuredGameIds.length === 0) {
+                return [];
+            }
+            
+            // Now fetch the LIVE data for these game IDs from sportsGames or yesterdayScores
+            const { DateTime } = luxon;
+            const todayStr = DateTime.now().setZone('America/Denver').toISODate();
+            const isToday = dateStr === todayStr;
+            
+            const collectionName = isToday 
+                ? 'artifacts/flashlive-daily-scraper/public/data/sportsGames'
+                : 'artifacts/flashlive-daily-scraper/public/data/yesterdayScores';
+            
+            const gamesRef = db.collection(collectionName);
+            
+            // Separate MLB games from other games
+            const mlbFeaturedGames = allFeaturedGames.filter(game => game.Sport === 'Baseball');
+            const nonMlbFeaturedGames = allFeaturedGames.filter(game => game.Sport !== 'Baseball');
+            
+            // Only fetch all games if we have MLB games to match
+            let allGames = [];
+            if (mlbFeaturedGames.length > 0) {
+                const allGamesSnapshot = await gamesRef.get();
+                allGames = allGamesSnapshot.docs.map(doc => doc.data());
+            }
+            
+            let liveFeaturedGames = [];
+            
+            // Create a map of game IDs to their title from Featured collection
+            const gameIdToTitleMap = {};
+            allFeaturedGames.forEach(game => {
+                if (game['Game ID'] && game.title) {
+                    gameIdToTitleMap[game['Game ID']] = game.title;
+                }
             });
             
-            console.log(`Found ${featuredGames.length} featured games from Firestore for date ${dateStr}`);
-            console.log(`Featured games data for ${dateStr}:`, featuredGames);
-            return featuredGames;
+            // Handle non-MLB games by Game ID matching
+            const nonMlbGameIds = nonMlbFeaturedGames.map(g => g['Game ID']);
+            if (nonMlbGameIds.length > 0) {
+                if (nonMlbGameIds.length <= 10) {
+                    const gamesSnapshot = await gamesRef.where('Game ID', 'in', nonMlbGameIds).get();
+                    liveFeaturedGames = gamesSnapshot.docs.map(doc => {
+                        const gameData = doc.data();
+                        // Add title from Featured collection
+                        gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
+                        return gameData;
+                    });
+                } else {
+                    // Batch queries if more than 10 game IDs
+                    for (let i = 0; i < nonMlbGameIds.length; i += 10) {
+                        const batch = nonMlbGameIds.slice(i, i + 10);
+                        const gamesSnapshot = await gamesRef.where('Game ID', 'in', batch).get();
+                        const batchGames = gamesSnapshot.docs.map(doc => {
+                            const gameData = doc.data();
+                            // Add title from Featured collection
+                            gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
+                            return gameData;
+                        });
+                        liveFeaturedGames = liveFeaturedGames.concat(batchGames);
+                    }
+                }
+            }
+            
+            // Handle MLB games by fuzzy matching team names
+            for (const featuredGame of mlbFeaturedGames) {
+                const featuredHome = (featuredGame['Home Team'] || '').toLowerCase().trim();
+                const featuredAway = (featuredGame['Away Team'] || '').toLowerCase().trim();
+                
+                // Find matching game in live data
+                const matchingGame = allGames.find(game => {
+                    if (game.Sport !== 'Baseball') return false;
+                    
+                    const gameHome = (game['Home Team'] || '').toLowerCase().trim();
+                    const gameAway = (game['Away Team'] || '').toLowerCase().trim();
+                    
+                    // Check if teams match (either home/away or away/home since order might differ)
+                    return (gameHome === featuredHome && gameAway === featuredAway) ||
+                           (gameHome === featuredAway && gameAway === featuredHome);
+                });
+                
+                if (matchingGame) {
+                    // Add title from Featured collection
+                    matchingGame.title = featuredGame.title || '';
+                    liveFeaturedGames.push(matchingGame);
+                } else {
+                    // Fall back to static data if no match found
+                    liveFeaturedGames.push(featuredGame);
+                }
+            }
+            
+            return liveFeaturedGames;
         } catch (error) {
             console.error(`Error fetching featured games for ${dateStr}:`, error);
             return [];
