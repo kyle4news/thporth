@@ -3481,9 +3481,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 // Scroll to top when navigating to a new page
                 window.scrollTo(0, 0);
                 
-                // Scroll all columns to top
+                // Scroll all columns to top EXCEPT the menu column
                 document.querySelectorAll('.column').forEach(col => {
-                    col.scrollTop = 0;
+                    if (!col.classList.contains('menu')) {
+                        col.scrollTop = 0;
+                    }
                 });
                 
                 if (item.dataset.section) {
@@ -3491,6 +3493,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
                 document.querySelectorAll("#menuList li[data-section]").forEach(li => li.classList.remove("selected"));
                 item.classList.add("selected");
+                
+                // Scroll the selected item into view in the menu
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 const section = item.dataset.section;
 
                 if (section === 'Home') {
