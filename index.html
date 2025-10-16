@@ -7553,15 +7553,11 @@ async function fetchFeaturedGames() {
                     const timeDisplay = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
                     const channelDisplay = game.channel || '';
                     
-                    // For NHL, strip city names to show only mascots
-                    let awayTeam = game.away;
-                    let homeTeam = game.home;
-                    if (leagueKey === 'NHL') {
-                        awayTeam = game.away.split(' ').slice(-1)[0]; // Get last word (mascot)
-                        homeTeam = game.home.split(' ').slice(-1)[0]; // Get last word (mascot)
-                    }
+                    // Use getTeamDisplayName to match home page formatting
+                    let awayTeam = getTeamDisplayName(game.away || '');
+                    let homeTeam = getTeamDisplayName(game.home || '');
                     
-                    // Use same table format as renderGames function
+                    // Use EXACT same table format as renderGames function
                     html += `
                         <tr class="game-row scheduled-game">
                             <td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeDisplay}</td>
@@ -7575,18 +7571,26 @@ async function fetchFeaturedGames() {
                         </tr>
                     `;
                 } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'Ligue1', 'MLS', 'NWSL', 'PremierLeague', 'SerieA', 'UEFAEuropaLeague', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'FIFAWorldCupAfricanQualifiers', 'FIFAWorldCupEuropeanQualifiers', '2027AFCAsianCupQualifiers', 'FIFAWorldCupAsianQualifiers', 'FIFAWorldCupCONCACAFQualifiers', 'ClubFriendly'].includes(leagueKey)) {
-                    // Format for soccer leagues: Time on left, Teams on two lines (home on top, away on bottom), Channel on right
+                    // Format for soccer leagues: Use same table format as home page (soccer shows home on top, away on bottom)
                     const timeDisplay = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
                     const channelDisplay = game.channel || '';
+                    
+                    // Use getTeamDisplayName to match home page formatting
+                    const homeTeam = getTeamDisplayName(game.home || '');
+                    const awayTeam = getTeamDisplayName(game.away || '');
+                    
+                    // Use EXACT same table format as renderGames function for soccer
                     html += `
-                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; min-width: 70px; margin-top: 4px;">${timeDisplay}</div>
-                            <div class="teams" style="flex: 1; margin: 0 8px;">
-                                <div class="home-team" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
-                                <div class="away-team" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
-                            </div>
-                            <div class="channel" style="color: #9ca3af; font-size: 10px; font-weight: normal; min-width: 50px; text-align: right; margin-top: 4px;">${channelDisplay}</div>
-                        </div>
+                        <tr class="game-row scheduled-game">
+                            <td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeDisplay}</td>
+                            <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${homeTeam}</td>
+                            <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
+                            <td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
+                        </tr>
+                        <tr class="game-row game-separator scheduled-game">
+                            <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${awayTeam}</td>
+                            <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
+                        </tr>
                     `;
                 } else if (['Boxing'].includes(leagueKey)) {
                     // Boxing: Group by event, show event as subheader, then all boxer matchups under it
