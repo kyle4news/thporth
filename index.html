@@ -6819,9 +6819,15 @@ async function fetchFeaturedGames() {
                 });
                 
                 // For NCAAF, filter out hockey games
+                // For UEFA Champions League, filter out women's games
                 const filteredGamesData = gamesData.filter(game => {
                     if (leagueKey === 'NCAAF' && game.League === 'USA: NCAA') {
                         return game.Sport === 'American Football';
+                    }
+                    if (leagueKey === 'UEFAChampionsLeague') {
+                        // Exclude women's Champions League games
+                        const leagueName = game.League || '';
+                        return !leagueName.toLowerCase().includes('women') && !leagueName.toLowerCase().includes('womens');
                     }
                     return true;
                 });
