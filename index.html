@@ -3481,6 +3481,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 // Scroll to top when navigating to a new page
                 window.scrollTo(0, 0);
                 
+                // Scroll all columns to top
+                document.querySelectorAll('.column').forEach(col => {
+                    col.scrollTop = 0;
+                });
+                
                 if (item.dataset.section) {
                     selectedSection = item.dataset.section;
                 }
