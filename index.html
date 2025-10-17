@@ -6626,6 +6626,11 @@ async function fetchFeaturedGames() {
             });
     }
 
+    // Cache for yesterday's scores to improve performance
+    let yesterdayScoresCache = null;
+    let yesterdayScoresCacheTime = null;
+    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours - yesterday's scores don't change until next day
+
     function fetchYesterdayScores() {
         const scoresContainer = document.getElementById('dynamicScoresContent');
         const scoresLoading = document.getElementById('scoresLoading');
@@ -6634,19 +6639,25 @@ async function fetchFeaturedGames() {
 
         if (!scoresContainer || !scoresLoading || !scoresError) return;
 
+        // Check cache first
+        const now = Date.now();
+        if (yesterdayScoresCache && yesterdayScoresCacheTime && (now - yesterdayScoresCacheTime) < CACHE_DURATION) {
+            console.log('Using cached yesterday scores');
+            renderYesterdayScores(yesterdayScoresCache);
+            return;
+        }
+
         scoresLoading.style.display = 'flex';
         scoresError.style.display = 'none';
         scoresContainer.innerHTML = '';
 
         // Read from yesterdayScores collection (completed games from all leagues)
         const yesterdayScoresRef = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
-        console.log('Attempting to read from collection:', "artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
 
         yesterdayScoresRef.get()
             .then(async snapshot => {
-            scoresLoading.style.display = 'none';
-                console.log('Yesterday scores snapshot:', snapshot);
-                console.log('Snapshot size:', snapshot.size);
+                scoresLoading.style.display = 'none';
+                
                 if (snapshot.empty) {
                     scoresContainer.innerHTML = '<p style="padding: 10px;">No completed games found. Check back after games finish.</p>';
                     return;
@@ -6656,32 +6667,21 @@ async function fetchFeaturedGames() {
                 const { DateTime } = luxon;
                 const now = DateTime.now().setZone('America/Denver');
                 const yesterdayStr = now.minus({ days: 1 }).toISODate();
-                const todayStr = now.toISODate();
-                
-                console.log('Current date:', todayStr);
-                console.log('Filtering for yesterday:', yesterdayStr);
                 
                 const allGamesData = snapshot.docs.map(doc => doc.data());
-                console.log('Sample game data:', allGamesData.slice(0, 3).map(g => ({ gameDate: g.gameDate, league: g.League, sport: g.Sport })));
                 
                 // Try to get games from yesterday first
                 let gamesData = allGamesData.filter(game => game.gameDate === yesterdayStr).sort(sortGames);
-                console.log(`Filtered ${gamesData.length} games from ${allGamesData.length} total for yesterday (${yesterdayStr})`);
                 
                 // If no games found for yesterday, try to get the most recent games available
                 if (gamesData.length === 0) {
-                    console.log('No games found for yesterday. Available dates:', [...new Set(allGamesData.map(g => g.gameDate))]);
-                    
                     // Get all unique dates and sort them
                     const availableDates = [...new Set(allGamesData.map(g => g.gameDate))].sort();
-                    console.log('Available dates sorted:', availableDates);
                     
                     // If we have dates, get the most recent one
                     if (availableDates.length > 0) {
                         const mostRecentDate = availableDates[availableDates.length - 1];
-                        console.log('Using most recent date:', mostRecentDate);
                         gamesData = allGamesData.filter(game => game.gameDate === mostRecentDate).sort(sortGames);
-                        console.log(`Using ${gamesData.length} games from ${mostRecentDate}`);
                     } else {
                         scoresContainer.innerHTML = '<p style="padding: 10px; color: #9ca3af;">No completed games found.</p>';
                         return;
@@ -6693,7 +6693,6 @@ async function fetchFeaturedGames() {
                 try {
                     const dateToUse = gamesData.length > 0 ? gamesData[0].gameDate : yesterdayStr;
                     yesterdayFeaturedGames = await fetchFeaturedGamesForDate(dateToUse);
-                    console.log(`Found ${yesterdayFeaturedGames.length} featured games for ${dateToUse}`);
                     
                     // Mark yesterday's featured games
                     yesterdayFeaturedGames.forEach(game => {
@@ -6707,15 +6706,31 @@ async function fetchFeaturedGames() {
                 // Combine games with yesterday's featured games first
                 const allGames = [...yesterdayFeaturedGames, ...gamesData];
                 
-                console.log('Yesterday games data:', gamesData);
-                renderGames(scoresContainer, allGames, true);
+                // Cache the results
+                yesterdayScoresCache = allGames;
+                yesterdayScoresCacheTime = Date.now();
+                
+                renderYesterdayScores(allGames);
             })
             .catch(error => {
-            scoresLoading.style.display = 'none';
-            scoresError.style.display = 'block';
-            if(scoresErrorText) scoresErrorText.textContent = "An error occurred while loading scores.";
-            console.error("Error fetching yesterday's scores:", error);
-        });
+                scoresLoading.style.display = 'none';
+                scoresError.style.display = 'block';
+                if(scoresErrorText) scoresErrorText.textContent = "An error occurred while loading scores.";
+                console.error("Error fetching yesterday's scores:", error);
+            });
+    }
+
+    function renderYesterdayScores(gamesData) {
+        const scoresContainer = document.getElementById('dynamicScoresContent');
+        const scoresLoading = document.getElementById('scoresLoading');
+        const scoresError = document.getElementById('scoresErrorMessage');
+        
+        if (!scoresContainer) return;
+        
+        scoresLoading.style.display = 'none';
+        scoresError.style.display = 'none';
+        
+        renderGames(scoresContainer, gamesData, true);
     }
     
     
