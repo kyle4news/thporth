@@ -3519,11 +3519,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     if (espnTab) {
                         espnTab.click();
                     }
-                } else if (section === 'FormulaOne') {
-                    gamesColumn.style.display = 'block';
-                    leagueSpecificColumn.style.display = 'none';
-                    gamesContent.style.display = 'none';
-                    f1Content.style.display = 'flex';
                 } else {
                     gamesColumn.style.display = 'none';
                     leagueSpecificColumn.style.display = 'block';
@@ -3949,13 +3944,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const section = clickedItem.dataset.section;
 
-            if (section === 'FormulaOne') {
-                gamesContent.style.display = 'none';
-                f1Content.style.display = 'flex'; // Use flex to restore layout
-            } else {
-                gamesContent.style.display = 'block';
-                f1Content.style.display = 'none';
-            }
+            gamesContent.style.display = 'block';
+            f1Content.style.display = 'none';
         });
     }
 
@@ -4266,7 +4256,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'NWSL': { leagueId: 'USA: NWSL Women', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJn_hnVeNfnXsDpeer_hgh6dxOcL2VOJzHKsE8cv-OTaX8EzWRYIGNLqLztvuAeuJbM4oEElA-LoiU/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'NWSL' },
   'UEFAEuropaLeague': { leagueId: 'Europe: Europa League', standingsUrl: 'YOUR_UEFAEUROPALEAGUE_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'UEFAEuropaLeague' },
   'UEFAConferenceLeague': { leagueId: 'Europe: Conference League', standingsUrl: 'YOUR_UEFACONFERENCELEAGUE_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'UEFAConferenceLeague' },
-  'FormulaOne': { leagueId: 'WORLD: FORMULA ONE', standingsUrl: 'YOUR_FORMULAONE_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'FormulaOne' },
+  'FormulaOne': { leagueId: 'WORLD: FORMULA ONE', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0ZCePqjVW1racqCCco2b780uxVWrdWV-CSMwkrJbFwgXCsfOdqniDeTmpb53YCkuS2EyUq0JQA9Ab/pub?gid=665565463&single=true&output=csv', upcomingCollectionName: 'FormulaOne' },
   'PGATour': { leagueId: 'WORLD: PGA TOUR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRh72gyQFguMGj0RkHvy-WrAH3EBpOMdikyKIjrOfSs5aAYYlE7NjbRJsBa7gkkJ4gV_nUUYSbCje2L/pub?gid=786471151&single=true&output=csv', upcomingCollectionName: 'PGATour' },
   'UFC': { leagueId: 'WORLD: UFC', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS2Z0QfXw34ib6V0gmcdqVvu6gwy8vHnD6cF3xMhJGZJHpU_s0vwC0h7phvbV0joe4tdVDGHiJ1kBfX/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'UFC' },
   'Boxing': { leagueId: 'WORLD: BOXING', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb/pub?gid=1100984840&single=true&output=csv', upcomingCollectionName: 'Boxing' },
@@ -6477,15 +6467,37 @@ async function fetchFeaturedGames() {
             
             const gamesRef = db.collection(collectionName);
             
-            // Separate MLB games from other games
-            const mlbFeaturedGames = featuredGamesForDate.filter(game => game.Sport === 'Baseball');
-            const nonMlbFeaturedGames = featuredGamesForDate.filter(game => game.Sport !== 'Baseball');
+            // Separate MLB games from other games - check multiple possible Sport field values
+            const mlbFeaturedGames = featuredGamesForDate.filter(game => 
+                game.Sport === 'Baseball' || 
+                game.Sport === 'MLB' || 
+                game.Sport === 'baseball' ||
+                game.Sport === 'mlb' ||
+                (game.League && game.League.toLowerCase().includes('mlb')) ||
+                (game.League && game.League.toLowerCase().includes('baseball'))
+            );
+            const nonMlbFeaturedGames = featuredGamesForDate.filter(game => 
+                game.Sport !== 'Baseball' && 
+                game.Sport !== 'MLB' && 
+                game.Sport !== 'baseball' &&
+                game.Sport !== 'mlb' &&
+                !(game.League && game.League.toLowerCase().includes('mlb')) &&
+                !(game.League && game.League.toLowerCase().includes('baseball'))
+            );
             
             // Only fetch MLB games from the collection if we have MLB featured games
             let mlbGamesFromCollection = [];
             if (mlbFeaturedGames.length > 0) {
-                const mlbSnapshot = await gamesRef.where('Sport', '==', 'Baseball').get();
-                mlbGamesFromCollection = mlbSnapshot.docs.map(doc => doc.data());
+                // Try multiple possible Sport field values
+                const possibleSportValues = ['Baseball', 'MLB', 'baseball', 'mlb'];
+                for (const sportValue of possibleSportValues) {
+                    const mlbSnapshot = await gamesRef.where('Sport', '==', sportValue).get();
+                    if (!mlbSnapshot.empty) {
+                        mlbGamesFromCollection = mlbSnapshot.docs.map(doc => doc.data());
+                        console.log(`Found ${mlbGamesFromCollection.length} MLB games with Sport field: ${sportValue}`);
+                        break;
+                    }
+                }
             }
             
             let liveFeaturedGames = [];
@@ -6640,16 +6652,48 @@ async function fetchFeaturedGames() {
                     return;
                 }
                 
-                // Get yesterday's games
-                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                // Get yesterday's games - filter by gameDate
+                const { DateTime } = luxon;
+                const now = DateTime.now().setZone('America/Denver');
+                const yesterdayStr = now.minus({ days: 1 }).toISODate();
+                const todayStr = now.toISODate();
                 
-                // Try to get yesterday's featured games, but don't fail if it doesn't work
+                console.log('Current date:', todayStr);
+                console.log('Filtering for yesterday:', yesterdayStr);
+                
+                const allGamesData = snapshot.docs.map(doc => doc.data());
+                console.log('Sample game data:', allGamesData.slice(0, 3).map(g => ({ gameDate: g.gameDate, league: g.League, sport: g.Sport })));
+                
+                // Try to get games from yesterday first
+                let gamesData = allGamesData.filter(game => game.gameDate === yesterdayStr).sort(sortGames);
+                console.log(`Filtered ${gamesData.length} games from ${allGamesData.length} total for yesterday (${yesterdayStr})`);
+                
+                // If no games found for yesterday, try to get the most recent games available
+                if (gamesData.length === 0) {
+                    console.log('No games found for yesterday. Available dates:', [...new Set(allGamesData.map(g => g.gameDate))]);
+                    
+                    // Get all unique dates and sort them
+                    const availableDates = [...new Set(allGamesData.map(g => g.gameDate))].sort();
+                    console.log('Available dates sorted:', availableDates);
+                    
+                    // If we have dates, get the most recent one
+                    if (availableDates.length > 0) {
+                        const mostRecentDate = availableDates[availableDates.length - 1];
+                        console.log('Using most recent date:', mostRecentDate);
+                        gamesData = allGamesData.filter(game => game.gameDate === mostRecentDate).sort(sortGames);
+                        console.log(`Using ${gamesData.length} games from ${mostRecentDate}`);
+                    } else {
+                        scoresContainer.innerHTML = '<p style="padding: 10px; color: #9ca3af;">No completed games found.</p>';
+                        return;
+                    }
+                }
+                
+                // Try to get featured games for the date we're using, but don't fail if it doesn't work
                 let yesterdayFeaturedGames = [];
                 try {
-                    const { DateTime } = luxon;
-                    const yesterdayStr = DateTime.now().setZone('America/Denver').minus({ days: 1 }).toISODate();
-                    yesterdayFeaturedGames = await fetchFeaturedGamesForDate(yesterdayStr);
-                    console.log(`Found ${yesterdayFeaturedGames.length} featured games for yesterday`);
+                    const dateToUse = gamesData.length > 0 ? gamesData[0].gameDate : yesterdayStr;
+                    yesterdayFeaturedGames = await fetchFeaturedGamesForDate(dateToUse);
+                    console.log(`Found ${yesterdayFeaturedGames.length} featured games for ${dateToUse}`);
                     
                     // Mark yesterday's featured games
                     yesterdayFeaturedGames.forEach(game => {
@@ -7353,14 +7397,24 @@ async function fetchFeaturedGames() {
                 homeField = 'boxers';
                 timeField = 'time';
                 dateField = 'date';
-            } else if (['LIVGolf', 'MotoGP', 'UFC'].includes(leagueKey)) {
+            } else if (['LIVGolf', 'UFC'].includes(leagueKey)) {
                 awayField = 'event';
                 homeField = 'event';
+                timeField = 'time';
+                dateField = 'date';
+            } else if (leagueKey === 'MotoGP') {
+                awayField = 'away';
+                homeField = 'home';
                 timeField = 'time';
                 dateField = 'date';
             } else if (['LPGATour', 'PGATour'].includes(leagueKey)) {
                 awayField = 'tournament';
                 homeField = 'tournament';
+                timeField = 'time';
+                dateField = 'date';
+            } else if (leagueKey === 'FormulaOne') {
+                awayField = 'away';
+                homeField = 'home';
                 timeField = 'time';
                 dateField = 'date';
             } else if (leagueKey === 'NASCARCupSeries') {
@@ -7629,13 +7683,35 @@ async function fetchFeaturedGames() {
                             <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;"></div>
                         </div>
                     `;
-                } else if (['LIVGolf', 'MotoGP', 'UFC'].includes(leagueKey)) {
-                    // LIVGolf, MotoGP, UFC: Event on top, blank on bottom, time on right
+                } else if (['LIVGolf', 'UFC'].includes(leagueKey)) {
+                    // LIVGolf, UFC: Event on top, blank on bottom, time on right
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1; margin-right: 8px;">
                                 <div class="event" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
+                            </div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
+                        </div>
+                    `;
+                } else if (leagueKey === 'MotoGP') {
+                    // MotoGP: Grand Prix on top, Race type on bottom, time on right
+                    html += `
+                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
+                            <div class="teams" style="flex: 1; margin-right: 8px;">
+                                <div class="event" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
+                                <div class="race-type" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
+                            </div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
+                        </div>
+                    `;
+                } else if (['FormulaOne'].includes(leagueKey)) {
+                    // FormulaOne: Grand Prix on top, Event type on bottom, time on right
+                    html += `
+                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
+                            <div class="teams" style="flex: 1; margin-right: 8px;">
+                                <div class="event" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
+                                <div class="event-type" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
                             </div>
                             <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
                         </div>
