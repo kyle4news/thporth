@@ -1549,6 +1549,11 @@ div[id^="breaking-content-"] a:hover {
     padding-bottom: 60px !important;
   }
   
+  /* Remove bottom padding from news column to allow headlines to extend to breaking section */
+  .column.news {
+    padding-bottom: 0 !important;
+  }
+  
   /* Ensure content areas have proper spacing */
   .column .content-section,
   .column .news-main-container,
@@ -4589,6 +4594,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function getGranularLiveStatus(game) {
         if (game.StageType !== "LIVE") return game.StageType;
         
+        const displayLeague = getLeagueDisplayName(game.League, game.Sport);
+        
         // Handle halftime/intermission for all sports
         if (game.Stage === "HALF_TIME" || game.Stage === "HALF") {
             return "Half";
@@ -4597,9 +4604,56 @@ document.addEventListener('DOMContentLoaded', function () {
             return "Int";
         }
         
-        // For sports with GAME_TIME (hockey, basketball, football)
-        if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
-            return `${game.Stage} ${game.GameTime}`;
+        // NFL, NCAAF, NBA, NCAAW, WNBA - Quarter-based sports
+        if (['NFL', 'NCAAF', 'NBA', 'NCAAW', 'WNBA'].includes(displayLeague)) {
+            if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
+                // Format quarter and time remaining with proper quarter names
+                let quarter = game.Stage;
+                if (quarter === "1ST_QUARTER") quarter = "1st";
+                else if (quarter === "2ND_QUARTER") quarter = "2nd";
+                else if (quarter === "3RD_QUARTER") quarter = "3rd";
+                else if (quarter === "4TH_QUARTER" || quarter === "FOURTH_QUARTER") quarter = "4th";
+                else if (quarter === "OVERTIME") quarter = "OT";
+                else quarter = quarter.replace('_QUARTER', '').replace('_', '');
+                // Format time to include seconds if not present
+                let timeStr = game.GameTime;
+                if (timeStr && !timeStr.includes(':')) {
+                    // If time is just a number (like "11"), add ":00" to make it "11:00"
+                    timeStr = timeStr + ':00';
+                }
+                return `${quarter}<br>${timeStr}`;
+            }
+            return game.Stage;
+        }
+        
+        // NHL - Period-based sport
+        if (displayLeague === 'NHL') {
+            if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
+                // Format period and time remaining
+                const period = game.Stage.replace('_PERIOD', '').replace('_', '');
+                // Format time to include seconds if not present
+                let timeStr = game.GameTime;
+                if (timeStr && !timeStr.includes(':')) {
+                    timeStr = timeStr + ':00';
+                }
+                return `${period}<br>${timeStr}`;
+            }
+            return game.Stage;
+        }
+        
+        // NCAAM - Half-based sport
+        if (displayLeague === 'NCAAM') {
+            if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
+                // Format half and time remaining
+                const half = game.Stage.replace('_HALF', '').replace('_', '');
+                // Format time to include seconds if not present
+                let timeStr = game.GameTime;
+                if (timeStr && !timeStr.includes(':')) {
+                    timeStr = timeStr + ':00';
+                }
+                return `${half}<br>${timeStr}`;
+            }
+            return game.Stage;
         }
         
         // For soccer - calculate minute from timestamps
@@ -5575,10 +5629,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup', 'USL Championship', 'UEFA W Champions League', 'CAF Qualifiers', 'UEFA European Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(displayLeagueForCheck);
                         
                         if (isSoccerLeague) {
-                            row1.innerHTML = `<td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${data.channel || ''}</div></td>`;
+                            row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${data.channel || ''}</div></td>`;
                             row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td>`;
                         } else {
-                            row1.innerHTML = `<td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${data.channel || ''}</div></td>`;
+                            row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${data.channel || ''}</div></td>`;
                             row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td>`;
                         }
 
@@ -5673,15 +5727,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const displayLeague = getLeagueDisplayName(data.League, data.Sport);
                 const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup', 'USL Championship', 'UEFA W Champions League', 'CAF Qualifiers', 'UEFA European Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly'].includes(displayLeague);
                 
-                const channelDisplay = data.channel ? `<td rowspan="2" style="width: 50px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: top; padding-left: 2px; padding-right: 2px;">${data.channel}</td>` : '<td rowspan="2" style="width: 50px; padding-left: 2px; padding-right: 2px;"></td>';
+                // Hide channel data for final games
+                const channelDisplay = (data.channel && !isFinal) ? `<td rowspan="2" style="width: 50px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: top; padding-left: 2px; padding-right: 2px;">${data.channel}</td>` : '<td rowspan="2" style="width: 50px; padding-left: 2px; padding-right: 2px;"></td>';
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${data.channel || ''}</div></td>`;
+                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
                     row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                row1.innerHTML = `<td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${data.channel || ''}</div></td>`;
+                row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
                 row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td>`;
                 }
 
