@@ -4602,11 +4602,6 @@ document.addEventListener('DOMContentLoaded', function () {
         
         const displayLeague = getLeagueDisplayName(game.League, game.Sport);
         
-        // Debug: Log all live games to see what's being processed
-        if (displayLeague === 'MLB') {
-            console.log('MLB game detected:', game);
-        }
-        
         // Handle halftime/intermission for all sports
         if (game.Stage === "HALF_TIME" || game.Stage === "HALF") {
             return "Half";
@@ -5643,14 +5638,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         let currentTimeLabel = "";
 
                         if (isLive) {
-                            // Debug: Log the full game object for MLB games in Featured section
-                            const debugLeague = getLeagueDisplayName(data.League, data.Sport);
-                            if (debugLeague === 'MLB') {
-                                console.log('Featured MLB game object:', data);
-                                console.log('Sport field:', data.Sport);
-                                console.log('League field:', data.League);
-                            }
-                            
                             let parsedStatus = getGranularLiveStatus(data);
                             currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
                         } else if (isFinal) {
