@@ -5577,7 +5577,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 
                 const sortedTitles = Object.keys(featuredByTitle).sort((a, b) => 
-                    (titleOrderMap[a] || 999) - (titleOrderMap[b] || 999)
+                    (titleOrderMap[b] || 999) - (titleOrderMap[a] || 999)
                 );
                 
                 // Render each title group within FEATURED
@@ -5585,7 +5585,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const titleGames = featuredByTitle[titleText];
                     
                     // Sort games within this title group by their order field
-                    titleGames.sort((a, b) => (a.order || 999) - (b.order || 999));
+                    titleGames.sort((a, b) => (b.order || 999) - (a.order || 999));
                     
                     // Create sub-header (normal weight, preserve case, black box background)
                     const subHeader = document.createElement("div");
@@ -5638,8 +5638,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         let currentTimeLabel = "";
 
                         if (isLive) {
-                            let parsedStatus = getGranularLiveStatus(data);
-                            currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
+                            currentTimeLabel = '<span style="color: red;">Live</span>';
                         } else if (isFinal) {
                             currentTimeLabel = "F";
                         } else if (rawStart && rawStart.toDate) {
@@ -5980,7 +5979,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // New function to load standings from Firestore (FlashLive API data)
     async function fetchLeagueStandingsFromFirestore(leagueKey) {
-        console.log('fetchLeagueStandingsFromFirestore called with leagueKey:', leagueKey);
         const standingsContent = document.getElementById('league-standings-content');
         if (!standingsContent) return;
         
@@ -6002,7 +6000,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         
         const firestoreKey = firestoreKeyMap[leagueKey] || leagueKey;
-        console.log(`Looking for standings in Firestore: ${firestoreKey} (from leagueKey: ${leagueKey})`);
         
         try {
             const standingsDoc = await db.collection('standings').doc(firestoreKey).get();
@@ -6013,20 +6010,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             const standingsData = standingsDoc.data();
-            console.log('Raw Firestore data:', standingsData);
             const teams = standingsData.data || [];
-            console.log('Teams array:', teams);
             
             if (teams.length === 0) {
                 standingsContent.innerHTML = '<p>No standings data available.</p>';
                 return true;
             }
             
-            console.log(`Standings for ${firestoreKey}:`, teams.length, 'teams');
-            console.log('Sample team data:', teams[0]);
-            console.log('Has Conference?', teams[0].Conference);
-            console.log('Has Division?', teams[0].Division);
-            console.log('All teams:', teams);
             
             // Build standings table
             let html = '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
@@ -6034,7 +6024,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // Determine if this is a soccer league (uses Points) or US sports (uses Wins/Losses)
             const isSoccerLeague = teams[0].Points !== undefined && teams[0].Points !== 0;
             
-            console.log('Is soccer league?', isSoccerLeague);
             
             if (isSoccerLeague) {
                 // Soccer standings: Rank, Team, MP, W, D, L, GF-GA, Pts
@@ -6064,9 +6053,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             } else {
                 // US Sports standings: Use specific tabbed layouts for each league
-                console.log('Processing US Sports standings for leagueKey:', leagueKey);
                 if (leagueKey === 'NFL') {
-                    console.log('Calling createNFLStandings with teams:', teams);
                     html = createNFLStandings(teams);
                 } else if (leagueKey === 'MLB') {
                     html = createMLBStandings(teams);
@@ -6104,9 +6091,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             html += '</table>';
-            console.log('Final HTML being inserted:', html);
             standingsContent.innerHTML = html;
-            console.log('Content inserted into DOM. Element content:', standingsContent.innerHTML.substring(0, 200) + '...');
             return true;
             
         } catch (error) {
@@ -6117,16 +6102,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // NFL Standings: AFC/NFC tabs with divisions
     function createNFLStandings(teams) {
-        console.log('createNFLStandings received teams:', teams);
-        console.log('Sample team:', teams[0]);
-        console.log('All team conferences:', teams.map(t => t.Conference));
-        console.log('Sample team properties:', Object.keys(teams[0] || {}));
-        console.log('Sample team values:', teams[0]);
         const afcTeams = teams.filter(team => team.Conference === 'AFC');
         const nfcTeams = teams.filter(team => team.Conference === 'NFC');
-        console.log('AFC teams:', afcTeams.length);
-        console.log('NFC teams:', nfcTeams.length);
-        console.log('AFC sample team:', afcTeams[0]);
         
         let html = '<div class="standings-tabs">';
         html += '<button class="tab-button active" onclick="showNFLTab(\'afc\')" id="nfl-afc-tab">AFC</button>';
@@ -6140,7 +6117,6 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '</div>';
         // JavaScript functions will be defined elsewhere
         
-        console.log('Generated NFL HTML:', html);
         return html;
     }
     
@@ -6148,14 +6124,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const divisions = ['East', 'West', 'North', 'South'];
         let html = '';
         
-        console.log('createNFLConferenceStandings called with teams:', teams.length, 'conference:', conference);
-        console.log('Sample team division:', teams[0]?.Division);
         
         divisions.forEach(division => {
             const divisionTeams = teams.filter(team => team.Division === conference + ' ' + division);
-            console.log(conference + ' ' + division + ' teams:', divisionTeams.length);
-            console.log('All divisions in this conference:', teams.map(t => t.Division));
-            console.log('Sample division team:', divisionTeams[0]);
             if (divisionTeams.length === 0) return;
             
             html += '<div class="division-section">';
@@ -6172,7 +6143,6 @@ document.addEventListener('DOMContentLoaded', function () {
             html += '<tbody>';
             
             divisionTeams.forEach((team, index) => {
-                console.log('Processing team:', team.Team, 'Wins:', team.Wins, 'Losses:', team.Losses, 'Ties:', team.Ties);
                 const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                 html += '<tr style="' + rowStyle + '">';
                 html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + team.Team + '</td>';
@@ -6349,12 +6319,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // WNBA Standings: Conference headers (no tabs)
     function createWNBAStandings(teams) {
-        console.log('createWNBAStandings received teams:', teams);
-        console.log('Sample WNBA team:', teams[0]);
         const eastTeams = teams.filter(team => team.Conference === 'Eastern Conference');
         const westTeams = teams.filter(team => team.Conference === 'Western Conference');
-        console.log('East teams:', eastTeams.length);
-        console.log('West teams:', westTeams.length);
         
         let html = '<div class="wnba-standings">';
         html += '<div class="conference-section">';
@@ -6518,11 +6484,9 @@ async function fetchFeaturedGames() {
         if (featuredGamesCache.date === todayStr && 
             featuredGamesCache.timestamp > 0 && 
             (now - featuredGamesCache.timestamp) < 300000) {
-            console.log('Using cached featured games');
             return featuredGamesCache.data;
         }
         
-        console.log('Fetching featured games from Firestore...');
         const games = await fetchFeaturedGamesForDate(todayStr);
         
         // Update cache
@@ -6591,7 +6555,6 @@ async function fetchFeaturedGames() {
                     const mlbSnapshot = await gamesRef.where('Sport', '==', sportValue).get();
                     if (!mlbSnapshot.empty) {
                         mlbGamesFromCollection = mlbSnapshot.docs.map(doc => doc.data());
-                        console.log(`Found ${mlbGamesFromCollection.length} MLB games with Sport field: ${sportValue}`);
                         break;
                     }
                 }
@@ -6739,7 +6702,6 @@ async function fetchFeaturedGames() {
         // Check cache first
         const now = Date.now();
         if (yesterdayScoresCache && yesterdayScoresCacheTime && (now - yesterdayScoresCacheTime) < CACHE_DURATION) {
-            console.log('Using cached yesterday scores');
             renderYesterdayScores(yesterdayScoresCache);
             return;
         }
