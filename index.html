@@ -4602,6 +4602,11 @@ document.addEventListener('DOMContentLoaded', function () {
         
         const displayLeague = getLeagueDisplayName(game.League, game.Sport);
         
+        // Debug: Log all live games to see what's being processed
+        if (displayLeague === 'MLB') {
+            console.log('MLB game detected:', game);
+        }
+        
         // Handle halftime/intermission for all sports
         if (game.Stage === "HALF_TIME" || game.Stage === "HALF") {
             return "Half";
@@ -4620,7 +4625,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 else if (quarter === "3RD_QUARTER") quarter = "3rd";
                 else if (quarter === "4TH_QUARTER" || quarter === "FOURTH_QUARTER") quarter = "4th";
                 else if (quarter === "OVERTIME") quarter = "OT";
-                else quarter = quarter.replace('_QUARTER', '').replace('_', '');
+                else {
+                    // Handle any other quarter format (like "THIRD_QUARTER" -> "3rd")
+                    quarter = quarter.replace('_QUARTER', '');
+                    if (quarter === "FIRST") quarter = "1st";
+                    else if (quarter === "SECOND") quarter = "2nd";
+                    else if (quarter === "THIRD") quarter = "3rd";
+                    else if (quarter === "FOURTH") quarter = "4th";
+                    else quarter = quarter.toLowerCase();
+                }
                 // Format time to include seconds if not present
                 let timeStr = game.GameTime;
                 if (timeStr && !timeStr.includes(':')) {
@@ -4659,6 +4672,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 return `${half}<br>${timeStr}`;
             }
+            return game.Stage;
+        }
+        
+        // MLB - Inning-based sport
+        if (displayLeague === 'MLB') {
+            // Try multiple possible field names for MLB API data
+            const inningHalf = game.inningHalf || game.inning_half || game.half || "";
+            const currentInning = game.currentInning || game.current_inning || game.inning || "";
+            
+            if (inningHalf && currentInning) {
+                return `${inningHalf.slice(0,3)}<br>${currentInning}`;
+            }
+            
+            // Try to extract from Stage field
+            if (game.Stage && game.Stage.includes('INNING')) {
+                return game.Stage.replace('_INNING', '').replace('_', ' ');
+            }
+            
+            // Try to extract from other possible fields
+            if (game.inningState) {
+                return game.inningState;
+            }
+            
+            // For MLB games, try to parse the Stage field more aggressively
+            if (game.Stage) {
+                // Handle cases like "TOP_2ND_INNING" or "BOTTOM_3RD_INNING"
+                if (game.Stage.includes('_INNING')) {
+                    const parts = game.Stage.split('_');
+                    if (parts.length >= 2) {
+                        const half = parts[0]; // TOP or BOTTOM
+                        const inning = parts[1]; // 2ND, 3RD, etc.
+                        return `${half.slice(0,3)}<br>${inning}`;
+                    }
+                }
+            }
+            
             return game.Stage;
         }
         
@@ -5594,15 +5643,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         let currentTimeLabel = "";
 
                         if (isLive) {
-                            let parsedStatus = '';
-                            const displayLeague = getLeagueDisplayName(data.League, data.Sport);
-                            if (displayLeague === "MLB") {
-                                const inningHalf = data.inningHalf || "";
-                                const currentInning = data.currentInning || "";
-                                if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
-                            } else {
-                                parsedStatus = getGranularLiveStatus(data);
+                            // Debug: Log the full game object for MLB games in Featured section
+                            const debugLeague = getLeagueDisplayName(data.League, data.Sport);
+                            if (debugLeague === 'MLB') {
+                                console.log('Featured MLB game object:', data);
+                                console.log('Sport field:', data.Sport);
+                                console.log('League field:', data.League);
                             }
+                            
+                            let parsedStatus = getGranularLiveStatus(data);
                             currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
                         } else if (isFinal) {
                             currentTimeLabel = "F";
