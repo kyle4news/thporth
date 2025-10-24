@@ -4343,6 +4343,38 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
+    // --- GLOBAL GAMES LISTENER (SHARED ACROSS ALL PAGES) ---
+    let globalGamesCache = [];
+    let globalGamesUnsubscribe = null;
+    let globalGamesLoaded = false;
+    
+    function initGlobalGamesListener() {
+        if (globalGamesUnsubscribe) return; // Already initialized
+        
+        const { DateTime } = luxon;
+        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
+        
+        globalGamesUnsubscribe = gamesCollectionRef
+            .where('gameDate', '==', todayStr)
+            .onSnapshot(snapshot => {
+                globalGamesCache = snapshot.docs.map(doc => doc.data());
+                globalGamesLoaded = true;
+            }, err => {
+                console.error("Error in global games listener:", err);
+            });
+    }
+    
+    function getGamesForLeague(leagueId, sportFilter = null) {
+        return globalGamesCache.filter(game => {
+            const leagueMatch = game.League === leagueId;
+            const sportMatch = !sportFilter || game.Sport === sportFilter;
+            return leagueMatch && sportMatch;
+        });
+    }
+    
+    // Initialize immediately on page load
+    initGlobalGamesListener();
+
     // --- PERIODIC REFRESH SYSTEM ---
     // Refresh data every 3 minutes instead of real-time listeners
     let refreshInterval;
@@ -5880,31 +5912,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
      function fetchLeagueSchedule(leagueId, leagueName) {
         scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
-        const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
         
-        // Find the league config to get the collection name
-        const leagueConfig = Object.values(LEAGUE_DATA_CONFIG).find(config => config.leagueId === leagueId);
-        if (!leagueConfig || !leagueConfig.upcomingCollectionName) {
-            scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
-            return;
-        }
+        // Initialize global listener if not already done
+        initGlobalGamesListener();
         
-        // All leagues use FlashLiveAPI (gamesCollectionRef)
-        // For NCAAF, also filter by Sport to exclude hockey games
-        let query = gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr);
-        if (leagueId === 'USA: NCAA') {
-            query = query.where('Sport', '==', 'American Football');
-        }
-        
-        query.onSnapshot(snapshot => {
-                if (snapshot.empty) {
+        // Render function that can be called whenever data updates
+        function renderLeagueGames() {
+            const sportFilter = leagueId === 'USA: NCAA' ? 'American Football' : null;
+            const gamesData = getGamesForLeague(leagueId, sportFilter);
+            
+            if (gamesData.length === 0) {
+                // Only show "no games" if data has loaded
+                if (globalGamesLoaded) {
                     scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
-                    return;
                 }
-                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
-                renderGames(scheduleContent, gamesData, false);
-            }, err => { scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>'; });
+                return;
+            }
+            
+            const sortedGames = gamesData.sort(sortGames);
+            renderGames(scheduleContent, sortedGames, false);
+        }
+        
+        // Render immediately with current cache
+        renderLeagueGames();
+        
+        // Re-render whenever global cache updates
+        const intervalId = setInterval(renderLeagueGames, 1000);
+        
+        // Store interval ID for cleanup (if page navigation happens)
+        if (!window.leagueScheduleIntervals) window.leagueScheduleIntervals = [];
+        window.leagueScheduleIntervals.push(intervalId);
     }
 
     function fetchYesterdayScoresForLeague(leagueId, leagueName) {
@@ -6915,45 +6952,55 @@ async function fetchFeaturedGames() {
         if (!todayContainer || !errorDiv) return () => {};
 
         errorDiv.textContent = "";
-        const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
-
-        return gamesCollectionRef.where('gameDate', '==', todayStr)
-            .onSnapshot(async snapshot => {
-                if (snapshot.empty) {
+        
+        // Initialize global listener
+        initGlobalGamesListener();
+        
+        // Render function
+        async function renderTodayGames() {
+            if (globalGamesCache.length === 0) {
+                // Only show "no games" if data has loaded
+                if (globalGamesLoaded) {
                     todayContainer.innerHTML = `<p style="padding: 10px;">No games found for today.</p>`;
-                    return;
                 }
+                return;
+            }
+            
+            // Get regular games from cache
+            const gamesData = [...globalGamesCache].sort(sortGames);
+            
+            // Try to get featured games, but don't fail if it doesn't work
+            let featuredGames = [];
+            try {
+                featuredGames = await fetchFeaturedGames();
                 
-                // Get regular games
-                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
-                
-                // Try to get featured games, but don't fail if it doesn't work
-                let featuredGames = [];
-                try {
-                    featuredGames = await fetchFeaturedGames();
-                    
-                    // Mark featured games
-                    featuredGames.forEach(game => {
-                        game.isFeatured = true;
-                    });
-                } catch (error) {
-                    console.error('Error fetching featured games:', error);
-                    // Continue without featured games if there's an error
-                }
-                
-                // Combine games with featured games first
-                const allGames = [...featuredGames, ...gamesData];
-                
-                renderGames(todayContainer, allGames, true);
-                
-                if (callback) {
-                    callback();
-                }
-            }, err => { 
-                console.error("Error fetching today's games: ", err);
-                errorDiv.textContent = "Failed to load real-time data.";
-            });
+                // Mark featured games
+                featuredGames.forEach(game => {
+                    game.isFeatured = true;
+                });
+            } catch (error) {
+                console.error('Error fetching featured games:', error);
+                // Continue without featured games if there's an error
+            }
+            
+            // Combine games with featured games first
+            const allGames = [...featuredGames, ...gamesData];
+            
+            renderGames(todayContainer, allGames, true);
+            
+            if (callback) {
+                callback();
+            }
+        }
+        
+        // Initial render
+        renderTodayGames();
+        
+        // Re-render every second to reflect cache updates
+        const intervalId = setInterval(renderTodayGames, 1000);
+        
+        // Return cleanup function
+        return () => clearInterval(intervalId);
     }
 
     // Cache for yesterday's scores to improve performance
