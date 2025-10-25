@@ -17,12 +17,10 @@
         body {
             overflow-y: scroll;
             overflow-x: hidden;
-            height: 100vh;
         }
 
         .video-section {
             width: 100vw;
-            min-height: 100vh;
             height: 100vh;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -31,9 +29,8 @@
         }
 
         .video-section:last-child {
-            height: auto;
-            min-height: 0;
-            grid-template-rows: repeat(1, calc(100vh / 3));
+            height: calc(100vh / 3);
+            grid-template-rows: 1fr;
         }
 
         .video-container {
@@ -43,9 +40,10 @@
             overflow: hidden;
             border: none;
             outline: none;
+            background: #000;
         }
 
-        .video-container iframe {
+        .video-container .player {
             width: 100%;
             height: 100%;
             border: none;
@@ -83,173 +81,224 @@
 
     <div class="video-section">
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/DBWgFXSMr-8?autoplay=1&mute=1&controls=0&loop=1&playlist=DBWgFXSMr-8" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="DBWgFXSMr-8"></div>
             <div class="video-label">Shibuya Crossing, Tokyo</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/rnXIjl_Rzy4?autoplay=1&mute=1&controls=0&loop=1&playlist=rnXIjl_Rzy4" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="rnXIjl_Rzy4"></div>
             <div class="video-label">Times Square, New York</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/B4-L2nfGcuE?autoplay=1&mute=1&controls=0&loop=1&playlist=B4-L2nfGcuE" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="B4-L2nfGcuE"></div>
             <div class="video-label">Bald Eagle Nest, Big Bear Valley, California, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/K_Vg94nBiaY?autoplay=1&mute=1&controls=0&loop=1&playlist=K_Vg94nBiaY" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="K_Vg94nBiaY"></div>
             <div class="video-label">Rialto Bridge, Venice</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/r0szTKKXh-k?autoplay=1&mute=1&controls=0&loop=1&playlist=r0szTKKXh-k" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="r0szTKKXh-k"></div>
             <div class="video-label">Western Wall, Jerusalem</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/86-7Dr7yeVQ?autoplay=1&mute=1&controls=0&loop=1&playlist=86-7Dr7yeVQ" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="86-7Dr7yeVQ"></div>
             <div class="video-label">Bourbon Street, New Orleans</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/7-Qf3g-0xEI?autoplay=1&mute=1&controls=0&loop=1&playlist=7-Qf3g-0xEI" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="7-Qf3g-0xEI"></div>
             <div class="video-label">Great Mosque, Mecca</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/gIv9J38Dax8?autoplay=1&mute=1&controls=0&loop=1&playlist=gIv9J38Dax8" allow="autoplay; encrypted-media"></iframe>
-            <div class="video-label">Niagara Falls</div>
+            <div class="player" data-video-id="gIv9J38Dax8"></div>
+            <div class="video-label">Niagara Falls, New York, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/u4UZ4UvZXrg?autoplay=1&mute=1&controls=0&loop=1&playlist=u4UZ4UvZXrg" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="u4UZ4UvZXrg"></div>
             <div class="video-label">Temple Bar, Dublin</div>
         </div>
     </div>
 
     <div class="video-section">
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/RDqrx6S2z20?autoplay=1&mute=1&controls=0&loop=1&playlist=RDqrx6S2z20" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="RDqrx6S2z20"></div>
             <div class="video-label">Prati District, Rome, Italy</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/57w2gYXjRic?autoplay=1&mute=1&controls=0&loop=1&playlist=57w2gYXjRic" allow="autoplay; encrypted-media"></iframe>
-            <div class="video-label">Abbey Road, London</div>
+            <div class="player" data-video-id="57w2gYXjRic"></div>
+            <div class="video-label">Abbey Road, London, England</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/RV2Iu0wbgec?autoplay=1&mute=1&controls=0&loop=1&playlist=RV2Iu0wbgec" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="RV2Iu0wbgec"></div>
             <div class="video-label">Los Bauliches Beach, Spain</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/-FguEt6H91s?autoplay=1&mute=1&controls=0&loop=1&playlist=-FguEt6H91s" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="-FguEt6H91s"></div>
             <div class="video-label">Broad Street, Oxford</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/KyQAB-TKOVA?autoplay=1&mute=1&controls=0&loop=1&playlist=KyQAB-TKOVA" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="KyQAB-TKOVA"></div>
             <div class="video-label">Watering Hole, Mpala Research Centre, Kenya</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/OzYp4NRZlwQ?autoplay=1&mute=1&controls=0&loop=1&playlist=OzYp4NRZlwQ" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="OzYp4NRZlwQ"></div>
             <div class="video-label">Palais d'Iéna, Paris</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/cn8_34TuMaM?autoplay=1&mute=1&controls=0&loop=1&playlist=cn8_34TuMaM" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="cn8_34TuMaM"></div>
             <div class="video-label">Harry Reid Airport, Las Vegas</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/8EZrLmaouXg?autoplay=1&mute=1&controls=0&loop=1&playlist=8EZrLmaouXg" allow="autoplay; encrypted-media"></iframe>
-            <div class="video-label">Copacabana Beach, Rio de Janeiro</div>
+            <div class="player" data-video-id="8EZrLmaouXg"></div>
+            <div class="video-label">Copacabana Beach, Rio de Janeiro, Brazil</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/sQxL8t0gtu8?autoplay=1&mute=1&controls=0&loop=1&playlist=sQxL8t0gtu8" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="sQxL8t0gtu8"></div>
             <div class="video-label">Chicago Skydeck, Chicago, USA</div>
         </div>
     </div>
 
     <div class="video-section">
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/IFnbDmgP69Q?autoplay=1&mute=1&controls=0&loop=1&playlist=IFnbDmgP69Q" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="IFnbDmgP69Q"></div>
             <div class="video-label">Prague, Czechia</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/xHLEKR3_8iI?autoplay=1&mute=1&controls=0&loop=1&playlist=xHLEKR3_8iI" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="xHLEKR3_8iI"></div>
             <div class="video-label">Overlook Luna Park, Coney Island, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/u70ySp4OuHY?autoplay=1&mute=1&controls=0&loop=1&playlist=u70ySp4OuHY" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="u70ySp4OuHY"></div>
             <div class="video-label">West Parade, Kingston, Jamaica</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/R__e74ULCXQ?autoplay=1&mute=1&controls=0&loop=1&playlist=R__e74ULCXQ" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="R__e74ULCXQ"></div>
             <div class="video-label">Bellagio Conservatory & Botanical Gardens, Las Vegas, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/nWFcWooDAxI?autoplay=1&mute=1&controls=0&loop=1&playlist=nWFcWooDAxI" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="nWFcWooDAxI"></div>
             <div class="video-label">Tossa de Mar, Girona, Spain</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/RH5fgOcO0jg?autoplay=1&mute=1&controls=0&loop=1&playlist=RH5fgOcO0jg" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="RH5fgOcO0jg"></div>
             <div class="video-label">The Franklin Institute, Philadelphia, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/DYWJdgulUEg?autoplay=1&mute=1&controls=0&loop=1&playlist=DYWJdgulUEg" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="DYWJdgulUEg"></div>
             <div class="video-label">Baykalsk, Russia</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/ojLU8UsTiQQ?autoplay=1&mute=1&controls=0&loop=1&playlist=ojLU8UsTiQQ" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="ojLU8UsTiQQ"></div>
             <div class="video-label">Maui, Hawaii, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/Gd9d4q6WvUY?autoplay=1&mute=1&controls=0&loop=1&playlist=Gd9d4q6WvUY" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="Gd9d4q6WvUY"></div>
             <div class="video-label">Dam Square, Amsterdam, Netherlands</div>
         </div>
     </div>
 
     <div class="video-section">
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/AttVS4KM8tY?autoplay=1&mute=1&controls=0&loop=1&playlist=AttVS4KM8tY" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="AttVS4KM8tY"></div>
             <div class="video-label">Praha hlavní nádraží, Prague, Czechia</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/q5522RsCN00?autoplay=1&mute=1&controls=0&loop=1&playlist=q5522RsCN00" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="q5522RsCN00"></div>
             <div class="video-label">Axis Experience Center, Cincinnati, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/RA6Jm7sv_F4?autoplay=1&mute=1&controls=0&loop=1&playlist=RA6Jm7sv_F4" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="RA6Jm7sv_F4"></div>
             <div class="video-label">Stavanger, Norway</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/HkHhXsWci7Q?autoplay=1&mute=1&controls=0&loop=1&playlist=HkHhXsWci7Q" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="HkHhXsWci7Q"></div>
             <div class="video-label">Galveston Beach, Texas, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/MgnXYdXTNWE?autoplay=1&mute=1&controls=0&loop=1&playlist=MgnXYdXTNWE" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="MgnXYdXTNWE"></div>
             <div class="video-label">Coastal towns, United Kingdom</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/xHLEKR3_8iI?autoplay=1&mute=1&controls=0&loop=1&playlist=xHLEKR3_8iI" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="KdXa0xp7jLs"></div>
             <div class="video-label">Statue of Liberty, New York City, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/uvNosrM4muQ?autoplay=1&mute=1&controls=0&loop=1&playlist=uvNosrM4muQ" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="uvNosrM4muQ"></div>
             <div class="video-label">Agdao Market, Davao City, Philippines</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/3LXQWU67Ufk?autoplay=1&mute=1&controls=0&loop=1&playlist=3LXQWU67Ufk" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="3LXQWU67Ufk"></div>
             <div class="video-label">Venice Beach, California, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/tkpmcVQroqs?autoplay=1&mute=1&controls=0&loop=1&playlist=tkpmcVQroqs" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="tkpmcVQroqs"></div>
             <div class="video-label">Broad Haven Beach, Pembrokeshire, Wales</div>
         </div>
     </div>
 
     <div class="video-section">
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/ojLU8UsTiQQ?autoplay=1&mute=1&controls=0&loop=1&playlist=ojLU8UsTiQQ" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="809RMryNnlM"></div>
             <div class="video-label">The RInk, Bryant Park, New York City, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/WeTM0K_MTDA?autoplay=1&mute=1&controls=0&loop=1&playlist=WeTM0K_MTDA" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="WeTM0K_MTDA"></div>
             <div class="video-label">Bay Beach Resort, Koh Samui, Thailand</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/xBGwYTurIsY?autoplay=1&mute=1&controls=0&loop=1&playlist=xBGwYTurIsY" allow="autoplay; encrypted-media"></iframe>
+            <div class="player" data-video-id="xBGwYTurIsY"></div>
             <div class="video-label">Mount Washington Observatory, New Hampshire, USA</div>
         </div>
     </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let players = {};
+        const sections = document.querySelectorAll('.video-section');
+
+        function onYouTubeIframeAPIReady() {
+            playSection(sections[0]);
+
+            for (let i = 1; i < sections.length; i++) {
+                setTimeout(() => {
+                    playSection(sections[i]);
+                }, i * 5000);
+            }
+        }
+
+        function playSection(section) {
+            if (!section) return;
+            
+            const playerDivs = section.querySelectorAll('.player');
+            
+            playerDivs.forEach((playerDiv) => {
+                const videoId = playerDiv.getAttribute('data-video-id');
+                const playerId = playerDiv.id || `player-${videoId}-${Math.random().toString(36).substr(2, 9)}`;
+                playerDiv.id = playerId;
+
+                if (!players[playerId]) {
+                    players[playerId] = new YT.Player(playerId, {
+                        videoId: videoId,
+                        playerVars: {
+                            autoplay: 1,
+                            mute: 1,
+                            controls: 0,
+                            loop: 1,
+                            playlist: videoId,
+                            modestbranding: 1,
+                            rel: 0,
+                            showinfo: 0,
+                            fs: 0,
+                            playsinline: 1
+                        },
+                        events: {
+                            onReady: (event) => {
+                                event.target.playVideo();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    </script>
 </body>
 </html>
