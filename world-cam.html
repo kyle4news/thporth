@@ -22,11 +22,18 @@
 
         .video-section {
             width: 100vw;
+            min-height: 100vh;
             height: 100vh;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
             position: relative;
+        }
+
+        .video-section:last-child {
+            height: auto;
+            min-height: 0;
+            grid-template-rows: repeat(1, calc(100vh / 3));
         }
 
         .video-container {
@@ -148,7 +155,7 @@
         </div>
         <div class="video-container">
             <iframe src="https://www.youtube.com/embed/sQxL8t0gtu8?autoplay=1&mute=1&controls=0&loop=1&playlist=sQxL8t0gtu8" allow="autoplay; encrypted-media"></iframe>
-            <div class="video-label">Chicago Skydeck, Chicago</div>
+            <div class="video-label">Chicago Skydeck, Chicago, USA</div>
         </div>
     </div>
 
@@ -170,8 +177,8 @@
             <div class="video-label">Bellagio Conservatory & Botanical Gardens, Las Vegas, USA</div>
         </div>
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/4CaHlfpGlAI?autoplay=1&mute=1&controls=0&loop=1&playlist=4CaHlfpGlAI" allow="autoplay; encrypted-media"></iframe>
-            <div class="video-label">Alameda Principal, Málaga, Spain</div>
+            <iframe src="https://www.youtube.com/embed/nWFcWooDAxI?autoplay=1&mute=1&controls=0&loop=1&playlist=nWFcWooDAxI" allow="autoplay; encrypted-media"></iframe>
+            <div class="video-label">Tossa de Mar, Girona, Spain</div>
         </div>
         <div class="video-container">
             <iframe src="https://www.youtube.com/embed/RH5fgOcO0jg?autoplay=1&mute=1&controls=0&loop=1&playlist=RH5fgOcO0jg" allow="autoplay; encrypted-media"></iframe>
