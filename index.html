@@ -6189,6 +6189,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'NBA': 'NBAStandings',  // New collection format
             'NHL': 'NHLStandings',  // New collection format
             'NCAAF': 'NCAAFStandings',  // New collection format
+            'UEFAChampionsLeague': 'standings',  // UCL uses generic standings collection
             'WNBA': 'standings'
         };
         
@@ -6203,6 +6204,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'MLB': 'MLB',
             'NBA': 'NBA',
             'NHL': 'NHL',
+            'UEFAChampionsLeague': 'UEFAChampionsLeague',
             'WNBA': 'WNBA'
         };
         
@@ -6240,16 +6242,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             } else {
-                // Old format: single document in 'standings' collection
-                const standingsDoc = await db.collection('standings').doc(firestoreKey).get();
+                // Old format: query 'standings' collection by league field
+                const snapshot = await db.collection('standings')
+                    .where('league', '==', firestoreKey)
+                    .get();
                 
-                if (!standingsDoc.exists) {
+                if (snapshot.empty) {
                     // Fallback to CSV if no Firestore data
                     return false;
                 }
                 
-                const standingsData = standingsDoc.data();
-                teams = standingsData.data || [];
+                teams = snapshot.docs.map(doc => doc.data());
             }
             
             // Cache the fetched data
@@ -9783,7 +9786,7 @@ const VIDEOS_CONFIG = {
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
         'NFL': {
-            highlights: 'zQK9pw6eT6fxttHu',
+            highlights: 'M3cpdiYqKAefdu5t',
             allVideos: 'vsvgWNVcJ1m95kd9'
         },
         'NCAAF': {
