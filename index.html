@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
 
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="Get the latest sports news, social buzz, and live scores for NFL, NBA, MLB, and more — all in one place.">
     <meta name="robots" content="index, follow" />
     <title>THPORTH | Breaking news. Highlights. Social. Videos.</title>
@@ -87,6 +87,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     background-color: #151515;
     color: white;
     overflow-x: hidden; /* Prevent horizontal scrolling */
+    zoom: 1;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
   }
 
   ul,
@@ -535,6 +538,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     margin: 0 auto;
     box-sizing: border-box;
     padding: 0 10px; /* Add horizontal padding to prevent edge cutoff */
+    transform: scale(1);
+    transform-origin: center top;
   }
 
   .column {
@@ -1476,6 +1481,22 @@ div[id^="breaking-content-"] a:hover {
 /* ═══════════════════════════════════════════════════════════════════
    MOBILE RESPONSIVENESS - MAINTAIN DESKTOP, ADD MOBILE
    ═══════════════════════════════════════════════════════════════════ */
+
+/* Very small desktop screens (1200px and below) - Scale down content */
+@media (max-width: 1200px) {
+  .container {
+    transform: scale(0.9);
+    transform-origin: center top;
+  }
+}
+
+/* Small desktop screens (1000px and below) - Scale down more */
+@media (max-width: 1000px) {
+  .container {
+    transform: scale(0.8);
+    transform-origin: center top;
+  }
+}
 
 /* Large screens (1421px+) - Prevent content from stretching too wide */
 @media (min-width: 1441px) {
