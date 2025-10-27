@@ -533,12 +533,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     width: 1421px;
     max-width: 1421px;
     min-width: 1421px;
-    height: calc(100vh - 20px); /* account for topBar + topDivider */
+    height: 100vh !important; /* Full viewport height */
+    min-height: 100vh !important;
     justify-content: center;
     margin: 0 auto;
     box-sizing: border-box;
     padding: 0;
     overflow-x: hidden;
+    position: relative;
+    top: -20px; /* Offset for top bar */
+    padding-top: 20px; /* Add back the space for top bar */
   }
 
   .column {
@@ -572,7 +576,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
 
   .news {
-    flex: 0 0 335px; /* reduced to accommodate 110px Standings panel */
+    flex: 0 0 317px; /* reduced to accommodate 110px Standings panel */
     background-color: #fafaf9;
     padding: 0;
   }
