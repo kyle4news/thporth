@@ -1898,7 +1898,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     
     <!-- Banner Ads Section -->
     <div id="banner-ads" style="display: flex; justify-content: center; align-items: center; background-color: #000; padding: 10px 0; gap: 10px; width: 100%; box-sizing: border-box;">
-      <div class="ad-container" style="width: 728px; height: 90px; display: flex; justify-content: center; align-items: center;">
+      <div class="ad-container" style="width: 728px; height: 90px; display: flex; justify-content: center; align-items: center; transform-origin: center;">
         <script type="text/javascript">
           atOptions = {
             'key' : '452de3915164cea7c2886de2ad095172',
@@ -10258,11 +10258,23 @@ function showNHLTab(conference) {
         // Center the content
         document.body.style.margin = '0 auto';
         document.body.style.width = targetWidth + 'px';
+        
+        // Scale ads to match the zoom level
+        const adContainers = document.querySelectorAll('.ad-container');
+        adContainers.forEach(container => {
+          container.style.transform = `scale(${zoomLevel})`;
+        });
       } else {
         // Reset for mobile
         document.documentElement.style.zoom = '1';
         document.body.style.margin = '0';
         document.body.style.width = '100%';
+        
+        // Reset ad scaling for mobile
+        const adContainers = document.querySelectorAll('.ad-container');
+        adContainers.forEach(container => {
+          container.style.transform = 'scale(1)';
+        });
       }
     }
     
