@@ -40,30 +40,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="Get the latest sports news, social buzz, and live scores for NFL, NBA, MLB, and more — all in one place.">
-    
-    <!-- Simple height fix -->
-    <script>
-      // Ensure full height immediately
-      (function() {
-        function setFullHeight() {
-          const container = document.querySelector('.container');
-          if (container) {
-            container.style.height = '100vh';
-            container.style.minHeight = '100vh';
-          }
-        }
-        
-        // Run immediately
-        setFullHeight();
-        
-        // Also run on DOM ready
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', setFullHeight);
-        } else {
-          setFullHeight();
-        }
-      })();
-    </script>
     <meta name="robots" content="index, follow" />
     <title>THPORTH | Breaking news. Highlights. Social. Videos.</title>
     
@@ -554,19 +530,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   /* ────────────────────────────────────────────────────────── */
   .container {
     display: flex;
-    width: 100vw;
-    max-width: 100vw;
-    min-width: 100vw;
-    height: 100vh !important; /* Full viewport height */
-    min-height: 100vh !important;
+    width: 1421px;
+    max-width: 1421px;
+    min-width: 1421px;
+    height: calc(100vh - 20px); /* account for topBar + topDivider */
     justify-content: center;
     margin: 0 auto;
     box-sizing: border-box;
     padding: 0;
     overflow-x: hidden;
-    position: relative;
-    top: -20px; /* Offset for top bar */
-    padding-top: 20px; /* Add back the space for top bar */
   }
 
   .column {
@@ -589,9 +561,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .main-menu {
     background-color: #151515;
     color: white;
-    flex: 0 0 12%;
-    min-width: 140px;
-    max-width: 200px;
+    flex: 0 0 165px;
     font-size: 11px;
     padding: 0;
   }
@@ -602,17 +572,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
 
   .news {
-    flex: 0 0 28%; /* responsive width */
-    min-width: 300px;
-    max-width: 400px;
+    flex: 0 0 335px; /* reduced to accommodate 110px Standings panel */
     background-color: #fafaf9;
     padding: 0;
   }
 
   .social {
-    flex: 0 0 26%; /* responsive width */
-    min-width: 280px;
-    max-width: 350px;
+    flex: 0 0 317px;
     background-color: #fff;
   }
 
@@ -2286,7 +2252,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="divider"></div>
 
 <!-- ─── TV-LISTINGS COLUMN (Default View) ──────────────────────────────────────── -->
-<div class="column tv-listings" id="games-column" style="flex: 0 0 19%; min-width: 250px; max-width: 350px; background-color: #1f1f1f; overflow-x: hidden; padding-bottom: 40px;">
+<div class="column tv-listings" id="games-column" style="flex: 0 0 250px; background-color: #1f1f1f; overflow-x: hidden; padding-bottom: 40px;">
   <div id="tv-listings-container" style="display: block;">
     <div id="games-header" style="
         position: sticky; top: 0; width: 100%; height: 18px;
@@ -3268,7 +3234,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="divider"></div>
 
         <!-- VIDEOS COLUMN -->
-        <div class="column videos-column" id="videos-column" style="flex: 0 0 15%; min-width: 180px; max-width: 250px; background-color: #000000;">
+        <div class="column videos-column" id="videos-column" style="flex: 0 0 200px; background-color: #000000;">
       <div id="videos-container" style="display: block;">
         <div id="videos-header" style="
             position: sticky; top: 0; width: 100%; height: 18px;
@@ -10280,19 +10246,44 @@ function showNHLTab(conference) {
 </script>
  
     <script>
-    // Simple function to ensure full height - no scaling needed
-    function ensureFullHeight() {
-      // Just ensure the container fills the full height
-      const container = document.querySelector('.container');
-      if (container) {
-        container.style.height = '100vh';
-        container.style.minHeight = '100vh';
+    // Auto-fit website to screen size for desktop browsers
+    function adjustZoom() {
+      // Only apply to desktop (screen width >= 768px)
+      if (window.innerWidth >= 768) {
+        const targetWidth = 1421; // Your design width
+        const currentWidth = window.innerWidth;
+        const zoomLevel = Math.min(currentWidth / targetWidth, 1.2); // Max zoom 120%
+        
+        // Apply zoom to the entire page
+        document.documentElement.style.zoom = zoomLevel;
+        
+        // Center the content
+        document.body.style.margin = '0 auto';
+        document.body.style.width = targetWidth + 'px';
+        
+        // Scale ads to match the zoom level
+        const adContainers = document.querySelectorAll('.ad-container');
+        adContainers.forEach(container => {
+          container.style.transform = `scale(${zoomLevel})`;
+        });
+      } else {
+        // Reset for mobile
+        document.documentElement.style.zoom = '1';
+        document.body.style.margin = '0';
+        document.body.style.width = '100%';
+        
+        // Reset ad scaling for mobile
+        const adContainers = document.querySelectorAll('.ad-container');
+        adContainers.forEach(container => {
+          container.style.transform = 'scale(1)';
+        });
       }
     }
     
     // Run on page load and window resize
-    window.addEventListener('load', ensureFullHeight);
-    window.addEventListener('resize', ensureFullHeight);
+    window.addEventListener('load', adjustZoom);
+    window.addEventListener('resize', adjustZoom);
   </script>
 </body>
 </html>
+
