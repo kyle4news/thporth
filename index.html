@@ -589,7 +589,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .main-menu {
     background-color: #151515;
     color: white;
-    flex: 0 0 165px;
+    flex: 0 0 12%;
+    min-width: 140px;
+    max-width: 200px;
     font-size: 11px;
     padding: 0;
   }
@@ -600,13 +602,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
 
   .news {
-    flex: 0 0 370px; /* reduced to accommodate 110px Standings panel */
+    flex: 0 0 28%; /* responsive width */
+    min-width: 300px;
+    max-width: 400px;
     background-color: #fafaf9;
     padding: 0;
   }
 
   .social {
-    flex: 0 0 350px;
+    flex: 0 0 26%; /* responsive width */
+    min-width: 280px;
+    max-width: 350px;
     background-color: #fff;
   }
 
@@ -2280,7 +2286,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="divider"></div>
 
 <!-- ─── TV-LISTINGS COLUMN (Default View) ──────────────────────────────────────── -->
-<div class="column tv-listings" id="games-column" style="flex: 0 0 250px; background-color: #1f1f1f; overflow-x: hidden; padding-bottom: 40px;">
+<div class="column tv-listings" id="games-column" style="flex: 0 0 19%; min-width: 250px; max-width: 350px; background-color: #1f1f1f; overflow-x: hidden; padding-bottom: 40px;">
   <div id="tv-listings-container" style="display: block;">
     <div id="games-header" style="
         position: sticky; top: 0; width: 100%; height: 18px;
@@ -3262,7 +3268,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="divider"></div>
 
         <!-- VIDEOS COLUMN -->
-        <div class="column videos-column" id="videos-column" style="flex: 0 0 200px; background-color: #000000;">
+        <div class="column videos-column" id="videos-column" style="flex: 0 0 15%; min-width: 180px; max-width: 250px; background-color: #000000;">
       <div id="videos-container" style="display: block;">
         <div id="videos-header" style="
             position: sticky; top: 0; width: 100%; height: 18px;
