@@ -41,20 +41,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="Get the latest sports news, social buzz, and live scores for NFL, NBA, MLB, and more — all in one place.">
     
-    <!-- Immediate height fix to prevent bottom space flash -->
+    <!-- Simple height fix -->
     <script>
-      // Run immediately to prevent layout flash
+      // Ensure full height immediately
       (function() {
         function setFullHeight() {
-          if (window.innerWidth >= 768) {
-            const targetWidth = 1421;
-            const currentWidth = window.innerWidth;
-            const zoomLevel = Math.min(currentWidth / targetWidth, 1.2);
-            
-            document.documentElement.style.zoom = zoomLevel;
-            document.documentElement.style.transformOrigin = 'center top';
-            document.body.style.margin = '0 auto';
-            document.body.style.width = targetWidth + 'px';
+          const container = document.querySelector('.container');
+          if (container) {
+            container.style.height = '100vh';
+            container.style.minHeight = '100vh';
           }
         }
         
@@ -559,9 +554,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   /* ────────────────────────────────────────────────────────── */
   .container {
     display: flex;
-    width: 1421px;
-    max-width: 1421px;
-    min-width: 1421px;
+    width: 100vw;
+    max-width: 100vw;
+    min-width: 100vw;
     height: 100vh !important; /* Full viewport height */
     min-height: 100vh !important;
     justify-content: center;
@@ -10279,44 +10274,19 @@ function showNHLTab(conference) {
 </script>
  
     <script>
-    // Auto-fit website to screen size for desktop browsers
-    function adjustZoom() {
-      // Only apply to desktop (screen width >= 768px)
-      if (window.innerWidth >= 768) {
-        const targetWidth = 1421; // Your design width
-        const currentWidth = window.innerWidth;
-        const zoomLevel = Math.min(currentWidth / targetWidth, 1.2); // Max zoom 120%
-        
-        // Apply zoom to the entire page
-        document.documentElement.style.zoom = zoomLevel;
-        document.documentElement.style.transformOrigin = 'center top';
-        
-        // Center the content
-        document.body.style.margin = '0 auto';
-        document.body.style.width = targetWidth + 'px';
-        
-        // Scale ads to match the zoom level (when they're uncommented)
-        const adContainers = document.querySelectorAll('.ad-container');
-        adContainers.forEach(container => {
-          container.style.transform = `scale(${zoomLevel})`;
-        });
-      } else {
-        // Reset for mobile
-        document.documentElement.style.zoom = '1';
-        document.body.style.margin = '0';
-        document.body.style.width = '100%';
-        
-        // Reset ad scaling for mobile
-        const adContainers = document.querySelectorAll('.ad-container');
-        adContainers.forEach(container => {
-          container.style.transform = 'scale(1)';
-        });
+    // Simple function to ensure full height - no scaling needed
+    function ensureFullHeight() {
+      // Just ensure the container fills the full height
+      const container = document.querySelector('.container');
+      if (container) {
+        container.style.height = '100vh';
+        container.style.minHeight = '100vh';
       }
     }
     
     // Run on page load and window resize
-    window.addEventListener('load', adjustZoom);
-    window.addEventListener('resize', adjustZoom);
+    window.addEventListener('load', ensureFullHeight);
+    window.addEventListener('resize', ensureFullHeight);
   </script>
 </body>
 </html>
