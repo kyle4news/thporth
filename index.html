@@ -10261,7 +10261,13 @@ function showNHLTab(conference) {
         document.body.style.margin = '0 auto';
         document.body.style.width = targetWidth + 'px';
         
-        // Scale ads to match the zoom level
+        // Ensure container always fills full height
+        const container = document.querySelector('.container');
+        if (container) {
+          container.style.height = 'calc(100vh - 20px)';
+        }
+        
+        // Scale ads to match the zoom level (when they're uncommented)
         const adContainers = document.querySelectorAll('.ad-container');
         adContainers.forEach(container => {
           container.style.transform = `scale(${zoomLevel})`;
@@ -10271,6 +10277,12 @@ function showNHLTab(conference) {
         document.documentElement.style.zoom = '1';
         document.body.style.margin = '0';
         document.body.style.width = '100%';
+        
+        // Reset container height for mobile
+        const container = document.querySelector('.container');
+        if (container) {
+          container.style.height = 'calc(100vh - 20px)';
+        }
         
         // Reset ad scaling for mobile
         const adContainers = document.querySelectorAll('.ad-container');
