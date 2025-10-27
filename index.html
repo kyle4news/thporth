@@ -55,8 +55,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             document.body.style.margin = '0 auto';
             document.body.style.width = targetWidth + 'px';
             
-            // Calculate height accounting for zoom
-            const viewportHeight = window.innerHeight;
+            // Calculate height accounting for zoom - Chrome compatible
+            const viewportHeight = document.documentElement.clientHeight;
             const topBarHeight = 20;
             const availableHeight = viewportHeight - topBarHeight;
             
@@ -10302,8 +10302,8 @@ function showNHLTab(conference) {
         document.body.style.margin = '0 auto';
         document.body.style.width = targetWidth + 'px';
         
-        // Calculate the correct height accounting for zoom
-        const viewportHeight = window.innerHeight;
+        // For Chrome compatibility, use documentElement clientHeight
+        const viewportHeight = document.documentElement.clientHeight;
         const topBarHeight = 20; // topBar + topDivider
         const availableHeight = viewportHeight - topBarHeight;
         
@@ -10312,6 +10312,7 @@ function showNHLTab(conference) {
         if (container) {
           container.style.height = availableHeight + 'px';
           container.style.minHeight = availableHeight + 'px';
+          container.style.maxHeight = availableHeight + 'px';
         }
         
         // Scale ads to match the zoom level (when they're uncommented)
@@ -10330,6 +10331,7 @@ function showNHLTab(conference) {
         if (container) {
           container.style.height = 'calc(100vh - 20px)';
           container.style.minHeight = 'calc(100vh - 20px)';
+          container.style.maxHeight = 'none';
         }
         
         // Reset ad scaling for mobile
