@@ -40,6 +40,34 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="Get the latest sports news, social buzz, and live scores for NFL, NBA, MLB, and more — all in one place.">
+    
+    <!-- Immediate height fix to prevent bottom space flash -->
+    <script>
+      // Run immediately to prevent layout flash
+      (function() {
+        function setFullHeight() {
+          if (window.innerWidth >= 768) {
+            const targetWidth = 1421;
+            const currentWidth = window.innerWidth;
+            const zoomLevel = Math.min(currentWidth / targetWidth, 1.2);
+            
+            document.documentElement.style.zoom = zoomLevel;
+            document.body.style.margin = '0 auto';
+            document.body.style.width = targetWidth + 'px';
+          }
+        }
+        
+        // Run immediately
+        setFullHeight();
+        
+        // Also run on DOM ready
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', setFullHeight);
+        } else {
+          setFullHeight();
+        }
+      })();
+    </script>
     <meta name="robots" content="index, follow" />
     <title>THPORTH | Breaking news. Highlights. Social. Videos.</title>
     
@@ -533,7 +561,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     width: 1421px;
     max-width: 1421px;
     min-width: 1421px;
-    height: calc(100vh - 20px); /* account for topBar + topDivider only */
+    height: calc(100vh - 20px) !important; /* account for topBar + topDivider only */
+    min-height: calc(100vh - 20px) !important; /* Ensure minimum height */
     justify-content: center;
     margin: 0 auto;
     box-sizing: border-box;
