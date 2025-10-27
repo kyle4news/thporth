@@ -533,16 +533,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     width: 1421px;
     max-width: 1421px;
     min-width: 1421px;
-    height: 100vh !important; /* Full viewport height */
-    min-height: 100vh !important;
+    height: calc(100vh - 130px) !important; /* account for topBar + topDivider + ads */
+    min-height: calc(100vh - 130px) !important;
     justify-content: center;
     margin: 0 auto;
     box-sizing: border-box;
     padding: 0;
     overflow-x: hidden;
-    position: relative;
-    top: -20px; /* Offset for top bar */
-    padding-top: 20px; /* Add back the space for top bar */
   }
 
   .column {
@@ -1900,8 +1897,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     <div id="topDivider"></div>
     
-    <!-- Banner Ads Section - COMMENTED OUT FOR NOW -->
-    <!--
+    <!-- Banner Ads Section -->
     <div id="banner-ads" style="display: flex; justify-content: center; align-items: center; background-color: #000; padding: 10px 0; gap: 10px; width: 100%; box-sizing: border-box;">
       <div class="ad-container" style="width: 728px; height: 90px; display: flex; justify-content: center; align-items: center; transform-origin: center;">
         <script type="text/javascript">
@@ -1928,7 +1924,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <script type="text/javascript" src="//www.highperformanceformat.com/452de3915164cea7c2886de2ad095172/invoke.js"></script>
       </div>
     </div>
-    -->
     
     
     <div class="container">
