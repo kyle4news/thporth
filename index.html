@@ -530,16 +530,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   /* ────────────────────────────────────────────────────────── */
   .container {
     display: flex;
-    width: 100%;
+    width: 1421px;
     max-width: 1421px;
-    min-width: 320px;
-    height: calc(100% - 20px); /* account for topBar + topDivider */
+    min-width: 1421px;
+    height: calc(100vh - 20px); /* account for topBar + topDivider */
     justify-content: center;
     margin: 0 auto;
     box-sizing: border-box;
-    padding: 0 10px; /* Add horizontal padding to prevent edge cutoff */
-    transform: scale(1);
-    transform-origin: center top;
+    padding: 0;
+    overflow-x: hidden;
   }
 
   .column {
@@ -1481,22 +1480,6 @@ div[id^="breaking-content-"] a:hover {
 /* ═══════════════════════════════════════════════════════════════════
    MOBILE RESPONSIVENESS - MAINTAIN DESKTOP, ADD MOBILE
    ═══════════════════════════════════════════════════════════════════ */
-
-/* Very small desktop screens (1200px and below) - Scale down content */
-@media (max-width: 1200px) {
-  .container {
-    transform: scale(0.9);
-    transform-origin: center top;
-  }
-}
-
-/* Small desktop screens (1000px and below) - Scale down more */
-@media (max-width: 1000px) {
-  .container {
-    transform: scale(0.8);
-    transform-origin: center top;
-  }
-}
 
 /* Large screens (1421px+) - Prevent content from stretching too wide */
 @media (min-width: 1441px) {
@@ -10260,5 +10243,32 @@ function showNHLTab(conference) {
 
 </script>
  
-  </body>
+    <script>
+    // Auto-fit website to screen size for desktop browsers
+    function adjustZoom() {
+      // Only apply to desktop (screen width >= 768px)
+      if (window.innerWidth >= 768) {
+        const targetWidth = 1421; // Your design width
+        const currentWidth = window.innerWidth;
+        const zoomLevel = Math.min(currentWidth / targetWidth, 1.2); // Max zoom 120%
+        
+        // Apply zoom to the entire page
+        document.documentElement.style.zoom = zoomLevel;
+        
+        // Center the content
+        document.body.style.margin = '0 auto';
+        document.body.style.width = targetWidth + 'px';
+      } else {
+        // Reset for mobile
+        document.documentElement.style.zoom = '1';
+        document.body.style.margin = '0';
+        document.body.style.width = '100%';
+      }
+    }
+    
+    // Run on page load and window resize
+    window.addEventListener('load', adjustZoom);
+    window.addEventListener('resize', adjustZoom);
+  </script>
+</body>
 </html>
