@@ -49,26 +49,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           if (window.innerWidth >= 768) {
             const targetWidth = 1421;
             const currentWidth = window.innerWidth;
-            const scaleX = Math.min(currentWidth / targetWidth, 1.2);
+            const zoomLevel = Math.min(currentWidth / targetWidth, 1.2);
             
-            // Use CSS transform scale instead of zoom
-            document.body.style.transform = `scaleX(${scaleX})`;
-            document.body.style.transformOrigin = 'center top';
+            document.documentElement.style.zoom = zoomLevel;
+            document.documentElement.style.transformOrigin = 'center top';
             document.body.style.margin = '0 auto';
             document.body.style.width = targetWidth + 'px';
-            
-            // Set container height to always fill the full viewport
-            const viewportHeight = window.innerHeight;
-            const topBarHeight = 20;
-            const availableHeight = viewportHeight - topBarHeight;
-            
-            // Set container height immediately
-            const container = document.querySelector('.container');
-            if (container) {
-              container.style.height = availableHeight + 'px';
-              container.style.minHeight = availableHeight + 'px';
-              container.style.maxHeight = availableHeight + 'px';
-            }
           }
         }
         
@@ -576,13 +562,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     width: 1421px;
     max-width: 1421px;
     min-width: 1421px;
-    height: calc(100vh - 20px) !important; /* account for topBar + topDivider only */
-    min-height: calc(100vh - 20px) !important; /* Ensure minimum height */
+    height: 100vh !important; /* Full viewport height */
+    min-height: 100vh !important;
     justify-content: center;
     margin: 0 auto;
     box-sizing: border-box;
     padding: 0;
     overflow-x: hidden;
+    position: relative;
+    top: -20px; /* Offset for top bar */
+    padding-top: 20px; /* Add back the space for top bar */
   }
 
   .column {
@@ -10296,51 +10285,31 @@ function showNHLTab(conference) {
       if (window.innerWidth >= 768) {
         const targetWidth = 1421; // Your design width
         const currentWidth = window.innerWidth;
-        const scaleX = Math.min(currentWidth / targetWidth, 1.2); // Max scale 120%
+        const zoomLevel = Math.min(currentWidth / targetWidth, 1.2); // Max zoom 120%
         
-        // Use CSS transform scale instead of zoom to control axes independently
-        document.body.style.transform = `scaleX(${scaleX})`;
-        document.body.style.transformOrigin = 'center top';
+        // Apply zoom to the entire page
+        document.documentElement.style.zoom = zoomLevel;
+        document.documentElement.style.transformOrigin = 'center top';
         
         // Center the content
         document.body.style.margin = '0 auto';
         document.body.style.width = targetWidth + 'px';
         
-        // Set container height to always fill the full viewport
-        const viewportHeight = window.innerHeight;
-        const topBarHeight = 20; // topBar + topDivider
-        const availableHeight = viewportHeight - topBarHeight;
-        
-        const container = document.querySelector('.container');
-        if (container) {
-          container.style.height = availableHeight + 'px';
-          container.style.minHeight = availableHeight + 'px';
-          container.style.maxHeight = availableHeight + 'px';
-        }
-        
-        // Scale ads to match the scale level (when they're uncommented)
+        // Scale ads to match the zoom level (when they're uncommented)
         const adContainers = document.querySelectorAll('.ad-container');
         adContainers.forEach(container => {
-          container.style.transform = `scaleX(${scaleX})`;
+          container.style.transform = `scale(${zoomLevel})`;
         });
       } else {
         // Reset for mobile
-        document.body.style.transform = 'scaleX(1)';
+        document.documentElement.style.zoom = '1';
         document.body.style.margin = '0';
         document.body.style.width = '100%';
-        
-        // Reset container height for mobile
-        const container = document.querySelector('.container');
-        if (container) {
-          container.style.height = 'calc(100vh - 20px)';
-          container.style.minHeight = 'calc(100vh - 20px)';
-          container.style.maxHeight = 'none';
-        }
         
         // Reset ad scaling for mobile
         const adContainers = document.querySelectorAll('.ad-container');
         adContainers.forEach(container => {
-          container.style.transform = 'scaleX(1)';
+          container.style.transform = 'scale(1)';
         });
       }
     }
