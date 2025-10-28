@@ -3565,6 +3565,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     gamesColumn.style.display = 'none';
                     leagueSpecificColumn.style.display = 'block';
                     loadLeagueSpecificData(section);
+                    
+                    // Update the standings tab text based on the league
+                    updateStandingsTabText(section);
                 }
 
                 document.querySelectorAll(".news .content-section, #social-feed-container .content-section").forEach(s => s.style.display = "none");
@@ -6104,27 +6107,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Cache configuration
-    const STANDINGS_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
     const STANDINGS_CACHE_PREFIX = 'standings_cache_';
     
     // Helper function to get cache key
     function getStandingsCacheKey(leagueKey) {
         return `${STANDINGS_CACHE_PREFIX}${leagueKey}`;
-    }
-    
-    // Helper function to check if cache is valid
-    function isStandingsCacheValid(leagueKey) {
-        const cacheKey = getStandingsCacheKey(leagueKey);
-        const cached = localStorage.getItem(cacheKey);
-        if (!cached) return false;
-        
-        try {
-            const data = JSON.parse(cached);
-            const now = Date.now();
-            return (now - data.timestamp) < STANDINGS_CACHE_DURATION;
-        } catch (e) {
-            return false;
-        }
     }
     
     // Helper function to get cached standings
@@ -6187,7 +6174,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 cacheInfo[key] = {
                     teams: data.teams.length,
                     ageHours: ageHours,
-                    isValid: age < STANDINGS_CACHE_DURATION
+                    lastUpdated: data.lastUpdated || 'unknown'
                 };
             } catch (e) {
                 cacheInfo[key] = { error: 'Invalid cache data' };
@@ -6204,9 +6191,17 @@ document.addEventListener('DOMContentLoaded', function () {
             // Determine if this is a soccer league (uses Points) or US sports (uses Wins/Losses)
         // Hockey also uses Points, so we need to exclude it explicitly
         const isUSSport = ['NFL', 'MLB', 'NBA', 'NHL', 'NCAAF', 'WNBA'].includes(leagueKey);
-        const isSoccerLeague = !isUSSport && teams[0].Points !== undefined && teams[0].Points !== 0;
+        const isSoccerLeague = !isUSSport && teams.length > 0 && teams[0].Points !== undefined && teams[0].Points !== 0;
             
-            if (isSoccerLeague) {
+            // Check if MLS has conference data and should use conference tabs
+            if (leagueKey === 'MLS' && teams.length > 0 && teams[0].Conference) {
+                console.log(`📊 MLS detected with Conference data, using tabbed layout`);
+                html = createMLSStandings(teams);
+            } else if (leagueKey === 'MLS') {
+                console.log(`⚠️ MLS detected but no Conference field. Sample team:`, teams[0]);
+                // Fallback to regular soccer table if Conference field is missing
+                html += '<p style="color: #ef4444;">MLS data missing Conference field. Please re-run scraper.</p>';
+            } else if (isSoccerLeague) {
             // Soccer standings: Rank, Team, Pts, MP, W, D, L
                 html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
             html += '<th style="padding: 8px; text-align: left; width: 20px;"></th>';
@@ -6289,17 +6284,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         
-        // Check cache first
-        if (isStandingsCacheValid(leagueKey)) {
-            console.log(`📊 Using cached standings for ${leagueKey}`);
-            const cachedTeams = getCachedStandings(leagueKey);
-            if (cachedTeams && cachedTeams.length > 0) {
-                displayStandingsTable(leagueKey, cachedTeams, standingsContent);
-                return true;
-            }
-        }
-        
-        console.log(`📊 Fetching fresh standings for ${leagueKey} from Firestore`);
+        console.log(`📊 Fetching standings for ${leagueKey} from Firestore`);
         
         // Map league keys to Firestore collection names
         const collectionMap = {
@@ -6360,25 +6345,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 teams = snapshot.docs.map(doc => doc.data());
                 
-                // Check if we have cached data and if Firestore data is newer
+                // Check if we have cached data and compare timestamps
                 const cachedData = localStorage.getItem(getStandingsCacheKey(leagueKey));
-                if (cachedData && teams.length > 0) {
+                if (cachedData && teams.length > 0 && teams[0].lastUpdated) {
                     try {
                         const cache = JSON.parse(cachedData);
                         const firestoreLastUpdated = teams[0].lastUpdated;
                         const cacheLastUpdated = cache.lastUpdated;
                         
-                        // If cached data is from the same scraper run, use cache instead
-                        if (cacheLastUpdated && firestoreLastUpdated && cacheLastUpdated === firestoreLastUpdated) {
-                            console.log(`📊 Firestore data matches cache, using cached version for ${leagueKey}`);
+                        // Check if cache is missing lastUpdated field (old format) - clear it
+                        if (!cacheLastUpdated) {
+                            console.log(`🗑️ Old cache format detected for ${leagueKey}, clearing...`);
+                            clearStandingsCache(leagueKey);
+                            // Continue to display fresh data and update cache below
+                        }
+                        // If cached data is from the SAME scraper run (same lastUpdated), use cache to avoid re-rendering
+                        else if (cacheLastUpdated === firestoreLastUpdated) {
+                            console.log(`📊 Cache is up-to-date for ${leagueKey}, using cached version`);
                             const cachedTeams = getCachedStandings(leagueKey);
                             if (cachedTeams && cachedTeams.length > 0) {
                                 displayStandingsTable(leagueKey, cachedTeams, standingsContent);
                                 return true;
                             }
+                        } else {
+                            console.log(`📊 New data detected for ${leagueKey}! Cache: ${cacheLastUpdated}, Firestore: ${firestoreLastUpdated}`);
+                            // Continue to display fresh data and update cache below
                         }
                     } catch (e) {
-                        // If cache parsing fails, continue with fresh data
+                        console.log(`📊 Error parsing cache for ${leagueKey}, clearing bad cache...`);
+                        clearStandingsCache(leagueKey);
+                        // Continue with fresh data
                     }
                 }
             } else {
@@ -6407,6 +6403,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             // Display the standings table
+            console.log(`📊 Displaying standings for ${leagueKey}, ${teams.length} teams, first team:`, teams[0]);
             displayStandingsTable(leagueKey, teams, standingsContent);
             return true;
             
@@ -6607,6 +6604,66 @@ document.addEventListener('DOMContentLoaded', function () {
             html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
             html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
             html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
+            html += '</tr>';
+        });
+        
+        html += '</tbody></table></div>';
+        return html;
+    }
+
+    // MLS Standings: East/West tabs
+    function createMLSStandings(teams) {
+        const eastTeams = teams.filter(team => team.Conference === 'Eastern Conference');
+        const westTeams = teams.filter(team => team.Conference === 'Western Conference');
+        
+        let html = '<div class="standings-tabs">';
+        html += '<button class="tab-button active" onclick="showMLSTab(\'east\')" id="mls-east-tab">Eastern Conference</button>';
+        html += '<button class="tab-button" onclick="showMLSTab(\'west\')" id="mls-west-tab">Western Conference</button>';
+        html += '</div>';
+        html += '<div id="mls-east-content" class="tab-content active">';
+        html += createMLSConferenceStandings(eastTeams, 'Eastern Conference');
+        html += '</div>';
+        html += '<div id="mls-west-content" class="tab-content">';
+        html += createMLSConferenceStandings(westTeams, 'Western Conference');
+        html += '</div>';
+        
+        return html;
+    }
+    
+    function createMLSConferenceStandings(teams, conference) {
+        // Sort teams by rank (which is based on points)
+        teams.sort((a, b) => {
+            const rankA = parseInt(a.Rank) || 0;
+            const rankB = parseInt(b.Rank) || 0;
+            return rankA - rankB;
+        });
+        
+        let html = '<div class="conference-section">';
+        html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
+        html += '<thead>';
+        html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
+        html += '<th style="padding: 8px; text-align: left; width: 20px;"></th>';
+        html += '<th style="padding: 8px; text-align: left;">Team</th>';
+        html += '<th style="padding: 8px; text-align: center; width: 50px;">Pts</th>';
+        html += '<th style="padding: 8px; text-align: center; width: 40px;">MP</th>';
+        html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
+        html += '<th style="padding: 8px; text-align: center; width: 40px;">D</th>';
+        html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
+        html += '</tr>';
+        html += '</thead>';
+        html += '<tbody>';
+        
+        teams.forEach((team, index) => {
+            const rank = team.Rank || (index + 1);
+            const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+            html += '<tr style="' + rowStyle + '">';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #9ca3af;">' + rank + '</td>';
+            html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600;">' + (team.Points || 0) + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.MP || 0) + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.Wins || 0) + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.Draws || 0) + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.Losses || 0) + '</td>';
             html += '</tr>';
         });
         
@@ -9018,6 +9075,37 @@ function resetStatsTabsToDefault() {
     }
 }
 
+// --- FUNCTION TO UPDATE STANDINGS TAB TEXT BASED ON LEAGUE ---
+function updateStandingsTabText(leagueName) {
+    const standingsTab = document.querySelector('.main-tab[data-main-tab="standings"]');
+    if (!standingsTab) return;
+    
+    // Soccer leagues use "TABLE"
+    const soccerLeagues = [
+        'Soccer', 'PremierLeague', 'MLS', 'LaLiga', 'SerieA', 'Bundesliga', 
+        'Ligue1', 'LigaMX', 'NWSL', 'UEFAChampionsLeague', 'UEFAEuropaLeague', 
+        'UEFAConferenceLeague', 'FACup', 'EFLCup', 'CopaDelRey', 'DFBPokal',
+        'BelgianProLeague', 'Brasileirão', 'LigaPortugal', 'Eredivisie',
+        'CopaLibertadores', 'CopaSudamericana', 'CFL'
+    ];
+    
+    // Combat sports and individual sports use "RANKINGS"
+    const rankingsLeagues = ['UFC', 'Boxing', 'PGATour', 'LPGATour', 'Tennis'];
+    
+    // Track & Field uses "WORLD LEADS"
+    const worldLeadsLeagues = ['TrackAndField'];
+    
+    if (soccerLeagues.includes(leagueName)) {
+        standingsTab.innerText = 'TABLE';
+    } else if (rankingsLeagues.includes(leagueName)) {
+        standingsTab.innerText = 'RANKINGS';
+    } else if (worldLeadsLeagues.includes(leagueName)) {
+        standingsTab.innerText = 'WORLD LEADS';
+    } else {
+        standingsTab.innerText = 'STANDINGS';
+    }
+}
+
 // --- MAIN TABS INITIALIZATION ---
 const mainTabsContainer = document.getElementById('main-tabs');
 if (mainTabsContainer) {
@@ -10390,6 +10478,16 @@ function showNHLTab(conference) {
     
     document.getElementById('nhl-' + conference + '-content').classList.add('active');
     document.getElementById('nhl-' + conference + '-tab').classList.add('active');
+}
+
+function showMLSTab(conference) {
+    document.getElementById('mls-east-content').classList.remove('active');
+    document.getElementById('mls-west-content').classList.remove('active');
+    document.getElementById('mls-east-tab').classList.remove('active');
+    document.getElementById('mls-west-tab').classList.remove('active');
+    
+    document.getElementById('mls-' + conference + '-content').classList.add('active');
+    document.getElementById('mls-' + conference + '-tab').classList.add('active');
 }
 
 </script>
