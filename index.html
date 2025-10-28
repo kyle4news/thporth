@@ -926,7 +926,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 /* 5) The horizontal tabs container (used for the Home page). */
 #headlines-tabs {
     position: sticky !important;
-    top: 18px !important;
+    top: 2px !important;
     z-index: 28 !important;
     display: flex !important;
     height: 18px !important;
@@ -6307,7 +6307,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'LaLiga': 'LaLigaStandings',  // New collection format
             'SerieA': 'SerieAStandings',  // New collection format
             'Bundesliga': 'BundesligaStandings',  // New collection format
-            'Ligue1': 'Ligue1standings',
+            'Ligue1': 'Ligue1Standings',  // New collection format
             'MLS': 'MLSStandings',  // New collection format
             'LigaMX': 'LigaMXStandings',  // New collection format
             'NWSL': 'NWSLStandings',  // New collection format
@@ -7725,6 +7725,14 @@ async function fetchFeaturedGames() {
                 // Use the same game-table styling as other pages
                 html += `<table class="game-table">`;
                 
+                // Add colgroup for consistent column widths (same as individual league pages)
+                html += `<colgroup>`;
+                html += `<col style="width: 23%;">`;  // Time column
+                html += `<col style="width: 32%;">`;  // Team column
+                html += `<col style="width: 15%;">`;  // Score column
+                html += `<col style="width: 30%;">`;  // Channel column
+                html += `</colgroup>`;
+                
                 // Sort games by time chronologically (handle both timestamp and string formats)
                 games.sort((a, b) => {
                     let timeA = 0;
@@ -7874,15 +7882,19 @@ async function fetchFeaturedGames() {
                     const awayScoreDisplay = (isLive || isFinal) ? (awayScore !== '' ? awayScore : '') : '';
                     
                     // Soccer: home team on top, away team on bottom (same as home page)
+                    // Add channel data (hide for finished games)
+                    const channelDisplay = (game.channel && !isFinal) ? game.channel : '';
+                    
                     html += `<tr class="game-row">`;
-                    html += `<td rowspan="2" style="width: 75px; text-align: left; font-size: 12px; vertical-align: top; padding-right: 5px;">${displayTimeLabel}</td>`;
-                    html += `<td class="team-cell">${homeTeam}</td>`;
-                    html += `<td style="width: 30px; text-align: right; padding-right: 0;">${homeScoreDisplay}</td>`;
+                    html += `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>`;
+                    html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${homeTeam}</td>`;
+                    html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${homeScoreDisplay}</td>`;
+                    html += `<td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
                     html += `</tr>`;
                     
                     html += `<tr class="game-row game-separator">`;
-                    html += `<td class="team-cell">${awayTeam}</td>`;
-                    html += `<td style="width: 30px; text-align: right; padding-right: 0;">${awayScoreDisplay}</td>`;
+                    html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${awayTeam}</td>`;
+                    html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${awayScoreDisplay}</td>`;
                     html += `</tr>`;
                 });
                 
