@@ -533,8 +533,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     width: 1421px;
     max-width: 1421px;
     min-width: 1421px;
-    height: calc(100vh - 130px) !important; /* account for topBar + topDivider + ads */
-    min-height: calc(100vh - 130px) !important;
+    height: calc(100vh - 20px); /* account for topBar + topDivider */
     justify-content: center;
     margin: 0 auto;
     box-sizing: border-box;
@@ -563,6 +562,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     background-color: #151515;
     color: white;
     flex: 0 0 165px;
+    min-width: 165px;
     font-size: 11px;
     padding: 0;
   }
@@ -573,7 +573,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
 
   .news {
-    flex: 0 0 317px; /* reduced to accommodate 110px Standings panel */
+    flex: 0 0 315px; /* reduced to accommodate 110px Standings panel */
     background-color: #fafaf9;
     padding: 0;
   }
@@ -766,7 +766,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 /* 1) Main News Column. Remove all padding to make content flush with edges. */
 .column.news {
-    flex: 0 0 370px !important;
+    flex: 0 0 315px !important;
     background-color: #fafaf9 !important;
     padding: 0 !important;
 }
@@ -1496,7 +1496,7 @@ div[id^="breaking-content-"] a:hover {
   }
   
   .main-menu {
-    flex: 0 0 140px; /* Slightly smaller menu */
+    flex: 0 0 165px; /* Keep fixed width to prevent text wrapping */
   }
   
   .news {
@@ -3998,8 +3998,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const section = clickedItem.dataset.section;
 
-            gamesContent.style.display = 'block';
-            f1Content.style.display = 'none';
+                gamesContent.style.display = 'block';
+                f1Content.style.display = 'none';
         });
     }
 
@@ -4661,7 +4661,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // NFL, NCAAF, NBA, NCAAW, WNBA - Quarter-based sports
         if (['NFL', 'NCAAF', 'NBA', 'NCAAW', 'WNBA'].includes(displayLeague)) {
-            if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
+        if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
                 // Format quarter and time remaining with proper quarter names
                 let quarter = game.Stage;
                 if (quarter === "1ST_QUARTER") quarter = "1st";
@@ -4815,8 +4815,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     // Group regular games by their league
                     const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
-                    if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
-                    leagueGroups[leagueDisplayName].push(game);
+                if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
+                leagueGroups[leagueDisplayName].push(game);
                 }
             });
         } else {
@@ -6128,25 +6128,25 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Function to display standings table (extracted for reuse with cache)
     function displayStandingsTable(leagueKey, teams, standingsContent) {
-        // Build standings table
-        let html = '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
-        
-        // Determine if this is a soccer league (uses Points) or US sports (uses Wins/Losses)
+            // Build standings table
+            let html = '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
+            
+            // Determine if this is a soccer league (uses Points) or US sports (uses Wins/Losses)
         // Hockey also uses Points, so we need to exclude it explicitly
         const isUSSport = ['NFL', 'MLB', 'NBA', 'NHL', 'NCAAF', 'WNBA'].includes(leagueKey);
         const isSoccerLeague = !isUSSport && teams[0].Points !== undefined && teams[0].Points !== 0;
-        
-        if (isSoccerLeague) {
+            
+            if (isSoccerLeague) {
             // Soccer standings: Rank, Team, Pts, MP, W, D, L
-            html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
+                html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
             html += '<th style="padding: 8px; text-align: left; width: 20px;"></th>';
-            html += '<th style="padding: 8px; text-align: left;">Team</th>';
+                html += '<th style="padding: 8px; text-align: left;">Team</th>';
             html += '<th style="padding: 8px; text-align: center; width: 50px;">Pts</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 40px;">MP</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 40px;">D</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
-            html += '</tr></thead><tbody>';
+                html += '<th style="padding: 8px; text-align: center; width: 40px;">MP</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 40px;">D</th>';
+                html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
+                html += '</tr></thead><tbody>';
             
             // Sort teams by rank (1-20)
             teams.sort((a, b) => {
@@ -6154,62 +6154,62 @@ document.addEventListener('DOMContentLoaded', function () {
                 const rankB = parseInt(b.Rank) || 0;
                 return rankA - rankB;
             });
-            
-            teams.forEach((team, index) => {
-                const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-                html += `<tr style="${rowStyle}">`;
-                html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank}</td>`;
-                html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>`;
-                html += `<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">${Math.round(team.Points)}</td>`;
-                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.MP || team.MatchesPlayed || 0}</td>`;
-                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>`;
-                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Draws || 0}</td>`;
-                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses || 0}</td>`;
-                html += '</tr>';
-            });
-        } else {
-            // US Sports standings: Use specific tabbed layouts for each league
-            if (leagueKey === 'NFL') {
-                html = createNFLStandings(teams);
-            } else if (leagueKey === 'MLB') {
-                html = createMLBStandings(teams);
-            } else if (leagueKey === 'NBA') {
-                html = createNBAStandings(teams);
-            } else if (leagueKey === 'NHL') {
-                html = createNHLStandings(teams);
-            } else if (leagueKey === 'NCAAF') {
-                html = createNCAAFStandings(teams);
-            } else if (leagueKey === 'WNBA') {
-                html = createWNBAStandings(teams);
-            } else {
-                // Fallback to simple list for other leagues
-                html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
-                html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
-                html += '<th style="padding: 8px; text-align: left;">Team</th>';
-                html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
-                html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
-                html += '<th style="padding: 8px; text-align: center; width: 60px;">PCT</th>';
-                html += '</tr></thead><tbody>';
                 
                 teams.forEach((team, index) => {
                     const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-                    const pct = team.Wins && team.Losses !== undefined ? 
-                        (team.Wins / (team.Wins + team.Losses)).toFixed(3) : '0.000';
-                    
                     html += `<tr style="${rowStyle}">`;
                     html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank}</td>`;
                     html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>`;
+                html += `<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">${Math.round(team.Points)}</td>`;
+                html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.MP || team.MatchesPlayed || 0}</td>`;
                     html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>`;
+                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Draws || 0}</td>`;
                     html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses || 0}</td>`;
-                    html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${pct}</td>`;
                     html += '</tr>';
                 });
-                html += '</tbody></table>';
+            } else {
+                // US Sports standings: Use specific tabbed layouts for each league
+                if (leagueKey === 'NFL') {
+                    html = createNFLStandings(teams);
+                } else if (leagueKey === 'MLB') {
+                    html = createMLBStandings(teams);
+                } else if (leagueKey === 'NBA') {
+                    html = createNBAStandings(teams);
+                } else if (leagueKey === 'NHL') {
+                    html = createNHLStandings(teams);
+            } else if (leagueKey === 'NCAAF') {
+                html = createNCAAFStandings(teams);
+                } else if (leagueKey === 'WNBA') {
+                    html = createWNBAStandings(teams);
+                } else {
+                    // Fallback to simple list for other leagues
+                    html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
+                    html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
+                    html += '<th style="padding: 8px; text-align: left;">Team</th>';
+                    html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
+                    html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
+                    html += '<th style="padding: 8px; text-align: center; width: 60px;">PCT</th>';
+                    html += '</tr></thead><tbody>';
+                    
+                    teams.forEach((team, index) => {
+                        const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                        const pct = team.Wins && team.Losses !== undefined ? 
+                            (team.Wins / (team.Wins + team.Losses)).toFixed(3) : '0.000';
+                        
+                        html += `<tr style="${rowStyle}">`;
+                        html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank}</td>`;
+                        html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>`;
+                        html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>`;
+                        html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Losses || 0}</td>`;
+                        html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${pct}</td>`;
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table>';
+                }
             }
-        }
-        
-        html += '</table>';
-        standingsContent.innerHTML = html;
+            
+            html += '</table>';
+            standingsContent.innerHTML = html;
     }
     
     // New function to load standings from Firestore (FlashLive API data)
@@ -6967,7 +6967,7 @@ async function fetchFeaturedGames() {
         }
     }
 
-
+    
     function fetchTodayGames(callback) {
         const todayContainer = document.getElementById('games');
         const errorDiv = document.getElementById('error');
@@ -7044,7 +7044,7 @@ async function fetchFeaturedGames() {
 
         yesterdayScoresRef.get()
             .then(async snapshot => {
-                scoresLoading.style.display = 'none';
+            scoresLoading.style.display = 'none';
                 
                 if (snapshot.empty) {
                     scoresContainer.innerHTML = '<p style="padding: 10px;">No completed games found. Check back after games finish.</p>';
@@ -7101,11 +7101,11 @@ async function fetchFeaturedGames() {
                 renderYesterdayScores(allGames);
             })
             .catch(error => {
-                scoresLoading.style.display = 'none';
-                scoresError.style.display = 'block';
-                if(scoresErrorText) scoresErrorText.textContent = "An error occurred while loading scores.";
-                console.error("Error fetching yesterday's scores:", error);
-            });
+            scoresLoading.style.display = 'none';
+            scoresError.style.display = 'block';
+            if(scoresErrorText) scoresErrorText.textContent = "An error occurred while loading scores.";
+            console.error("Error fetching yesterday's scores:", error);
+        });
     }
 
     function renderYesterdayScores(gamesData) {
@@ -10245,44 +10245,17 @@ function showNHLTab(conference) {
 </script>
  
     <script>
-    // Auto-fit website to screen size for desktop browsers
-    function adjustZoom() {
-      // Only apply to desktop (screen width >= 768px)
-      if (window.innerWidth >= 768) {
-        const targetWidth = 1421; // Your design width
-        const currentWidth = window.innerWidth;
-        const zoomLevel = Math.min(currentWidth / targetWidth, 1.2); // Max zoom 120%
-        
-        // Apply zoom to the entire page
-        document.documentElement.style.zoom = zoomLevel;
-        
-        // Center the content
-        document.body.style.margin = '0 auto';
-        document.body.style.width = targetWidth + 'px';
-        
-        // Scale ads to match the zoom level
-        const adContainers = document.querySelectorAll('.ad-container');
-        adContainers.forEach(container => {
-          container.style.transform = `scale(${zoomLevel})`;
-        });
-      } else {
-        // Reset for mobile
-        document.documentElement.style.zoom = '1';
-        document.body.style.margin = '0';
-        document.body.style.width = '100%';
-        
-        // Reset ad scaling for mobile
-        const adContainers = document.querySelectorAll('.ad-container');
-        adContainers.forEach(container => {
-          container.style.transform = 'scale(1)';
-        });
+    // Simple function to ensure full height
+    function ensureFullHeight() {
+      const container = document.querySelector('.container');
+      if (container) {
+        container.style.height = 'calc(100vh - 20px)';
       }
     }
     
-    // Run on page load and window resize
-    window.addEventListener('load', adjustZoom);
-    window.addEventListener('resize', adjustZoom);
+    window.addEventListener('load', ensureFullHeight);
+    window.addEventListener('resize', ensureFullHeight);
   </script>
-</body>
+  </body>
 </html>
 
