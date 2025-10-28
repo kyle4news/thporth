@@ -5675,7 +5675,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         let currentTimeLabel = "";
 
                         if (isLive) {
-                            currentTimeLabel = '<span style="color: red;">Live</span>';
+                            // Use EXACT same logic as individual league sections
+                            let parsedStatus = '';
+                            const displayLeague = getLeagueDisplayName(data.League, data.Sport);
+                            if (displayLeague === "MLB") {
+                                const inningHalf = data.inningHalf || "";
+                                const currentInning = data.currentInning || "";
+                                if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
+                            } else {
+                                // Use granular live status for ALL sports (including NFL, MLS, etc.)
+                                parsedStatus = getGranularLiveStatus(data);
+                            }
+                            currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
                         } else if (isFinal) {
                             currentTimeLabel = "F";
                         } else if (rawStart && rawStart.toDate) {
@@ -6795,25 +6806,9 @@ async function fetchFeaturedGames() {
     try {
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/Denver').toISODate();
-        const now = Date.now();
         
-        // Cache for 5 minutes to match live game update frequency
-        if (featuredGamesCache.date === todayStr && 
-            featuredGamesCache.timestamp > 0 && 
-            (now - featuredGamesCache.timestamp) < 300000) {
-            return featuredGamesCache.data;
-        }
-        
-        const games = await fetchFeaturedGamesForDate(todayStr);
-        
-        // Update cache
-        featuredGamesCache = {
-            data: games,
-            timestamp: now,
-            date: todayStr
-        };
-        
-        return games;
+        // fetchFeaturedGamesForDate already handles MLB matching and live data merging
+        return await fetchFeaturedGamesForDate(todayStr);
     } catch (error) {
         console.error('Error fetching featured games:', error);
         return [];
@@ -6965,42 +6960,102 @@ async function fetchFeaturedGames() {
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/Denver').toISODate();
 
-        return gamesCollectionRef.where('gameDate', '==', todayStr)
+        let regularGames = [];
+        let featuredGames = [];
+        
+        // Set up real-time listener for regular games
+        const regularGamesUnsubscribe = gamesCollectionRef.where('gameDate', '==', todayStr)
+            .onSnapshot(snapshot => {
+                regularGames = snapshot.empty ? [] : snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                updateDisplay();
+            }, err => {
+                console.error("Error fetching regular games: ", err);
+                errorDiv.textContent = "Failed to load real-time data.";
+            });
+
+        // Set up real-time listener for Featured games
+        const featuredRef = firebase.firestore().collection("artifacts/flashlive-daily-scraper/public/data/Featured");
+        const featuredGamesUnsubscribe = featuredRef.where('gameDate', '==', todayStr)
             .onSnapshot(async snapshot => {
                 if (snapshot.empty) {
-                    todayContainer.innerHTML = `<p style="padding: 10px;">No games found for today.</p>`;
+                    featuredGames = [];
+                    updateDisplay();
                     return;
                 }
                 
-                // Get regular games
-                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                const featuredGamesForDate = snapshot.docs.map(doc => doc.data());
                 
-                // Try to get featured games, but don't fail if it doesn't work
-                let featuredGames = [];
-                try {
-                    featuredGames = await fetchFeaturedGames();
+                // Get live data from sportsGames for featured games
+                const gamesRef = firebase.firestore().collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
+                const liveSnapshot = await gamesRef.where('gameDate', '==', todayStr).get();
+                const liveGames = liveSnapshot.docs.map(doc => doc.data());
+                
+                // Merge featured games with live data
+                featuredGames = featuredGamesForDate.map(featuredGame => {
+                    // For MLB games, match by team names since Game IDs are different
+                    if (featuredGame.Sport === 'Baseball' || featuredGame.Sport === 'MLB') {
+                        const liveGame = liveGames.find(live => {
+                            const featuredHome = (featuredGame['Home Team'] || '').toLowerCase().trim();
+                            const featuredAway = (featuredGame['Away Team'] || '').toLowerCase().trim();
+                            const liveHome = (live['Home Team'] || '').toLowerCase().trim();
+                            const liveAway = (live['Away Team'] || '').toLowerCase().trim();
+                            
+                            return (liveHome === featuredHome && liveAway === featuredAway) ||
+                                   (liveHome === featuredAway && liveAway === featuredHome);
+                        });
+                        
+                        if (liveGame) {
+                            return {
+                                ...liveGame,
+                                title: featuredGame.title,
+                                order: featuredGame.order,
+                                isFeatured: true
+                            };
+                        }
+                    } else {
+                        // For non-MLB games, match by Game ID or team names
+                        const liveGame = liveGames.find(live => 
+                            live['Game ID'] === featuredGame['Game ID'] || 
+                            (live['Home Team'] === featuredGame['Home Team'] && 
+                             live['Away Team'] === featuredGame['Away Team'] &&
+                             live.League === featuredGame.League)
+                        );
+                        
+                        if (liveGame) {
+                            return {
+                                ...liveGame,
+                                title: featuredGame.title,
+                                order: featuredGame.order,
+                                isFeatured: true
+                            };
+                        }
+                    }
                     
-                    // Mark featured games
-                    featuredGames.forEach(game => {
-                        game.isFeatured = true;
-                    });
-                } catch (error) {
-                    console.error('Error fetching featured games:', error);
-                    // Continue without featured games if there's an error
-                }
+                    return {
+                        ...featuredGame,
+                        isFeatured: true
+                    };
+                });
                 
-                // Combine games with featured games first
-                const allGames = [...featuredGames, ...gamesData];
-                
-                renderGames(todayContainer, allGames, true);
-                
-                if (callback) {
-                    callback();
-                }
-            }, err => { 
-                console.error("Error fetching today's games: ", err);
-                errorDiv.textContent = "Failed to load real-time data.";
+                updateDisplay();
+            }, err => {
+                console.error("Error fetching featured games: ", err);
             });
+
+        function updateDisplay() {
+            const allGames = [...featuredGames, ...regularGames];
+            renderGames(todayContainer, allGames, true);
+            
+            if (callback) {
+                callback();
+            }
+        }
+
+        // Return cleanup function
+        return () => {
+            regularGamesUnsubscribe();
+            featuredGamesUnsubscribe();
+        };
     }
 
     // Cache for yesterday's scores to improve performance
