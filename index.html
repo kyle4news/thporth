@@ -345,7 +345,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     border-bottom: 1px solid #374151; /* divide-y divide-gray-700 */
     margin-bottom: 0;
 }
-
 /* Individual game entry styling (from index-7, now applies to .game-entry) */
 .game-entry {
     display: flex; /* flex */
@@ -696,7 +695,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     align-items: center;
     box-sizing: border-box;
   }
-
   .news-menu-item.active {
     background-color: black;
     color: white;
@@ -1043,11 +1041,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 #fox-feed ul li a:visited {
   color: lightgray;
 }
-
-	   
-
-
-
 /* 6) The news feed content area. This needs to be padding-free. */
 .headlines-section .news-feed-content {
     flex: 1 1 auto !important;
@@ -1389,7 +1382,6 @@ div[id^="breaking-content-"] a:hover {
     vertical-align: middle !important;
     display: inline-block !important;
   }
-  
 </style>
 	  <style>
 		  /* ───────────── Header Styling ───────────── */
@@ -1738,7 +1730,6 @@ div[id^="breaking-content-"] a:hover {
   max-width: 400px;
   margin: 0 auto;
 }
-
 #mobile-league-menu .menu-header {
   color: white;
   font-size: 18px;
@@ -2362,8 +2353,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   </div>
 <br><br><br><br><br><br><br><br>
-
-
 <!-- ─── LEAGUE-SPECIFIC COLUMN (New, Initially Hidden) ────────────────────────── -->
 <div class="column" id="league-specific-column" style="display: none; flex: 0 0 250px; background-color: #1f1f1f; color: #ffffff; padding: 0; overflow-x: hidden;">
     <!-- Header will be dynamically set -->
@@ -2693,7 +2682,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
 </div>
-
 <div id="news-MLS" class="content-section" style="display: none; height: calc(100% - 18px);">
     <div class="news-main-container" style="display: flex; flex-direction: column; height: 100%;">
         <div class="news-section headlines-section" style="flex: 1 1 auto; min-height: 0;">
@@ -3036,7 +3024,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
 </div>
-
 <div id="news-Tennis" class="content-section" style="display: none; height: calc(100% - 18px);">
     <div class="news-main-container" style="display: flex; flex-direction: column; height: 100%;">
         <div class="news-section headlines-section" style="flex: 1 1 auto; min-height: 0;">
@@ -3676,7 +3663,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
             });
         });
-
         // Horizontal News Tabs (Breaking, etc.) - HANDLES BOTH HOME & LEAGUE PAGES
         document.querySelectorAll(".news").forEach(newsContainer => {
             newsContainer.addEventListener('click', (event) => {
@@ -3998,7 +3984,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     });
   });
 </script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     
@@ -4326,7 +4311,6 @@ document.addEventListener('DOMContentLoaded', function () {
     setInterval(updateSchedule, 60000); 
 });
 </script>
-	 
 <script>
 // --- FINAL UNIFIED SCRIPT for ALL Game, Schedule, and Standings Logic ---
 document.addEventListener('DOMContentLoaded', function () {
@@ -4678,7 +4662,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
-
         return null;
     }
     
@@ -5710,7 +5693,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 leagueSection.appendChild(title);
             }
-            
             // Special handling for FEATURED section - group by title or league
             if (leagueNameKey === 'FEATURED' && isGroupedByLeague) {
                 // Group featured games by title (if present) or by their actual league
@@ -6050,38 +6032,45 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!isFinalA && isFinalB) return -1;
         return a["Start Time"] - b["Start Time"];
     }
-
      function fetchLeagueSchedule(leagueId, leagueName) {
-        scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
-        const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
-        
-        // Find the league config to get the collection name
-        const leagueConfig = Object.values(LEAGUE_DATA_CONFIG).find(config => config.leagueId === leagueId);
-        if (!leagueConfig || !leagueConfig.upcomingCollectionName) {
-            scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
-            return;
-        }
-        
-        // All leagues use FlashLiveAPI (gamesCollectionRef)
-        // For NCAAF, also filter by Sport to exclude hockey games
-        let query = gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr);
-        if (leagueId === 'USA: NCAA') {
-            const desiredSport = (leagueName && leagueName.toLowerCase().includes('hockey'))
-                ? 'Hockey'
-                : 'American Football';
-            query = query.where('Sport', '==', desiredSport);
-        }
-        
-        query.onSnapshot(snapshot => {
-                if (snapshot.empty) {
-                    scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
-                    return;
-                }
-                const gamesData = snapshot.docs.map(doc => doc.data()).sort(sortGames);
-                renderGames(scheduleContent, gamesData, false);
-            }, err => { scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>'; });
-    }
+         scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
+         const { DateTime } = luxon;
+         // Match home column logic (Denver) for gameDate equality
+         const todayStr = DateTime.now().setZone('America/Denver').toISODate();
+         
+         // League config is not required for today's games; read from sportsGames
+         // 1) Exact League + gameDate (primary)
+         let q = gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr);
+         if (leagueId === 'USA: NCAA') {
+             const desiredSport = (leagueName && leagueName.toLowerCase().includes('hockey')) ? 'Hockey' : 'American Football';
+             q = q.where('Sport', '==', desiredSport);
+         }
+         q.onSnapshot(snapshot => {
+             if (!snapshot.empty) {
+                 const gamesData = snapshot.docs.map(d => d.data()).sort(sortGames);
+                 renderGames(scheduleContent, gamesData, false);
+                 return;
+             }
+             // 2) Fallback to exact League + scheduledDate (if backend provided it)
+             let q2 = gamesCollectionRef.where('League', '==', leagueId).where('scheduledDate', '==', todayStr);
+             if (leagueId === 'USA: NCAA') {
+                 const desiredSport = (leagueName && leagueName.toLowerCase().includes('hockey')) ? 'Hockey' : 'American Football';
+                 q2 = q2.where('Sport', '==', desiredSport);
+             }
+             q2.onSnapshot(s2 => {
+                 if (!s2.empty) {
+                     const gamesData2 = s2.docs.map(d => d.data()).sort(sortGames);
+                     renderGames(scheduleContent, gamesData2, false);
+                     return;
+                 }
+                 scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
+             }, _err => {
+                 scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>';
+             });
+         }, _err => {
+             scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>';
+         });
+     }
 
     function fetchYesterdayScoresForLeague(leagueId, leagueName) {
         const yesterdayScheduleContent = document.getElementById('league-schedule-yesterday-content');
@@ -6364,7 +6353,6 @@ document.addEventListener('DOMContentLoaded', function () {
             html += '</table>';
             standingsContent.innerHTML = html;
     }
-    
     // New function to load standings from Firestore (FlashLive API data)
     async function fetchLeagueStandingsFromFirestore(leagueKey) {
         const standingsContent = document.getElementById('league-standings-content');
@@ -6698,7 +6686,6 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '</tbody></table></div>';
         return html;
     }
-
     // MLS Standings: East/West tabs
     function createMLSStandings(teams) {
         const eastTeams = teams.filter(team => team.Conference === 'Eastern Conference');
@@ -7045,7 +7032,6 @@ async function fetchFeaturedGames() {
         return [];
     }
 }
-
     async function fetchFeaturedGamesForDate(dateStr) {
         try {
             const db = firebase.firestore();
@@ -7390,7 +7376,6 @@ async function fetchFeaturedGames() {
                     console.error('Error fetching yesterday\'s featured games:', error);
                     // Continue without featured games if there's an error
                 }
-                
                 // Combine games with yesterday's featured games first
                 const allGames = [...yesterdayFeaturedGames, ...gamesData];
                 
@@ -7502,10 +7487,15 @@ async function fetchFeaturedGames() {
         // Use the same approach as home page - get all games for today, then filter by league
         (async () => {
             try {
-                // Get all games for today (same as home page)
-                const allGamesSnapshot = await gamesCollectionRef
-                    .where('scheduledDate', '==', todayStr)
+                // Get all games for today
+                let allGamesSnapshot = await gamesCollectionRef
+                    .where('gameDate', '==', todayStr)
                     .get();
+                if (allGamesSnapshot.empty) {
+                    allGamesSnapshot = await gamesCollectionRef
+                        .where('scheduledDate', '==', todayStr)
+                        .get();
+                }
                 
                 if (allGamesSnapshot.empty) {
                     todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
@@ -7704,7 +7694,6 @@ async function fetchFeaturedGames() {
             standingsContent.innerHTML = '<p style="color: #9ca3af;">Standings available on individual league pages.</p>';
         }
     }
-
     function loadAllSoccerGames(soccerLeagues, container) {
         const { DateTime } = luxon;
         const today = DateTime.now().setZone('America/Denver');
@@ -8040,7 +8029,6 @@ async function fetchFeaturedGames() {
                     
                     // Determine if it's today or upcoming for formatting
                     const isGameToday = game.isToday;
-                    
                     // Use the exact same structure as home page renderGames function
                     const homeScoreDisplay = (isLive || isFinal) ? (homeScore !== '' ? homeScore : '') : '';
                     const awayScoreDisplay = (isLive || isFinal) ? (awayScore !== '' ? awayScore : '') : '';
@@ -8702,8 +8690,6 @@ function loadStatsCategory(category, displayElementId) {
         }, 500);
     }
 }
-
-
 // --- PARSE BASEBALL REFERENCE DATA ---
 function parseBaseballReferenceData(html, category) {
     try {
@@ -9003,7 +8989,6 @@ async function testBaseballReferenceScraper() {
         allH2s.forEach((h2, index) => {
             console.log(`${index + 1}. "${h2.textContent.trim()}"`);
         });
-        
         // Look for 2025 Leaders section
         const leadersSection = allH2s.find(h2 => h2.textContent.includes('2025 Leaders'));
         
@@ -9335,7 +9320,6 @@ if (scheduleTabsContainer) {
 }
 });
 </script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const nwsltabs = document.getElementById('nwsltabs-NWSL');
@@ -9641,7 +9625,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const uefaconferenceleaguetabs = document.getElementById('uefaconferenceleaguetabs-UEFAConferenceLeague');
@@ -10290,7 +10273,6 @@ function loadVideosWithTabs(section) {
     switchVideosTab('highlights');
     displayRSSWidget(config.highlights, document.getElementById('dynamicVideosContent'));
 }
-
 // Switch between video tabs
 function switchVideosTab(activeTab) {
     const tabs = document.querySelectorAll('.videos-tab');
@@ -10613,4 +10595,3 @@ function showMLSTab(conference) {
   </script>
   </body>
 </html>
-
