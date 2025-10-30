@@ -2283,9 +2283,34 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <h2 style="font-size: 12px; font-weight: normal; color: #fff;">Schedule</h2>
       </div>
   
-      <div id="f1-schedule-container" style="padding: 1rem; font-size: 0.875rem;">
-    <p style="color: #9ca3af;">Loading schedule...</p>
-</div>
+      <div style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+          <div style="padding: 0 1.5rem; border-bottom: 1px solid #374151;">
+              <nav id="f1-schedule-tabs" style="display: flex; margin-bottom: -1px; gap: 1.5rem;">
+                  <button class="f1-schedule-tab" data-tab="f1-today" style="border-bottom: 2px solid transparent; color: #9ca3af; padding-bottom: 0.5rem; font-size: 0.875rem; font-weight: 600; background: none; border-top: none; border-left: none; border-right: none; cursor: pointer;">
+                      Today
+                  </button>
+                  <button class="f1-schedule-tab" data-tab="f1-yesterday" style="border-bottom: 2px solid transparent; color: #9ca3af; padding-bottom: 0.5rem; font-size: 0.875rem; font-weight: 600; background: none; border-top: none; border-left: none; border-right: none; cursor: pointer;">
+                      Yesterday
+                  </button>
+                  <button class="f1-schedule-tab active" data-tab="f1-upcoming" style="border-bottom: 2px solid #DC143C; color: #fff; padding-bottom: 0.5rem; font-size: 0.875rem; font-weight: 600; background: none; border-top: none; border-left: none; border-right: none; cursor: pointer;">
+                      Upcoming
+                  </button>
+              </nav>
+          </div>
+          <div style="padding: 0.5rem; flex: 1; overflow-y: auto;">
+             <div id="f1-today" class="f1-schedule-content-pane" style="display: none;">
+              <p style="color: #9ca3af; padding: 1rem;">No Formula 1 events today.</p>
+            </div>
+            <div id="f1-yesterday" class="f1-schedule-content-pane" style="display: none;">
+              <p style="color: #9ca3af; padding: 1rem;">No Formula 1 events yesterday.</p>
+            </div>
+            <div id="f1-upcoming" class="f1-schedule-content-pane" style="display: block;">
+              <div id="f1-schedule-container" style="padding: 1rem; font-size: 0.875rem;">
+                <p style="color: #9ca3af;">Loading schedule...</p>
+              </div>
+            </div>
+          </div>
+      </div>
   
       <div style="padding: 0.5rem; border-top: 1px solid #374151; border-bottom: 0px; background-color: #3c3c3c;">
           <h2 style="font-size: 12px; font-weight: normal; color: #fff;">Standings</h2>
@@ -4051,6 +4076,41 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    
+    // F1 Schedule tabs handler
+    const f1ScheduleTabsContainer = document.getElementById('f1-schedule-tabs');
+    const f1ScheduleContentPanes = document.querySelectorAll('.f1-schedule-content-pane');
+    
+    if (f1ScheduleTabsContainer) {
+        f1ScheduleTabsContainer.addEventListener('click', function(event) {
+            const clickedButton = event.target.closest('.f1-schedule-tab');
+            if (!clickedButton) return;
+
+            const targetTabId = clickedButton.dataset.tab;
+            
+            // Deactivate all buttons
+            f1ScheduleTabsContainer.querySelectorAll('.f1-schedule-tab').forEach(btn => {
+                btn.style.borderBottomColor = 'transparent';
+                btn.style.color = '#9ca3af';
+                btn.classList.remove('active');
+            });
+
+            // Hide all panes
+            f1ScheduleContentPanes.forEach(pane => {
+                pane.style.display = 'none';
+            });
+
+            // Activate the clicked button and its pane
+            clickedButton.style.borderBottomColor = '#DC143C';
+            clickedButton.style.color = '#fff';
+            clickedButton.classList.add('active');
+            
+            const targetPane = document.getElementById(targetTabId);
+            if (targetPane) {
+                targetPane.style.display = 'block';
+            }
+        });
+    }
 });
 </script>
 
@@ -4200,7 +4260,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Renders the schedule based on the current time.
+    // Renders the schedule based on the current time - shows ALL upcoming races
     function renderSchedule(allEvents) {
         if (!allEvents || allEvents.length === 0) {
             scheduleContainer.innerHTML = `<p style="color: #9ca3af;">No upcoming schedule found.</p>`;
@@ -4209,21 +4269,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const now = luxon.DateTime.now();
 
-        // 1. Find the current or next race weekend to display
-        const nextEvent = allEvents.find(event => event.end > now);
-        if (!nextEvent) {
+        // Filter for all upcoming events (end time hasn't passed)
+        const upcomingEvents = allEvents.filter(event => event.end > now);
+        
+        if (upcomingEvents.length === 0) {
             scheduleContainer.innerHTML = `<p style="color: #9ca3af;">The season may have concluded.</p>`;
             return;
         }
-        const currentRaceHead = nextEvent.eventHead;
 
-        // 2. Filter for events for that specific weekend whose end time hasn't passed
-        const eventsToDisplay = allEvents.filter(event => 
-            event.eventHead === currentRaceHead && event.end > now
-        );
-
-        // 3. Group events by date for display
-        const groupedByDate = eventsToDisplay.reduce((acc, event) => {
+        // Group events by date for display
+        const groupedByDate = upcomingEvents.reduce((acc, event) => {
             const dateKey = event.start.toFormat('yyyy-MM-dd');
             if (!acc[dateKey]) {
                 acc[dateKey] = [];
@@ -4232,36 +4287,32 @@ document.addEventListener('DOMContentLoaded', function () {
             return acc;
         }, {});
         
-        // 4. Generate and inject the HTML
+        // Generate and inject the HTML
         let html = '';
-        const today = now.toFormat('yyyy-MM-dd');
+        const sortedDates = Object.keys(groupedByDate).sort();
         
-        for (const dateKey in groupedByDate) {
+        for (const dateKey of sortedDates) {
             const dateObj = luxon.DateTime.fromISO(dateKey);
-            const dateHeader = (dateKey === today) ? 'Today' : dateObj.toFormat('MMMM d');
+            const dateHeader = dateObj.toFormat('MMMM d');
             
-            html += `<h3 style="font-weight: 600; margin-bottom: 0.5rem; margin-top: 1rem;">${dateHeader}</h3>`;
+            html += `<div style="background-color: #374151; color: white; padding: 8px; margin: 10px 0 5px 0; font-weight: bold;">${dateHeader}</div>`;
 
             groupedByDate[dateKey].forEach(event => {
-                const isLive = now >= event.start && now < event.end;
-                const timeDisplay = isLive 
-                    ? `<span style="color: #ef4444; font-weight: bold;">Live</span>`
-                    : event.start.toFormat('h:mm a');
+                const timeDisplay = event.start.toFormat('h:mm a');
 
                 html += `
-                        <div style="display: flex; justify-content: space-between; align-items: top; margin-bottom: 0.75rem;">
-                            <div style="flex: 0 0 70px; color: #e0e0e0;">${timeDisplay}</div>
-                            <div style="flex: 1 1 auto;">
-                                <p style="margin: 0; padding: 0; font-weight: 500;">${event.eventHead}</p>
-                                <p style="margin: 0; padding: 0; color: #9ca3af;">${event.eventSub}</p>
-                            </div>
-                            <div style="flex: 0 0 60px; text-align: right; color: #e0e0e0;">${event.channel}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #2a2a2a;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 500; font-size: 11px;">${event.eventHead}</div>
+                            <div style="color: #9ca3af; font-size: 11px;">${event.eventSub}</div>
                         </div>
+                        <div style="text-align: right; color: #e0e0e0; font-size: 11px; white-space: nowrap; margin-left: 8px;">${timeDisplay}</div>
+                    </div>
                 `;
             });
         }
 
-        scheduleContainer.innerHTML = html || `<p style="color: #9ca3af;">No upcoming events for this race.</p>`;
+        scheduleContainer.innerHTML = html || `<p style="color: #9ca3af;">No upcoming events found.</p>`;
     }
 
     // Main function to update the schedule
@@ -6016,7 +6067,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // For NCAAF, also filter by Sport to exclude hockey games
         let query = gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr);
         if (leagueId === 'USA: NCAA') {
-            query = query.where('Sport', '==', 'American Football');
+            const desiredSport = (leagueName && leagueName.toLowerCase().includes('hockey'))
+                ? 'Hockey'
+                : 'American Football';
+            query = query.where('Sport', '==', desiredSport);
         }
         
         query.onSnapshot(snapshot => {
@@ -6039,7 +6093,38 @@ document.addEventListener('DOMContentLoaded', function () {
         const { DateTime } = luxon;
         const yesterdayStr = DateTime.now().setZone('America/Denver').minus({ days: 1 }).toISODate();
 
-        // Use the same logic as the working home page fetchYesterdayScores function
+        // If we have a valid raw cache, use it to avoid refetching
+        const nowMs = Date.now();
+        if (yesterdayScoresRawCache && yesterdayScoresCacheExpiry && nowMs < yesterdayScoresCacheExpiry) {
+            const allGames = yesterdayScoresRawCache;
+            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayStr);
+            const leagueGames = yesterdayGames.filter(game => {
+                if (game.League === leagueId) return true;
+                // Flexible matching for display name mapping
+                const displayName = getLeagueDisplayName(game.League, game.Sport);
+                return displayName && displayName === leagueName;
+            });
+
+            // For NCAAF, filter out hockey games from yesterday's scores
+            const filteredLeagueGames = leagueGames.filter(game => {
+                if (leagueId === 'USA: NCAA') {
+                    const isHockeyContext = leagueName && leagueName.toLowerCase().includes('hockey');
+                    return isHockeyContext ? (game.Sport === 'Hockey') : (game.Sport === 'American Football');
+                }
+                return true;
+            });
+
+            if (filteredLeagueGames.length === 0) {
+                yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
+                return;
+            }
+
+            const gamesData = filteredLeagueGames.sort(sortGames);
+            renderGames(yesterdayScheduleContent, gamesData, false);
+            return;
+        }
+
+        // Otherwise load from Firestore and refresh caches
         const yesterdayScoresRef = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
         
         yesterdayScoresRef.get()
@@ -6051,6 +6136,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Filter games by gameDate first (only yesterday's games)
                 const allGames = snapshot.docs.map(doc => doc.data());
+                // Refresh raw cache and its expiry
+                yesterdayScoresRawCache = allGames;
+                yesterdayScoresCacheExpiry = getNextPrepExpiryTimestamp();
                 const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayStr);
                 
                 // Then filter by league using flexible matching
@@ -7210,10 +7298,25 @@ async function fetchFeaturedGames() {
         };
     }
 
-    // Cache for yesterday's scores to improve performance
-    let yesterdayScoresCache = null;
-    let yesterdayScoresCacheTime = null;
-    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours - yesterday's scores don't change until next day
+    // Cache for yesterday's scores to improve performance (valid until next prep-yesterday run at 3:55 AM ET)
+    let yesterdayScoresCache = null;            // Combined list used by SCORES tab rendering
+    let yesterdayScoresRawCache = null;         // Raw docs list for league Yesterday tabs
+    let yesterdayScoresCacheExpiry = null;      // Epoch ms when cache expires
+
+    function getNextPrepExpiryTimestamp() {
+        try {
+            const { DateTime } = luxon;
+            const nowNY = DateTime.now().setZone('America/New_York');
+            let nextRun = nowNY.set({ hour: 3, minute: 55, second: 0, millisecond: 0 });
+            if (nowNY >= nextRun) {
+                nextRun = nextRun.plus({ days: 1 });
+            }
+            return nextRun.toMillis();
+        } catch (e) {
+            // Fallback: 24h
+            return Date.now() + 24 * 60 * 60 * 1000;
+        }
+    }
 
     function fetchYesterdayScores() {
         const scoresContainer = document.getElementById('dynamicScoresContent');
@@ -7224,8 +7327,8 @@ async function fetchFeaturedGames() {
         if (!scoresContainer || !scoresLoading || !scoresError) return;
 
         // Check cache first
-        const now = Date.now();
-        if (yesterdayScoresCache && yesterdayScoresCacheTime && (now - yesterdayScoresCacheTime) < CACHE_DURATION) {
+        const nowMs = Date.now();
+        if (yesterdayScoresCache && yesterdayScoresCacheExpiry && nowMs < yesterdayScoresCacheExpiry) {
             renderYesterdayScores(yesterdayScoresCache);
             return;
         }
@@ -7252,6 +7355,8 @@ async function fetchFeaturedGames() {
                 const yesterdayStr = now.minus({ days: 1 }).toISODate();
                 
                 const allGamesData = snapshot.docs.map(doc => doc.data());
+                // Keep a raw cache for league Yesterday tabs
+                yesterdayScoresRawCache = allGamesData;
                 
                 // Try to get games from yesterday first
                 let gamesData = allGamesData.filter(game => game.gameDate === yesterdayStr).sort(sortGames);
@@ -7289,9 +7394,9 @@ async function fetchFeaturedGames() {
                 // Combine games with yesterday's featured games first
                 const allGames = [...yesterdayFeaturedGames, ...gamesData];
                 
-                // Cache the results
+                // Cache the results until next 3:55 AM ET
                 yesterdayScoresCache = allGames;
-                yesterdayScoresCacheTime = Date.now();
+                yesterdayScoresCacheExpiry = getNextPrepExpiryTimestamp();
                 
                 renderYesterdayScores(allGames);
             })
@@ -7399,7 +7504,7 @@ async function fetchFeaturedGames() {
             try {
                 // Get all games for today (same as home page)
                 const allGamesSnapshot = await gamesCollectionRef
-                    .where('gameDate', '==', todayStr)
+                    .where('scheduledDate', '==', todayStr)
                     .get();
                 
                 if (allGamesSnapshot.empty) {
@@ -7631,6 +7736,8 @@ async function fetchFeaturedGames() {
             let todayQuery = gamesCollectionRef.where('League', '==', leagueInfo.leagueId).where('gameDate', '==', todayStr);
             if (leagueKey === 'NCAAF') {
                 todayQuery = todayQuery.where('Sport', '==', 'American Football');
+            } else if (leagueKey === 'NCAAMensHockey' || (leagueInfo.displayName && leagueInfo.displayName.toLowerCase().includes('hockey'))) {
+                todayQuery = todayQuery.where('Sport', '==', 'Hockey');
             }
             
             todayQuery.get()
@@ -8086,7 +8193,7 @@ async function fetchFeaturedGames() {
 
                 let gameDate;
 
-            if (typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
+            if (data[dateField] && typeof data[dateField] === "object" && typeof data[dateField].toDate === "function") {
                 // Handle Firestore Timestamp (legacy)
                 gameDate = luxon.DateTime.fromJSDate(data[dateField].toDate());
             } else if (typeof data[dateField] === "string") {
@@ -9075,8 +9182,8 @@ function resetStatsTabsToDefault() {
     }
 }
 
-// --- FUNCTION TO UPDATE STANDINGS TAB TEXT BASED ON LEAGUE ---
-function updateStandingsTabText(leagueName) {
+// --- FUNCTION TO UPDATE STANDINGS TAB TEXT BASED ON LEAGUE (Define early so it's available) ---
+window.updateStandingsTabText = function(leagueName) {
     const standingsTab = document.querySelector('.main-tab[data-main-tab="standings"]');
     if (!standingsTab) return;
     
