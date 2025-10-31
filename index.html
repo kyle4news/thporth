@@ -138,11 +138,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 .game-table td {
     padding: 4px 10px; /* Default cell padding */
     vertical-align: top;
-    font-size: 12px; /* Set a single font size for all cells */
+    font-size: 12px; /* Default font size for all cells */
+}
+/* Ensure first column (time/status) uses 11px - applies to all game tables */
+.game-table td:first-child,
+.game-table td:nth-child(1),
+.game-table > tbody > tr > td:first-child,
+.game-table > tbody > tr > td:nth-child(1),
+table.game-table td:first-child,
+table.game-table td:nth-child(1) {
+    font-size: 11px !important;
 }
 .game-table td:nth-child(2) { /* Second column (teams) */
     width: 100% !important;
-    min-width: 250px !important;
+    min-width: 248px !important;
     max-width: none !important;
 }
 @media (max-width: 768px) {
@@ -160,10 +169,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     padding-right: 0;
 }
 .game-table td:nth-child(1) { /* First column (time/status) */
-    width: 75px;
-    min-width: 75px;
+    width: 77px;
+    min-width: 77px;
     text-align: left;
     padding-right: 5px;
+    font-size: 11px !important; /* Override to ensure 11px for start times */
 }
 .game-table td:nth-child(3) { /* Third column (score) */
     width: 30px !important;
@@ -207,7 +217,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     border: none;
     color: #5f5f5f;
     padding: 6px 8px;
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 500;
     cursor: pointer;
     text-align: center;
@@ -265,7 +275,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 .video-meta {
     color: #888888;
-    font-size: 9px;
+    font-size: 11px;
 }
 
 /* --- END CSS FROM testing_testing-3.html --- */
@@ -381,7 +391,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     padding-left: 0 !important;
     margin-left: 0 !important;
     color: #e0e0e0 !important; /* Changed to !important to ensure override */
-    font-size: 10px !important; /* Changed font size and added !important */
+    font-size: 11px !important; /* Changed font size and added !important */
 }
 
 /* Game details (teams) styling */
@@ -630,7 +640,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     padding: 1px;
     border: 1px solid #444;
     background-color: #222;
-    font-size: 9px;
+    font-size: 11px;
     font-family: Helvetica, Arial, sans-serif;
     cursor: pointer;
     color: #fff;
@@ -1292,9 +1302,16 @@ div[id^="breaking-content-"] a:hover {
 
 /* Target the first column (Time/Status) inside the league-specific column */
 #league-specific-column .game-table td:first-child {
-    /* Reduce the width from 90px to a much smaller 60px */
-    width: 60px;
-    min-width: 60px;
+    /* Widen the width to 65px for better fit (was 62px) */
+    width: 65px;
+    min-width: 65px;
+    font-size: 10px !important; /* Font size for first column - reduced from 11px to 10px */
+}
+
+/* Target the second column (Team names) inside the league-specific column */
+#league-specific-column .game-table td:nth-child(2) {
+    /* Reduce min-width to 245px to compensate for wider time column */
+    min-width: 245px !important;
 }
 
 /* Target the last column (Score) inside the league-specific column */
@@ -1844,6 +1861,12 @@ div[id^="breaking-content-"] a:hover {
     margin-bottom: 0;
 }
 
+/* FINAL OVERRIDE: Force 11px on all first columns of game tables - must be last */
+.game-table td:first-child { font-size: 11px !important; }
+.game-table td:nth-child(1) { font-size: 11px !important; }
+/* League-specific column uses 10px for start time column */
+#league-specific-column .game-table td:first-child { font-size: 10px !important; }
+#league-specific-column .game-table td:nth-child(1) { font-size: 10px !important; }
 </style>
 
 <!-- Add this snippet above closing </head> or integrate into your existing <style> section -->
@@ -2688,9 +2711,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-MLS" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab active" data-url="https://rss.app/feeds/7uKlukxNjjXJ2Ajl.xml">SI</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/XgOB7BUJbxy6FsjC.xml">MLSSoccer.com</div>
+                    <div class="headlines-tab active" data-url="https://rss.app/feeds/XgOB7BUJbxy6FsjC.xml">MLSSoccer.com</div>
                     <div class="headlines-tab" data-url="https://rss.app/feeds/rAadgaUcXJa3grIV.xml">Google News</div>
+                    <div class="headlines-tab" data-url="https://rss.app/feeds/liWpcUXYMINvUeWS.xml">FLM</div>
                     
                 </div>
                 <div id="headlines-content-MLS" class="news-feed-content" style="width: 80%; overflow-y: auto;"></div>
@@ -4827,6 +4850,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- 5. CORE RENDERING FUNCTION ---
     function renderGames(container, gamesData, isGroupedByLeague, isYesterdayScores = false) {
         container.innerHTML = "";
+        // For league Yesterday tabs, show a simple SCORES header instead of league title row
+        if (!isGroupedByLeague && isYesterdayScores) {
+            const scoresHeader = document.createElement('div');
+            scoresHeader.textContent = 'SCORES';
+            scoresHeader.style.color = '#9ca3af';
+            scoresHeader.style.fontWeight = '400';
+            scoresHeader.style.fontSize = '13px';
+            scoresHeader.style.padding = '0 0 6px 5px';
+            scoresHeader.style.marginTop = '10px';
+            container.appendChild(scoresHeader);
+        }
         const leagueGroups = {};
 
         if (isGroupedByLeague) {
@@ -5773,12 +5807,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     titleGames.forEach(data => {
                         const home = getTeamDisplayName(data["Home Team"] || "");
                         const away = getTeamDisplayName(data["Away Team"] || "");
-                        const homeScore = data["Home Score"], awayScore = data["Away Score"];
+                        // Try multiple possible field names for scores
+                        const homeScore = data["Home Score"] || data["HomeScore"] || data.homeScore || '';
+                        const awayScore = data["Away Score"] || data["AwayScore"] || data.awayScore || '';
                         const matchStatus = (data["Match Status"] || "").toUpperCase();
                         const rawStart = data["Start Time"];
                         
-                        const isLive = matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE");
-                        const isFinal = matchStatus.includes("FINISHED") || matchStatus.includes("FINAL") || matchStatus.includes("GAME OVER");
+                        // For yesterdayScores, never show live; always treat as final
+                        const isLive = isYesterdayScores ? false : (matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE"));
+                        const isFinal = isYesterdayScores || matchStatus.includes("FINISHED") || matchStatus.includes("FINAL") || matchStatus.includes("GAME OVER");
                         let currentTimeLabel = "";
 
                         if (isLive) {
@@ -5811,7 +5848,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         let displayAwayScore = awayScore ?? '';
                         let displayHomeScore = homeScore ?? '';
                         
-                        if (!isLive && !isFinal) {
+                        // For yesterdayScores, always show scores (convert to string, show 0 if needed)
+                        if (isYesterdayScores) {
+                            displayAwayScore = (awayScore !== null && awayScore !== undefined) ? String(awayScore) : '';
+                            displayHomeScore = (homeScore !== null && homeScore !== undefined) ? String(homeScore) : '';
+                        } else if (!isLive && !isFinal) {
                            displayAwayScore = '';
                            displayHomeScore = '';
                         }
@@ -5872,12 +5913,15 @@ document.addEventListener('DOMContentLoaded', function () {
             games.forEach(data => {
                 const home = getTeamDisplayName(data["Home Team"] || "");
                 const away = getTeamDisplayName(data["Away Team"] || "");
-                const homeScore = data["Home Score"], awayScore = data["Away Score"];
+                // Try multiple possible field names for scores
+                const homeScore = data["Home Score"] || data["HomeScore"] || data.homeScore || '';
+                const awayScore = data["Away Score"] || data["AwayScore"] || data.awayScore || '';
                 const matchStatus = (data["Match Status"] || "").toUpperCase();
                 const rawStart = data["Start Time"];
                 
-                const isLive = matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE");
-                const isFinal = matchStatus.includes("FINISHED") || matchStatus.includes("FINAL") || matchStatus.includes("GAME OVER");
+                // For yesterdayScores, never show live; always treat as final
+                const isLive = isYesterdayScores ? false : (matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE"));
+                const isFinal = isYesterdayScores || matchStatus.includes("FINISHED") || matchStatus.includes("FINAL") || matchStatus.includes("GAME OVER");
                 let currentTimeLabel = "";
 
                 if (isLive) {
@@ -5909,7 +5953,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 let displayAwayScore = awayScore ?? '';
                 let displayHomeScore = homeScore ?? '';
                 
-                if (!isLive && !isFinal) {
+                // For yesterdayScores, always show scores (convert to string, show 0 if needed)
+                if (isYesterdayScores) {
+                    // Show score if it exists (including 0), otherwise empty string
+                    displayAwayScore = (awayScore !== null && awayScore !== undefined && awayScore !== '') ? String(awayScore) : '';
+                    displayHomeScore = (homeScore !== null && homeScore !== undefined && homeScore !== '') ? String(homeScore) : '';
+                    // Debug: console.log('Score check:', { awayScore, homeScore, displayAwayScore, displayHomeScore, data });
+                } else if (!isLive && !isFinal) {
                    displayAwayScore = '';
                    displayHomeScore = '';
                 }
@@ -5923,16 +5973,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 const displayLeague = getLeagueDisplayName(data.League, data.Sport);
                 const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup', 'USL Championship', 'UEFA W Champions League', 'CAF Qualifiers', 'UEFA European Qualifiers', 'AFC Asian Cup Qualifiers', 'Copa Libertadores', 'Copa Sudamericana', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly'].includes(displayLeague);
                 
+                // Check if we're rendering in the league-specific column (for font size adjustment)
+                const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
+                const timeFontSize = isLeagueSpecificColumn ? '10px' : '11px';
+                
                 // Hide channel data for final games
                 const channelDisplay = (data.channel && !isFinal) ? `<td rowspan="2" style="width: 50px; text-align: center; font-size: 10px; color: #9ca3af; vertical-align: top; padding-left: 2px; padding-right: 2px;">${data.channel}</td>` : '<td rowspan="2" style="width: 50px; padding-left: 2px; padding-right: 2px;"></td>';
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
+                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
                     row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
+                row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
                 row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td>`;
                 }
 
@@ -6072,26 +6126,148 @@ document.addEventListener('DOMContentLoaded', function () {
          });
      }
 
-    function fetchYesterdayScoresForLeague(leagueId, leagueName) {
+    async function fetchYesterdayScoresForLeague(leagueId, leagueName) {
         const yesterdayScheduleContent = document.getElementById('league-schedule-yesterday-content');
         if (!yesterdayScheduleContent) return;
 
         yesterdayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading yesterday\'s scores...</p>';
 
-        // Calculate yesterday's date
-        const { DateTime } = luxon;
-        const yesterdayStr = DateTime.now().setZone('America/Denver').minus({ days: 1 }).toISODate();
-
-        // If we have a valid raw cache, use it to avoid refetching
-        const nowMs = Date.now();
-        if (yesterdayScoresRawCache && yesterdayScoresCacheExpiry && nowMs < yesterdayScoresCacheExpiry) {
-            const allGames = yesterdayScoresRawCache;
-            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayStr);
-            const leagueGames = yesterdayGames.filter(game => {
+        // Direct path: read entire yesterdayScores (no date filter), then organize by league
+        try {
+            const refAll = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
+            const snapAll = await refAll.get();
+            if (snapAll.empty) {
+                yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
+                return;
+            }
+            const allGames = snapAll.docs.map(d => d.data());
+            // Flexible league matching (exact → key-based → partials)
+            let leagueGames = allGames.filter(game => {
                 if (game.League === leagueId) return true;
-                // Flexible matching for display name mapping
-                const displayName = getLeagueDisplayName(game.League, game.Sport);
-                return displayName && displayName === leagueName;
+                const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
+                const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId || '');
+                if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) return true;
+                const targetLeagueName = (leagueName || '').toLowerCase();
+                const gameLeagueName = (game.League || '').toLowerCase();
+                if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) return true;
+                return gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName);
+            });
+            // NCAA split
+            if (leagueId === 'USA: NCAA') {
+                const isHockeyContext = leagueName && leagueName.toLowerCase().includes('hockey');
+                leagueGames = leagueGames.filter(g => isHockeyContext ? (g.Sport === 'Hockey') : (g.Sport === 'American Football'));
+            }
+            if (leagueGames.length === 0) {
+                yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
+                return;
+            }
+            // Render as completed (same as Home SCORES)
+            renderGames(yesterdayScheduleContent, leagueGames.sort(sortGames), false, true);
+            return;
+        } catch (e) {
+            // Fall through to existing logic if this path fails
+        }
+
+        // Calculate yesterday in both Denver and New York to handle edge timezone mismatches
+        const { DateTime } = luxon;
+        const yesterdayDenver = DateTime.now().setZone('America/Denver').minus({ days: 1 }).toISODate();
+        const yesterdayNY = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
+
+        // Ensure Home SCORES cache is available (single source of truth)
+        const nowCheck = Date.now();
+        if (!yesterdayScoresCache || !yesterdayScoresCacheExpiry || nowCheck >= yesterdayScoresCacheExpiry) {
+            try { fetchYesterdayScores(); } catch (e) {}
+            // Wait briefly for cache to build
+            const waitForYesterdayCache = (maxMs = 4000, interval = 200) => new Promise(resolve => {
+                const start = Date.now();
+                const timer = setInterval(() => {
+                    const ready = yesterdayScoresCache && yesterdayScoresCacheExpiry && Date.now() < yesterdayScoresCacheExpiry;
+                    if (ready || (Date.now() - start) >= maxMs) {
+                        clearInterval(timer);
+                        resolve(ready);
+                    }
+                }, interval);
+            });
+            await waitForYesterdayCache();
+        }
+
+        // If cache is ready now, use it directly and return
+        const nowAfterWait = Date.now();
+        if (yesterdayScoresCache && yesterdayScoresCacheExpiry && nowAfterWait < yesterdayScoresCacheExpiry) {
+            const allGames = yesterdayScoresCache;
+            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayDenver || game.gameDate === yesterdayNY);
+            let leagueGames = yesterdayGames.filter(game => {
+                if (game.League === leagueId) return true;
+                const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
+                const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId || '');
+                if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) return true;
+                const targetLeagueName = leagueName.toLowerCase();
+                const gameLeagueName = (game.League || '').toLowerCase();
+                if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) return true;
+                return gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName);
+            });
+            if (leagueId === 'USA: NCAA') {
+                const isHockeyContext = leagueName && leagueName.toLowerCase().includes('hockey');
+                leagueGames = leagueGames.filter(g => isHockeyContext ? (g.Sport === 'Hockey') : (g.Sport === 'American Football'));
+            }
+            if (leagueGames.length > 0) {
+                renderGames(yesterdayScheduleContent, leagueGames.sort(sortGames), false, true);
+                return;
+            }
+        }
+
+        // Fast path: query by date only, then client-filter by league (mirrors home SCORES logic)
+        const col = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
+        Promise.all([
+            col.where('gameDate', '==', yesterdayDenver).get(),
+            col.where('gameDate', '==', yesterdayNY).get()
+        ]).then(([snapA, snapB]) => {
+            if (!snapA.empty || !snapB.empty) {
+                let allGames = [...snapA.docs, ...snapB.docs].map(d => d.data());
+                // Flexible league matching
+                let leagueGames = allGames.filter(game => {
+                    if (game.League === leagueId) return true;
+                    const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
+                    const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId || '');
+                    if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) return true;
+                    const targetLeagueName = leagueName.toLowerCase();
+                    const gameLeagueName = (game.League || '').toLowerCase();
+                    if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) return true;
+                    return gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName);
+                });
+                // NCAA sport split
+                if (leagueId === 'USA: NCAA') {
+                    const isHockeyContext = leagueName && leagueName.toLowerCase().includes('hockey');
+                    leagueGames = leagueGames.filter(g => isHockeyContext ? (g.Sport === 'Hockey') : (g.Sport === 'American Football'));
+                }
+                if (leagueGames.length > 0) {
+                    renderGames(yesterdayScheduleContent, leagueGames.sort(sortGames), false, true);
+                    return;
+                }
+            }
+            // Fallback to cached/all-games path
+            continueWithCachedOrAll();
+        }).catch(() => continueWithCachedOrAll());
+
+        function continueWithCachedOrAll() {
+        // If we have a valid cache (same data the Home SCORES tab uses), use it for identical results
+        const nowMs = Date.now();
+        if (yesterdayScoresCache && yesterdayScoresCacheExpiry && nowMs < yesterdayScoresCacheExpiry) {
+            const allGames = yesterdayScoresCache; // includes featured merges; we'll filter by league
+            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayDenver || game.gameDate === yesterdayNY);
+            const leagueGames = yesterdayGames.filter(game => {
+                // Exact match first
+                if (game.League === leagueId) return true;
+                // Then try flexible matching based on league key
+                const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
+                const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId || '');
+                if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) return true;
+                // Fallback: display name and partials
+                const targetLeagueName = leagueName.toLowerCase();
+                const gameLeagueName = (game.League || '').toLowerCase();
+                if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) return true;
+                if (gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName)) return true;
+                return false;
             });
 
             // For NCAAF, filter out hockey games from yesterday's scores
@@ -6109,7 +6285,52 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const gamesData = filteredLeagueGames.sort(sortGames);
-            renderGames(yesterdayScheduleContent, gamesData, false);
+            renderGames(yesterdayScheduleContent, gamesData, false, true);
+            return;
+        }
+
+        // If no cache yet, load it once (same as Home SCORES), then filter
+        if (!yesterdayScoresCache || !yesterdayScoresCacheExpiry || nowMs >= yesterdayScoresCacheExpiry) {
+            try {
+                fetchYesterdayScores();
+            } catch (e) {}
+        }
+
+        // If we have a valid raw cache, use it to avoid refetching
+        if (yesterdayScoresRawCache && yesterdayScoresCacheExpiry && nowMs < yesterdayScoresCacheExpiry) {
+            const allGames = yesterdayScoresRawCache;
+            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayDenver || game.gameDate === yesterdayNY);
+            const leagueGames = yesterdayGames.filter(game => {
+                // Exact match first
+                if (game.League === leagueId) return true;
+                // Then try flexible matching based on league key
+                const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
+                const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId || '');
+                if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) return true;
+                // Fallback: display name and partials
+                const targetLeagueName = leagueName.toLowerCase();
+                const gameLeagueName = (game.League || '').toLowerCase();
+                if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) return true;
+                if (gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName)) return true;
+                return false;
+            });
+
+            // For NCAAF, filter out hockey games from yesterday's scores
+            const filteredLeagueGames = leagueGames.filter(game => {
+                if (leagueId === 'USA: NCAA') {
+                    const isHockeyContext = leagueName && leagueName.toLowerCase().includes('hockey');
+                    return isHockeyContext ? (game.Sport === 'Hockey') : (game.Sport === 'American Football');
+                }
+                return true;
+            });
+
+            if (filteredLeagueGames.length === 0) {
+                yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
+                return;
+            }
+
+            const gamesData = filteredLeagueGames.sort(sortGames);
+            renderGames(yesterdayScheduleContent, gamesData, false, true);
             return;
         }
 
@@ -6176,11 +6397,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 const gamesData = filteredLeagueGames.sort(sortGames);
-                renderGames(yesterdayScheduleContent, gamesData, false);
+                renderGames(yesterdayScheduleContent, gamesData, false, true);
             }, err => { 
                 console.error('Error fetching yesterday scores for', leagueId, ':', err);
                 yesterdayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading yesterday\'s scores.</p>'; 
             });
+        }
     }
 
     // Cache configuration
@@ -6879,15 +7101,20 @@ document.addEventListener('DOMContentLoaded', function () {
             const conferenceTeams = teams.filter(team => team.Conference === conferenceName);
             if (conferenceTeams.length === 0) return;
             
-            // Sort teams by wins (descending), then losses (ascending)
+            // Sort by conference record first (ConfRecord like "4-0"), then overall record (Wins/Losses)
             conferenceTeams.sort((a, b) => {
+                const [cWA, cLA] = String(a.ConfRecord || '').split('-').map(n => parseInt(n) || 0);
+                const [cWB, cLB] = String(b.ConfRecord || '').split('-').map(n => parseInt(n) || 0);
+                if (cWA !== cWB) return cWB - cWA; // more conference wins first
+                if (cLA !== cLB) return cLA - cLB; // fewer conference losses next
+
                 const winsA = parseInt(a.Wins) || 0;
                 const winsB = parseInt(b.Wins) || 0;
-                if (winsA !== winsB) return winsB - winsA;
-                
+                if (winsA !== winsB) return winsB - winsA; // more overall wins
+
                 const lossesA = parseInt(a.Losses) || 0;
                 const lossesB = parseInt(b.Losses) || 0;
-                return lossesA - lossesB;
+                return lossesA - lossesB; // fewer overall losses
             });
             
             html += '<div class="conference-section" style="margin-bottom: 30px;">';
@@ -8322,10 +8549,10 @@ async function fetchFeaturedGames() {
                     let awayTeam = getTeamDisplayName(game.away || '');
                     let homeTeam = getTeamDisplayName(game.home || '');
                     
-                    // Use EXACT same table format as renderGames function
+                    // Use EXACT same table format as renderGames function (10px font for time column in league-specific column)
                     html += `
                         <tr class="game-row scheduled-game">
-                            <td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeDisplay}</td>
+                            <td rowspan="2" style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeDisplay}</td>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${awayTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                             <td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
@@ -8344,10 +8571,10 @@ async function fetchFeaturedGames() {
                     const homeTeam = getTeamDisplayName(game.home || '');
                     const awayTeam = getTeamDisplayName(game.away || '');
                     
-                    // Use EXACT same table format as renderGames function for soccer
+                    // Use EXACT same table format as renderGames function for soccer (10px font for time column in league-specific column)
                     html += `
                         <tr class="game-row scheduled-game">
-                            <td rowspan="2" style="text-align: left; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeDisplay}</td>
+                            <td rowspan="2" style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeDisplay}</td>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${homeTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                             <td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
