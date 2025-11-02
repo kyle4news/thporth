@@ -3596,9 +3596,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     if (espnTab) {
                         espnTab.click();
                     }
+                } else if (section === 'FormulaOne') {
+                    // Formula One has its own special column structure
+                    gamesColumn.style.display = 'block';
+                    leagueSpecificColumn.style.display = 'none';
+                    f1Content.style.display = 'block';
+                    gamesContent.style.display = 'none';
                 } else {
                     gamesColumn.style.display = 'none';
                     leagueSpecificColumn.style.display = 'block';
+                    f1Content.style.display = 'none';
                     loadLeagueSpecificData(section);
                     
                     // Update the standings tab text based on the league
@@ -4243,11 +4250,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             return rows.map(row => {
                 const columns = row.split(',');
-                if (columns.length < 6) return null; // Skip malformed rows
+                if (columns.length < 5) return null; // Need at least 5 columns (Date, Time, Home Team, Away Team, Channel)
 
                 const date = columns[0].trim();
                 const startTimeStr = columns[1].trim();
-                const endTimeStr = columns[2].trim();
+                // If there's a second time column, use it; otherwise use start time for end time
+                const endTimeStr = columns.length >= 6 ? columns[2].trim() : columns[1].trim();
+                
+                // Determine column indices based on whether there's an end time column
+                const hasEndTime = columns.length >= 6;
+                const eventHeadIndex = hasEndTime ? 3 : 2; // Home Team
+                const eventSubIndex = hasEndTime ? 4 : 3;   // Away Team
+                const channelIndex = hasEndTime ? 5 : 4;    // Channel
 
                 // Combine date and time to create a valid Luxon DateTime object with the correct time zone
                 const startDateTime = DateTime.fromFormat(`${date} ${startTimeStr}`, 'M/d/yyyy h:mm a', { zone: timeZone });
@@ -4256,9 +4270,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 return {
                     start: startDateTime,
                     end: endDateTime,
-                    eventHead: columns[3].trim(),
-                    eventSub: columns[4].trim(),
-                    channel: columns[5].trim()
+                    eventHead: columns[eventHeadIndex].trim(), // Home Team
+                    eventSub: columns[eventSubIndex].trim(),  // Away Team
+                    channel: columns[channelIndex] ? columns[channelIndex].trim() : '' // Channel
                 };
             }).filter(event => event && event.start.isValid); // Filter out null or invalid date rows
         } catch (error) {
@@ -4307,6 +4321,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             groupedByDate[dateKey].forEach(event => {
                 const timeDisplay = event.start.toFormat('h:mm a');
+                const channelDisplay = event.channel || '';
 
                 html += `
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #2a2a2a;">
@@ -4314,7 +4329,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div style="font-weight: 500; font-size: 11px;">${event.eventHead}</div>
                             <div style="color: #9ca3af; font-size: 11px;">${event.eventSub}</div>
                         </div>
-                        <div style="text-align: right; color: #e0e0e0; font-size: 11px; white-space: nowrap; margin-left: 8px;">${timeDisplay}</div>
+                        <div style="text-align: right; white-space: nowrap; margin-left: 8px;">
+                            <div style="color: #e0e0e0; font-size: 11px;">${timeDisplay}</div>
+                            ${channelDisplay ? `<div style="color: #9ca3af; font-size: 10px; margin-top: 2px;">${channelDisplay}</div>` : ''}
+                        </div>
                     </div>
                 `;
             });
@@ -4688,10 +4706,574 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
     
-    function getTeamDisplayName(name) {
+    // League-specific team name display mappings
+    const TEAM_DISPLAY_MAP = {
+        // MLB
+        MLB: {
+            "Arizona Diamondbacks": "Diamondbacks",
+            "Atlanta Braves": "Braves",
+            "Baltimore Orioles": "Orioles",
+            "Boston Red Sox": "Red Sox",
+            "Chicago Cubs": "Cubs",
+            "Chicago White Sox": "White Sox",
+            "Cincinnati Reds": "Reds",
+            "Cleveland Guardians": "Guardians",
+            "Colorado Rockies": "Rockies",
+            "Detroit Tigers": "Tigers",
+            "Houston Astros": "Astros",
+            "Kansas City Royals": "Royals",
+            "Los Angeles Angels": "Angels",
+            "Los Angeles Dodgers": "Dodgers",
+            "Miami Marlins": "Marlins",
+            "Milwaukee Brewers": "Brewers",
+            "Minnesota Twins": "Twins",
+            "New York Mets": "Mets",
+            "New York Yankees": "Yankees",
+            "Athletics": "Athletics",
+            "Philadelphia Phillies": "Phillies",
+            "Pittsburgh Pirates": "Pirates",
+            "San Diego Padres": "Padres",
+            "San Francisco Giants": "Giants",
+            "Seattle Mariners": "Mariners",
+            "St. Louis Cardinals": "Cardinals",
+            "Tampa Bay Rays": "Rays",
+            "Texas Rangers": "Rangers",
+            "Toronto Blue Jays": "Blue Jays",
+            "Washington Nationals": "Nationals"
+        },
+        // NFL
+        NFL: {
+            "Arizona Cardinals": "Cardinals",
+            "Atlanta Falcons": "Falcons",
+            "Baltimore Ravens": "Ravens",
+            "Buffalo Bills": "Bills",
+            "Carolina Panthers": "Panthers",
+            "Chicago Bears": "Bears",
+            "Cincinnati Bengals": "Bengals",
+            "Cleveland Browns": "Browns",
+            "Dallas Cowboys": "Cowboys",
+            "Denver Broncos": "Broncos",
+            "Detroit Lions": "Lions",
+            "Green Bay Packers": "Packers",
+            "Houston Texans": "Texans",
+            "Indianapolis Colts": "Colts",
+            "Jacksonville Jaguars": "Jaguars",
+            "Kansas City Chiefs": "Chiefs",
+            "Las Vegas Raiders": "Raiders",
+            "Los Angeles Chargers": "Chargers",
+            "Los Angeles Rams": "Rams",
+            "Miami Dolphins": "Dolphins",
+            "Minnesota Vikings": "Vikings",
+            "New England Patriots": "Patriots",
+            "New Orleans Saints": "Saints",
+            "New York Giants": "Giants",
+            "New York Jets": "Jets",
+            "Philadelphia Eagles": "Eagles",
+            "Pittsburgh Steelers": "Steelers",
+            "San Francisco 49ers": "49ers",
+            "Seattle Seahawks": "Seahawks",
+            "Tampa Bay Buccaneers": "Buccaneers",
+            "Tennessee Titans": "Titans",
+            "Washington Commanders": "Commanders"
+        },
+        // NBA
+        NBA: {
+            "Atlanta Hawks": "Hawks",
+            "Boston Celtics": "Celtics",
+            "Brooklyn Nets": "Nets",
+            "Charlotte Hornets": "Hornets",
+            "Chicago Bulls": "Bulls",
+            "Cleveland Cavaliers": "Cavaliers",
+            "Dallas Mavericks": "Mavericks",
+            "Denver Nuggets": "Nuggets",
+            "Detroit Pistons": "Pistons",
+            "Golden State Warriors": "Warriors",
+            "Houston Rockets": "Rockets",
+            "Indiana Pacers": "Pacers",
+            "Los Angeles Clippers": "Clippers",
+            "Los Angeles Lakers": "Lakers",
+            "Memphis Grizzlies": "Grizzlies",
+            "Miami Heat": "Heat",
+            "Milwaukee Bucks": "Bucks",
+            "Minnesota Timberwolves": "Timberwolves",
+            "New Orleans Pelicans": "Pelicans",
+            "New York Knicks": "Knicks",
+            "Oklahoma City Thunder": "Thunder",
+            "Orlando Magic": "Magic",
+            "Philadelphia 76ers": "76ers",
+            "Phoenix Suns": "Suns",
+            "Portland Trail Blazers": "Trail Blazers",
+            "Sacramento Kings": "Kings",
+            "San Antonio Spurs": "Spurs",
+            "Toronto Raptors": "Raptors",
+            "Utah Jazz": "Jazz",
+            "Washington Wizards": "Wizards"
+        },
+        // NHL
+        NHL: {
+            "Anaheim Ducks": "Ducks",
+            "Arizona Coyotes": "Coyotes",
+            "Boston Bruins": "Bruins",
+            "Buffalo Sabres": "Sabres",
+            "Calgary Flames": "Flames",
+            "Carolina Hurricanes": "Hurricanes",
+            "Chicago Blackhawks": "Blackhawks",
+            "Colorado Avalanche": "Avalanche",
+            "Columbus Blue Jackets": "Blue Jackets",
+            "Dallas Stars": "Stars",
+            "Detroit Red Wings": "Red Wings",
+            "Edmonton Oilers": "Oilers",
+            "Florida Panthers": "Panthers",
+            "Los Angeles Kings": "Kings",
+            "Utah Mammoth": "Mammoth",
+            "Minnesota Wild": "Wild",
+            "Montreal Canadiens": "Canadiens",
+            "Nashville Predators": "Predators",
+            "New Jersey Devils": "Devils",
+            "New York Islanders": "Islanders",
+            "New York Rangers": "Rangers",
+            "Ottawa Senators": "Senators",
+            "Philadelphia Flyers": "Flyers",
+            "Pittsburgh Penguins": "Penguins",
+            "San Jose Sharks": "Sharks",
+            "Seattle Kraken": "Kraken",
+            "St. Louis Blues": "Blues",
+            "Tampa Bay Lightning": "Lightning",
+            "Toronto Maple Leafs": "Maple Leafs",
+            "Vancouver Canucks": "Canucks",
+            "Vegas Golden Knights": "Golden Knights",
+            "Washington Capitals": "Capitals",
+            "Winnipeg Jets": "Jets"
+        },
+        // WNBA
+        WNBA: {
+            "Atlanta Dream": "Dream",
+            "Chicago Sky": "Sky",
+            "Connecticut Sun": "Sun",
+            "Dallas Wings": "Wings",
+            "Indiana Fever": "Fever",
+            "Las Vegas Aces": "Aces",
+            "Los Angeles Sparks": "Sparks",
+            "Minnesota Lynx": "Lynx",
+            "New York Liberty": "Liberty",
+            "Phoenix Mercury": "Mercury",
+            "Seattle Storm": "Storm",
+            "Washington Mystics": "Mystics"
+        },
+        // CFL
+        CFL: {
+            "BC Lions": "BC",
+            "Calgary Stampeders": "Calgary",
+            "Edmonton Elks": "Edmonton",
+            "Hamilton Tiger-Cats": "Hamilton",
+            "Montreal Alouettes": "Montreal",
+            "Ottawa Redblacks": "Ottawa",
+            "Saskatchewan Roughriders": "Saskatchewan",
+            "Toronto Argonauts": "Toronto",
+            "Winnipeg Blue Bombers": "Winnipeg"
+        },
+        // NWSL
+        NWSL: {
+            "Kansas City Current": "KC Current",
+            "Kansas City Current W": "KC Current",
+            "Washington Spirit": "Spirit",
+            "Washington Spirit W": "Spirit",
+            "Orlando Pride": "Pride",
+            "Orlando Pride W": "Pride",
+            "Seattle Reign": "Reign",
+            "Seattle Reign W": "Reign",
+            "San Diego Wave": "Wave",
+            "San Diego Wave W": "Wave",
+            "Portland Thorns": "Thorns",
+            "Portland Thorns W": "Thorns",
+            "Gotham": "Gotham FC",
+            "Gotham W": "Gotham FC",
+            "NJ/NY Gotham FC": "Gotham FC",
+            "Racing Louisville": "Louisville",
+            "Racing Louisville W": "Louisville",
+            "Racing Louisville FC": "Louisville",
+            "North Carolina Courage": "NC Courage",
+            "North Carolina Courage W": "NC Courage",
+            "Houston Dash": "Dash",
+            "Houston Dash W": "Dash",
+            "Angel City": "Angel City",
+            "Angel City W": "Angel City",
+            "Utah Royals": "Royals",
+            "Utah Royals W": "Royals",
+            "Bay FC": "Bay FC",
+            "Bay FC W": "Bay FC",
+            "Chicago": "Stars",
+            "Chicago W": "Stars",
+            "Chicago Stars": "Stars"
+        },
+        // Premier League
+        PremierLeague: {
+            "Arsenal": "Arsenal",
+            "Manchester City": "Man City",
+            "Man City": "Man City",
+            "Liverpool": "Liverpool",
+            "Bournemouth": "Bournemouth",
+            "AFC Bournemouth": "Bournemouth",
+            "Tottenham Hotspur": "Tottenham",
+            "Tottenham": "Tottenham",
+            "Chelsea": "Chelsea",
+            "Sunderland": "Sunderland",
+            "Manchester United": "Man United",
+            "Man United": "Man United",
+            "Crystal Palace": "Palace",
+            "Palace": "Palace",
+            "Brighton & Hove Albion": "Brighton",
+            "Brighton": "Brighton",
+            "Aston Villa": "Aston Villa",
+            "Brentford": "Brentford",
+            "Newcastle United": "Newcastle",
+            "Newcastle": "Newcastle",
+            "Fulham": "Fulham",
+            "Everton": "Everton",
+            "Leeds United": "Leeds",
+            "Leeds": "Leeds",
+            "Burnley": "Burnley",
+            "West Ham United": "West Ham",
+            "West Ham": "West Ham",
+            "Nottingham Forest": "Forest",
+            "Forest": "Forest",
+            "Wolverhampton Wanderers": "Wolves",
+            "Wolves": "Wolves",
+            "Wolverhampton": "Wolves"
+        },
+        // Bundesliga
+        Bundesliga: {
+            "Bayern Munich": "Bayern",
+            "Bayern München": "Bayern",
+            "Bayern": "Bayern",
+            "FC Bayern Munich": "Bayern",
+            "FC Bayern München": "Bayern",
+            "RB Leipzig": "RB Leipzig",
+            "Borussia Dortmund": "Dortmund",
+            "Dortmund": "Dortmund",
+            "BVB Dortmund": "Dortmund",
+            "VfB Stuttgart": "Stuttgart",
+            "Stuttgart": "Stuttgart",
+            "Bayer Leverkusen": "Leverkusen",
+            "Leverkusen": "Leverkusen",
+            "1. FC Köln": "Köln",
+            "FC Köln": "Köln",
+            "Köln": "Köln",
+            "Eintracht Frankfurt": "Frankfurt",
+            "Frankfurt": "Frankfurt",
+            "1899 Hoffenheim": "Hoffenheim",
+            "Hoffenheim": "Hoffenheim",
+            "TSG Hoffenheim": "Hoffenheim",
+            "Werder Bremen": "Werder",
+            "Werder": "Werder",
+            "SV Werder Bremen": "Werder",
+            "1. FC Union Berlin": "Union Berlin",
+            "Union Berlin": "Union Berlin",
+            "FC Union Berlin": "Union Berlin",
+            "SC Freiburg": "SC Freiburg",
+            "Freiburg": "SC Freiburg",
+            "VfL Wolfsburg": "Wolfsburg",
+            "Wolfsburg": "Wolfsburg",
+            "Hamburger SV": "Hamburger",
+            "Hamburg": "Hamburger",
+            "Hamburger": "Hamburger",
+            "FC Augsburg": "Augsburg",
+            "Augsburg": "Augsburg",
+            "FC St. Pauli": "FC St. Pauli",
+            "St. Pauli": "FC St. Pauli",
+            "Borussia Mönchengladbach": "Mönchengladbach",
+            "Mönchengladbach": "Mönchengladbach",
+            "Gladbach": "Mönchengladbach",
+            "Borussia M'gladbach": "Mönchengladbach",
+            "1. FSV Mainz 05": "Mainz",
+            "Mainz 05": "Mainz",
+            "Mainz": "Mainz",
+            "1. FC Heidenheim": "Heidenheim",
+            "Heidenheim": "Heidenheim",
+            "FC Heidenheim": "Heidenheim"
+        },
+        // Liga MX
+        LigaMX: {
+            "Cruz Azul": "Cruz Azul",
+            "Toluca": "Toluca",
+            "Club América": "Club América",
+            "Club America": "Club América",
+            "América": "Club América",
+            "America": "Club América",
+            "Tigres UANL": "Tigres UANL",
+            "Tigres": "Tigres UANL",
+            "Monterrey": "Monterrey",
+            "CF Monterrey": "Monterrey",
+            "Guadalajara": "Guadalajara",
+            "Guadalajara Chivas": "Guadalajara",
+            "Chivas Guadalajara": "Guadalajara",
+            "Juárez": "Juárez",
+            "Juarez": "Juárez",
+            "FC Juárez": "Juárez",
+            "FC Juarez": "Juárez",
+            "Pachuca": "Pachuca",
+            "Club Tijuana": "Club Tijuana",
+            "Tijuana": "Club Tijuana",
+            "Xolos Tijuana": "Club Tijuana",
+            "Santos Laguna": "Santos Laguna",
+            "Santos": "Santos Laguna",
+            "Atlas": "Atlas",
+            "San Luis": "San Luis",
+            "Atlético San Luis": "San Luis",
+            "Atl. San Luis": "San Luis",
+            "Atletico San Luis": "San Luis",
+            "Necaxa": "Necaxa",
+            "Club Necaxa": "Necaxa",
+            "Pumas UNAM": "Pumas UNAM",
+            "UNAM Pumas": "Pumas UNAM",
+            "Pumas": "Pumas UNAM",
+            "Querétaro": "Querétaro",
+            "Queretaro": "Querétaro",
+            "Gallos Blancos Querétaro": "Querétaro",
+            "Mazatlán": "Mazatlán",
+            "Mazatlan": "Mazatlán",
+            "Mazatlán FC": "Mazatlán",
+            "Mazatlan FC": "Mazatlán",
+            "León": "León",
+            "Leon": "León",
+            "Club León": "León",
+            "Club Leon": "León",
+            "Puebla": "Puebla",
+            "Puebla FC": "Puebla"
+        },
+        // Argentine Primera División
+        ArgentinePrimeraDivision: {
+            "Unión de Santa Fe": "Santa Fe",
+            "Union de Santa Fe": "Santa Fe",
+            "Unión Santa Fe": "Santa Fe",
+            "Union Santa Fe": "Santa Fe",
+            "Santa Fe": "Santa Fe",
+            "Belgrano de Córdoba": "Córdoba",
+            "Belgrano de Cordoba": "Córdoba",
+            "Club Belgrano": "Córdoba",
+            "Belgrano": "Córdoba",
+            "Barracas Central": "Barracas",
+            "Barracas": "Barracas",
+            "Estudiantes de La Plata": "Estudiantes",
+            "Estudiantes L.P.": "Estudiantes",
+            "Estudiantes LP": "Estudiantes",
+            "Estudiantes": "Estudiantes",
+            "Boca Juniors": "Boca Juniors",
+            "Boca": "Boca Juniors",
+            "Defensa y Justicia": "Def. y Justicia",
+            "Def y Justicia": "Def. y Justicia",
+            "Argentinos Juniors": "Argentinos",
+            "Argentinos": "Argentinos",
+            "Belgrano": "Belgrano",
+            "Club Atlético Tigre": "Tigre",
+            "Tigre": "Tigre",
+            "Racing Club": "Racing Club",
+            "Racing": "Racing Club",
+            "Banfield": "Banfield",
+            "Huracán": "Huracán",
+            "Huracan": "Huracán",
+            "Club Atlético Huracán": "Huracán",
+            "Independiente Rivadavia": "Ind. Rivadavia",
+            "Ind. Rivadavia": "Ind. Rivadavia",
+            "Independiente Riv": "Ind. Rivadavia",
+            "Aldosivi": "Aldosivi",
+            "Club Aldosivi": "Aldosivi",
+            "Newell's Old Boys": "Newells",
+            "Newells Old Boys": "Newells",
+            "Newell's": "Newells",
+            "Newells": "Newells",
+            "Rosario Central": "Rosario",
+            "Rosario": "Rosario",
+            "Deportivo Riestra": "Dep. Riestra",
+            "Dep. Riestra": "Dep. Riestra",
+            "Riestra": "Dep. Riestra",
+            "Lanús": "Lanús",
+            "Lanus": "Lanús",
+            "Club Atlético Lanús": "Lanús",
+            "Vélez Sarsfield": "V. Sarsfield",
+            "Velez Sarsfield": "V. Sarsfield",
+            "Vélez": "V. Sarsfield",
+            "Velez": "V. Sarsfield",
+            "San Lorenzo": "San Lorenzo",
+            "San Lorenzo de Almagro": "San Lorenzo",
+            "River Plate": "River Plate",
+            "River": "River Plate",
+            "San Martín": "San Martín",
+            "San Martin": "San Martín",
+            "San Martín de San Juan": "San Martín",
+            "San Martín de Tucumán": "San Martín",
+            "Talleres de Córdoba": "Talleres",
+            "Talleres de Cordoba": "Talleres",
+            "Talleres": "Talleres",
+            "Atlético Tucumán": "At.. Tucumán",
+            "Atletico Tucuman": "At.. Tucumán",
+            "Atl. Tucumán": "At.. Tucumán",
+            "At Tucuman": "At.. Tucumán",
+            "Sarmiento": "Sarmiento",
+            "Sarmiento de Junín": "Sarmiento",
+            "Instituto de Córdoba": "Instituto",
+            "Instituto de Cordoba": "Instituto",
+            "Instituto": "Instituto",
+            "Gimnasia y Esgrima La Plata": "Gimnasia",
+            "Gimnasia La Plata": "Gimnasia",
+            "Gimnasia": "Gimnasia",
+            "Independiente": "Independiente",
+            "Club Atlético Independiente": "Independiente",
+            "Club Atlético Platense": "Platense",
+            "Platense": "Platense",
+            "Godoy Cruz": "Godoy Cruz",
+            "Godoy Cruz Antonio Tomba": "Godoy Cruz"
+        },
+        // Eredivisie
+        Eredivisie: {
+            "Feyenoord": "Feyenoord",
+            "PSV Eindhoven": "PSV",
+            "PSV": "PSV",
+            "AZ Alkmaar": "AZ",
+            "AZ": "AZ",
+            "Ajax": "Ajax",
+            "AFC Ajax": "Ajax",
+            "FC Groningen": "Groningen",
+            "Groningen": "Groningen",
+            "FC Utrecht": "Utrecht",
+            "Utrecht": "Utrecht",
+            "Sparta Rotterdam": "Rotterdam",
+            "Rotterdam": "Rotterdam",
+            "NEC Nijmegen": "Nijmegen",
+            "Nijmegen": "Nijmegen",
+            "FC Twente": "Twente",
+            "Twente": "Twente",
+            "Heerenveen": "Heerenven",
+            "SC Heerenveen": "Heerenven",
+            "Go Ahead Eagles": "G.A. Eagles",
+            "G.A. Eagles": "G.A. Eagles",
+            "Go Ahead Eagles Deventer": "G.A. Eagles",
+            "Fortuna Sittard": "Sittard",
+            "Sittard": "Sittard",
+            "NAC Breda": "NAC Breda",
+            "NAC": "NAC Breda",
+            "FC Volendam": "Volendam",
+            "Volendam": "Volendam",
+            "Excelsior": "Excelsior",
+            "Excelsior Rotterdam": "Excelsior",
+            "PEC Zwolle": "Zwolle",
+            "Zwolle": "Zwolle",
+            "Telstar": "Telstar",
+            "SC Telstar": "Telstar",
+            "Heracles": "Heracles",
+            "Heracles Almelo": "Heracles"
+        },
+        // Women's Super League
+        WomensSuperLeague: {
+            "Chelsea": "Chelsea",
+            "Chelsea FC Women": "Chelsea",
+            "Manchester City": "Man City",
+            "Man City": "Man City",
+            "Manchester City Women": "Man City",
+            "Manchester United": "Man United",
+            "Man United": "Man United",
+            "Manchester United Women": "Man United",
+            "Manchester Utd": "Man United",
+            "Manchesterd United": "Man United",
+            "Tottenham Hotspur": "Tottenham",
+            "Tottenham": "Tottenham",
+            "Tottenham Hotspur Women": "Tottenham",
+            "Arsenal": "Arsenal",
+            "Arsenal Women": "Arsenal",
+            "London City Lionesses": "London",
+            "London": "London",
+            "Brighton & Hove Albion": "Brighton",
+            "Brighton": "Brighton",
+            "Brighton & Hove Albion Women": "Brighton",
+            "Aston Villa": "Aston Villa",
+            "Aston Villa Women": "Aston Villa",
+            "Everton": "Everton",
+            "Everton Women": "Everton",
+            "Leicester City": "Leicester",
+            "Leicester": "Leicester",
+            "Leicester City Women": "Leicester",
+            "Liverpool": "Liverpool",
+            "Liverpool Women": "Liverpool",
+            "West Ham United": "West Ham",
+            "West Ham": "West Ham",
+            "West Ham United Women": "West Ham"
+        },
+        // OHL (Ontario Hockey League)
+        OHL: {
+            "Windsor Spitfires": "Spitfires",
+            "Spitfires": "Spitfires",
+            "Kitchener Rangers": "Rangers",
+            "Rangers": "Rangers",
+            "Owen Sound Attack": "Attack",
+            "Attack": "Attack",
+            "Sault Ste. Marie Greyhounds": "Greyhounds",
+            "Greyhounds": "Greyhounds",
+            "London Knights": "Knights",
+            "Knights": "Knights",
+            "Flint Firebirds": "Firebirds",
+            "Firebirds": "Firebirds",
+            "Saginaw Spirit": "Spirit",
+            "Spirit": "Spirit",
+            "Guelph Storm": "Storm",
+            "Storm": "Storm",
+            "Sarnia Sting": "Sting",
+            "Sting": "Sting",
+            "Erie Otters": "Otters",
+            "Otters": "Otters",
+            "Hamilton Bulldogs": "Bulldogs",
+            "Bulldogs": "Bulldogs",
+            "Brantford Bulldogs": "Bulldogs",
+            "Niagara IceDogs": "IceDogs",
+            "IceDogs": "IceDogs",
+            "Ottawa 67's": "67s",
+            "Ottawa 67s":"67s",
+            "67's": "67s",
+            "67s": "67s",
+            "Barrie Colts": "Colts",
+            "Colts": "Colts",
+            "Peterborough Petes": "Petes",
+            "Petes": "Petes",
+            "Kingston Frontenacs": "Frotenacs",
+            "Frontenacs": "Frotenacs",
+            "Frotenacs": "Frotenacs",
+            "North Bay Battalion": "Battalion",
+            "Battalion": "Battalion",
+            "Mississauga Steelheads": "Steelheads",
+            "Steelheads": "Steelheads",
+            "Oshawa Generals": "Generals",
+            "Generals": "Generals",
+            "Sudbury Wolves": "Wolves",
+            "Wolves": "Wolves"
+        }
+        // Additional leagues can be added here:
+        // PremierLeague: { ... },
+        // LaLiga: { ... },
+        // SerieA: { ... },
+        // Bundesliga: { ... },
+        // Ligue1: { ... },
+        // MLS: { ... },
+        // NWSL: { ... },
+        // etc.
+    };
+    
+    function getTeamDisplayName(name, league = null) {
+        // Remove " W" suffix if present (for NWSL)
         let p = name.endsWith(" W") ? name.slice(0, -2) : name;
-        const map = { "Arizona Diamondbacks": "Diamondbacks", "Atlanta Braves": "Braves", "Baltimore Orioles": "Orioles", "Boston Red Sox": "Red Sox", "Chicago Cubs": "Cubs", "Chicago White Sox": "White Sox", "Cincinnati Reds": "Reds", "Cleveland Guardians": "Guardians", "Colorado Rockies": "Rockies", "Detroit Tigers": "Tigers", "Houston Astros": "Astros", "Kansas City Royals": "Royals", "Los Angeles Angels": "Angels", "Los Angeles Dodgers": "Dodgers", "Miami Marlins": "Marlins", "Milwaukee Brewers": "Brewers", "Minnesota Twins": "Twins", "New York Mets": "Mets", "New York Yankees": "Yankees", "Athletics": "Athletics", "Philadelphia Phillies": "Phillies", "Pittsburgh Pirates": "Pirates", "San Diego Padres": "Padres", "San Francisco Giants": "Giants", "Seattle Mariners": "Mariners", "St. Louis Cardinals": "Cardinals", "Tampa Bay Rays": "Rays", "Texas Rangers": "Rangers", "Toronto Blue Jays": "Blue Jays", "Washington Nationals": "Nationals", "Atlanta Dream": "Dream", "Chicago Sky": "Sky", "Connecticut Sun": "Sun", "Dallas Wings": "Wings", "Indiana Fever": "Fever", "Las Vegas Aces": "Aces", "Los Angeles Sparks": "Sparks", "Minnesota Lynx": "Lynx", "New York Liberty": "Liberty", "Phoenix Mercury": "Mercury", "Seattle Storm": "Storm", "Washington Mystics": "Mystics", "Arizona Cardinals": "Cardinals", "Atlanta Falcons": "Falcons", "Baltimore Ravens": "Ravens", "Buffalo Bills": "Bills", "Carolina Panthers": "Panthers", "Chicago Bears": "Bears", "Cincinnati Bengals": "Bengals", "Cleveland Browns": "Browns", "Dallas Cowboys": "Cowboys", "Denver Broncos": "Broncos", "Detroit Lions": "Lions", "Green Bay Packers": "Packers", "Houston Texans": "Texans", "Indianapolis Colts": "Colts", "Jacksonville Jaguars": "Jaguars", "Kansas City Chiefs": "Chiefs", "Las Vegas Raiders": "Raiders", "Los Angeles Chargers": "Chargers", "Los Angeles Rams": "Rams", "Miami Dolphins": "Dolphins", "Minnesota Vikings": "Vikings", "New England Patriots": "Patriots", "New Orleans Saints": "Saints", "New York Giants": "Giants", "New York Jets": "Jets", "Philadelphia Eagles": "Eagles", "Pittsburgh Steelers": "Steelers", "San Francisco 49ers": "49ers", "Seattle Seahawks": "Seahawks", "Tampa Bay Buccaneers": "Buccaneers", "Tennessee Titans": "Titans", "Washington Commanders": "Commanders", "Anaheim Ducks": "Ducks", "Arizona Coyotes": "Coyotes", "Boston Bruins": "Bruins", "Buffalo Sabres": "Sabres", "Calgary Flames": "Flames", "Carolina Hurricanes": "Hurricanes", "Chicago Blackhawks": "Blackhawks", "Colorado Avalanche": "Avalanche", "Columbus Blue Jackets": "Blue Jackets", "Dallas Stars": "Stars", "Detroit Red Wings": "Red Wings", "Edmonton Oilers": "Oilers", "Florida Panthers": "Panthers", "Los Angeles Kings": "Kings", "Minnesota Wild": "Wild", "Montreal Canadiens": "Canadiens", "Nashville Predators": "Predators", "New Jersey Devils": "Devils", "New York Islanders": "Islanders", "New York Rangers": "Rangers", "Ottawa Senators": "Senators", "Philadelphia Flyers": "Flyers", "Pittsburgh Penguins": "Penguins", "San Jose Sharks": "Sharks", "Seattle Kraken": "Kraken", "St. Louis Blues": "Blues", "Tampa Bay Lightning": "Lightning", "Toronto Maple Leafs": "Maple Leafs", "Vancouver Canucks": "Canucks", "Vegas Golden Knights": "Golden Knights", "Washington Capitals": "Capitals", "Winnipeg Jets": "Jets", "Atlanta Hawks": "Hawks", "Boston Celtics": "Celtics", "Brooklyn Nets": "Nets", "Charlotte Hornets": "Hornets", "Chicago Bulls": "Bulls", "Cleveland Cavaliers": "Cavaliers", "Dallas Mavericks": "Mavericks", "Denver Nuggets": "Nuggets", "Detroit Pistons": "Pistons", "Golden State Warriors": "Warriors", "Houston Rockets": "Rockets", "Indiana Pacers": "Pacers", "Los Angeles Clippers": "Clippers", "Los Angeles Lakers": "Lakers", "Memphis Grizzlies": "Grizzlies", "Miami Heat": "Heat", "Milwaukee Bucks": "Bucks", "Minnesota Timberwolves": "Timberwolves", "New Orleans Pelicans": "Pelicans", "New York Knicks": "Knicks", "Oklahoma City Thunder": "Thunder", "Orlando Magic": "Magic", "Philadelphia 76ers": "76ers", "Phoenix Suns": "Suns", "Portland Trail Blazers": "Trail Blazers", "Sacramento Kings": "Kings", "San Antonio Spurs": "Spurs", "Toronto Raptors": "Raptors", "Utah Jazz": "Jazz", "Washington Wizards": "Wizards", "Atlanta Dream": "Dream", "Chicago Sky": "Sky", "Connecticut Sun": "Sun", "Dallas Wings": "Wings", "Indiana Fever": "Fever", "Las Vegas Aces": "Aces", "Los Angeles Sparks": "Sparks", "Minnesota Lynx": "Lynx", "New York Liberty": "Liberty", "Phoenix Mercury": "Mercury", "Seattle Storm": "Storm", "Washington Mystics": "Mystics", "BC Lions": "Lions", "Calgary Stampeders": "Stampeders", "Edmonton Elks": "Elks", "Hamilton Tiger-Cats": "Tiger-Cats", "Montreal Alouettes": "Alouettes", "Ottawa Redblacks": "Redblacks", "Saskatchewan Roughriders": "Roughriders", "Toronto Argonauts": "Argonauts", "Winnipeg Blue Bombers": "Blue Bombers" };
-        return map[p] || p;
+        
+        // If league is specified and has mappings, use league-specific mapping
+        if (league && TEAM_DISPLAY_MAP[league]) {
+            return TEAM_DISPLAY_MAP[league][p] || p;
+        }
+        
+        // Otherwise, try all leagues (fallback for backward compatibility)
+        for (const leagueMap of Object.values(TEAM_DISPLAY_MAP)) {
+            if (leagueMap[p]) {
+                return leagueMap[p];
+            }
+        }
+        
+        // Return original name if no mapping found
+        return p;
     }
     
     // Granular Live Status Display Function
