@@ -1978,8 +1978,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li data-section="WNBA"><img src="https://github.com/kyle4news/thporth/blob/main/WNBA.png?raw=true" alt="WNBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">WNBA</li>
             <li data-section="LIVGolf"><img src="https://github.com/kyle4news/thporth/blob/main/LIVGolf.png?raw=true" alt="LIV Golf" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">LIV Golf</li>
             <li data-section="IndyCar"><img src="https://github.com/kyle4news/thporth/blob/main/indycar.png?raw=true" alt="IndyCar" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">IndyCar</li>
-            <li data-section="NCAAM"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png" alt="NCAAM" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAM</li>
-            <li data-section="NCAAW"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png" alt="NCAAW" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAW</li>
+            <li data-section="NCAAM"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAM" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAM</li>
+            <li data-section="NCAAW"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAW" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAW</li>
            <!-- <li data-section="UFL">UFL</li> -->
             <li data-section="NCAABaseball"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png" alt="NCAA Baseball" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAA Baseball</li>
             <li data-section="NCAASoftball"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png" alt="NCAA Softball" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAA Softball</li>
@@ -2292,85 +2292,82 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
   <div id="f1-column-content" style="display: none; height: 100%; flex-direction: column; background-color: #1f1f1f; color: #ffffff;">
+      <!-- League Header -->
+      <div id="f1-league-header" style="position: sticky; top: 0; width: 100%; height: 18px; background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif; font-size: 10px; display: flex; align-items: center; padding-left: 10px; z-index: 11; border-bottom: 1px solid #1f1f1f; font-weight: bold;">
+          Formula One
+      </div>
       
-      <div style="padding: 0.5rem; border-bottom: 0px; background-color: #3c3c3c;">
-          <h2 style="font-size: 12px; font-weight: normal; color: #fff;">Schedule</h2>
+      <!-- Main Tabs: Schedule | Standings -->
+      <div id="f1-main-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0; gap: 2px; margin-top: 2px;">
+          <div class="f1-main-tab active" data-f1-main-tab="schedule" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #fff; color: #000; font-weight: bold;">SCHEDULE</div>
+          <div class="f1-main-tab" data-f1-main-tab="standings" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">STANDINGS</div>
       </div>
-  
-      <div style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-          <div style="padding: 0 1.5rem; border-bottom: 1px solid #374151;">
-              <nav id="f1-schedule-tabs" style="display: flex; margin-bottom: -1px; gap: 1.5rem;">
-                  <button class="f1-schedule-tab" data-tab="f1-today" style="border-bottom: 2px solid transparent; color: #9ca3af; padding-bottom: 0.5rem; font-size: 0.875rem; font-weight: 600; background: none; border-top: none; border-left: none; border-right: none; cursor: pointer;">
-                      Today
-                  </button>
-                  <button class="f1-schedule-tab" data-tab="f1-yesterday" style="border-bottom: 2px solid transparent; color: #9ca3af; padding-bottom: 0.5rem; font-size: 0.875rem; font-weight: 600; background: none; border-top: none; border-left: none; border-right: none; cursor: pointer;">
-                      Yesterday
-                  </button>
-                  <button class="f1-schedule-tab active" data-tab="f1-upcoming" style="border-bottom: 2px solid #DC143C; color: #fff; padding-bottom: 0.5rem; font-size: 0.875rem; font-weight: 600; background: none; border-top: none; border-left: none; border-right: none; cursor: pointer;">
-                      Upcoming
-                  </button>
-              </nav>
+
+      <!-- Schedule Tab Content (active by default) -->
+      <div id="f1-schedule-tab-content" class="f1-main-tab-content" style="display: block; height: calc(100% - 36px); flex-direction: column;">
+          <!-- Schedule Sub-Tabs (Yesterday, Today, Upcoming) -->
+          <div id="f1-schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-top: 2px; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%; gap: 2px;">
+              <div class="f1-schedule-tab" data-f1-schedule-tab="yesterday" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Yesterday</div>
+              <div class="f1-schedule-tab" data-f1-schedule-tab="today" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Today</div>
+              <div class="f1-schedule-tab active" data-f1-schedule-tab="upcoming" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Upcoming</div>
           </div>
-          <div style="padding: 0.5rem; flex: 1; overflow-y: auto;">
-             <div id="f1-today" class="f1-schedule-content-pane" style="display: none;">
-              <p style="color: #9ca3af; padding: 1rem;">No Formula 1 events today.</p>
-            </div>
-            <div id="f1-yesterday" class="f1-schedule-content-pane" style="display: none;">
-              <p style="color: #9ca3af; padding: 1rem;">No Formula 1 events yesterday.</p>
-            </div>
-            <div id="f1-upcoming" class="f1-schedule-content-pane" style="display: block;">
-              <div id="f1-schedule-container" style="padding: 1rem; font-size: 0.875rem;">
-                <p style="color: #9ca3af;">Loading schedule...</p>
+          
+          <!-- Schedule Content Panes -->
+          <div style="flex: 1; overflow-y: auto;">
+              <div id="f1-yesterday-content" class="f1-schedule-content-pane" style="display: none; padding: 1rem;">
+                  <p style="color: #9ca3af;">No Formula 1 events yesterday.</p>
               </div>
-            </div>
+              <div id="f1-today-content" class="f1-schedule-content-pane" style="display: none; padding: 1rem;">
+                  <p style="color: #9ca3af;">No Formula 1 events today.</p>
+              </div>
+              <div id="f1-upcoming-content" class="f1-schedule-content-pane" style="display: block; padding: 1rem; font-size: 0.875rem;">
+                  <div id="f1-schedule-container">
+                      <p style="color: #9ca3af;">Loading schedule...</p>
+                  </div>
+              </div>
           </div>
       </div>
-  
-      <div style="padding: 0.5rem; border-top: 1px solid #374151; border-bottom: 0px; background-color: #3c3c3c;">
-          <h2 style="font-size: 12px; font-weight: normal; color: #fff;">Standings</h2>
-      </div>
-  
-      <div style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-          <div style="padding: 0 1.5rem; border-bottom: 1px solid #374151;">
-              <nav id="f1-tab-buttons" style="display: flex; margin-bottom: -1px; gap: 1.5rem;">
-                  <button class="f1-tab-button active" data-tab="driver-standings" style="border-bottom: 2px solid #DC143C; color: #fff; padding-bottom: 0.5rem; font-size: 0.875rem; font-weight: 600; background: none; border-top: none; border-left: none; border-right: none; cursor: pointer;">
-                      Driver
-                  </button>
-                  <button class="f1-tab-button" data-tab="constructor-standings" style="border-bottom: 2px solid transparent; color: #9ca3af; padding-bottom: 0.5rem; font-size: 0.875rem; font-weight: 600; background: none; border-top: none; border-left: none; border-right: none; cursor: pointer;">
-                      Constructor
-                  </button>
-              </nav>
+
+      <!-- Standings Tab Content -->
+      <div id="f1-standings-tab-content" class="f1-main-tab-content" style="display: none; height: calc(100% - 36px); flex-direction: column;">
+          <!-- Standings Sub-Tabs (Driver, Constructor) -->
+          <div id="f1-standings-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-top: 2px; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%; gap: 2px;">
+              <div class="f1-standings-tab active" data-f1-standings-tab="driver" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Driver</div>
+              <div class="f1-standings-tab" data-f1-standings-tab="constructor" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Constructor</div>
           </div>
-          <div style="padding: 0.5rem; flex: 1; overflow-y: auto;">
-             <div id="driver-standings" class="f1-content-pane">
-              <div id="driver-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading driver standings...</div>
-              <div id="driver-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
-              <table id="driver-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
-                <thead>
-                  <tr style="text-align: left;">
-                    <th style="padding: 6px 4px; width: 25px;">#</th>
-                    <th style="padding: 6px 4px;">Driver</th>
-                    <th style="padding: 6px 4px;">Team</th>
-                    <th style="padding: 6px 4px; text-align: right;">Pts</th>
-                  </tr>
-                </thead>
-                <tbody id="driver-tbody"></tbody>
-              </table>
-            </div>
-            <div id="constructor-standings" class="f1-content-pane" style="display: none;">
-              <div id="constructor-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading constructor standings...</div>
-              <div id="constructor-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
-              <table id="constructor-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
-                <thead>
-                  <tr style="text-align: left;">
-                    <th style="padding: 6px 4px; width: 25px;">#</th>
-                    <th style="padding: 6px 4px;">Team</th>
-                    <th style="padding: 6px 4px; text-align: right;">Pts</th>
-                  </tr>
-                </thead>
-                <tbody id="constructor-tbody"></tbody>
-              </table>
-            </div>
+          
+          <!-- Standings Content Panes -->
+          <div style="flex: 1; overflow-y: auto; padding: 0.5rem;">
+              <div id="f1-driver-standings-content" class="f1-standings-content-pane">
+                  <div id="driver-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading driver standings...</div>
+                  <div id="driver-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
+                  <table id="driver-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
+                      <thead>
+                          <tr style="text-align: left;">
+                              <th style="padding: 6px 4px; width: 25px;">#</th>
+                              <th style="padding: 6px 4px;">Driver</th>
+                              <th style="padding: 6px 4px; text-align: right;">Pts</th>
+                              <th style="padding: 6px 4px; text-align: right;">Wins</th>
+                          </tr>
+                      </thead>
+                      <tbody id="driver-tbody"></tbody>
+                  </table>
+              </div>
+              <div id="f1-constructor-standings-content" class="f1-standings-content-pane" style="display: none;">
+                  <div id="constructor-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading constructor standings...</div>
+                  <div id="constructor-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
+                  <table id="constructor-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
+                      <thead>
+                          <tr style="text-align: left;">
+                              <th style="padding: 6px 4px; width: 25px;">#</th>
+                              <th style="padding: 6px 4px;">Constructor</th>
+                              <th style="padding: 6px 4px; text-align: right;">Pts</th>
+                              <th style="padding: 6px 4px; text-align: right;">Wins</th>
+                          </tr>
+                      </thead>
+                      <tbody id="constructor-tbody"></tbody>
+                  </table>
+              </div>
           </div>
       </div>
   </div>
@@ -4034,95 +4031,148 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- PART 2: Logic for the F1 Driver/Constructor tabs ---
-    const f1TabButtonsContainer = document.getElementById('f1-tab-buttons');
-    const f1ContentPanes = document.querySelectorAll('.f1-content-pane');
+    // --- PART 2: Logic for the F1 Main tabs (Schedule | Standings) ---
+    const f1MainTabsContainer = document.getElementById('f1-main-tabs');
+    const f1MainTabContents = document.querySelectorAll('.f1-main-tab-content');
     
     let driverStandingsLoaded = false;
     let constructorStandingsLoaded = false;
     
     // Load the default tab's data immediately when the F1 panel is shown
-    // This assumes you want to load it when FormulaOne is clicked.
-    // We can also trigger this on the first click of the tab.
     const f1MenuItem = document.querySelector('li[data-section="FormulaOne"]');
     if (f1MenuItem) {
         f1MenuItem.addEventListener('click', () => {
-            if (!driverStandingsLoaded) {
-                loadDriverStandings();
-                driverStandingsLoaded = true;
-            }
-        }, { once: true }); // Use { once: true } so it only fires the first time
+            // Schedule tab is active by default with Upcoming sub-tab active
+            // Load the schedule after a short delay to ensure the function is available
+            setTimeout(() => {
+                if (window.updateF1Schedule) {
+                    window.updateF1Schedule();
+                }
+            }, 100);
+        }, { once: true });
     }
 
-    if (f1TabButtonsContainer) {
-        f1TabButtonsContainer.addEventListener('click', function(event) {
-            const clickedButton = event.target.closest('.f1-tab-button');
-            if (!clickedButton) return;
+    if (f1MainTabsContainer) {
+        f1MainTabsContainer.addEventListener('click', function(event) {
+            const clickedTab = event.target.closest('.f1-main-tab');
+            if (!clickedTab) return;
 
-            const targetTabId = clickedButton.dataset.tab;
+            const targetTab = clickedTab.dataset.f1MainTab;
             
-            // Deactivate all buttons
-            f1TabButtonsContainer.querySelectorAll('.f1-tab-button').forEach(btn => {
-                btn.style.borderBottomColor = 'transparent';
-                btn.style.color = '#9ca3af';
+            // Deactivate all main tabs
+            f1MainTabsContainer.querySelectorAll('.f1-main-tab').forEach(tab => {
+                tab.style.backgroundColor = '#2a2a2a';
+                tab.style.color = '#ccc';
+                tab.style.fontWeight = 'normal';
+                tab.classList.remove('active');
             });
 
-            // Hide all panes
-            f1ContentPanes.forEach(pane => {
-                pane.style.display = 'none';
+            // Hide all main tab contents
+            f1MainTabContents.forEach(content => {
+                content.style.display = 'none';
             });
 
-            // Activate the clicked button and its pane
-            clickedButton.style.borderBottomColor = '#DC143C';
-            clickedButton.style.color = '#fff';
+            // Activate the clicked tab and its content
+            clickedTab.style.backgroundColor = '#fff';
+            clickedTab.style.color = '#000';
+            clickedTab.style.fontWeight = 'bold';
+            clickedTab.classList.add('active');
             
-            const targetPane = document.getElementById(targetTabId);
-            if (targetPane) {
-                targetPane.style.display = 'block';
+            const targetContent = document.getElementById(`f1-${targetTab}-tab-content`);
+            if (targetContent) {
+                targetContent.style.display = 'flex';
             }
             
-            // Load data if it hasn't been loaded yet
-            if (targetTabId === 'driver-standings' && !driverStandingsLoaded) {
+            // Load standings data when Standings tab is clicked
+            if (targetTab === 'standings' && !driverStandingsLoaded) {
                 loadDriverStandings();
-                driverStandingsLoaded = true; 
-            } else if (targetTabId === 'constructor-standings' && !constructorStandingsLoaded) {
-                loadConstructorStandings();
-                constructorStandingsLoaded = true;
+                driverStandingsLoaded = true;
             }
         });
     }
     
-    // F1 Schedule tabs handler
+    // F1 Schedule sub-tabs handler (Yesterday, Today, Upcoming)
     const f1ScheduleTabsContainer = document.getElementById('f1-schedule-tabs');
     const f1ScheduleContentPanes = document.querySelectorAll('.f1-schedule-content-pane');
     
     if (f1ScheduleTabsContainer) {
         f1ScheduleTabsContainer.addEventListener('click', function(event) {
-            const clickedButton = event.target.closest('.f1-schedule-tab');
-            if (!clickedButton) return;
+            const clickedTab = event.target.closest('.f1-schedule-tab');
+            if (!clickedTab) return;
 
-            const targetTabId = clickedButton.dataset.tab;
+            const targetTab = clickedTab.dataset.f1ScheduleTab;
             
-            // Deactivate all buttons
-            f1ScheduleTabsContainer.querySelectorAll('.f1-schedule-tab').forEach(btn => {
-                btn.style.borderBottomColor = 'transparent';
-                btn.style.color = '#9ca3af';
-                btn.classList.remove('active');
+            // Deactivate all schedule sub-tabs
+            f1ScheduleTabsContainer.querySelectorAll('.f1-schedule-tab').forEach(tab => {
+                tab.style.borderBottom = 'none';
+                tab.style.color = '#ccc';
+                tab.classList.remove('active');
             });
 
-            // Hide all panes
+            // Hide all schedule content panes
             f1ScheduleContentPanes.forEach(pane => {
                 pane.style.display = 'none';
             });
 
-            // Activate the clicked button and its pane
-            clickedButton.style.borderBottomColor = '#DC143C';
-            clickedButton.style.color = '#fff';
-            clickedButton.classList.add('active');
+            // Activate the clicked tab and its content
+            clickedTab.style.borderBottom = '2px solid #fff';
+            clickedTab.style.color = '#fff';
+            clickedTab.classList.add('active');
             
-            const targetPane = document.getElementById(targetTabId);
+            const targetPane = document.getElementById(`f1-${targetTab}-content`);
             if (targetPane) {
                 targetPane.style.display = 'block';
+            }
+            
+            // Load upcoming schedule when Upcoming tab is clicked
+            if (targetTab === 'upcoming') {
+                if (window.updateF1Schedule) {
+                    window.updateF1Schedule();
+                }
+            }
+        });
+    }
+    
+    // F1 Standings sub-tabs handler (Driver, Constructor)
+    const f1StandingsTabsContainer = document.getElementById('f1-standings-tabs');
+    const f1StandingsContentPanes = document.querySelectorAll('.f1-standings-content-pane');
+    
+    if (f1StandingsTabsContainer) {
+        f1StandingsTabsContainer.addEventListener('click', function(event) {
+            const clickedTab = event.target.closest('.f1-standings-tab');
+            if (!clickedTab) return;
+
+            const targetTab = clickedTab.dataset.f1StandingsTab;
+            
+            // Deactivate all standings sub-tabs
+            f1StandingsTabsContainer.querySelectorAll('.f1-standings-tab').forEach(tab => {
+                tab.style.borderBottom = 'none';
+                tab.style.color = '#ccc';
+                tab.classList.remove('active');
+            });
+
+            // Hide all standings content panes
+            f1StandingsContentPanes.forEach(pane => {
+                pane.style.display = 'none';
+            });
+
+            // Activate the clicked tab and its content
+            clickedTab.style.borderBottom = '2px solid #fff';
+            clickedTab.style.color = '#fff';
+            clickedTab.classList.add('active');
+            
+            const targetPane = document.getElementById(`f1-${targetTab}-standings-content`);
+            if (targetPane) {
+                targetPane.style.display = 'block';
+            }
+            
+            // Load data if it hasn't been loaded yet
+            if (targetTab === 'driver' && !driverStandingsLoaded) {
+                loadDriverStandings();
+                driverStandingsLoaded = true; 
+            } else if (targetTab === 'constructor' && !constructorStandingsLoaded) {
+                loadConstructorStandings();
+                constructorStandingsLoaded = true;
             }
         });
     }
@@ -4153,7 +4203,27 @@ async function fetchFromGoogleSheetsCSV(url) {
     }
 }
 
-// Function to load driver standings
+// Function to format driver name as "O. Piastri" (first initial + last name)
+function formatDriverName(fullName) {
+    if (!fullName) return '';
+    const parts = fullName.trim().split(' ');
+    if (parts.length >= 2) {
+        const firstInitial = parts[0].charAt(0).toUpperCase() + '.';
+        const lastName = parts.slice(1).join(' ');
+        return `${firstInitial} ${lastName}`;
+    }
+    return fullName;
+}
+
+// Function to get team name from Firestore driver data (we'll need to add this field)
+function getTeamNameFromDriver(driver) {
+    // The scraper stores driver info, but we need team name
+    // For now, we'll extract it from the API data structure
+    // The team name should be in the driver's team object if available
+    return driver.Team || driver.team || driver.teamName || '';
+}
+
+// Function to load driver standings from Firestore
 async function loadDriverStandings() {
     const loadingDiv = document.getElementById('driver-loading');
     const errorDiv = document.getElementById('driver-error');
@@ -4163,23 +4233,58 @@ async function loadDriverStandings() {
         loadingDiv.style.display = 'block';
         errorDiv.style.display = 'none';
         table.style.display = 'none';
-        const data = await fetchFromGoogleSheetsCSV(GOOGLE_SHEETS_CONFIG.DRIVER_STANDINGS_URL);
-        if (data.length === 0) throw new Error('No data found in sheet');
-        tbody.innerHTML = '';
-        for (let i = 1; i < data.length; i++) {
-            const row = data[i];
-            if (row.length >= 4) {
-                const tr = document.createElement('tr');
-                tr.style.borderTop = '1px solid #374151';
-                tr.innerHTML = `
-                        <td style="padding: 6px 4px;">${row[0]}</td>
-                        <td style="padding: 6px 4px;">${row[1]}</td>
-                        <td style="padding: 6px 4px;">${row[3]}</td>
-                        <td style="padding: 6px 4px; text-align: right; font-weight: bold;">${row[2]}</td>
-                `;
-                tbody.appendChild(tr);
-            }
+        
+        // Get Firestore db instance
+        let firestoreDb;
+        if (typeof db !== 'undefined' && db) {
+            firestoreDb = db;
+        } else if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firestoreDb = firebase.firestore();
+        } else {
+            throw new Error('Firestore database not initialized');
         }
+        
+        // Fetch from Firestore
+        const snapshot = await firestoreDb.collection('F1DriverStandings').get();
+        
+        if (snapshot.empty) {
+            throw new Error('No driver standings found in Firestore');
+        }
+        
+        const drivers = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            drivers.push({
+                Rank: data.Rank || 0,
+                Driver: data.Driver || '',
+                Points: data.Points || '0',
+                Wins: data.Wins || '0',
+                Team: data.Team || '' // We need to add team to scraper or get from API
+            });
+        });
+        
+        // Sort by rank
+        drivers.sort((a, b) => parseInt(a.Rank) - parseInt(b.Rank));
+        
+        tbody.innerHTML = '';
+        drivers.forEach(driver => {
+            const tr = document.createElement('tr');
+            tr.style.borderTop = '1px solid #374151';
+            const driverName = formatDriverName(driver.Driver);
+            const teamName = driver.Team || '';
+            
+            tr.innerHTML = `
+                <td style="padding: 6px 4px;">${driver.Rank}</td>
+                <td style="padding: 6px 4px;">
+                    <div style="color: #fff;">${driverName}</div>
+                    ${teamName ? `<div style="color: #9ca3af; font-size: 10px; margin-top: 2px;">${teamName}</div>` : ''}
+                </td>
+                <td style="padding: 6px 4px; text-align: right; font-weight: bold;">${driver.Points}</td>
+                <td style="padding: 6px 4px; text-align: right;">${driver.Wins}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
         loadingDiv.style.display = 'none';
         table.style.display = 'table';
     } catch (error) {
@@ -4190,7 +4295,7 @@ async function loadDriverStandings() {
     }
 }
 
-// Function to load constructor standings
+// Function to load constructor standings from Firestore
 async function loadConstructorStandings() {
     const loadingDiv = document.getElementById('constructor-loading');
     const errorDiv = document.getElementById('constructor-error');
@@ -4200,22 +4305,52 @@ async function loadConstructorStandings() {
         loadingDiv.style.display = 'block';
         errorDiv.style.display = 'none';
         table.style.display = 'none';
-        const data = await fetchFromGoogleSheetsCSV(GOOGLE_SHEETS_CONFIG.CONSTRUCTOR_STANDINGS_URL);
-        if (data.length === 0) throw new Error('No data found in sheet');
-        tbody.innerHTML = '';
-        for (let i = 1; i < data.length; i++) {
-            const row = data[i];
-            if (row.length >= 3) {
-                const tr = document.createElement('tr');
-                tr.style.borderTop = '1px solid #374151';
-                tr.innerHTML = `
-                        <td style="padding: 6px 4px;">${row[0]}</td>
-                        <td style="padding: 6px 4px;">${row[1]}</td>
-                        <td style="padding: 6px 4px; text-align: right; font-weight: bold;">${row[2]}</td>
-                `;
-                tbody.appendChild(tr);
-            }
+        
+        // Get Firestore db instance
+        let firestoreDb;
+        if (typeof db !== 'undefined' && db) {
+            firestoreDb = db;
+        } else if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firestoreDb = firebase.firestore();
+        } else {
+            throw new Error('Firestore database not initialized');
         }
+        
+        // Fetch from Firestore
+        const snapshot = await firestoreDb.collection('F1ConstructorStandings').get();
+        
+        if (snapshot.empty) {
+            throw new Error('No constructor standings found in Firestore');
+        }
+        
+        const constructors = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            constructors.push({
+                Rank: data.Rank || 0,
+                Constructor: data.Constructor || '',
+                Points: data.Points || '0',
+                Wins: data.Wins || '0'
+            });
+        });
+        
+        // Sort by rank
+        constructors.sort((a, b) => parseInt(a.Rank) - parseInt(b.Rank));
+        
+        tbody.innerHTML = '';
+        constructors.forEach(constructor => {
+            const tr = document.createElement('tr');
+            tr.style.borderTop = '1px solid #374151';
+            
+            tr.innerHTML = `
+                <td style="padding: 6px 4px;">${constructor.Rank}</td>
+                <td style="padding: 6px 4px;">${constructor.Constructor}</td>
+                <td style="padding: 6px 4px; text-align: right; font-weight: bold;">${constructor.Points}</td>
+                <td style="padding: 6px 4px; text-align: right;">${constructor.Wins}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
         loadingDiv.style.display = 'none';
         table.style.display = 'table';
     } catch (error) {
@@ -4234,49 +4369,145 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	  <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const F1_SCHEDULE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRZ9MyNW-7sVotdUg-L3rBWegNuPhhYek7C367krB8PfVRrRNBTE57AXTGPcxOXc192MqS_toeVrWER/pub?output=csv';
     const scheduleContainer = document.getElementById('f1-schedule-container');
 
-    // Fetches and parses the F1 schedule CSV data.
+    // Fetches F1 schedule data from Firestore.
     async function fetchF1ScheduleData() {
         try {
-            const response = await fetch(F1_SCHEDULE_URL);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const csvText = await response.text();
+            // Ensure Firebase is initialized - try to use global db first, otherwise initialize Firebase
+            let firestoreDb = typeof db !== 'undefined' ? db : null;
+            if (!firestoreDb && typeof firebase !== 'undefined') {
+                try {
+                    if (firebase.apps && firebase.apps.length === 0) {
+                        // Firebase not initialized - get config from the main script or use fallback
+                        // The main script should initialize Firebase, but if it hasn't, we'll try
+                        firestoreDb = firebase.firestore();
+                    } else {
+                        firestoreDb = firebase.firestore();
+                    }
+                } catch (e) {
+                    console.error('F1 Schedule: Error accessing Firestore:', e);
+                }
+            }
             
-            const rows = csvText.split(/\r?\n/).slice(1); // Split and remove header row
-            const timeZone = 'America/Chicago'; // Times in the sheet are Central U.S. Time
+            if (!firestoreDb) {
+                console.error('F1 Schedule: Firestore database not available');
+                scheduleContainer.innerHTML = `<p style="color: #ef4444;">Error loading schedule.</p>`;
+                return [];
+            }
+
             const { DateTime } = luxon;
+            const snapshot = await firestoreDb.collection('FormulaOne').get();
+            
+            console.log(`F1 Schedule: Found ${snapshot.size} documents in Firestore`);
+            
+            if (snapshot.empty) {
+                console.log('F1 Schedule: Firestore collection is empty');
+                return [];
+            }
 
-            return rows.map(row => {
-                const columns = row.split(',');
-                if (columns.length < 5) return null; // Need at least 5 columns (Date, Time, Home Team, Away Team, Channel)
-
-                const date = columns[0].trim();
-                const startTimeStr = columns[1].trim();
-                // If there's a second time column, use it; otherwise use start time for end time
-                const endTimeStr = columns.length >= 6 ? columns[2].trim() : columns[1].trim();
+            const events = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
                 
-                // Determine column indices based on whether there's an end time column
-                const hasEndTime = columns.length >= 6;
-                const eventHeadIndex = hasEndTime ? 3 : 2; // Home Team
-                const eventSubIndex = hasEndTime ? 4 : 3;   // Away Team
-                const channelIndex = hasEndTime ? 5 : 4;    // Channel
+                // Extract fields from Firestore document
+                const home = data['home'] || '';
+                const away = data['away'] || '';
+                const channel = data['channel'] || '';
+                const dateStr = (data['date'] || '').trim(); // Format: YYYY-MM-DD
+                const timeStr = (data['time'] || '').trim(); // Format: H:MM:SS AM/PM or H:MM AM/PM
+                
+                console.log(`F1 Schedule: Processing document - home: ${home}, away: ${away}, date: "${dateStr}", time: "${timeStr}"`);
+                
+                if (!dateStr || !timeStr) {
+                    console.log('F1 Schedule: Skipping document - missing date or time', { home, away, dateStr, timeStr });
+                    return; // Skip if missing date or time
+                }
 
-                // Combine date and time to create a valid Luxon DateTime object with the correct time zone
-                const startDateTime = DateTime.fromFormat(`${date} ${startTimeStr}`, 'M/d/yyyy h:mm a', { zone: timeZone });
-                const endDateTime = DateTime.fromFormat(`${date} ${endTimeStr}`, 'M/d/yyyy h:mm a', { zone: timeZone });
+                // Parse date (YYYY-MM-DD) and time
+                // Handle both formats: "2:00:00 PM" and "2:00 PM"
+                const timeStrClean = timeStr.replace(/:\d{2}$/, '').trim(); // Remove seconds if present
+                
+                console.log(`F1 Schedule: After cleaning - timeStrClean: "${timeStrClean}"`);
+                
+                try {
+                    // Combine date and time, then parse
+                    // Firestore dates are in YYYY-MM-DD format
+                    const dateParts = dateStr.split('-');
+                    if (dateParts.length !== 3) {
+                        console.log('F1 Schedule: Invalid date format', dateStr);
+                        return;
+                    }
+                    
+                    const year = parseInt(dateParts[0]);
+                    const month = parseInt(dateParts[1]);
+                    const day = parseInt(dateParts[2]);
+                    
+                    // Parse time string (e.g., "2:00 PM" or "2:00:00 PM")
+                    // More flexible regex to handle variations
+                    const timeMatch = timeStrClean.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)$/i);
+                    if (!timeMatch) {
+                        console.error('F1 Schedule: Invalid time format - regex did not match', {
+                            timeStrClean: timeStrClean,
+                            timeStrOriginal: timeStr,
+                            charCodes: timeStrClean.split('').map(c => c.charCodeAt(0))
+                        });
+                        return;
+                    }
+                    
+                    let hours = parseInt(timeMatch[1]);
+                    const minutes = parseInt(timeMatch[2]);
+                    const ampm = timeMatch[3].toUpperCase();
+                    
+                    const originalHours = hours;
+                    if (ampm === 'PM' && hours !== 12) hours += 12;
+                    if (ampm === 'AM' && hours === 12) hours = 0;
+                    
+                    console.log(`F1 Schedule: Parsing time - original: ${originalHours}:${minutes} ${ampm}, converted to 24h: ${hours}:${minutes}`);
+                    
+                    // Create DateTime in America/New_York timezone (EST/EDT)
+                    const startDateTime = DateTime.fromObject({
+                        year: year,
+                        month: month,
+                        day: day,
+                        hour: hours,
+                        minute: minutes
+                    }, { zone: 'America/New_York' });
+                    
+                    if (!startDateTime.isValid) {
+                        console.error('F1 Schedule: Invalid DateTime created', { year, month, day, hours, minutes, invalidReason: startDateTime.invalidReason });
+                        return;
+                    }
+                    
+                    console.log(`F1 Schedule: Created DateTime - ${startDateTime.toISO()}, local display: ${startDateTime.setZone('local').toFormat('h:mm a')}`);
+                    
+                    // For end time, assume 3 hours duration for races, 1 hour for practice/qualifying
+                    let durationHours = 1;
+                    if (away.toLowerCase().includes('race')) {
+                        durationHours = 3;
+                    } else if (away.toLowerCase().includes('qualifying') || away.toLowerCase().includes('sprint')) {
+                        durationHours = 1.5;
+                    }
+                    
+                    const endDateTime = startDateTime.plus({ hours: durationHours });
+                    
+                    events.push({
+                        start: startDateTime,
+                        end: endDateTime,
+                        eventHead: home,
+                        eventSub: away,
+                        channel: channel
+                    });
+                } catch (parseError) {
+                    console.error('F1 Schedule: Error parsing date/time for F1 event:', parseError, data);
+                }
+            });
 
-                return {
-                    start: startDateTime,
-                    end: endDateTime,
-                    eventHead: columns[eventHeadIndex].trim(), // Home Team
-                    eventSub: columns[eventSubIndex].trim(),  // Away Team
-                    channel: columns[channelIndex] ? columns[channelIndex].trim() : '' // Channel
-                };
-            }).filter(event => event && event.start.isValid); // Filter out null or invalid date rows
+            console.log(`F1 Schedule: Successfully parsed ${events.length} events`);
+            
+            return events.sort((a, b) => a.start.toMillis() - b.start.toMillis());
         } catch (error) {
-            console.error('Error fetching or parsing F1 schedule:', error);
+            console.error('F1 Schedule: Error fetching from Firestore:', error);
             scheduleContainer.innerHTML = `<p style="color: #ef4444;">Error loading schedule.</p>`;
             return [];
         }
@@ -4284,24 +4515,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Renders the schedule based on the current time - shows ALL upcoming races
     function renderSchedule(allEvents) {
+        console.log(`F1 Schedule Render: Received ${allEvents ? allEvents.length : 0} events`);
+        
         if (!allEvents || allEvents.length === 0) {
+            console.log('F1 Schedule Render: No events to render');
             scheduleContainer.innerHTML = `<p style="color: #9ca3af;">No upcoming schedule found.</p>`;
             return;
         }
 
-        const now = luxon.DateTime.now();
+        // Use America/New_York timezone for consistent comparison (EST/EDT)
+        const now = luxon.DateTime.now().setZone('America/New_York');
+        console.log(`F1 Schedule Render: Current time is ${now.toISO()}`);
 
         // Filter for all upcoming events (end time hasn't passed)
-        const upcomingEvents = allEvents.filter(event => event.end > now);
+        const upcomingEvents = allEvents.filter(event => {
+            // Ensure both are in the same timezone for comparison
+            const eventEnd = event.end.setZone('America/New_York');
+            const isUpcoming = eventEnd > now;
+            if (!isUpcoming) {
+                console.log(`F1 Schedule Render: Filtered out event - ${event.eventHead} ${event.eventSub} (end: ${eventEnd.toISO()}, now: ${now.toISO()})`);
+            }
+            return isUpcoming;
+        });
+        
+        console.log(`F1 Schedule Render: ${upcomingEvents.length} upcoming events after filtering`);
         
         if (upcomingEvents.length === 0) {
+            console.log('F1 Schedule Render: No upcoming events after filtering');
             scheduleContainer.innerHTML = `<p style="color: #9ca3af;">The season may have concluded.</p>`;
             return;
         }
 
-        // Group events by date for display
+        // Group events by date for display (using local timezone)
         const groupedByDate = upcomingEvents.reduce((acc, event) => {
-            const dateKey = event.start.toFormat('yyyy-MM-dd');
+            // Convert to local timezone for date grouping
+            const localStart = event.start.setZone('local');
+            const dateKey = localStart.toFormat('yyyy-MM-dd');
             if (!acc[dateKey]) {
                 acc[dateKey] = [];
             }
@@ -4317,10 +4566,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const dateObj = luxon.DateTime.fromISO(dateKey);
             const dateHeader = dateObj.toFormat('MMMM d');
             
-            html += `<div style="background-color: #374151; color: white; padding: 8px; margin: 10px 0 5px 0; font-weight: bold;">${dateHeader}</div>`;
+            html += `<div style="background-color: #2a2a2a; color: white; padding: 1px 8px; margin: 10px 0 5px 0; font-weight: bold;">${dateHeader}</div>`;
 
             groupedByDate[dateKey].forEach(event => {
-                const timeDisplay = event.start.toFormat('h:mm a');
+                // Convert to user's local timezone for display
+                const timeDisplay = event.start.setZone('local').toFormat('h:mm a');
                 const channelDisplay = event.channel || '';
 
                 html += `
@@ -4329,9 +4579,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div style="font-weight: 500; font-size: 11px;">${event.eventHead}</div>
                             <div style="color: #9ca3af; font-size: 11px;">${event.eventSub}</div>
                         </div>
-                        <div style="text-align: right; white-space: nowrap; margin-left: 8px;">
+                        <div style="text-align: right; white-space: nowrap; margin-left: 8px; display: flex; flex-direction: column; align-items: flex-end;">
                             <div style="color: #e0e0e0; font-size: 11px;">${timeDisplay}</div>
-                            ${channelDisplay ? `<div style="color: #9ca3af; font-size: 10px; margin-top: 2px;">${channelDisplay}</div>` : ''}
+                            ${channelDisplay ? `<div style="color: #9ca3af; font-size: 10px; margin-top: 2px;">${channelDisplay}</div>` : '<div style="color: #9ca3af; font-size: 10px; margin-top: 2px; visibility: hidden;">&nbsp;</div>'}
                         </div>
                     </div>
                 `;
@@ -4346,10 +4596,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const events = await fetchF1ScheduleData();
         renderSchedule(events);
     }
-
-    // Initial load and then update every 60 seconds to catch "Live" status changes
-    updateSchedule();
-    setInterval(updateSchedule, 60000); 
+    
+    // Make updateSchedule available globally
+    window.updateF1Schedule = updateSchedule;
+    
+    // Auto-load schedule if the Upcoming tab is already visible
+    const upcomingContent = document.getElementById('f1-upcoming-content');
+    if (upcomingContent && upcomingContent.style.display !== 'none') {
+        // Wait a bit for Firebase to initialize
+        setTimeout(() => {
+            updateSchedule();
+        }, 500);
+    }
 });
 </script>
 <script>
@@ -4385,15 +4643,15 @@ document.addEventListener('DOMContentLoaded', function () {
   'Tennis': { leagueId: 'WORLD: TENNIS', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ74Qw3ZgBqRAKd_HVAnGLI9zDqk_JILTBTtlrFKI8oCosRHnLQZ9Nu8BIAVYdLq932wzE8oz3UNCIP/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'Tennis' },
   'LIVGolf': { leagueId: 'WORLD: LIV GOLF', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZ7zf4PAme33oOeQ5NFNVE3W1OXJDJ2-qN0_TKLYaditRtpsa7yfxGY3lsGJQxZLQxhIKGzAH7NgBo/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LIVGolf' },
   'IndyCar': { leagueId: 'USA: INDYCAR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQWqPs7Krfm7U1_bU2MShMSgAGF5RIXqIVUZ6vQO2XWz0waDHd48eiawVeOwXwAkeZBdoNA1X4Mkzs3/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'IndyCar' },
-  'NCAAM': { leagueId: 'USA: NCAAM', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRWwuY4T7aQXTeW_8WDncuzDZUAIr9JDhV2MjP4ZFAM0EjuUWgpKBb2sWjI9gZxvqCxnON9JTN7lo2i/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'NCAAM' },
-  'NCAAW': { leagueId: 'USA: NCAAW', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDKX76cBl2tx7s_rW20e2TzKX-uvA6UsPBjsv_UXhhoE8zVmUFJvDaopCxEhaDWyaOtL4wDWSVE6H7/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'NCAAW' },
+  'NCAAM': { leagueId: 'USA: NCAA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRWwuY4T7aQXTeW_8WDncuzDZUAIr9JDhV2MjP4ZFAM0EjuUWgpKBb2sWjI9gZxvqCxnON9JTN7lo2i/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'NCAAM', desiredSport: 'Basketball' },
+  'NCAAW': { leagueId: 'USA: NCAA Women', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDKX76cBl2tx7s_rW20e2TzKX-uvA6UsPBjsv_UXhhoE8zVmUFJvDaopCxEhaDWyaOtL4wDWSVE6H7/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'NCAAW', desiredSport: 'Basketball' },
   'NCAABaseball': { leagueId: 'USA: NCAA BASEBALL', standingsUrl: 'YOUR_NCAABASEBALL_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'NCAABaseball' },
   'NCAASoftball': { leagueId: 'USA: NCAA SOFTBALL', standingsUrl: 'YOUR_NCAASOFTBALL_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'NCAASoftball' },
   'MotoGP': { leagueId: 'WORLD: MOTOGP', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSqOmundPRaLEu2Jcgt3KBdTRX6jy-Nmkb89fuJC_SfntbZVF_Y-tNehFSnZwqdmK2O3GJR3UlHFXms/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'MotoGP' },
   'LPGATour': { leagueId: 'WORLD: LPGA TOUR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "Formula 1", "NCAAF", "UEFA Champions League", "ATP", "WTA", "MLS", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA European Qualifiers", "CONCACAF Qualifiers", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera División", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "UEFA W Champions League", "Women's Cricket World Cup", "FIFA U-20 World Cup", "AFC Qualifiers", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "Formula 1", "NCAAF", "UEFA Champions League", "NCAAM", "NCAAW", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA European Qualifiers", "CONCACAF Qualifiers", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera División", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "UEFA W Champions League", "Women's Cricket World Cup", "FIFA U-20 World Cup", "AFC Qualifiers", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
     
     // Leagues that should be collapsed by default on the home page
     const COLLAPSED_LEAGUES = [
@@ -4592,12 +4850,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- 5. HELPER FUNCTIONS ---
     function getLeagueDisplayName(name, sport) {
-        // Special handling for USA: NCAA - check sport to determine if it's football or hockey
+        // Special handling for USA: NCAA - check sport to determine if it's football, hockey, or basketball
         if (name === "USA: NCAA") {
             if (sport === "Hockey") {
                 return "NCAA Men's Hockey";
             } else if (sport === "American Football") {
                 return "NCAAF";
+            } else if (sport === "Basketball") {
+                return "NCAAM";
+            }
+        }
+        
+        // Special handling for USA: NCAA Women - check sport to determine display name
+        if (name === "USA: NCAA Women") {
+            if (sport === "Basketball") {
+                return "NCAAW";
             }
         }
         
@@ -4606,7 +4873,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return "Formula 1";
         }
         
-        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: NBA": "NBA", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: MLS - Play Offs": "MLS", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Spain: Copa del Rey": "Copa del Rey", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup","England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "Belgium: Jupiler Pro League": "Belgian Pro League", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "Asia: AFC Asian Cup - Qualification - Third round": "AFC Asian Cup Qualifiers", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA W Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Europe: Conference League - League phase": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera División", "Argentina: Torneo Betano - Apertura": "Argentine Primera División", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership", "World: World Cup U20": "FIFA U-20 World Cup", "North & Central America: Campeones Cup": "Campeones Cup", "World: ICC World Cup Women": "Women's Cricket World Cup", "World: Test Series": "ICC Test Series", "World: One Day International": "ODI", "World: Twenty20 International": "T20 International", "USA: NBA - Pre-season": "NBA Preseason", "Europe: Champions League Women - League phase": "UEFA W Champions League", "USA: USL Championship": "USL Championship", "World: World Cup U20 - Play Offs": "FIFA U-20 World Cup", "USA: MLB - Play Offs": "MLB", "Africa: World Cup - Qualification": "CAF Qualifiers", "Europe: World Cup - Qualification": "UEFA European Qualifiers", "Asia: Asian Cup - Qualification - Third round": "AFC Asian Cup Qualifiers", "Asia: World Cup - Qualification - Fourth stage": "AFC Qualifiers", "North & Central America: World Cup - Qualification - Third stage": "CONCACAF Qualifiers", "Canada: OHL": "OHL", "USA: NCAA Hockey": "NCAA Men's Hockey", "World: Friendly International": "International Friendly" };
+        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: NBA": "NBA", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: MLS - Play Offs": "MLS", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Spain: Copa del Rey": "Copa del Rey", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup", "England: FA Cup": "FA Cup", "England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "Belgium: Jupiler Pro League": "Belgian Pro League", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "Asia: AFC Asian Cup - Qualification - Third round": "AFC Asian Cup Qualifiers", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "UEFA W Champions League", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Europe: Conference League - League phase": "UEFA Conference League", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera División", "Argentina: Torneo Betano - Apertura": "Argentine Primera División", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership", "World: World Cup U20": "FIFA U-20 World Cup", "North & Central America: Campeones Cup": "Campeones Cup", "World: ICC World Cup Women": "Women's Cricket World Cup", "World: Test Series": "ICC Test Series", "World: One Day International": "ODI", "World: Twenty20 International": "T20 International", "USA: NBA - Pre-season": "NBA Preseason", "Europe: Champions League Women - League phase": "UEFA W Champions League", "USA: USL Championship": "USL Championship", "World: World Cup U20 - Play Offs": "FIFA U-20 World Cup", "USA: MLB - Play Offs": "MLB", "Africa: World Cup - Qualification": "CAF Qualifiers", "Europe: World Cup - Qualification": "UEFA European Qualifiers", "Asia: Asian Cup - Qualification - Third round": "AFC Asian Cup Qualifiers", "Asia: World Cup - Qualification - Fourth stage": "AFC Qualifiers", "North & Central America: World Cup - Qualification - Third stage": "CONCACAF Qualifiers", "Canada: OHL": "OHL", "USA: NCAA Hockey": "NCAA Men's Hockey", "World: Friendly International": "International Friendly" };
         return map[name] || name;
     }
 
@@ -4841,7 +5108,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Tampa Bay Lightning": "Lightning",
             "Toronto Maple Leafs": "Maple Leafs",
             "Vancouver Canucks": "Canucks",
-            "Vegas Golden Knights": "Golden Knights",
+            "Vegas Golden Knights": "Vegas",
             "Washington Capitals": "Capitals",
             "Winnipeg Jets": "Jets"
         },
@@ -4977,6 +5244,8 @@ document.addEventListener('DOMContentLoaded', function () {
             "Hamburger SV": "Hamburger",
             "Hamburg": "Hamburger",
             "Hamburger": "Hamburger",
+            "Hambruger SV": "Hamburger",
+            "FC Koln": "FC Köln",
             "FC Augsburg": "Augsburg",
             "Augsburg": "Augsburg",
             "FC St. Pauli": "FC St. Pauli",
@@ -5048,10 +5317,11 @@ document.addEventListener('DOMContentLoaded', function () {
             "Unión Santa Fe": "Santa Fe",
             "Union Santa Fe": "Santa Fe",
             "Santa Fe": "Santa Fe",
-            "Belgrano de Córdoba": "Córdoba",
-            "Belgrano de Cordoba": "Córdoba",
-            "Club Belgrano": "Córdoba",
-            "Belgrano": "Córdoba",
+            "Belgrano de Córdoba": "CA Belgrano",
+            "Belgrano de Cordoba": "CA Belgrano",
+            "Club Belgrano": "CA Belgrano",
+            "Belgrano": "CA Belgrano",
+            "Central Cordoba": "C. Córdoba",
             "Barracas Central": "Barracas",
             "Barracas": "Barracas",
             "Estudiantes de La Plata": "Estudiantes",
@@ -5063,6 +5333,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Defensa y Justicia": "Def. y Justicia",
             "Def y Justicia": "Def. y Justicia",
             "Argentinos Juniors": "Argentinos",
+            "Sarmiento Junin": "Sarmiento",
             "Argentinos": "Argentinos",
             "Belgrano": "Belgrano",
             "Club Atlético Tigre": "Tigre",
@@ -5101,6 +5372,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "San Martín": "San Martín",
             "San Martin": "San Martín",
             "San Martín de San Juan": "San Martín",
+            "San Martin S.J.": "San Martín",
             "San Martín de Tucumán": "San Martín",
             "Talleres de Córdoba": "Talleres",
             "Talleres de Cordoba": "Talleres",
@@ -5244,16 +5516,192 @@ document.addEventListener('DOMContentLoaded', function () {
             "Generals": "Generals",
             "Sudbury Wolves": "Wolves",
             "Wolves": "Wolves"
+        },
+        // LaLiga
+        LaLiga: {
+            "Real Madrid": "Real Madrid",
+            "Barcelona": "Barcelona",
+            "FC Barcelona": "Barcelona",
+            "Villarreal": "Villarreal",
+            "Villarreal CF": "Villarreal",
+            "Atlético Madrid": "Atlético Madrid",
+            "Atletico Madrid": "Atlético Madrid",
+            "Atletico": "Atlético Madrid",
+            "Espanyol": "Espanyol",
+            "RCD Espanyol": "Espanyol",
+            "Getafe": "Getafa",
+            "Getafa": "Getafa",
+            "Getafe CF": "Getafa",
+            "Real Betis": "Real Betis",
+            "Betis": "Real Betis",
+            "Deportivo Alavés": "Alavés",
+            "Alavés": "Alavés",
+            "Alaves": "Alavés",
+            "Elche": "Elche",
+            "Elche CF": "Elche",
+            "Rayo Vallecano": "Rayo Vallecano",
+            "Rayo": "Rayo Vallecano",
+            "Athletic Club": "Athletic Club",
+            "Athletic Bilbao": "Athletic Club",
+            "Athletic": "Athletic Club",
+            "Celta Vigo": "Celta Vigo",
+            "Celta": "Celta Vigo",
+            "RC Celta": "Celta Vigo",
+            "Sevilla": "Sevilla",
+            "Sevilla FC": "Sevilla",
+            "Real Sociedad": "Real Sociedad",
+            "Sociedad": "Real Sociedad",
+            "Osasuna": "Osasuna",
+            "CA Osasuna": "Osasuna",
+            "Mallorca": "Mallorca",
+            "RCD Mallorca": "Mallorca",
+            "Levante": "Levante",
+            "Levante UD": "Levante",
+            "Valencia": "Valencia",
+            "Valencia CF": "Valencia",
+            "Real Oviedo": "Oviedo",
+            "Oviedo": "Oviedo",
+            "R. Oviedo": "Oviedo",
+            "Girona": "Girona",
+            "Girona FC": "Girona"
+        },
+        // MLS
+        MLS: {
+            "San Diego FC": "San Diego",
+            "Vancouver Whitecaps": "Vancouver",
+            "Vancouver Whitecaps FC": "Vancouver",
+            "Los Angeles FC": "LAFC",
+            "LAFC": "LAFC",
+            "Minnesota United": "MN United",
+            "Minnesota United FC": "MN United",
+            "Seattle Sounders": "Sounders",
+            "Seattle Sounders FC": "Sounders",
+            "Austin FC": "Austin FC",
+            "FC Dallas": "FC Dallas",
+            "Portland Timbers": "Timbers",
+            "Portland Timbers FC": "Timbers",
+            "Real Salt Lake": "Real Salt Lake",
+            "San Jose Earthquakes": "Earthquakes",
+            "Colorado Rapids": "Rapids",
+            "Houston Dynamo": "Dynamo",
+            "Houston Dynamo FC": "Dynamo",
+            "St. Louis City": "St. Louis City",
+            "St. Louis City SC": "St. Louis City",
+            "Los Angeles Galaxy": "LA Galaxy",
+            "LA Galaxy": "LA Galaxy",
+            "Sporting Kansas City": "Sporting KC",
+            "Sporting KC": "Sporting KC",
+            "Philadelphia Union": "Union",
+            "FC Cincinnati": "Cincinnati",
+            "Inter Miami": "Inter Miami",
+            "Inter Miami CF": "Inter Miami",
+            "Charlotte": "Charlotte",
+            "Charlotte FC": "Charlotte",
+            "New York City": "NYCFC",
+            "NYCFC": "NYCFC",
+            "New York City FC": "NYCFC",
+            "Nashville SC": "Nashville",
+            "Nashville": "Nashville",
+            "Columbus Crew": "Columbus",
+            "Chicago Fire": "Chicago",
+            "Chicago Fire FC": "Chicago",
+            "Orlando City": "Orlando",
+            "Orlando City SC": "Orlando",
+            "New York Red Bulls": "NY Red Bulls",
+            "NY Red Bulls": "NY Red Bulls",
+            "New England Revolution": "Revolution",
+            "Revolution": "Revolution",
+            "Toronto FC": "Toronto FC",
+            "CF Montreal": "CF Montreal",
+            "Atlanta Utd": "Atlanta Utd",
+            "Atlanta United": "Atlanta Utd",
+            "Atlanta United FC": "Atlanta Utd",
+            "DC United": "DC United",
+            "D.C. United": "DC United"
+        },
+        // NCAAM
+        NCAAM: {
+            "Oklahoma State": "OK State",
+            "Arkansas Baptist": "Ark Baptist",
+            "NC Greensboro": "UNC-Greensb",
+            "Missouri Southern State": "MO So. State",
+            "Penn State-York": "Penn St-York",
+            "UMBC Retrievers": "UMBC",
+            "Converse Valkyries": "Converse",
+            "East Tennessee St": "E Tenn State",
+            "Caldwell College": "Caldwell",
+            "Georgia Southern": "GA Southern",
+            "EWU Phantoms": "East West U",
+            "SIU Edwardsville": "SIU-Edwardsv",
+            "Siu Edwardsville": "SIU-E",
+            "Mount St. Mary's": "Mt. St. Mary's",
+            "St. Joseph's (Brooklyn)": "St. Joseph's",
+            "N. Carolina A&T": "NC A&T",
+            "South Carolina": "S Carolina",
+            "West Coast Baptist": "W Coast Bapt",
+            "Utah Valley State": "Utah Valley St",
+            "CBS Ambassadors": "CBS",
+            "San Diego State": "San Diego St",
+            "San Diego Toreros": "San Diego",
+            "San Francisco State": "SF State",
+            "UC Santa Barbara": "UCSB",
+            "New Mexico State": "NM State",
+            "Humboldt State": "Humboldt",
+            "Dominican Penguins": "Dominican",
+            "Sacramento State": "Sac State",
+            "Long Beach State": "LB State",
+            "Gilbert Buccaneers": "Park U",
+            "Louisiana Tech": "LA Tech"
+        },
+        // NCAAF
+        NCAAF: {
+            "Massachusetts": "UMass"
+        },
+        // NCAAW
+        NCAAW: {
+            "SMU Mustangs": "SMU",
+            "Southern Illinois": "So. Illinois",
+            "Tennessee Volunteers": "Tennessee",
+            "Richmond Spiders": "Richmond",
+            "Cincinnati Bearcats": "Cincinnati",
+            "New Haven Chargers": "New Haven",
+            "Mercyhurst Lakers": "Mercyhurst",
+            "Michigan State": "Michigan St",
+            "Albany Great Danes": "UAlbany",
+            "Kennesaw State": "Kennesaw St",
+            "Florida Atlantic": "FAU",
+            "Florida Mem.": "FL Memorial",
+            "Lipscomb Bisons": "Lipscomb",
+            "Virginia Cavaliers": "Virginia",
+            "Saint Josephs Hawks": "St Joseph's",
+            "St. Peters": "St. Peter's",
+            "Illinois Fighting Illini": "Illinois",
+            "SE Missouri State": "SE MO State",
+            "Providence Friars": "Providence",
+            "Houston Christian": "Hou Christian",
+            "LSU Tigers": "LSU",
+            "Michigan Wolverines": "Michigan",
+            "Westminster UT": "Westminster",
+            "Colorado State": "Colorado St",
+            "Arkansas Razorbacks": "Arkansas",
+            "Carroll College": "Carrol Coll.",
+            "USC Trojans": "USC",
+            "Frostburg State Bobcats": "Frostburg St",
+            "Merrimack Warriors": "Merrimack",
+            "Bethesda University": "Bethesda",
+            "Saint Marys Gaels": "Saint Mary's",
+            "Northern New Mexico": "N New Mexico",
+            "Northern Colorado": "N Colorado",
+            "Westminster Blue Jays": "Westminster",
+            "Western Illinois": "W Illinois",
+            "Houston Cougars": "Houston",
+        },
+        // UEFA Champions League
+        UEFAChampionsLeague: {
+            "Royale Union SG": "Royale USG",
+            "Olympiacos Piraeus": "Olympiacos",
+            "FC Copenhagen": "Copenhagen"
         }
-        // Additional leagues can be added here:
-        // PremierLeague: { ... },
-        // LaLiga: { ... },
-        // SerieA: { ... },
-        // Bundesliga: { ... },
-        // Ligue1: { ... },
-        // MLS: { ... },
-        // NWSL: { ... },
-        // etc.
     };
     
     function getTeamDisplayName(name, league = null) {
@@ -5680,7 +6128,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     title.appendChild(logo);
                 } else if (leagueNameKey === "NCAAM" || leagueNameKey === "NCAAW" || leagueNameKey === "NCAA Baseball" || leagueNameKey === "NCAA Softball") {
                     const logo = document.createElement("img");
-                    logo.src = "https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png";
+                    logo.src = "https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png";
                     logo.alt = "NCAA Logo";
                     logo.style.width = "14px";
                     logo.style.height = "14px";
@@ -5747,6 +6195,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/82tQHwgU-r9l5Je0r.png";
                     logo.alt = "MLS Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    title.appendChild(logo);
+                } else if (leagueNameKey === "FA Cup") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/G6WqthjD-rgOxvTTi.png";
+                    logo.alt = "FA Cup Logo";
                     logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
@@ -6046,6 +6507,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/mls.png?raw=true";
                     logo.alt = "MLS Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    title.appendChild(logo);
+                } else if (leagueNameKey === "FA Cup") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/G6WqthjD-rgOxvTTi.png";
+                    logo.alt = "FA Cup Logo";
                     logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
@@ -6678,8 +7152,16 @@ document.addEventListener('DOMContentLoaded', function () {
          // 1) Exact League + gameDate (primary)
          let q = gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr);
          if (leagueId === 'USA: NCAA') {
-             const desiredSport = (leagueName && leagueName.toLowerCase().includes('hockey')) ? 'Hockey' : 'American Football';
+             let desiredSport = 'American Football'; // default
+             if (leagueName && leagueName.toLowerCase().includes('hockey')) {
+                 desiredSport = 'Hockey';
+             } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
+                 desiredSport = 'Basketball';
+             }
              q = q.where('Sport', '==', desiredSport);
+         }
+         if (leagueId === 'USA: NCAA Women') {
+             q = q.where('Sport', '==', 'Basketball');
          }
          q.onSnapshot(snapshot => {
              if (!snapshot.empty) {
@@ -6690,8 +7172,16 @@ document.addEventListener('DOMContentLoaded', function () {
              // 2) Fallback to exact League + scheduledDate (if backend provided it)
              let q2 = gamesCollectionRef.where('League', '==', leagueId).where('scheduledDate', '==', todayStr);
              if (leagueId === 'USA: NCAA') {
-                 const desiredSport = (leagueName && leagueName.toLowerCase().includes('hockey')) ? 'Hockey' : 'American Football';
+                 let desiredSport = 'American Football'; // default
+                 if (leagueName && leagueName.toLowerCase().includes('hockey')) {
+                     desiredSport = 'Hockey';
+                 } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
+                     desiredSport = 'Basketball';
+                 }
                  q2 = q2.where('Sport', '==', desiredSport);
+             }
+             if (leagueId === 'USA: NCAA Women') {
+                 q2 = q2.where('Sport', '==', 'Basketball');
              }
              q2.onSnapshot(s2 => {
                  if (!s2.empty) {
@@ -6736,8 +7226,16 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             // NCAA split
             if (leagueId === 'USA: NCAA') {
-                const isHockeyContext = leagueName && leagueName.toLowerCase().includes('hockey');
-                leagueGames = leagueGames.filter(g => isHockeyContext ? (g.Sport === 'Hockey') : (g.Sport === 'American Football'));
+                let desiredSport = 'American Football'; // default
+                if (leagueName && leagueName.toLowerCase().includes('hockey')) {
+                    desiredSport = 'Hockey';
+                } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
+                    desiredSport = 'Basketball';
+                }
+                leagueGames = leagueGames.filter(g => g.Sport === desiredSport);
+            }
+            if (leagueId === 'USA: NCAA Women') {
+                leagueGames = leagueGames.filter(g => g.Sport === 'Basketball');
             }
             if (leagueGames.length === 0) {
                 yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
@@ -6789,8 +7287,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 return gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName);
             });
             if (leagueId === 'USA: NCAA') {
-                const isHockeyContext = leagueName && leagueName.toLowerCase().includes('hockey');
-                leagueGames = leagueGames.filter(g => isHockeyContext ? (g.Sport === 'Hockey') : (g.Sport === 'American Football'));
+                let desiredSport = 'American Football'; // default
+                if (leagueName && leagueName.toLowerCase().includes('hockey')) {
+                    desiredSport = 'Hockey';
+                } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
+                    desiredSport = 'Basketball';
+                }
+                leagueGames = leagueGames.filter(g => g.Sport === desiredSport);
+            }
+            if (leagueId === 'USA: NCAA Women') {
+                leagueGames = leagueGames.filter(g => g.Sport === 'Basketball');
             }
             if (leagueGames.length > 0) {
                 renderGames(yesterdayScheduleContent, leagueGames.sort(sortGames), false, true);
@@ -6819,8 +7325,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 // NCAA sport split
                 if (leagueId === 'USA: NCAA') {
-                    const isHockeyContext = leagueName && leagueName.toLowerCase().includes('hockey');
-                    leagueGames = leagueGames.filter(g => isHockeyContext ? (g.Sport === 'Hockey') : (g.Sport === 'American Football'));
+                    let desiredSport = 'American Football'; // default
+                    if (leagueName && leagueName.toLowerCase().includes('hockey')) {
+                        desiredSport = 'Hockey';
+                    } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
+                        desiredSport = 'Basketball';
+                    }
+                    leagueGames = leagueGames.filter(g => g.Sport === desiredSport);
+                }
+                if (leagueId === 'USA: NCAA Women') {
+                    leagueGames = leagueGames.filter(g => g.Sport === 'Basketball');
                 }
                 if (leagueGames.length > 0) {
                     renderGames(yesterdayScheduleContent, leagueGames.sort(sortGames), false, true);
@@ -6852,11 +7366,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 return false;
             });
 
-            // For NCAAF, filter out hockey games from yesterday's scores
+            // For NCAA, filter by sport from yesterday's scores
             const filteredLeagueGames = leagueGames.filter(game => {
                 if (leagueId === 'USA: NCAA') {
-                    const isHockeyContext = leagueName && leagueName.toLowerCase().includes('hockey');
-                    return isHockeyContext ? (game.Sport === 'Hockey') : (game.Sport === 'American Football');
+                    let desiredSport = 'American Football'; // default
+                    if (leagueName && leagueName.toLowerCase().includes('hockey')) {
+                        desiredSport = 'Hockey';
+                    } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
+                        desiredSport = 'Basketball';
+                    }
+                    return game.Sport === desiredSport;
+                }
+                if (leagueId === 'USA: NCAA Women') {
+                    return game.Sport === 'Basketball';
                 }
                 return true;
             });
@@ -6897,11 +7419,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 return false;
             });
 
-            // For NCAAF, filter out hockey games from yesterday's scores
+            // For NCAA, filter by sport from yesterday's scores
             const filteredLeagueGames = leagueGames.filter(game => {
                 if (leagueId === 'USA: NCAA') {
-                    const isHockeyContext = leagueName && leagueName.toLowerCase().includes('hockey');
-                    return isHockeyContext ? (game.Sport === 'Hockey') : (game.Sport === 'American Football');
+                    let desiredSport = 'American Football'; // default
+                    if (leagueName && leagueName.toLowerCase().includes('hockey')) {
+                        desiredSport = 'Hockey';
+                    } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
+                        desiredSport = 'Basketball';
+                    }
+                    return game.Sport === desiredSport;
+                }
+                if (leagueId === 'USA: NCAA Women') {
+                    return game.Sport === 'Basketball';
                 }
                 return true;
             });
@@ -6965,10 +7495,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     return false;
                 });
                 
-                // For NCAAF, filter out hockey games from yesterday's scores
+                // For NCAA, filter by sport from yesterday's scores
                 const filteredLeagueGames = leagueGames.filter(game => {
                     if (leagueId === 'USA: NCAA') {
-                        return game.Sport === 'American Football';
+                        let desiredSport = 'American Football'; // default
+                        if (leagueName && leagueName.toLowerCase().includes('hockey')) {
+                            desiredSport = 'Hockey';
+                        } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
+                            desiredSport = 'Basketball';
+                        }
+                        return game.Sport === desiredSport;
+                    }
+                    if (leagueId === 'USA: NCAA Women') {
+                        return game.Sport === 'Basketball';
                     }
                     return true;
                 });
