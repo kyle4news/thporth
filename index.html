@@ -7605,6 +7605,9 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Function to display standings table (extracted for reuse with cache)
     function displayStandingsTable(leagueKey, teams, standingsContent) {
+            // Debug: Log the leagueKey being used
+            console.log(`🔍 DEBUG: displayStandingsTable called with leagueKey="${leagueKey}", teams count: ${teams.length}`);
+            
             // Build standings table
             let html = '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
             
@@ -7664,6 +7667,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     html = createNHLStandings(teams);
             } else if (leagueKey === 'NCAAF') {
                 html = createNCAAFStandings(teams);
+            } else if (leagueKey === 'NCAAM') {
+                console.log(`🔍 DEBUG: Creating NCAAM standings with ${teams.length} teams`);
+                if (teams.length > 0) {
+                    console.log(`🔍 DEBUG: First NCAAM team:`, teams[0]);
+                }
+                html = createNCAAMStandings(teams);
+            } else if (leagueKey === 'NCAAW') {
+                console.log(`🔍 DEBUG: Creating NCAAW standings with ${teams.length} teams`);
+                if (teams.length > 0) {
+                    console.log(`🔍 DEBUG: First NCAAW team:`, teams[0]);
+                }
+                html = createNCAAWStandings(teams);
                 } else if (leagueKey === 'WNBA') {
                     html = createWNBAStandings(teams);
                 } else {
@@ -7705,6 +7720,15 @@ document.addEventListener('DOMContentLoaded', function () {
         
         console.log(`📊 Fetching standings for ${leagueKey} from Firestore`);
         
+        // Debug: Log the leagueKey to verify it's correct
+        console.log(`🔍 DEBUG: leagueKey = "${leagueKey}"`);
+        
+        // For NCAAM/NCAAW, ensure we clear any stale cache that might be cross-contaminated
+        if (leagueKey === 'NCAAM' || leagueKey === 'NCAAW') {
+            console.log(`🔍 DEBUG: Clearing cache for ${leagueKey} to prevent cross-contamination`);
+            clearStandingsCache(leagueKey);
+        }
+        
         // Map league keys to Firestore collection names
         const collectionMap = {
             'PremierLeague': 'EPLStandings',  // New collection format
@@ -7722,6 +7746,8 @@ document.addEventListener('DOMContentLoaded', function () {
             'NBA': 'NBAStandings',  // New collection format
             'NHL': 'NHLStandings',  // New collection format
             'NCAAF': 'NCAAFStandings',  // New collection format
+            'NCAAM': 'NCAAMStandings',  // New collection format
+            'NCAAW': 'NCAAWStandings',  // New collection format
             'UEFAChampionsLeague': 'standings',  // UCL uses generic standings collection
             'WNBA': 'standings'
         };
@@ -7748,12 +7774,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const collectionName = collectionMap[leagueKey] || 'standings';
         const firestoreKey = firestoreKeyMap[leagueKey] || leagueKey;
         
+        // Debug: Log collection mapping
+        console.log(`🔍 DEBUG: leagueKey="${leagueKey}" -> collectionName="${collectionName}"`);
+        
         try {
             let teams = [];
             
             // Check if this league uses the new collection format (like NFLStandings)
             if (collectionName !== 'standings') {
                 // Fetch all documents from the collection
+                console.log(`🔍 DEBUG: Fetching from collection: ${collectionName} for leagueKey: ${leagueKey}`);
                 const snapshot = await db.collection(collectionName).get();
                 
                 // If collection is empty, return false to fall back to CSV
@@ -7763,6 +7793,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 teams = snapshot.docs.map(doc => doc.data());
+                
+                // CRITICAL: For NCAAM/NCAAW, verify we got the right data by checking sample team
+                if ((leagueKey === 'NCAAM' || leagueKey === 'NCAAW') && teams.length > 0) {
+                    const sampleTeam = teams[0];
+                    console.log(`🔍 DEBUG: ${leagueKey} - Sample team from ${collectionName}:`, sampleTeam);
+                    console.log(`🔍 DEBUG: ${leagueKey} - Total teams: ${teams.length}, First team Conference: "${sampleTeam.Conference}"`);
+                    // Verify the data looks correct (should have Conference, Team, etc.)
+                    if (!sampleTeam.Conference || !sampleTeam.Team) {
+                        console.error(`⚠️ WARNING: ${leagueKey} data from ${collectionName} appears invalid!`);
+                    }
+                    
+                    // Double-check: Verify collection name matches leagueKey
+                    if (leagueKey === 'NCAAM' && collectionName !== 'NCAAMStandings') {
+                        console.error(`❌ ERROR: NCAAM leagueKey but fetching from wrong collection: ${collectionName}`);
+                    }
+                    if (leagueKey === 'NCAAW' && collectionName !== 'NCAAWStandings') {
+                        console.error(`❌ ERROR: NCAAW leagueKey but fetching from wrong collection: ${collectionName}`);
+                    }
+                }
                 
                 // Check if we have cached data and compare timestamps
                 const cachedData = localStorage.getItem(getStandingsCacheKey(leagueKey));
@@ -7821,8 +7870,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 return true;
             }
             
+            // Debug: Verify data source for NCAAM/NCAAW
+            if (leagueKey === 'NCAAM' || leagueKey === 'NCAAW') {
+                console.log(`🔍 DEBUG: ${leagueKey} - Collection: ${collectionName}, Teams count: ${teams.length}`);
+                if (teams.length > 0) {
+                    console.log(`🔍 DEBUG: First team sample:`, teams[0]);
+                    // Check if teams have Conference field (should be present for both NCAAM and NCAAW)
+                    const sampleConference = teams[0].Conference;
+                    console.log(`🔍 DEBUG: Sample conference from data: "${sampleConference}"`);
+                }
+            }
+            
             // Display the standings table
             console.log(`📊 Displaying standings for ${leagueKey}, ${teams.length} teams, first team:`, teams[0]);
+            console.log(`🔍 DEBUG: About to call displayStandingsTable with leagueKey="${leagueKey}"`);
             displayStandingsTable(leagueKey, teams, standingsContent);
             return true;
             
@@ -8256,6 +8317,228 @@ document.addEventListener('DOMContentLoaded', function () {
                 html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + team.Team + '</td>';
                 html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.OverallRecord + '</td>';
                 html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.ConfRecord + '</td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table></div>';
+        });
+        
+        html += '</div>';
+        return html;
+    }
+
+    // NCAAM Standings: Show all conferences with Team | Overall | Conf columns
+    function createNCAAMStandings(teams) {
+        // Conference name mapping for NCAAM
+        const conferenceNameMap = {
+            'ASUN Conference': 'ASUN',
+            'America East Conference': 'America East',
+            'American Conference': 'AAC',
+            'Atlantic 10 Conference': 'A-10',
+            'Atlantic Coast Conference': 'ACC',
+            'Big 12 Conference': 'Big 12',
+            'Big East Conference': 'Big East',
+            'Big Sky Conference': 'Big Sky',
+            'Big South Conference': 'Big South',
+            'Big Ten Conference': 'B1G',
+            'Big West Conference': 'Big West',
+            'Coastal Athletic Association': 'CAA',
+            'Conference USA': 'Conference USA',
+            'Horizon League': 'Horizon League',
+            'Ivy League': 'Ivy League',
+            'Metro Atlantic Athletic Conference': 'MAAC',
+            'Mid-American Conference': 'MAC',
+            'Mid-Eastern Athletic Conference': 'MEAC',
+            'Missouri Valley Conference': 'Missouri Valley',
+            'Mountain West Conference': 'Mountain West',
+            'Northeast Conference': 'NEC',
+            'Ohio Valley Conference': 'Ohio Valley',
+            'Patriot League': 'Patriot League',
+            'Southeastern Conference': 'SEC',
+            'Southern Conference': 'Southern',
+            'Southland Conference': 'Southland',
+            'Southwestern Athletic Conference': 'SWAC',
+            'Summit League': 'Summit League',
+            'Sun Belt Conference': 'Sun Belt',
+            'West Coast Conference': 'WCC',
+            'Western Athletic Conference': 'WAC'
+        };
+        
+        // Get unique conferences and sort them
+        const conferences = [...new Set(teams.map(t => t.Conference))].sort();
+        
+        let html = '<div class="ncaam-standings">';
+        
+        conferences.forEach(conferenceName => {
+            // Use mapped name if available, otherwise use original
+            const displayConferenceName = conferenceNameMap[conferenceName] || conferenceName;
+            const conferenceTeams = teams.filter(team => team.Conference === conferenceName);
+            if (conferenceTeams.length === 0) return;
+            
+            // Sort by conference record first, then overall record
+            // If conference record is 0-0, sort by overall record
+            conferenceTeams.sort((a, b) => {
+                const [cWA, cLA] = String(a.ConfRecord || '0-0').split('-').map(n => parseInt(n) || 0);
+                const [cWB, cLB] = String(b.ConfRecord || '0-0').split('-').map(n => parseInt(n) || 0);
+                
+                // If both have 0-0 conference records, sort by overall record
+                if (cWA === 0 && cLA === 0 && cWB === 0 && cLB === 0) {
+                    const winsA = parseInt(a.Wins) || 0;
+                    const winsB = parseInt(b.Wins) || 0;
+                    if (winsA !== winsB) return winsB - winsA; // more overall wins first
+                    const lossesA = parseInt(a.Losses) || 0;
+                    const lossesB = parseInt(b.Losses) || 0;
+                    return lossesA - lossesB; // fewer overall losses first
+                }
+                
+                // Otherwise, sort by conference record first
+                if (cWA !== cWB) return cWB - cWA; // more conference wins first
+                if (cLA !== cLB) return cLA - cLB; // fewer conference losses next
+
+                // Then by overall record
+                const winsA = parseInt(a.Wins) || 0;
+                const winsB = parseInt(b.Wins) || 0;
+                if (winsA !== winsB) return winsB - winsA; // more overall wins
+
+                const lossesA = parseInt(a.Losses) || 0;
+                const lossesB = parseInt(b.Losses) || 0;
+                return lossesA - lossesB; // fewer overall losses
+            });
+            
+            html += '<div class="conference-section" style="margin-bottom: 30px;">';
+            html += '<h3 class="conference-header" style="color: #ffffff; font-size: 16px; font-weight: 600; margin-bottom: 10px; padding: 8px; background-color: #3a3a3a; border-left: 4px solid #ef4444;">' + displayConferenceName + '</h3>';
+            html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; table-layout: fixed;">';
+            html += '<colgroup>';
+            html += '<col style="width: auto;">';
+            html += '<col style="width: 60px;">';
+            html += '<col style="width: 60px;">';
+            html += '</colgroup>';
+            html += '<thead>';
+            html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
+            html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
+            html += '<th style="padding: 8px 5px 8px 0; text-align: right; border-bottom: 1px solid #666;">Conf.</th>';
+            html += '<th style="padding: 8px 8px 8px 5px; text-align: right; border-bottom: 1px solid #666;">Overall</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
+            
+            conferenceTeams.forEach((team, index) => {
+                const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                html += '<tr style="' + rowStyle + '">';
+                html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + team.Team + '</td>';
+                html += '<td style="padding: 8px 5px 8px 0; text-align: right; font-size: 12px; color: #ffffff;">' + team.ConfRecord + '</td>';
+                html += '<td style="padding: 8px 8px 8px 5px; text-align: right; font-size: 12px; color: #ffffff;">' + team.OverallRecord + '</td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table></div>';
+        });
+        
+        html += '</div>';
+        return html;
+    }
+
+    // NCAAW Standings: Show all conferences with Team | Overall | Conf columns
+    function createNCAAWStandings(teams) {
+        // Conference name mapping for NCAAW (same as NCAAM)
+        const conferenceNameMap = {
+            'ASUN Conference': 'ASUN',
+            'America East Conference': 'America East',
+            'American Conference': 'AAC',
+            'Atlantic 10 Conference': 'A-10',
+            'Atlantic Coast Conference': 'ACC',
+            'Big 12 Conference': 'Big 12',
+            'Big East Conference': 'Big East',
+            'Big Sky Conference': 'Big Sky',
+            'Big South Conference': 'Big South',
+            'Big Ten Conference': 'B1G',
+            'Big West Conference': 'Big West',
+            'Coastal Athletic Association': 'CAA',
+            'Conference USA': 'Conference USA',
+            'Horizon League': 'Horizon League',
+            'Ivy League': 'Ivy League',
+            'Metro Atlantic Athletic Conference': 'MAAC',
+            'Mid-American Conference': 'MAC',
+            'Mid-Eastern Athletic Conference': 'MEAC',
+            'Missouri Valley Conference': 'Missouri Valley',
+            'Mountain West Conference': 'Mountain West',
+            'Northeast Conference': 'NEC',
+            'Ohio Valley Conference': 'Ohio Valley',
+            'Patriot League': 'Patriot League',
+            'Southeastern Conference': 'SEC',
+            'Southern Conference': 'Southern',
+            'Southland Conference': 'Southland',
+            'Southwestern Athletic Conference': 'SWAC',
+            'Summit League': 'Summit League',
+            'Sun Belt Conference': 'Sun Belt',
+            'West Coast Conference': 'WCC',
+            'Western Athletic Conference': 'WAC'
+        };
+        
+        // Get unique conferences and sort them
+        const conferences = [...new Set(teams.map(t => t.Conference))].sort();
+        
+        let html = '<div class="ncaaw-standings">';
+        
+        conferences.forEach(conferenceName => {
+            // Use mapped name if available, otherwise use original
+            const displayConferenceName = conferenceNameMap[conferenceName] || conferenceName;
+            const conferenceTeams = teams.filter(team => team.Conference === conferenceName);
+            if (conferenceTeams.length === 0) return;
+            
+            // Sort by conference record first, then overall record
+            // If conference record is 0-0, sort by overall record
+            conferenceTeams.sort((a, b) => {
+                const [cWA, cLA] = String(a.ConfRecord || '0-0').split('-').map(n => parseInt(n) || 0);
+                const [cWB, cLB] = String(b.ConfRecord || '0-0').split('-').map(n => parseInt(n) || 0);
+                
+                // If both have 0-0 conference records, sort by overall record
+                if (cWA === 0 && cLA === 0 && cWB === 0 && cLB === 0) {
+                    const winsA = parseInt(a.Wins) || 0;
+                    const winsB = parseInt(b.Wins) || 0;
+                    if (winsA !== winsB) return winsB - winsA; // more overall wins first
+                    const lossesA = parseInt(a.Losses) || 0;
+                    const lossesB = parseInt(b.Losses) || 0;
+                    return lossesA - lossesB; // fewer overall losses first
+                }
+                
+                // Otherwise, sort by conference record first
+                if (cWA !== cWB) return cWB - cWA; // more conference wins first
+                if (cLA !== cLB) return cLA - cLB; // fewer conference losses next
+
+                // Then by overall record
+                const winsA = parseInt(a.Wins) || 0;
+                const winsB = parseInt(b.Wins) || 0;
+                if (winsA !== winsB) return winsB - winsA; // more overall wins
+
+                const lossesA = parseInt(a.Losses) || 0;
+                const lossesB = parseInt(b.Losses) || 0;
+                return lossesA - lossesB; // fewer overall losses
+            });
+            
+            html += '<div class="conference-section" style="margin-bottom: 30px;">';
+            html += '<h3 class="conference-header" style="color: #ffffff; font-size: 16px; font-weight: 600; margin-bottom: 10px; padding: 8px; background-color: #3a3a3a; border-left: 4px solid #ef4444;">' + displayConferenceName + '</h3>';
+            html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; table-layout: fixed;">';
+            html += '<colgroup>';
+            html += '<col style="width: auto;">';
+            html += '<col style="width: 60px;">';
+            html += '<col style="width: 60px;">';
+            html += '</colgroup>';
+            html += '<thead>';
+            html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
+            html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
+            html += '<th style="padding: 8px 5px 8px 0; text-align: right; border-bottom: 1px solid #666;">Conf.</th>';
+            html += '<th style="padding: 8px 8px 8px 5px; text-align: right; border-bottom: 1px solid #666;">Overall</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
+            
+            conferenceTeams.forEach((team, index) => {
+                const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                html += '<tr style="' + rowStyle + '">';
+                html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + team.Team + '</td>';
+                html += '<td style="padding: 8px 5px 8px 0; text-align: right; font-size: 12px; color: #ffffff;">' + team.ConfRecord + '</td>';
+                html += '<td style="padding: 8px 8px 8px 5px; text-align: right; font-size: 12px; color: #ffffff;">' + team.OverallRecord + '</td>';
                 html += '</tr>';
             });
             
@@ -8904,10 +9187,25 @@ async function fetchFeaturedGames() {
                 });
                 
                 // For NCAAF, filter out hockey games
+                // For NCAAM, filter out NCAAW games (women's games)
                 // For UEFA Champions League, filter out women's games
                 const filteredGamesData = gamesData.filter(game => {
                     if (leagueKey === 'NCAAF' && game.League === 'USA: NCAA') {
                         return game.Sport === 'American Football';
+                    }
+                    if (leagueKey === 'NCAAM') {
+                        // Exclude women's games - only show men's basketball
+                        const leagueName = game.League || '';
+                        if (leagueName.toLowerCase().includes('women') || leagueName.toLowerCase().includes('womens')) {
+                            return false;
+                        }
+                        // Only show Basketball sport for NCAAM
+                        return game.Sport === 'Basketball';
+                    }
+                    if (leagueKey === 'NCAAW') {
+                        // Only show women's games
+                        const leagueName = game.League || '';
+                        return (leagueName.toLowerCase().includes('women') || leagueName.toLowerCase().includes('womens')) && game.Sport === 'Basketball';
                     }
                     if (leagueKey === 'UEFAChampionsLeague') {
                         // Exclude women's Champions League games
@@ -9612,7 +9910,7 @@ async function fetchFeaturedGames() {
             html += `<div class="date-header" style="background-color: #d1d5db; color: #000; padding: 0px 12px; margin: 8px 0 4px 0; font-weight: normal; font-size: 11px; line-height: 18px;">${formattedDate}</div>`;
             
             // Create table for this date's games (same structure as renderGames)
-            html += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">';
+            html += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed;">';
             
             // Add colgroup with percentage widths to match renderGames
             html += `
@@ -9674,12 +9972,12 @@ async function fetchFeaturedGames() {
                     html += `
                         <tr class="game-row scheduled-game">
                             <td rowspan="2" style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeDisplay}</td>
-                            <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${awayTeam}</td>
+                            <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${awayTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                             <td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
                         </tr>
                         <tr class="game-row game-separator scheduled-game">
-                            <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${homeTeam}</td>
+                            <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${homeTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                         </tr>
                     `;
@@ -9696,12 +9994,12 @@ async function fetchFeaturedGames() {
                     html += `
                         <tr class="game-row scheduled-game">
                             <td rowspan="2" style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeDisplay}</td>
-                            <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${homeTeam}</td>
+                            <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${homeTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                             <td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
                         </tr>
                         <tr class="game-row game-separator scheduled-game">
-                            <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${awayTeam}</td>
+                            <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${awayTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                         </tr>
                     `;
@@ -10572,6 +10870,18 @@ if (mainTabsContainer) {
             content.style.display = 'none';
         });
         document.getElementById(`${tabType}-tab-content`).style.display = 'block';
+        
+        // Load standings when Standings tab is clicked
+        if (tabType === 'standings') {
+            const leagueHeader = document.getElementById('league-specific-header');
+            const leagueKey = leagueHeader ? leagueHeader.innerText : null;
+            if (leagueKey) {
+                const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
+                if (leagueInfo && leagueInfo.standingsUrl) {
+                    fetchLeagueStandings(leagueInfo.standingsUrl, leagueKey);
+                }
+            }
+        }
         
         // Reset stats tabs to default state when switching leagues
         if (tabType === 'stats') {
