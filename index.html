@@ -5676,7 +5676,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Dallas Univ.": "Dallas U",
             "Prairie View A&M": "Prairie View",
             "Dickinson Red Devils": "Dickinson",
-            "Md.-East. Shore": "MD-E. Shore",
+            "Md.-East. Shore": "MD E. Shore",
             "Delaware State": "Delaware St",
             "Washington & Lee": "Wash & Lee",
             "James Madison": "JMU",
@@ -5707,6 +5707,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Richmond Spiders": "Richmond",
             "Cincinnati Bearcats": "Cincinnati",
             "New Haven Chargers": "New Haven",
+            "MD-E. Shore": "MD E. Shore",
             "Mercyhurst Lakers": "Mercyhurst",
             "Michigan State": "Michigan St",
             "Albany Great Danes": "UAlbany",
@@ -5729,7 +5730,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Dallas Univ.": "Dallas U",
             "Prairie View A&M": "Prairie View",
             "Dickinson Red Devils": "Dickinson",
-            "Md.-East. Shore": "MD-E. Shore",
+            "Md.-East. Shore": "MD E. Shore",
             "Delaware State": "Delaware St",
             "Washington & Lee": "Wash & Lee",
             "James Madison": "JMU",
@@ -5742,7 +5743,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Ottawa Spirit": "Ottowa (AZ)",
             "Pacific Lutheran": "Pac. Lutheran",
             "East. Washington": "EWU",
-            "Loyola Marymount": "Loyola-Marym",
+            "Loyola Marymount": "Loyola Mary.",
             "North Carolina A&T": "N. Carolina A&T",
             "NC State": "NC State",
             "Notre Dame": "Notre Dame",
@@ -5788,6 +5789,11 @@ document.addEventListener('DOMContentLoaded', function () {
     };
     
     function getTeamDisplayName(name, league = null) {
+        // Handle null/undefined/empty values
+        if (!name || typeof name !== 'string') {
+            return '';
+        }
+        
         // Remove " W" suffix if present (for NWSL)
         let p = name.endsWith(" W") ? name.slice(0, -2) : name;
         
@@ -8924,75 +8930,94 @@ async function fetchFeaturedGames() {
                 errorDiv.textContent = "Failed to load real-time data.";
             });
 
+        // Store featured games data and live games data separately
+        let featuredGamesData = [];
+        let liveGamesData = [];
+        
+        // Helper function to merge featured games with live data
+        function mergeFeaturedWithLive() {
+            if (featuredGamesData.length === 0) {
+                featuredGames = [];
+                updateDisplay();
+                return;
+            }
+            
+            // Merge featured games with live data
+            featuredGames = featuredGamesData.map(featuredGame => {
+                // For MLB games, match by team names since Game IDs are different
+                if (featuredGame.Sport === 'Baseball' || featuredGame.Sport === 'MLB') {
+                    const liveGame = liveGamesData.find(live => {
+                        const featuredHome = (featuredGame['Home Team'] || '').toLowerCase().trim();
+                        const featuredAway = (featuredGame['Away Team'] || '').toLowerCase().trim();
+                        const liveHome = (live['Home Team'] || '').toLowerCase().trim();
+                        const liveAway = (live['Away Team'] || '').toLowerCase().trim();
+                        
+                        return (liveHome === featuredHome && liveAway === featuredAway) ||
+                               (liveHome === featuredAway && liveAway === featuredHome);
+                    });
+                    
+                    if (liveGame) {
+                        return {
+                            ...liveGame,
+                            title: featuredGame.title,
+                            yesterdayTitle: featuredGame.yesterdayTitle,
+                            order: featuredGame.order,
+                            isFeatured: true
+                        };
+                    }
+                } else {
+                    // For non-MLB games, match by Game ID or team names
+                    const liveGame = liveGamesData.find(live => 
+                        live['Game ID'] === featuredGame['Game ID'] || 
+                        (live['Home Team'] === featuredGame['Home Team'] && 
+                         live['Away Team'] === featuredGame['Away Team'] &&
+                         live.League === featuredGame.League)
+                    );
+                    
+                    if (liveGame) {
+                        return {
+                            ...liveGame,
+                            title: featuredGame.title,
+                            yesterdayTitle: featuredGame.yesterdayTitle,
+                            order: featuredGame.order,
+                            isFeatured: true
+                        };
+                    }
+                }
+                
+                return {
+                    ...featuredGame,
+                    isFeatured: true
+                };
+            });
+            
+            updateDisplay();
+        }
+        
         // Set up real-time listener for Featured games
         const featuredRef = firebase.firestore().collection("artifacts/flashlive-daily-scraper/public/data/Featured");
         const featuredGamesUnsubscribe = featuredRef.where('gameDate', '==', todayStr)
-            .onSnapshot(async snapshot => {
+            .onSnapshot(snapshot => {
                 if (snapshot.empty) {
-                    featuredGames = [];
-                    updateDisplay();
+                    featuredGamesData = [];
+                    mergeFeaturedWithLive();
                     return;
                 }
                 
-                const featuredGamesForDate = snapshot.docs.map(doc => doc.data());
-                
-                // Get live data from sportsGames for featured games
-                const gamesRef = firebase.firestore().collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
-                const liveSnapshot = await gamesRef.where('gameDate', '==', todayStr).get();
-                const liveGames = liveSnapshot.docs.map(doc => doc.data());
-                
-                // Merge featured games with live data
-                featuredGames = featuredGamesForDate.map(featuredGame => {
-                    // For MLB games, match by team names since Game IDs are different
-                    if (featuredGame.Sport === 'Baseball' || featuredGame.Sport === 'MLB') {
-                        const liveGame = liveGames.find(live => {
-                            const featuredHome = (featuredGame['Home Team'] || '').toLowerCase().trim();
-                            const featuredAway = (featuredGame['Away Team'] || '').toLowerCase().trim();
-                            const liveHome = (live['Home Team'] || '').toLowerCase().trim();
-                            const liveAway = (live['Away Team'] || '').toLowerCase().trim();
-                            
-                            return (liveHome === featuredHome && liveAway === featuredAway) ||
-                                   (liveHome === featuredAway && liveAway === featuredHome);
-                        });
-                        
-                        if (liveGame) {
-                            return {
-                                ...liveGame,
-                                title: featuredGame.title,
-                                yesterdayTitle: featuredGame.yesterdayTitle,
-                                order: featuredGame.order,
-                                isFeatured: true
-                            };
-                        }
-                    } else {
-                        // For non-MLB games, match by Game ID or team names
-                        const liveGame = liveGames.find(live => 
-                            live['Game ID'] === featuredGame['Game ID'] || 
-                            (live['Home Team'] === featuredGame['Home Team'] && 
-                             live['Away Team'] === featuredGame['Away Team'] &&
-                             live.League === featuredGame.League)
-                        );
-                        
-                        if (liveGame) {
-                            return {
-                                ...liveGame,
-                                title: featuredGame.title,
-                                yesterdayTitle: featuredGame.yesterdayTitle,
-                                order: featuredGame.order,
-                                isFeatured: true
-                            };
-                        }
-                    }
-                    
-                    return {
-                        ...featuredGame,
-                        isFeatured: true
-                    };
-                });
-                
-                updateDisplay();
+                featuredGamesData = snapshot.docs.map(doc => doc.data());
+                mergeFeaturedWithLive();
             }, err => {
                 console.error("Error fetching featured games: ", err);
+            });
+        
+        // Set up real-time listener for live games (sportsGames collection)
+        const gamesRef = firebase.firestore().collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
+        const liveGamesUnsubscribe = gamesRef.where('gameDate', '==', todayStr)
+            .onSnapshot(snapshot => {
+                liveGamesData = snapshot.empty ? [] : snapshot.docs.map(doc => doc.data());
+                mergeFeaturedWithLive();
+            }, err => {
+                console.error("Error fetching live games for featured: ", err);
             });
 
         function updateDisplay() {
@@ -9008,6 +9033,7 @@ async function fetchFeaturedGames() {
         return () => {
             regularGamesUnsubscribe();
             featuredGamesUnsubscribe();
+            liveGamesUnsubscribe();
         };
     }
 
