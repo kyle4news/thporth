@@ -5781,6 +5781,23 @@ document.addEventListener('DOMContentLoaded', function () {
             "Royale Union SG": "Royale USG",
             "Olympiacos Piraeus": "Olympiacos",
             "FC Copenhagen": "Copenhagen"
+        },
+        // UEFA Europa League
+        UEFAEuropaLeague: {
+            "Din. Zagreb": "D. Zagreb",
+            "Crvena zvezda": "Red Star",
+            "Maccabi Tel Aviv": "M. Tel Aviv"
+        },
+        // UEFA Conference League
+        UEFAConferenceLeague: {
+            "Shakhtar Donetsk": "Shaktar D.",
+            "Sigma Olomouc": "S. Olomouc",
+            "Slovan Bratislava": "S. Bratislava",
+            "AEK Athens FC": "AEK Athens",
+            "Shamrock Rovers": "Shamrock",
+            "Rayo Vallecano": "R. Vallecano",
+            "Lincoln Red Imps": "L. Red Imps",
+            "Rayo Vallecano": "R. Vallecano",
         }
     };
     
@@ -5811,7 +5828,16 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Granular Live Status Display Function
     function getGranularLiveStatus(game) {
-        if (game.StageType !== "LIVE") return game.StageType;
+        // Check if game is live - handle both "LIVE" and "IN PROGRESS" statuses
+        const stageType = (game.StageType || '').toUpperCase();
+        const matchStatus = (game['Match Status'] || '').toUpperCase();
+        const isLive = stageType === 'LIVE' || stageType === 'IN PROGRESS' || 
+                       matchStatus.includes('IN PROGRESS') || matchStatus.includes('LIVE');
+        
+        // If not live, return the status
+        if (!isLive) {
+            return game.StageType || game['Match Status'] || '';
+        }
         
         const displayLeague = getLeagueDisplayName(game.League, game.Sport);
         
@@ -5823,8 +5849,8 @@ document.addEventListener('DOMContentLoaded', function () {
             return "Int";
         }
         
-        // NFL, NCAAF, NBA, NCAAW, WNBA - Quarter-based sports
-        if (['NFL', 'NCAAF', 'NBA', 'NCAAW', 'WNBA'].includes(displayLeague)) {
+        // NFL, NCAAF, NBA, WNBA - Quarter-based sports (NCAAW handled separately above)
+        if (['NFL', 'NCAAF', 'NBA', 'WNBA'].includes(displayLeague)) {
         if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
                 // Format quarter and time remaining with proper quarter names
                 let quarter = game.Stage;
@@ -5857,7 +5883,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if (displayLeague === 'NHL') {
             if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
                 // Format period and time remaining
-                const period = game.Stage.replace('_PERIOD', '').replace('_', '');
+                let period = game.Stage || '';
+                // Remove _PERIOD suffix and normalize
+                period = period.replace(/_PERIOD/gi, '').replace(/_/g, '').trim();
+                // Convert FIRST/SECOND/THIRD to 1st/2nd/3rd, and PAUSE to INT
+                if (period === "FIRST" || period === "1ST") period = "1st";
+                else if (period === "SECOND" || period === "2ND") period = "2nd";
+                else if (period === "THIRD" || period === "3RD") period = "3rd";
+                else if (period === "PAUSE") period = "INT";
                 // Format time to include seconds if not present
                 let timeStr = game.GameTime;
                 if (timeStr && !timeStr.includes(':')) {
@@ -5865,22 +5898,135 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 return `${period}<br>${timeStr}`;
             }
+            // Also format period even without time
+            let period = game.Stage || '';
+            if (period) {
+                // Remove _PERIOD suffix and normalize
+                period = period.replace(/_PERIOD/gi, '').replace(/_/g, '').trim();
+                // Convert FIRST/SECOND/THIRD to 1st/2nd/3rd, and PAUSE to INT
+                if (period === "FIRST" || period === "1ST") period = "1st";
+                else if (period === "SECOND" || period === "2ND") period = "2nd";
+                else if (period === "THIRD" || period === "3RD") period = "3rd";
+                else if (period === "PAUSE") period = "INT";
+                return period;
+            }
             return game.Stage;
         }
         
-        // NCAAM - Half-based sport
+        // NCAAM - Quarter-based sport (uses quarters, not halves)
         if (displayLeague === 'NCAAM') {
-            if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
-                // Format half and time remaining
-                const half = game.Stage.replace('_HALF', '').replace('_', '');
+            // Check for currentPeriod in multiple field names
+            const currentPeriod = game['Current Period'] || game.currentPeriod || game.Stage || '';
+            const gameTime = game.GameTime || game.gameTime || '';
+            
+            // Debug logging
+            if (currentPeriod || gameTime) {
+                console.log('NCAAM Debug:', {
+                    currentPeriod: currentPeriod,
+                    gameTime: gameTime,
+                    Stage: game.Stage,
+                    'Current Period': game['Current Period'],
+                    StageType: game.StageType,
+                    'Match Status': game['Match Status']
+                });
+            }
+            
+            if (gameTime && gameTime !== "" && gameTime !== "-1" && currentPeriod) {
+                // Format quarter from currentPeriod (e.g., "1ST_QUARTER", "2ND_QUARTER", "HALFTIME")
+                let quarter = currentPeriod;
+                if (quarter === "1ST_QUARTER" || quarter === "FIRST_QUARTER") quarter = "1st";
+                else if (quarter === "2ND_QUARTER" || quarter === "SECOND_QUARTER") quarter = "2nd";
+                else if (quarter === "3RD_QUARTER" || quarter === "THIRD_QUARTER") quarter = "3rd";
+                else if (quarter === "4TH_QUARTER" || quarter === "FOURTH_QUARTER") quarter = "4th";
+                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "Half";
+                else if (quarter === "OVERTIME" || quarter === "OT") quarter = "OT";
+                else {
+                    // Handle any other quarter format
+                    quarter = quarter.replace('_QUARTER', '').replace('_', '');
+                    if (quarter === "FIRST") quarter = "1st";
+                    else if (quarter === "SECOND") quarter = "2nd";
+                    else if (quarter === "THIRD") quarter = "3rd";
+                    else if (quarter === "FOURTH") quarter = "4th";
+                    else quarter = quarter.toLowerCase();
+                }
+                
                 // Format time to include seconds if not present
-                let timeStr = game.GameTime;
+                let timeStr = gameTime;
                 if (timeStr && !timeStr.includes(':')) {
                     timeStr = timeStr + ':00';
                 }
-                return `${half}<br>${timeStr}`;
+                return `${quarter}<br>${timeStr}`;
             }
-            return game.Stage;
+            // If no time but we have period, just show period
+            if (currentPeriod) {
+                let quarter = currentPeriod;
+                if (quarter === "1ST_QUARTER" || quarter === "FIRST_QUARTER") quarter = "1st";
+                else if (quarter === "2ND_QUARTER" || quarter === "SECOND_QUARTER") quarter = "2nd";
+                else if (quarter === "3RD_QUARTER" || quarter === "THIRD_QUARTER") quarter = "3rd";
+                else if (quarter === "4TH_QUARTER" || quarter === "FOURTH_QUARTER") quarter = "4th";
+                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "Half";
+                else if (quarter === "OVERTIME" || quarter === "OT") quarter = "OT";
+                return quarter;
+            }
+            return game.Stage || game.StageType || '';
+        }
+        
+        // NCAAW - Quarter-based sport (uses quarters, not halves)
+        if (displayLeague === 'NCAAW') {
+            // Check for currentPeriod in multiple field names
+            const currentPeriod = game['Current Period'] || game.currentPeriod || game.Stage || '';
+            const gameTime = game.GameTime || game.gameTime || '';
+            
+            // Debug logging
+            if (currentPeriod || gameTime) {
+                console.log('NCAAW Debug:', {
+                    currentPeriod: currentPeriod,
+                    gameTime: gameTime,
+                    Stage: game.Stage,
+                    'Current Period': game['Current Period'],
+                    StageType: game.StageType,
+                    'Match Status': game['Match Status']
+                });
+            }
+            
+            if (gameTime && gameTime !== "" && gameTime !== "-1" && currentPeriod) {
+                // Format quarter from currentPeriod (e.g., "1ST_QUARTER", "2ND_QUARTER", "HALFTIME")
+                let quarter = currentPeriod;
+                if (quarter === "1ST_QUARTER" || quarter === "FIRST_QUARTER") quarter = "1st";
+                else if (quarter === "2ND_QUARTER" || quarter === "SECOND_QUARTER") quarter = "2nd";
+                else if (quarter === "3RD_QUARTER" || quarter === "THIRD_QUARTER") quarter = "3rd";
+                else if (quarter === "4TH_QUARTER" || quarter === "FOURTH_QUARTER") quarter = "4th";
+                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "Half";
+                else if (quarter === "OVERTIME" || quarter === "OT") quarter = "OT";
+                else {
+                    // Handle any other quarter format
+                    quarter = quarter.replace('_QUARTER', '').replace('_', '');
+                    if (quarter === "FIRST") quarter = "1st";
+                    else if (quarter === "SECOND") quarter = "2nd";
+                    else if (quarter === "THIRD") quarter = "3rd";
+                    else if (quarter === "FOURTH") quarter = "4th";
+                    else quarter = quarter.toLowerCase();
+                }
+                
+                // Format time to include seconds if not present
+                let timeStr = gameTime;
+                if (timeStr && !timeStr.includes(':')) {
+                    timeStr = timeStr + ':00';
+                }
+                return `${quarter}<br>${timeStr}`;
+            }
+            // If no time but we have period, just show period
+            if (currentPeriod) {
+                let quarter = currentPeriod;
+                if (quarter === "1ST_QUARTER" || quarter === "FIRST_QUARTER") quarter = "1st";
+                else if (quarter === "2ND_QUARTER" || quarter === "SECOND_QUARTER") quarter = "2nd";
+                else if (quarter === "3RD_QUARTER" || quarter === "THIRD_QUARTER") quarter = "3rd";
+                else if (quarter === "4TH_QUARTER" || quarter === "FOURTH_QUARTER") quarter = "4th";
+                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "Half";
+                else if (quarter === "OVERTIME" || quarter === "OT") quarter = "OT";
+                return quarter;
+            }
+            return game.Stage || game.StageType || '';
         }
         
         // MLB - Inning-based sport
@@ -7002,6 +7148,23 @@ document.addEventListener('DOMContentLoaded', function () {
                            displayHomeScore = '';
                         }
 
+                        // Determine losing team color for final games
+                        let homeColor = '';
+                        let awayColor = '';
+                        let homeScoreColor = '';
+                        let awayScoreColor = '';
+                        if (isFinal) {
+                            const homeScoreNum = parseFloat(homeScore) || 0;
+                            const awayScoreNum = parseFloat(awayScore) || 0;
+                            if (homeScoreNum < awayScoreNum) {
+                                homeColor = 'color: #7f7f7f;';
+                                homeScoreColor = 'color: #7f7f7f;';
+                            } else if (awayScoreNum < homeScoreNum) {
+                                awayColor = 'color: #7f7f7f;';
+                                awayScoreColor = 'color: #7f7f7f;';
+                            }
+                        }
+
                         const row1 = subTable.insertRow();
                         row1.className = "game-row";
                         const row2 = subTable.insertRow();
@@ -7011,11 +7174,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'Argentine Primera División', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'Campeones Cup', 'USL Championship', 'UEFA W Champions League', 'CAF Qualifiers', 'UEFA European Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(displayLeagueForCheck);
                         
                         if (isSoccerLeague) {
-                            row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
-                            row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td>`;
+                            row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
+                            row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                         } else {
-                            row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
-                            row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td>`;
+                            row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
+                            row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                         }
 
                         let gameStatusClass = 'scheduled-game';
@@ -7113,6 +7276,23 @@ document.addEventListener('DOMContentLoaded', function () {
                    displayHomeScore = '';
                 }
 
+                // Determine losing team color for final games
+                let homeColor = '';
+                let awayColor = '';
+                let homeScoreColor = '';
+                let awayScoreColor = '';
+                if (isFinal) {
+                    const homeScoreNum = parseFloat(homeScore) || 0;
+                    const awayScoreNum = parseFloat(awayScore) || 0;
+                    if (homeScoreNum < awayScoreNum) {
+                        homeColor = 'color: #7f7f7f;';
+                        homeScoreColor = 'color: #7f7f7f;';
+                    } else if (awayScoreNum < homeScoreNum) {
+                        awayColor = 'color: #7f7f7f;';
+                        awayScoreColor = 'color: #7f7f7f;';
+                    }
+                }
+
                 const row1 = table.insertRow();
                 row1.className = "game-row";
                 const row2 = table.insertRow();
@@ -7131,12 +7311,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
-                    row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td>`;
+                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
+                    row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
-                row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${displayHomeScore}</td>`;
+                row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
+                row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                 }
 
                 let gameStatusClass = 'scheduled-game';
@@ -8885,13 +9065,19 @@ async function fetchFeaturedGames() {
                     matchingGame.yesterdayTitle = featuredGame.yesterdayTitle || '';
                     matchingGame.order = featuredGame.order;
                     liveFeaturedGames.push(matchingGame);
-                } else {
-                    // Fall back to static data if no match found
-                    liveFeaturedGames.push(featuredGame);
                 }
+                // Only include featured games that have a matching live game
+                // Do not include non-live featured games
             }
             
-            return liveFeaturedGames;
+            // Filter out final games - only return games that are actually live
+            return liveFeaturedGames.filter(game => {
+                const gameMatchStatus = (game['Match Status'] || '').toUpperCase();
+                const gameIsLive = gameMatchStatus.includes('IN PROGRESS') || gameMatchStatus.includes('LIVE');
+                const gameIsFinal = gameMatchStatus.includes('FINISHED') || gameMatchStatus.includes('FINAL') || gameMatchStatus.includes('GAME OVER');
+                // Only include games that are live (not final and not scheduled)
+                return gameIsLive && !gameIsFinal;
+            });
         } catch (error) {
             console.error(`Error fetching featured games for ${dateStr}:`, error);
             return [];
@@ -8938,7 +9124,7 @@ async function fetchFeaturedGames() {
                 return;
             }
             
-            // Merge featured games with live data
+            // Merge featured games with live data - only include games that have a matching live game AND are actually live
             featuredGames = featuredGamesData.map(featuredGame => {
                 // For MLB games, match by team names since Game IDs are different
                 if (featuredGame.Sport === 'Baseball' || featuredGame.Sport === 'MLB') {
@@ -8953,13 +9139,21 @@ async function fetchFeaturedGames() {
                     });
                     
                     if (liveGame) {
-                        return {
-                            ...liveGame,
-                            title: featuredGame.title,
-                            yesterdayTitle: featuredGame.yesterdayTitle,
-                            order: featuredGame.order,
-                            isFeatured: true
-                        };
+                        // Check if the matched game is actually live (not final)
+                        const matchStatus = (liveGame['Match Status'] || '').toUpperCase();
+                        const isLive = matchStatus.includes('IN PROGRESS') || matchStatus.includes('LIVE');
+                        const isFinal = matchStatus.includes('FINISHED') || matchStatus.includes('FINAL') || matchStatus.includes('GAME OVER');
+                        
+                        // Only return if the game is live and not final
+                        if (isLive && !isFinal) {
+                            return {
+                                ...liveGame,
+                                title: featuredGame.title,
+                                yesterdayTitle: featuredGame.yesterdayTitle,
+                                order: featuredGame.order,
+                                isFeatured: true
+                            };
+                        }
                     }
                 } else {
                     // For non-MLB games, match by Game ID or team names
@@ -8971,21 +9165,28 @@ async function fetchFeaturedGames() {
                     );
                     
                     if (liveGame) {
-                        return {
-                            ...liveGame,
-                            title: featuredGame.title,
-                            yesterdayTitle: featuredGame.yesterdayTitle,
-                            order: featuredGame.order,
-                            isFeatured: true
-                        };
+                        // Check if the matched game is actually live (not final)
+                        const matchStatus = (liveGame['Match Status'] || '').toUpperCase();
+                        const isLive = matchStatus.includes('IN PROGRESS') || matchStatus.includes('LIVE');
+                        const isFinal = matchStatus.includes('FINISHED') || matchStatus.includes('FINAL') || matchStatus.includes('GAME OVER');
+                        
+                        // Only return if the game is live and not final
+                        if (isLive && !isFinal) {
+                            return {
+                                ...liveGame,
+                                title: featuredGame.title,
+                                yesterdayTitle: featuredGame.yesterdayTitle,
+                                order: featuredGame.order,
+                                isFeatured: true
+                            };
+                        }
                     }
                 }
                 
-                return {
-                    ...featuredGame,
-                    isFeatured: true
-                };
-            });
+                // Return null for featured games without a matching live game, or for final games
+                // These will be filtered out below
+                return null;
+            }).filter(game => game !== null); // Filter out null entries (non-live featured games)
             
             updateDisplay();
         }
@@ -9874,20 +10075,37 @@ async function fetchFeaturedGames() {
                     const homeScoreDisplay = (isLive || isFinal) ? (homeScore !== '' ? homeScore : '') : '';
                     const awayScoreDisplay = (isLive || isFinal) ? (awayScore !== '' ? awayScore : '') : '';
                     
+                    // Determine losing team color for final games
+                    let homeColor = '';
+                    let awayColor = '';
+                    let homeScoreColor = '';
+                    let awayScoreColor = '';
+                    if (isFinal) {
+                        const homeScoreNum = parseFloat(homeScore) || 0;
+                        const awayScoreNum = parseFloat(awayScore) || 0;
+                        if (homeScoreNum < awayScoreNum) {
+                            homeColor = 'color: #7f7f7f;';
+                            homeScoreColor = 'color: #7f7f7f;';
+                        } else if (awayScoreNum < homeScoreNum) {
+                            awayColor = 'color: #7f7f7f;';
+                            awayScoreColor = 'color: #7f7f7f;';
+                        }
+                    }
+                    
                     // Soccer: home team on top, away team on bottom (same as home page)
                     // Add channel data (hide for finished games)
                     const channelDisplay = (game.channel && !isFinal) ? game.channel : '';
                     
                     html += `<tr class="game-row">`;
                     html += `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>`;
-                    html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${homeTeam}</td>`;
-                    html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${homeScoreDisplay}</td>`;
+                    html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${homeTeam}</td>`;
+                    html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${homeScoreDisplay}</td>`;
                     html += `<td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
                     html += `</tr>`;
                     
                     html += `<tr class="game-row game-separator">`;
-                    html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box;">${awayTeam}</td>`;
-                    html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;">${awayScoreDisplay}</td>`;
+                    html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${awayTeam}</td>`;
+                    html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${awayScoreDisplay}</td>`;
                     html += `</tr>`;
                 });
                 
