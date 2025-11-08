@@ -5958,6 +5958,12 @@ document.addEventListener('DOMContentLoaded', function () {
             return 'Live';
         }
         
+        if (displayLeague === 'ODI') {
+            const stage = (game.Stage || '').toUpperCase();
+            if (stage === 'FIRST_INNING') return '1st';
+            if (stage === 'SECOND_INNING') return '2nd';
+        }
+        
         // NFL, NCAAF, NBA, WNBA - Quarter-based sports (NCAAW handled separately above)
         if (['NFL', 'NCAAF', 'NBA', 'WNBA'].includes(displayLeague)) {
         if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
@@ -7518,6 +7524,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // Initially hide table if league is in collapsed list
                     table.style.display = "none";
+                    table.dataset.collapsible = "true";
+                    table.dataset.isCollapsed = "true";
                 }
                 
                 // Add click handler to title for toggling (only for leagues that can collapse)
@@ -7528,12 +7536,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (table.style.display === "none") {
                             // Expand
                             table.style.display = "";
+                            table.dataset.isCollapsed = "false";
                             if (arrow) {
                                 arrow.innerHTML = "▼";
                             }
                         } else {
                             // Collapse
                             table.style.display = "none";
+                            table.dataset.isCollapsed = "true";
                             if (arrow) {
                                 arrow.innerHTML = "▶";
                             }
@@ -10847,7 +10857,12 @@ if (gamesTabsContainer) {
         gameTables.forEach(table => {
             const rows = table.querySelectorAll('.game-row');
             const hasVisible = !isFilterActive || Array.from(rows).some(row => row.style.display !== 'none');
-            table.style.display = hasVisible ? '' : 'none';
+            const isDefaultCollapsed = table.dataset.collapsible === 'true' && table.dataset.isCollapsed === 'true';
+            if (isDefaultCollapsed) {
+                table.style.display = 'none';
+            } else {
+                table.style.display = hasVisible ? '' : 'none';
+            }
 
             const header = table.previousElementSibling;
             if (header && header.classList && header.classList.contains('featured-subheader')) {
