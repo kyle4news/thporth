@@ -3584,14 +3584,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     gamesContent.style.display = 'block';
                     f1Content.style.display = 'none';
 
-                    // Clear LIVE filter and ensure TODAY tab is active when navigating to Home page
-                    const liveFilter = document.getElementById('live-filter-toggle');
-                    if (liveFilter && liveFilter.classList.contains('active')) {
-                        liveFilter.classList.remove('active');
-                    }
-                    
+                    // Ensure TODAY tab reloads (and resets Live filter) when returning to Home
                     const todayTab = document.querySelector('.games-tab[data-tab="today"]');
-                    if (todayTab && !todayTab.classList.contains('active')) {
+                    if (todayTab) {
                         todayTab.click();
                     }
 
