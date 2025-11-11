@@ -160,7 +160,7 @@ table.game-table td:nth-child(1) {
 }
 @media (max-width: 767px) {
     .column.tv-listings .game-table col:nth-child(1) {
-        width: 10% !important;
+        width: 20% !important;
     }
     .column.tv-listings .game-table col:nth-child(2) {
         width: 50% !important;
@@ -177,6 +177,7 @@ table.game-table td:nth-child(1) {
 }
 .column.tv-listings .game-table td:nth-child(1) { /* Start time/status column */
     width: auto !important;
+    min-width: 95px !important;
     text-align: left !important;
     padding-left: 10px !important;
     padding-right: 6px !important;
@@ -7517,10 +7518,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     const subColgroup = document.createElement("colgroup");
                     subColgroup.innerHTML = `
-                        <col style="width: 23%;">
                         <col style="width: 32%;">
-                        <col style="width: 15%;">
-                        <col style="width: 30%;">
+                        <col style="width: 32%;">
+                        <col style="width: 10%;">
+                        <col style="width: 26%;">
                     `;
                     subTable.appendChild(subColgroup);
                     
@@ -7659,10 +7660,10 @@ document.addEventListener('DOMContentLoaded', function () {
             // Add colgroup with percentage widths to work in both contexts
             const colgroup = document.createElement("colgroup");
             colgroup.innerHTML = `
-                <col style="width: 23%;">   <!-- time -->
+                <col style="width: 32%;">   <!-- time -->
                 <col style="width: 32%;">  <!-- team -->
-                <col style="width: 15%;">   <!-- score -->
-                <col style="width: 30%;">   <!-- channel -->
+                <col style="width: 10%;">   <!-- score -->
+                <col style="width: 26%;">   <!-- channel -->
             `;
             table.appendChild(colgroup);
             
@@ -10620,10 +10621,10 @@ async function fetchFeaturedGames() {
                 
                 // Add colgroup for consistent column widths (same as individual league pages)
                 html += `<colgroup>`;
-                html += `<col style="width: 23%;">`;  // Time column
+                html += `<col style="width: 32%;">`;  // Time column
                 html += `<col style="width: 32%;">`;  // Team column
-                html += `<col style="width: 15%;">`;  // Score column
-                html += `<col style="width: 30%;">`;  // Channel column
+                html += `<col style="width: 10%;">`;  // Score column
+                html += `<col style="width: 26%;">`;  // Channel column
                 html += `</colgroup>`;
                 
                 // Sort games by time chronologically (handle both timestamp and string formats)
@@ -11037,10 +11038,10 @@ async function fetchFeaturedGames() {
             // Add colgroup with percentage widths to match renderGames
             html += `
                 <colgroup>
-                    <col style="width: 23%;">   <!-- time -->
+                    <col style="width: 32%;">   <!-- time -->
                     <col style="width: 32%;">  <!-- team -->
-                    <col style="width: 15%;">   <!-- score -->
-                    <col style="width: 30%;">   <!-- channel -->
+                    <col style="width: 10%;">   <!-- score -->
+                    <col style="width: 26%;">   <!-- channel -->
                 </colgroup>
             `;
             
