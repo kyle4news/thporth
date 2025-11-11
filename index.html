@@ -10767,7 +10767,7 @@ async function fetchFeaturedGames() {
                 homeField = 'home';
                 timeField = 'time';
                 dateField = 'date';
-            } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLB', 'NBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball', 'NFL', 'NHL', 'NWSL', 'SerieA', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'WNBA'].includes(leagueKey)) {
+            } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLB', 'NBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball', 'NFL', 'NHL', 'NWSL', 'SerieA', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'WNBA', 'FACup'].includes(leagueKey)) {
                 awayField = 'away';
                 homeField = 'home';
                 timeField = 'time';
@@ -11038,7 +11038,7 @@ async function fetchFeaturedGames() {
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                         </tr>
                     `;
-                } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'Ligue1', 'MLS', 'NWSL', 'PremierLeague', 'SerieA', 'UEFAEuropaLeague', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'FIFAWorldCupAfricanQualifiers', 'FIFAWorldCupEuropeanQualifiers', '2027AFCAsianCupQualifiers', 'FIFAWorldCupAsianQualifiers', 'FIFAWorldCupCONCACAFQualifiers', 'ClubFriendly'].includes(leagueKey)) {
+                } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'Ligue1', 'MLS', 'NWSL', 'PremierLeague', 'SerieA', 'UEFAEuropaLeague', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'FIFAWorldCupAfricanQualifiers', 'FIFAWorldCupEuropeanQualifiers', '2027AFCAsianCupQualifiers', 'FIFAWorldCupAsianQualifiers', 'FIFAWorldCupCONCACAFQualifiers', 'ClubFriendly', 'FACup'].includes(leagueKey)) {
                     // Format for soccer leagues: Use same table format as home page (soccer shows home on top, away on bottom)
                     const timeDisplayRaw = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
                     let displayTimeLabel = timeDisplayRaw;
