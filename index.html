@@ -1648,6 +1648,16 @@ div[id^="breaking-content-"] a:hover {
     max-width: 100vw !important;
     overflow-x: hidden !important;
     flex: 0 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .column.news,
+  .column.social,
+  .videos-column {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    flex: 0 0 auto !important;
   }
   
   .column.tv-listings {
@@ -3354,7 +3364,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="divider"></div>
 
         <!-- VIDEOS COLUMN -->
-        <div class="column videos-column" id="videos-column" style="flex: 0 0 200px; background-color: #000000;">
+        <div class="column videos-column" id="videos-column" style="background-color: #000000;">
       <div id="videos-container" style="display: block;">
         <div id="videos-header" style="
             position: sticky; top: 0; width: 100%; height: 18px;
@@ -8583,6 +8593,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const standingsContent = document.getElementById('league-standings-content');
         if (!standingsContent) return;
         
+        if (leagueKey === 'WNBA') {
+            return false;
+        }
+        
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         
         console.log(`📊 Fetching standings for ${leagueKey} from Firestore`);
@@ -9095,7 +9109,8 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; margin-bottom: 30px;">';
         html += '<thead>';
         html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
-        html += '<th style="padding: 8px; text-align: left; width: 40px;">Team</th>';
+        html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
+        html += '<th style="padding: 8px; text-align: left;">Team</th>';
         html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
         html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
         html += '</tr>';
@@ -9105,6 +9120,7 @@ document.addEventListener('DOMContentLoaded', function () {
         eastTeams.forEach((team, index) => {
             const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
             html += '<tr style="' + rowStyle + '">';
+            html += '<td style="padding: 8px; text-align: left; font-size: 12px;">' + (team.Rank || '') + '</td>';
             html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
             html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
             html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
@@ -9119,7 +9135,8 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
         html += '<thead>';
         html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
-        html += '<th style="padding: 8px; text-align: left; width: 40px;">Team</th>';
+        html += '<th style="padding: 8px; text-align: left; width: 40px;">Rank</th>';
+        html += '<th style="padding: 8px; text-align: left;">Team</th>';
         html += '<th style="padding: 8px; text-align: center; width: 40px;">W</th>';
         html += '<th style="padding: 8px; text-align: center; width: 40px;">L</th>';
         html += '</tr>';
@@ -9129,6 +9146,7 @@ document.addEventListener('DOMContentLoaded', function () {
         westTeams.forEach((team, index) => {
             const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
             html += '<tr style="' + rowStyle + '">';
+            html += '<td style="padding: 8px; text-align: left; font-size: 12px;">' + (team.Rank || '') + '</td>';
             html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
             html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
             html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
@@ -9430,6 +9448,86 @@ document.addEventListener('DOMContentLoaded', function () {
         // Fallback to CSV if not in Firestore
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         try {
+            if (leagueKey === 'Tennis') {
+                const ATP_RANKINGS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ74Qw3ZgBqRAKd_HVAnGLI9zDqk_JILTBTtlrFKI8oCosRHnLQZ9Nu8BIAVYdLq932wzE8oz3UNCIP/pub?gid=0&single=true&output=csv';
+                const WTA_RANKINGS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ74Qw3ZgBqRAKd_HVAnGLI9zDqk_JILTBTtlrFKI8oCosRHnLQZ9Nu8BIAVYdLq932wzE8oz3UNCIP/pub?gid=1773187500&single=true&output=csv';
+                
+                const [atpRows, wtaRows] = await Promise.all([
+                    fetchFromGoogleSheetsCSV(ATP_RANKINGS_URL),
+                    fetchFromGoogleSheetsCSV(WTA_RANKINGS_URL)
+                ]);
+                
+                const buildRankingsTable = (rows) => {
+                    if (!rows || rows.length < 2) {
+                        return '<p style="color: #9ca3af;">No rankings data available.</p>';
+                    }
+                    
+                    const headerRow = rows[0];
+                    const rankIndex = headerRow.findIndex(h => h.toLowerCase().includes('rank'));
+                    const nameIndex = headerRow.findIndex(h => h.toLowerCase().includes('name'));
+                    const pointsIndex = headerRow.findIndex(h => h.toLowerCase().includes('point'));
+                    
+                    const dataRows = rows.slice(1).filter(row => row.length > 1 && row[rankIndex] && row[nameIndex]);
+                    
+                    let tableHtml = '<table style="width: 100%; border-collapse: collapse; color: #ffffff; font-size: 12px;">';
+                    tableHtml += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
+                    tableHtml += '<th style="padding: 8px; text-align: left; width: 50px;">Rank</th>';
+                    tableHtml += '<th style="padding: 8px; text-align: left;">Name</th>';
+                    tableHtml += '<th style="padding: 8px; text-align: right; width: 80px;">Points</th>';
+                    tableHtml += '</tr></thead><tbody>';
+                    
+                    dataRows.forEach((row, index) => {
+                        const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                        tableHtml += `<tr style="${rowStyle}">`;
+                        tableHtml += `<td style="padding: 8px; text-align: left;">${row[rankIndex] || ''}</td>`;
+                        tableHtml += `<td style="padding: 8px; text-align: left; font-weight: 500;">${row[nameIndex] || ''}</td>`;
+                        tableHtml += `<td style="padding: 8px; text-align: right;">${row[pointsIndex] || ''}</td>`;
+                        tableHtml += '</tr>';
+                    });
+                    
+                    tableHtml += '</tbody></table>';
+                    return tableHtml;
+                };
+                
+                const atpTable = buildRankingsTable(atpRows);
+                const wtaTable = buildRankingsTable(wtaRows);
+                
+                standingsContent.innerHTML = `
+                    <div class="tennis-rankings">
+                        <div class="tennis-rankings-tabs" style="display: flex; background-color: #2a2a2a; margin-bottom: 6px;">
+                            <div class="tennis-rankings-tab active" data-tab="atp" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">ATP</div>
+                            <div class="tennis-rankings-tab" data-tab="wta" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">WTA</div>
+                        </div>
+                        <div class="tennis-rankings-content" data-tab-content="atp">${atpTable}</div>
+                        <div class="tennis-rankings-content" data-tab-content="wta" style="display: none;">${wtaTable}</div>
+                    </div>
+                `;
+                
+                const tennisTabs = standingsContent.querySelectorAll('.tennis-rankings-tab');
+                const tennisContents = standingsContent.querySelectorAll('.tennis-rankings-content');
+                
+                tennisTabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const target = tab.dataset.tab;
+                        
+                        tennisTabs.forEach(t => {
+                            t.classList.remove('active');
+                            t.style.color = '#ccc';
+                            t.style.borderBottom = 'none';
+                        });
+                        tab.classList.add('active');
+                        tab.style.color = '#fff';
+                        tab.style.borderBottom = '2px solid #fff';
+                        
+                        tennisContents.forEach(content => {
+                            content.style.display = content.dataset.tabContent === target ? 'block' : 'none';
+                        });
+                    });
+                });
+                
+                return;
+            }
+            
             if (!url || !url.startsWith('http')) {
                 standingsContent.innerHTML = '<p>Standings not available.</p>';
                 return;
@@ -9437,9 +9535,47 @@ document.addEventListener('DOMContentLoaded', function () {
             const response = await fetch(url);
             if (!response.ok) throw new Error('Network response was not ok');
             const csvText = await response.text();
-            const rows = csvText.split(/\r?\n/).map(row => row.split(','));
+            const rows = csvText.split(/\r?\n/).map(row => row.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
             if (rows.length < 2) {
                 standingsContent.innerHTML = '<p>No standings data available.</p>';
+                return;
+            }
+            
+            if (leagueKey === 'WNBA') {
+                const teams = [];
+                let currentConference = '';
+                
+                rows.forEach(row => {
+                    if (row.length === 0) return;
+                    const label = (row[0] || '').toLowerCase();
+                    if (!label) return;
+                    
+                    if (label.includes('eastern conference')) {
+                        currentConference = 'Eastern Conference';
+                        return;
+                    }
+                    if (label.includes('western conference')) {
+                        currentConference = 'Western Conference';
+                        return;
+                    }
+                    if (label === 'rank' || label === 'team' || !currentConference) {
+                        return;
+                    }
+                    const rank = row[0];
+                    const teamName = row[1];
+                    const wins = row[2];
+                    const losses = row[3];
+                    if (!rank || !teamName) return;
+                    teams.push({
+                        Rank: rank,
+                        Team: teamName,
+                        Wins: wins || '0',
+                        Losses: losses || '0',
+                        Conference: currentConference
+                    });
+                });
+                
+                standingsContent.innerHTML = createWNBAStandings(teams);
                 return;
             }
             
