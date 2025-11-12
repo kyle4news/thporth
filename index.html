@@ -1643,13 +1643,12 @@ div[id^="breaking-content-"] a:hover {
     display: none !important; /* Hidden by default, shown by JS */
   }
 
-  .column.tv-listings {
+  .column.tv-listings,
+  #league-specific-column {
     width: 100% !important;
     max-width: 100vw !important;
     overflow-x: hidden !important;
     flex: 0 0 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
   }
   .column.news,
   .column.social,
@@ -2477,9 +2476,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ─── LEAGUE-SPECIFIC COLUMN (New, Initially Hidden) ────────────────────────── -->
 <div class="column" id="league-specific-column" style="display: none; flex: 0 0 250px; background-color: #1f1f1f; color: #ffffff; padding: 0; overflow-x: hidden;">
     <!-- Header will be dynamically set -->
-    <div id="league-specific-header" style="position: sticky; top: 0; width: 100%; height: 18px; background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif; font-size: 10px; display: flex; align-items: center; padding-left: 10px; z-index: 11; border-bottom: 1px solid #1f1f1f; font-weight: bold;">
-        League Info
-    </div>
+    <div id="league-specific-header" style="position: sticky; top: 0; width: 100%; height: 18px; background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif; font-size: 10px; display: flex; align-items: center; padding-left: 10px; z-index: 11; border-bottom: 1px solid #1f1f1f; font-weight: bold;"></div>
     
             <!-- Main Tabs: Schedule | Standings (Stats hidden for now) -->
             <div id="main-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0;">
@@ -13688,6 +13685,10 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (columnType === 'videos') {
                 document.querySelector('.column.videos-column')?.classList.add('mobile-active');
             }
+            
+            document.querySelectorAll('.featured-subheader').forEach(header => {
+                header.style.display = columnType === 'games' ? '' : 'none';
+            });
             
             // Update toolbar button states
             document.querySelectorAll('.mobile-toolbar-btn').forEach(btn => {
