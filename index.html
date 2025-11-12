@@ -11549,13 +11549,18 @@ async function fetchFeaturedGames() {
                     `;
                 } else if (['LIVGolf', 'UFC'].includes(leagueKey)) {
                     // LIVGolf, UFC: Event on top, blank on bottom, time on right
+                    const channelDisplay = game.channel || '';
+                    const timeDisplay = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1; margin-right: 8px;">
                                 <div class="event" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px; display: flex; flex-direction: column; align-items: flex-end;">
+                                <div>${timeDisplay}</div>
+                                ${channelDisplay ? `<div style="color: #9ca3af; font-size: 10px; margin-top: 2px;">${channelDisplay}</div>` : ''}
+                            </div>
                         </div>
                     `;
                 } else if (leagueKey === 'MotoGP') {
