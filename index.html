@@ -264,6 +264,15 @@ table.game-table td:nth-child(1) {
     display: block;
     height: 30px;
 }
+.atp-doubles-spacer {
+    height: 1.5em;
+}
+.atp-doubles-spacer td {
+    height: 1.5em;
+    padding: 0;
+    border: none;
+    line-height: 0;
+}
 .error {
     color: red;
 }
@@ -6384,17 +6393,56 @@ document.addEventListener('DOMContentLoaded', function () {
         // Remove " W" suffix if present (for NWSL)
         let p = name.endsWith(" W") ? name.slice(0, -2) : name;
         
+        // Check if this is a tennis league (ATP, WTA, or any league containing "ATP" or "WTA")
+        const isTennisLeague = league && (league.includes('ATP') || league.includes('WTA') || league === 'Tennis');
+        
+        // For tennis player names, remove initial and country code
+        // Pattern: "Musetti L. (Ita)" -> "Musetti"
+        // Pattern: "Alcaraz C. (Esp)" -> "Alcaraz"
+        // For doubles: "Cash J./Glasgow M. (Aus)" -> "Cash<br>Glasgow" (split at "/" and process each part)
+        if (isTennisLeague) {
+            // Check if this is a doubles name (contains "/")
+            if (p.includes('/')) {
+                // Split at "/" and process each part separately
+                const parts = p.split('/').map(part => part.trim());
+                const processedParts = parts.map(part => {
+                    // Remove country code in parentheses (e.g., "(Ita)", "(Esp)")
+                    let processed = part.replace(/\s*\([^)]+\)\s*$/, '').trim();
+                    // Remove initial (e.g., "L.", "C.") - single letter followed by period
+                    processed = processed.replace(/\s+[A-Z]\.\s*$/, '').trim();
+                    return processed;
+                });
+                // Join with <br> to display on separate lines
+                return processedParts.join('<br>');
+            } else {
+                // Singles: remove country code and initial
+                // Remove country code in parentheses (e.g., "(Ita)", "(Esp)")
+                p = p.replace(/\s*\([^)]+\)\s*$/, '').trim();
+                // Remove initial (e.g., "L.", "C.") - single letter followed by period
+                p = p.replace(/\s+[A-Z]\.\s*$/, '').trim();
+            }
+        }
+        
         if (league === 'FIFA U-17 World Cup') {
             p = p.replace(/\s*U17\b/gi, '').trim();
         }
         
         // If league is specified and has mappings, use league-specific mapping
+        // Note: For doubles with <br>, we need to check if the original name (before processing) has a mapping
         if (league && TEAM_DISPLAY_MAP[league]) {
+            const originalName = name.endsWith(" W") ? name.slice(0, -2) : name;
+            if (TEAM_DISPLAY_MAP[league][originalName]) {
+                return TEAM_DISPLAY_MAP[league][originalName];
+            }
             return TEAM_DISPLAY_MAP[league][p] || p;
         }
         
         // Otherwise, try all leagues (fallback for backward compatibility)
         for (const leagueMap of Object.values(TEAM_DISPLAY_MAP)) {
+            const originalName = name.endsWith(" W") ? name.slice(0, -2) : name;
+            if (leagueMap[originalName]) {
+                return leagueMap[originalName];
+            }
             if (leagueMap[p]) {
                 return leagueMap[p];
             }
@@ -7822,6 +7870,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         const awayDisplay = getTeamDisplayName(data["Away Team"] || "", displayLeague);
                         const home = formatTeamNameWithRanking(homeDisplay, leagueKey);
                         const away = formatTeamNameWithRanking(awayDisplay, leagueKey);
+                        // Check if names contain <br> (doubles tennis) to adjust styling
+                        const isHomeDoubles = homeDisplay.includes('<br>');
+                        const isAwayDoubles = awayDisplay.includes('<br>');
+                        const homeWhiteSpace = isHomeDoubles ? 'white-space: normal;' : 'white-space: nowrap;';
+                        const awayWhiteSpace = isAwayDoubles ? 'white-space: normal;' : 'white-space: nowrap;';
                         // Try multiple possible field names for scores
                         const homeScore = data["Home Score"] || data["HomeScore"] || data.homeScore || '';
                         const awayScore = data["Away Score"] || data["AwayScore"] || data.awayScore || '';
@@ -7901,14 +7954,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     row2.className = "game-row game-separator";
                     
                     const displayLeagueForCheck = getLeagueDisplayName(data.League, data.Sport);
+                    // Add special class for ATP Finals (Doubles) to add extra spacing
+                    const isAtpDoubles = displayLeagueForCheck === "ATP Finals (Doubles)";
+                    if (isAtpDoubles) {
+                        row2.classList.add("atp-doubles-match");
+                    }
                 const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(displayLeagueForCheck);
                     
                     if (isSoccerLeague) {
-                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
-                        row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
+                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
+                        row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                     } else {
-                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
-                        row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
+                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${(!isFinal && data.channel) ? data.channel : ''}</div></td>`;
+                        row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                     }
 
                     let gameStatusClass = 'scheduled-game';
@@ -7916,6 +7974,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (isFinal) gameStatusClass = 'final-game';
                     row1.classList.add(gameStatusClass);
                     row2.classList.add(gameStatusClass);
+                    
+                    // Add spacer row after ATP doubles matches for extra spacing
+                    if (isAtpDoubles) {
+                        const spacerRow = currentTable.insertRow();
+                        spacerRow.className = "atp-doubles-spacer";
+                        spacerRow.innerHTML = '<td colspan="4" style="height: 1.5em; padding: 0; border: none; line-height: 0;"></td>';
+                    }
                 });
                 
                 container.appendChild(leagueSection);
@@ -7958,6 +8023,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 const home = formatTeamNameWithRanking(homeDisplay, leagueKey);
                 const away = formatTeamNameWithRanking(awayDisplay, leagueKey);
+                // Check if names contain <br> (doubles tennis) to adjust styling
+                const isHomeDoubles = homeDisplay.includes('<br>');
+                const isAwayDoubles = awayDisplay.includes('<br>');
+                const homeWhiteSpace = isHomeDoubles ? 'white-space: normal;' : 'white-space: nowrap;';
+                const awayWhiteSpace = isAwayDoubles ? 'white-space: normal;' : 'white-space: nowrap;';
                 // Try multiple possible field names for scores
                 const homeScore = data["Home Score"] || data["HomeScore"] || data.homeScore || '';
                 const awayScore = data["Away Score"] || data["AwayScore"] || data.awayScore || '';
@@ -8047,6 +8117,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 const row2 = table.insertRow();
                 row2.className = "game-row game-separator";
                 
+                // Add special class for ATP Finals (Doubles) to add extra spacing
+                const isAtpDoubles = displayLeague === "ATP Finals (Doubles)";
+                if (isAtpDoubles) {
+                    row2.classList.add("atp-doubles-match");
+                }
+                
                 // Check if this is a soccer league - soccer leagues show home on top, away on bottom
                 // displayLeague already declared above
                 const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'Copa Libertadores', 'Copa Sudamericana', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly'].includes(displayLeague);
@@ -8060,12 +8136,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
-                    row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
+                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
+                    row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
-                    row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
+                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
+                    row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                 }
 
                 if (shouldPrioritizeImportant) {
@@ -8088,6 +8164,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (isFinal) gameStatusClass = 'final-game';
                 row1.classList.add(gameStatusClass);
                 row2.classList.add(gameStatusClass);
+                
+                // Add spacer row after ATP doubles matches for extra spacing
+                if (isAtpDoubles) {
+                    const spacerRow = table.insertRow();
+                    spacerRow.className = "atp-doubles-spacer";
+                    spacerRow.innerHTML = '<td colspan="4" style="height: 1.5em; padding: 0; border: none; line-height: 0;"></td>';
+                }
             });
             
             if (shouldPrioritizeImportant) {
