@@ -2511,7 +2511,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div style="padding: 0 0 1rem 0; flex: 1; display: flex; flex-direction: column;">
             <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
             <div id="league-schedule-yesterday-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading yesterday's scores...</p></div>
-            <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
+            <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto; flex-direction: column;">
+                <!-- Tennis ATP/WTA sub-tabs (only shown for Tennis) -->
+                <div id="tennis-upcoming-tabs" style="display: none; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0; gap: 2px; margin-bottom: 2px;">
+                    <div class="tennis-upcoming-subtab active" data-tennis-tab="atp" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">ATP</div>
+                    <div class="tennis-upcoming-subtab" data-tennis-tab="wta" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">WTA</div>
+                </div>
+                <div id="tennis-upcoming-atp-content" class="tennis-upcoming-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading ATP schedule...</p></div>
+                <div id="tennis-upcoming-wta-content" class="tennis-upcoming-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading WTA schedule...</p></div>
+                <div id="league-schedule-upcoming-default-content" style="flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
+            </div>
         </div>
     </div>
 
@@ -4951,7 +4960,8 @@ document.addEventListener('DOMContentLoaded', function () {
         "UEFA Conference League": "https://www.fotmob.com/leagues/10216/matches/conference-league",
         NWSL: "https://www.fotmob.com/leagues/9134/matches/nwsl",
         "Women's UCL": "https://www.fotmob.com/leagues/9375/matches/womens-champions-league",
-        "FIFA U-17 World Cup": "https://www.flashscore.com/football/world/world-cup-u17/"
+        "FIFA U-17 World Cup": "https://www.flashscore.com/football/world/world-cup-u17/",
+        Brasileirão: "https://www.fotmob.com/leagues/268/matches/serie"
     };
 
     function normalizeNcaaTeamName(name) {
@@ -11176,17 +11186,221 @@ async function fetchFeaturedGames() {
         container.innerHTML = html;
     }
 
+    function loadTennisUpcomingSchedule(tourType, container) {
+        if (!container) return;
+        
+        container.innerHTML = '<p style="color: #9ca3af;">Loading ' + tourType + ' schedule...</p>';
+        const collectionRef = db.collection(tourType);
+        
+        collectionRef.get().then(snapshot => {
+            const today = luxon.DateTime.now().startOf('day');
+            let tournaments = [];
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const dateStr = data.date;
+                const tournament = data.tournament || '';
+                const time = data.time || '';
+                const channel = data.channel || '';
+                
+                if (!dateStr || !tournament) return;
+                
+                let gameDate;
+                if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    gameDate = luxon.DateTime.fromISO(dateStr);
+                } else {
+                    return;
+                }
+                
+                if (!gameDate || !gameDate.isValid) return;
+                
+                // Show tournaments from today onwards
+                if (gameDate < today) return;
+                
+                tournaments.push({
+                    date: gameDate,
+                    dateHeader: gameDate.toFormat('MMMM d, yyyy'),
+                    tournament: tournament,
+                    time: time,
+                    channel: channel
+                });
+            });
+            
+            if (tournaments.length === 0) {
+                container.innerHTML = '<p style="color: #9ca3af;">No upcoming ' + tourType + ' tournaments found.</p>';
+                return;
+            }
+            
+            // Sort by date
+            tournaments.sort((a, b) => a.date - b.date);
+            
+            // Group by date
+            const tournamentsByDate = {};
+            tournaments.forEach(t => {
+                if (!tournamentsByDate[t.dateHeader]) {
+                    tournamentsByDate[t.dateHeader] = [];
+                }
+                tournamentsByDate[t.dateHeader].push(t);
+            });
+            
+            // Sort date headers chronologically
+            const sortedDateHeaders = Object.keys(tournamentsByDate).sort((a, b) => {
+                const dateA = luxon.DateTime.fromFormat(a, 'MMMM d, yyyy');
+                const dateB = luxon.DateTime.fromFormat(b, 'MMMM d, yyyy');
+                return dateA - dateB;
+            });
+            
+            // Filter out today's date from upcoming
+            const todayFormatted = luxon.DateTime.now().toFormat('MMMM d, yyyy');
+            const filteredDateHeaders = sortedDateHeaders.filter(dateHeader => dateHeader !== todayFormatted);
+            
+            let html = '';
+            
+            filteredDateHeaders.forEach(dateHeader => {
+                // Format date header (e.g., "November 13")
+                const dateObj = luxon.DateTime.fromFormat(dateHeader, 'MMMM d, yyyy');
+                const formattedDate = dateObj.isValid ? dateObj.toFormat('MMMM d') : dateHeader;
+                
+                // Date header
+                html += `<div class="date-header" style="background-color: #d1d5db; color: #000; padding: 0px 12px; margin: 8px 0 4px 0; font-weight: normal; font-size: 11px; line-height: 18px;">${formattedDate}</div>`;
+                
+                // Tournaments for this date
+                tournamentsByDate[dateHeader].forEach(tournament => {
+                    // Tournament name
+                    html += `<div style="padding: 8px 12px; color: white; font-size: 11px; font-weight: bold; background-color: #1f2937;">${tournament.tournament}</div>`;
+                    
+                    // Time and Channel on same line
+                    html += `<div style="padding: 6px 12px; display: flex; gap: 12px; background-color: #1f2937; border-bottom: 1px solid #374151;">`;
+                    if (tournament.time) {
+                        html += `<span style="color: #9ca3af; font-size: 10px;">${tournament.time}</span>`;
+                    }
+                    if (tournament.channel) {
+                        html += `<span style="color: #9ca3af; font-size: 10px;">${tournament.channel}</span>`;
+                    }
+                    html += `</div>`;
+                });
+                
+                html += `<div style="margin-bottom: 20px;"></div>`;
+            });
+            
+            container.innerHTML = html;
+        }).catch(error => {
+            container.innerHTML = `<div class="error" style="color: #c00;">Error loading ${tourType} schedule: ${error.message}</div>`;
+        });
+    }
+
     function loadUpcomingSchedule(leagueKey) {
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
         if (!upcomingScheduleContent) return;
 
+        // Special handling for Tennis - show ATP/WTA sub-tabs
+        // Normalize league key (trim whitespace, handle case)
+        const normalizedLeagueKey = leagueKey ? leagueKey.trim() : '';
+        
+        // Check if this is Tennis - must be checked first before any other processing
+        if (normalizedLeagueKey === 'Tennis' || leagueKey === 'Tennis') {
+            const tennisTabs = document.getElementById('tennis-upcoming-tabs');
+            const atpContent = document.getElementById('tennis-upcoming-atp-content');
+            const wtaContent = document.getElementById('tennis-upcoming-wta-content');
+            const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
+            
+            // Always clear default content first when Tennis is detected
+            if (defaultContent) {
+                defaultContent.innerHTML = '';
+                defaultContent.style.display = 'none';
+            }
+            
+            if (tennisTabs && atpContent && wtaContent) {
+                tennisTabs.style.display = 'flex';
+                atpContent.style.display = 'block';
+                wtaContent.style.display = 'none';
+                
+                // Ensure parent container is using flex layout
+                if (upcomingScheduleContent) {
+                    upcomingScheduleContent.style.display = 'flex';
+                    upcomingScheduleContent.style.flexDirection = 'column';
+                }
+                
+                // Load ATP and WTA data
+                loadTennisUpcomingSchedule('ATP', atpContent);
+                loadTennisUpcomingSchedule('WTA', wtaContent);
+            } else {
+                console.error('Tennis sub-tab elements not found:', {
+                    tennisTabs: !!tennisTabs,
+                    atpContent: !!atpContent,
+                    wtaContent: !!wtaContent,
+                    defaultContent: !!defaultContent
+                });
+                // Fallback: show error message
+                if (defaultContent) {
+                    defaultContent.style.display = 'block';
+                    defaultContent.innerHTML = '<p style="color: #c00;">Error: Tennis sub-tabs not found.</p>';
+                }
+                return;
+            }
+            
+            // Add click handlers for sub-tabs (remove existing first to prevent duplicates)
+            const atpTab = tennisTabs.querySelector('[data-tennis-tab="atp"]');
+            const wtaTab = tennisTabs.querySelector('[data-tennis-tab="wta"]');
+            
+            if (atpTab && wtaTab) {
+                // Remove existing listeners by cloning
+                const newAtpTab = atpTab.cloneNode(true);
+                const newWtaTab = wtaTab.cloneNode(true);
+                atpTab.parentNode.replaceChild(newAtpTab, atpTab);
+                wtaTab.parentNode.replaceChild(newWtaTab, wtaTab);
+                
+                newAtpTab.addEventListener('click', () => {
+                    newAtpTab.classList.add('active');
+                    newAtpTab.style.color = '#fff';
+                    newAtpTab.style.borderBottom = '2px solid #fff';
+                    newWtaTab.classList.remove('active');
+                    newWtaTab.style.color = '#ccc';
+                    newWtaTab.style.borderBottom = 'none';
+                    atpContent.style.display = 'block';
+                    wtaContent.style.display = 'none';
+                });
+                
+                newWtaTab.addEventListener('click', () => {
+                    newWtaTab.classList.add('active');
+                    newWtaTab.style.color = '#fff';
+                    newWtaTab.style.borderBottom = '2px solid #fff';
+                    newAtpTab.classList.remove('active');
+                    newAtpTab.style.color = '#ccc';
+                    newAtpTab.style.borderBottom = 'none';
+                    wtaContent.style.display = 'block';
+                    atpContent.style.display = 'none';
+                });
+            }
+            return;
+        }
+        
+        // Hide Tennis sub-tabs for other leagues
+        const tennisTabs = document.getElementById('tennis-upcoming-tabs');
+        const atpContent = document.getElementById('tennis-upcoming-atp-content');
+        const wtaContent = document.getElementById('tennis-upcoming-wta-content');
+        const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
+        
+        if (tennisTabs) tennisTabs.style.display = 'none';
+        if (atpContent) atpContent.style.display = 'none';
+        if (wtaContent) wtaContent.style.display = 'none';
+        if (defaultContent) {
+            defaultContent.style.display = 'block';
+            // Clear any old content first
+            defaultContent.innerHTML = '<p style="color: #9ca3af;">Loading upcoming schedule...</p>';
+        }
+
         const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
         if (!leagueInfo || !leagueInfo.upcomingCollectionName) {
-            upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule is not available for this league.</p>';
+            if (defaultContent) {
+                defaultContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule is not available for this league.</p>';
+            }
             return;
         }
 
-        upcomingScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading upcoming schedule...</p>';
+        if (defaultContent) {
+            defaultContent.innerHTML = '<p style="color: #9ca3af;">Loading upcoming schedule...</p>';
+        }
         const upcomingCollectionRef = db.collection(leagueInfo.upcomingCollectionName);
 
         upcomingCollectionRef.get().then(snapshot => {
@@ -11230,10 +11444,12 @@ async function fetchFeaturedGames() {
                 timeField = 'time';
                 dateField = 'date';
             } else if (['LPGATour', 'PGATour'].includes(leagueKey)) {
-                awayField = 'tournament';
-                homeField = 'tournament';
-                timeField = 'time';
-                dateField = 'date';
+                // Special handling: data structure has dateRange, tournament, and rounds array
+                // Skip standard field mapping - will handle separately
+                awayField = null;
+                homeField = null;
+                timeField = null;
+                dateField = null;
             } else if (leagueKey === 'FormulaOne') {
                 awayField = 'away';
                 homeField = 'home';
@@ -11262,6 +11478,42 @@ async function fetchFeaturedGames() {
                 dateField = 'date';
             }
 
+            // Special handling for PGATour and LPGATour
+            if (['LPGATour', 'PGATour'].includes(leagueKey) && data.tournament && data.rounds && Array.isArray(data.rounds)) {
+                // Parse date range
+                const startDate = data.startDate ? luxon.DateTime.fromISO(data.startDate) : null;
+                const endDate = data.endDate ? luxon.DateTime.fromISO(data.endDate) : null;
+                
+                if (!startDate || !startDate.isValid) {
+                    return;
+                }
+                
+                // Show tournaments from today onwards
+                const today = luxon.DateTime.now().startOf('day');
+                if (endDate && endDate < today) {
+                    return;
+                }
+                
+                // Format date range header
+                let dateRangeHeader = '';
+                if (startDate && endDate && startDate.toISODate() !== endDate.toISODate()) {
+                    const startFormatted = startDate.toFormat('MMMM d');
+                    const endDay = endDate.toFormat('d');
+                    dateRangeHeader = `${startFormatted}-${endDay}`;
+                } else if (startDate) {
+                    dateRangeHeader = startDate.toFormat('MMMM d');
+                }
+                
+                games.push({
+                    dateHeader: dateRangeHeader,
+                    tournament: data.tournament,
+                    rounds: data.rounds,
+                    gameDate: startDate,
+                    isGolfTournament: true
+                });
+                return;
+            }
+            
             const away = data[awayField] || "";
             const home = data[homeField] || "";
             let timeStr = "";
@@ -11347,14 +11599,36 @@ async function fetchFeaturedGames() {
         
             console.log(`NHL: Processed ${games.length} games after filtering`);
             if (games.length === 0) {
-                upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
+                // Don't overwrite Tennis sub-tabs - use default content instead
+                const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
+                if (defaultContent && defaultContent.style.display !== 'none') {
+                    defaultContent.innerHTML = "<p>No upcoming games found.</p>";
+                } else {
+                    upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
+                }
                 console.log('NHL: No games after processing - check date filtering logic');
                 return;
             }
         
-            games.sort((a, b) => a.gameDate - b.gameDate);
+            // Separate golf tournaments from regular games
+            const golfTournaments = games.filter(g => g.isGolfTournament);
+            const regularGames = games.filter(g => !g.isGolfTournament);
+            
+            // Sort golf tournaments by start date
+            golfTournaments.sort((a, b) => a.gameDate - b.gameDate);
+            // Sort regular games by date
+            regularGames.sort((a, b) => a.gameDate - b.gameDate);
+            
+            // Group golf tournaments by date header
+            const golfByDate = {};
+            golfTournaments.forEach(g => {
+                if (!golfByDate[g.dateHeader]) golfByDate[g.dateHeader] = [];
+                golfByDate[g.dateHeader].push(g);
+            });
+            
+            // Group regular games by date
             const gamesByDate = {};
-            games.forEach(g => {
+            regularGames.forEach(g => {
                 if (!gamesByDate[g.dateHeader]) gamesByDate[g.dateHeader] = [];
                 gamesByDate[g.dateHeader].push(g);
             });
@@ -11362,7 +11636,62 @@ async function fetchFeaturedGames() {
         
             let html = "";
         
-        // Sort date headers chronologically
+        // Handle golf tournaments separately if this is a golf league
+        if (['LPGATour', 'PGATour'].includes(leagueKey) && Object.keys(golfByDate).length > 0) {
+            // Sort golf tournament date headers
+            const sortedGolfHeaders = Object.keys(golfByDate).sort((a, b) => {
+                // Try to parse as date range or single date
+                const parseGolfDate = (header) => {
+                    // Try to extract start date from range like "November 13-16, 2025" or "November 13, 2025"
+                    const match = header.match(/(\w+)\s+(\d+)/);
+                    if (match) {
+                        const month = match[1];
+                        const day = parseInt(match[2]);
+                        const year = new Date().getFullYear();
+                        return luxon.DateTime.fromObject({ month: luxon.DateTime.fromFormat(month, 'MMMM').month, day, year });
+                    }
+                    return luxon.DateTime.now();
+                };
+                return parseGolfDate(a) - parseGolfDate(b);
+            });
+            
+            sortedGolfHeaders.forEach(dateHeader => {
+                // Show date range header for golf tournaments
+                html += `<div class="date-header" style="background-color: #d1d5db; color: #000; padding: 0px 12px; margin: 8px 0 4px 0; font-weight: normal; font-size: 11px; line-height: 18px;">${dateHeader}</div>`;
+                
+                // Display golf tournaments (no table, custom format)
+                golfByDate[dateHeader].forEach(game => {
+                    if (game.isGolfTournament && game.tournament && game.rounds) {
+                        // Tournament header
+                        html += `<div class="tournament-header" style="padding: 8px 12px; border-bottom: 1px solid #374151; background-color: #1f2937;">`;
+                        html += `<div class="tournament-name" style="color: white; font-size: 11px; font-weight: bold; margin-bottom: 4px;">${game.tournament}</div>`;
+                        html += `</div>`;
+                        
+                        // Display each round
+                        game.rounds.forEach((round, index) => {
+                            const dayDisplay = round.day || '';
+                            const roundName = round.round || '';
+                            const timeDisplay = round.time || '';
+                            const channelDisplay = round.channel || '';
+                            
+                            html += `
+                                <div class="round-row" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: ${index < game.rounds.length - 1 ? '1px solid #374151' : 'none'}; background-color: #1f2937;">
+                                    <div class="round-info" style="flex: 1; display: flex; gap: 12px;">
+                                        ${dayDisplay ? `<span style="color: white; font-size: 11px;">${dayDisplay}</span>` : ''}
+                                        <span style="color: white; font-size: 11px;">${roundName}</span>
+                                        ${timeDisplay ? `<span style="color: #9ca3af; font-size: 10px;">${timeDisplay}</span>` : ''}
+                                        ${channelDisplay ? `<span style="color: #9ca3af; font-size: 10px;">${channelDisplay}</span>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += `<div style="margin-bottom: 20px;"></div>`;
+                    }
+                });
+            });
+        }
+        
+        // Sort date headers chronologically for regular games
         const sortedDateHeaders = Object.keys(gamesByDate).sort((a, b) => {
             const dateA = luxon.DateTime.fromFormat(a, 'MMMM d, yyyy');
             const dateB = luxon.DateTime.fromFormat(b, 'MMMM d, yyyy');
@@ -11586,16 +11915,19 @@ async function fetchFeaturedGames() {
                         </div>
                     `;
                 } else if (['LPGATour', 'PGATour'].includes(leagueKey)) {
-                    // LPGATour, PGATour: Tournament on top, blank on bottom, no time
-                    html += `
-                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                            <div class="teams" style="flex: 1; margin-right: 8px;">
-                                <div class="tournament" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
-                                <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
+                    // LPGATour, PGATour: Skip in table format - handled separately above
+                    // This should not be reached for golf tournaments, but keep fallback
+                    if (!game.isGolfTournament) {
+                        html += `
+                            <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
+                                <div class="teams" style="flex: 1; margin-right: 8px;">
+                                    <div class="tournament" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home || ''}</div>
+                                    <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
+                                </div>
+                                <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;"></div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;"></div>
-                        </div>
-                    `;
+                        `;
+                    }
                 } else if (['NASCARCupSeries'].includes(leagueKey)) {
                     // NASCARCupSeries: Race on top, Location on bottom, time on right
                     html += `
@@ -11630,16 +11962,34 @@ async function fetchFeaturedGames() {
         
         // Only update content if we're still on the same league
         const currentLeagueHeader = document.getElementById('league-specific-header');
-        const currentLeagueKey = currentLeagueHeader ? currentLeagueHeader.innerText : null;
-        if (currentLeagueKey === leagueKey) {
-            upcomingScheduleContent.innerHTML = html;
+        const currentLeagueKey = currentLeagueHeader ? currentLeagueHeader.innerText.trim() : null;
+        const normalizedCurrentKey = currentLeagueKey ? currentLeagueKey.trim() : '';
+        
+        if (currentLeagueKey === leagueKey || normalizedCurrentKey === leagueKey) {
+            // Don't overwrite Tennis sub-tabs - use default content instead
+            const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
+            if (normalizedCurrentKey === 'Tennis') {
+                // Should not reach here for Tennis (should return early), but just in case, don't overwrite
+                return;
+            }
+            if (defaultContent && defaultContent.style.display !== 'none') {
+                defaultContent.innerHTML = html;
+            } else {
+                upcomingScheduleContent.innerHTML = html;
+            }
         }
         }).catch(error => {
         // Only update content if we're still on the same league
         const currentLeagueHeader = document.getElementById('league-specific-header');
-        const currentLeagueKey = currentLeagueHeader ? currentLeagueHeader.innerText : null;
+        const currentLeagueKey = currentLeagueHeader ? currentLeagueHeader.innerText.trim() : null;
         if (currentLeagueKey === leagueKey) {
-            upcomingScheduleContent.innerHTML = `<div class="error" style="color: #c00;">Error loading schedule: ${error.message}</div>`;
+            // Don't overwrite Tennis sub-tabs - use default content instead
+            const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
+            if (defaultContent && defaultContent.style.display !== 'none') {
+                defaultContent.innerHTML = `<div class="error" style="color: #c00;">Error loading schedule: ${error.message}</div>`;
+            } else {
+                upcomingScheduleContent.innerHTML = `<div class="error" style="color: #c00;">Error loading schedule: ${error.message}</div>`;
+            }
         }
         });
     }
@@ -12857,11 +13207,19 @@ if (scheduleTabsContainer) {
         // Show upcoming content, hide other content
         document.getElementById('league-schedule-today-content').style.display = 'none';
         document.getElementById('league-schedule-yesterday-content').style.display = 'none';
-        document.getElementById('league-schedule-upcoming-content').style.display = 'block';
+        const upcomingContent = document.getElementById('league-schedule-upcoming-content');
+        if (upcomingContent) {
+            upcomingContent.style.display = 'flex';
+        }
         
         // Get the current league key from the header
         const leagueHeader = document.getElementById('league-specific-header');
-        const leagueKey = leagueHeader ? leagueHeader.innerText : null;
+        let leagueKey = leagueHeader ? leagueHeader.innerText : null;
+        
+        // Normalize the league key (trim whitespace)
+        if (leagueKey) {
+            leagueKey = leagueKey.trim();
+        }
 
         // Call the new function to load the upcoming schedule, passing the current leagueKey
         if (leagueKey) {
