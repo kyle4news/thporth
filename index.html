@@ -2419,7 +2419,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div id="f1-schedule-tab-content" class="f1-main-tab-content" style="display: block; height: calc(100% - 36px); flex-direction: column;">
           <!-- Schedule Sub-Tabs (Yesterday, Today, Upcoming) -->
           <div id="f1-schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-top: 2px; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%; gap: 2px;">
-              <div class="f1-schedule-tab" data-f1-schedule-tab="yesterday" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Yesterday</div>
+              <!-- <div class="f1-schedule-tab" data-f1-schedule-tab="yesterday" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Yesterday</div> -->
               <div class="f1-schedule-tab" data-f1-schedule-tab="today" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Today</div>
               <div class="f1-schedule-tab active" data-f1-schedule-tab="upcoming" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Upcoming</div>
           </div>
@@ -2503,7 +2503,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- Schedule Sub-Tabs (Today/Upcoming) - Full Column Width -->
         <div id="schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%;">
             <div class="schedule-tab active" data-schedule-tab="today" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Today</div>
-            <div class="schedule-tab" data-schedule-tab="yesterday" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #2a2a2a; color: #ccc;">Yesterday</div>
+            <!-- <div class="schedule-tab" data-schedule-tab="yesterday" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #2a2a2a; color: #ccc;">Yesterday</div> -->
             <div class="schedule-tab" data-schedule-tab="upcoming" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Upcoming</div>
         </div>
         
@@ -4225,7 +4225,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     function setF1ScheduleActiveTab(targetTab, isUserInitiated = false) {
         if (!f1ScheduleTabsContainer) return;
-        const validTabs = ['today', 'yesterday', 'upcoming'];
+        const validTabs = ['today', 'upcoming']; // 'yesterday' removed - restore as: ['today', 'yesterday', 'upcoming']
         if (!validTabs.includes(targetTab)) {
             targetTab = 'upcoming';
         }
@@ -4740,14 +4740,14 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderF1Schedule(events) {
         const scheduleContainer = document.getElementById('f1-schedule-container');
         const todayContent = document.getElementById('f1-today-content');
-        const yesterdayContent = document.getElementById('f1-yesterday-content');
+        // const yesterdayContent = document.getElementById('f1-yesterday-content'); // Commented out
 
         if (!events || events.length === 0) {
             todayContent.innerHTML = `<p style="color: #9ca3af; padding: 1rem;">No Formula 1 events today.</p>`;
             scheduleContainer.innerHTML = `<p style="color: #9ca3af;">No upcoming schedule found.</p>`;
-            if (yesterdayContent) {
-                yesterdayContent.innerHTML = `<p style="color: #9ca3af;">No Formula 1 events yesterday.</p>`;
-            }
+            // if (yesterdayContent) {
+            //     yesterdayContent.innerHTML = `<p style="color: #9ca3af;">No Formula 1 events yesterday.</p>`;
+            // }
             if (!window.f1ScheduleLastUserSelection && typeof window.setF1ScheduleActiveTab === 'function') {
                 window.setF1ScheduleActiveTab('upcoming');
             }
@@ -4797,6 +4797,8 @@ document.addEventListener('DOMContentLoaded', function () {
             todayContent.innerHTML = `<p style="color: #9ca3af; padding: 1rem;">No Formula 1 events today.</p>`;
         }
 
+        // Yesterday tab functionality commented out
+        /*
         if (yesterdayContent) {
             if (yesterdayEvents.length > 0) {
                 yesterdayEvents.sort((a, b) => a.start.toMillis() - b.start.toMillis());
@@ -4819,6 +4821,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 yesterdayContent.innerHTML = `<p style="color: #9ca3af;">No Formula 1 events yesterday.</p>`;
             }
         }
+        */
 
         if (upcomingEvents.length === 0 && todayEvents.length === 0) {
             scheduleContainer.innerHTML = `<p style="color: #9ca3af;">The season may have concluded.</p>`;
@@ -4860,13 +4863,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const hasTodayEvents = todayEvents.length > 0;
-        const hasYesterdayEvents = yesterdayEvents.length > 0;
+        // const hasYesterdayEvents = yesterdayEvents.length > 0; // Commented out
         if (!window.f1ScheduleLastUserSelection && typeof window.setF1ScheduleActiveTab === 'function') {
             if (hasTodayEvents) {
                 window.setF1ScheduleActiveTab('today');
-            } else if (hasYesterdayEvents) {
-                window.setF1ScheduleActiveTab('yesterday');
             } else {
+                // else if (hasYesterdayEvents) { window.setF1ScheduleActiveTab('yesterday'); } // Commented out
                 window.setF1ScheduleActiveTab('upcoming');
             }
         }
@@ -10474,7 +10476,7 @@ async function fetchFeaturedGames() {
         // Reset schedule sub-tabs (Today/Yesterday/Upcoming) - reset ALL tabs to inactive state
         if (scheduleTabsContainer) {
             const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
-            const yesterdayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="yesterday"]');
+            // const yesterdayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="yesterday"]'); // Commented out
             const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
             
             // Reset ALL tabs to inactive state (both classes and inline styles)
@@ -10694,7 +10696,7 @@ async function fetchFeaturedGames() {
         if (!scheduleTabsContainer) return;
         const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
         const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
-        const yesterdayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="yesterday"]');
+        // const yesterdayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="yesterday"]'); // Commented out
 
         scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => {
             tab.classList.remove('active');
@@ -10713,10 +10715,10 @@ async function fetchFeaturedGames() {
             upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
             upcomingScheduleTab.style.color = '#ccc';
         }
-        if (yesterdayScheduleTab) {
-            yesterdayScheduleTab.style.backgroundColor = '#2a2a2a';
-            yesterdayScheduleTab.style.color = '#ccc';
-        }
+        // if (yesterdayScheduleTab) {
+        //     yesterdayScheduleTab.style.backgroundColor = '#2a2a2a';
+        //     yesterdayScheduleTab.style.color = '#ccc';
+        // }
 
         const todayContent = document.getElementById('league-schedule-today-content');
         const upcomingContent = document.getElementById('league-schedule-upcoming-content');
@@ -13160,6 +13162,8 @@ if (scheduleTabsContainer) {
         document.getElementById('league-schedule-upcoming-content').style.display = 'none';
     });
     
+    // Yesterday tab commented out - functionality not working
+    /*
     yesterdayScheduleTab.addEventListener('click', () => {
         // Remove active class from all tabs and reset styling
         scheduleTabsContainer.querySelectorAll('.schedule-tab').forEach(tab => {
@@ -13189,6 +13193,7 @@ if (scheduleTabsContainer) {
             }
         }
     });
+    */
     
     upcomingScheduleTab.addEventListener('click', (event) => {
         // Remove active class from all tabs and reset styling
