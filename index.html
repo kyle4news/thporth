@@ -2509,7 +2509,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         
         <!-- Schedule Content with padding -->
         <div style="padding: 0 0 1rem 0; flex: 1; display: flex; flex-direction: column;">
-            <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
+            <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto; flex-direction: column;">
+                <!-- Tennis ATP/WTA sub-tabs for Today (only shown for Tennis) -->
+                <div id="tennis-today-tabs" style="display: none; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0; gap: 2px; margin-bottom: 2px;">
+                    <div class="tennis-today-subtab active" data-tennis-today-tab="atp" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">ATP</div>
+                    <div class="tennis-today-subtab" data-tennis-today-tab="wta" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">WTA</div>
+                </div>
+                <div id="tennis-today-atp-content" class="tennis-today-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading ATP schedule...</p></div>
+                <div id="tennis-today-wta-content" class="tennis-today-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading WTA schedule...</p></div>
+                <div id="league-schedule-today-default-content" style="flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
+            </div>
             <div id="league-schedule-yesterday-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading yesterday's scores...</p></div>
             <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto; flex-direction: column;">
                 <!-- Tennis ATP/WTA sub-tabs (only shown for Tennis) -->
@@ -6753,6 +6762,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderGames(container, gamesData, isGroupedByLeague, isYesterdayScores = false) {
         container.innerHTML = "";
+        // Check if this is for Tennis ATP/WTA section
+        const isTennisSection = container && (container.id === 'tennis-today-atp-content' || container.id === 'tennis-today-wta-content' || container.id === 'tennis-upcoming-atp-content' || container.id === 'tennis-upcoming-wta-content');
+        
         // For league Yesterday tabs, show a simple SCORES header instead of league title row
         if (!isGroupedByLeague && isYesterdayScores) {
             const scoresHeader = document.createElement('div');
@@ -6793,7 +6805,8 @@ document.addEventListener('DOMContentLoaded', function () {
         sortedLeagueNames.forEach(leagueNameKey => {
             const games = leagueGroups[leagueNameKey];
             const leagueSection = document.createElement("div");
-            const isCollapsedLeague = isGroupedByLeague && COLLAPSED_LEAGUES.includes(leagueNameKey);
+            // For Tennis section, never collapse leagues
+            const isCollapsedLeague = isGroupedByLeague && !isTennisSection && COLLAPSED_LEAGUES.includes(leagueNameKey);
             let collapsedScoresRow = null;
             const isSpecialNCAALeague = (leagueNameKey === 'NCAAM' || leagueNameKey === 'NCAAW');
             const shouldPrioritizeImportant = isGroupedByLeague && isSpecialNCAALeague;
@@ -6811,66 +6824,76 @@ document.addEventListener('DOMContentLoaded', function () {
                 titleContent.style.alignItems = "center";
                 titleContent.style.gap = "5px";
                 
-                // Add left padding to FEATURED title to match logo spacing
-                if (leagueNameKey === 'FEATURED') {
-                    title.style.paddingLeft = '5px';
+                // Special styling for Tennis sections
+                if (isTennisSection) {
+                    title.style.padding = "3px 0px"; // Minimal padding - only 3px vertical
+                    title.style.fontSize = "12px";
+                    title.style.fontWeight = "normal";
+                    title.style.paddingLeft = "5px";
+                    title.style.paddingRight = "0px";
+                } else {
+                    // Add left padding to FEATURED title to match logo spacing
+                    if (leagueNameKey === 'FEATURED') {
+                        title.style.paddingLeft = '5px';
+                    }
                 }
                 
-                // Add league logo if applicable
-                if (leagueNameKey === "NFL") {
-                    const logo = document.createElement("img");
-                    logo.src = "https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png";
-                    logo.alt = "NFL Logo";
-                    logo.style.width = "14px";
-                    logo.style.height = "14px";
-                    logo.style.objectFit = "contain";
-                    logo.style.marginLeft = "5px";
-                    logo.style.marginRight = "8px";
-                    logo.style.verticalAlign = "middle";
-                    logo.style.display = "inline-block";
-                    logo.style.marginTop = "-2px";
-                    titleContent.appendChild(logo);
-                } else if (leagueNameKey === "Ligue 1") {
-                    const logo = document.createElement("img");
-                    logo.src = "https://static.flashscore.com/res/image/data/tOAXV6hU-QJIQNuDK.png";
-                    logo.alt = "Ligue 1 Logo";
-                    logo.style.width = "14px";
-                    logo.style.height = "14px";
-                    logo.style.objectFit = "contain";
-                    logo.style.marginLeft = "5px";
-                    logo.style.marginRight = "8px";
-                    logo.style.verticalAlign = "middle";
-                    logo.style.display = "inline-block";
-                    logo.style.marginTop = "-2px";
-                    titleContent.appendChild(logo);
-                } else if (leagueNameKey === "CFL") {
-                    const logo = document.createElement("img");
-                    logo.src = "https://github.com/kyle4news/thporth/blob/main/CFL.png?raw=true";
-                    logo.alt = "CFL Logo";
-                    logo.style.width = "14px";
-                    logo.style.height = "14px";
-                    logo.style.objectFit = "contain";
-                    logo.style.marginLeft = "5px";
-                    logo.style.marginRight = "8px";
-                    logo.style.verticalAlign = "middle";
-                    logo.style.display = "inline-block";
-                    logo.style.marginTop = "-2px";
-                    titleContent.appendChild(logo);
-                } else if (leagueNameKey === "Super Lig") {
-                    const logo = document.createElement("img");
-                    logo.src = "https://github.com/kyle4news/thporth/blob/main/Super%20lig.png?raw=true";
-                    logo.alt = "Super Lig Logo";
-                    logo.style.width = "14px";
-                    logo.style.height = "14px";
-                    logo.style.objectFit = "contain";
-                    logo.style.marginLeft = "5px";
-                    logo.style.marginRight = "8px";
-                    logo.style.verticalAlign = "middle";
-                    logo.style.display = "inline-block";
-                    logo.style.marginTop = "-2px";
-                    titleContent.appendChild(logo);
-                } else if (leagueNameKey === "UEFA Europa League") {
-                    const logo = document.createElement("img");
+                // Add league logo if applicable (skip for Tennis sections)
+                if (!isTennisSection) {
+                    if (leagueNameKey === "NFL") {
+                        const logo = document.createElement("img");
+                        logo.src = "https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png";
+                        logo.alt = "NFL Logo";
+                        logo.style.width = "14px";
+                        logo.style.height = "14px";
+                        logo.style.objectFit = "contain";
+                        logo.style.marginLeft = "5px";
+                        logo.style.marginRight = "8px";
+                        logo.style.verticalAlign = "middle";
+                        logo.style.display = "inline-block";
+                        logo.style.marginTop = "-2px";
+                        titleContent.appendChild(logo);
+                    } else if (leagueNameKey === "Ligue 1") {
+                        const logo = document.createElement("img");
+                        logo.src = "https://static.flashscore.com/res/image/data/tOAXV6hU-QJIQNuDK.png";
+                        logo.alt = "Ligue 1 Logo";
+                        logo.style.width = "14px";
+                        logo.style.height = "14px";
+                        logo.style.objectFit = "contain";
+                        logo.style.marginLeft = "5px";
+                        logo.style.marginRight = "8px";
+                        logo.style.verticalAlign = "middle";
+                        logo.style.display = "inline-block";
+                        logo.style.marginTop = "-2px";
+                        titleContent.appendChild(logo);
+                    } else if (leagueNameKey === "CFL") {
+                        const logo = document.createElement("img");
+                        logo.src = "https://github.com/kyle4news/thporth/blob/main/CFL.png?raw=true";
+                        logo.alt = "CFL Logo";
+                        logo.style.width = "14px";
+                        logo.style.height = "14px";
+                        logo.style.objectFit = "contain";
+                        logo.style.marginLeft = "5px";
+                        logo.style.marginRight = "8px";
+                        logo.style.verticalAlign = "middle";
+                        logo.style.display = "inline-block";
+                        logo.style.marginTop = "-2px";
+                        titleContent.appendChild(logo);
+                    } else if (leagueNameKey === "Super Lig") {
+                        const logo = document.createElement("img");
+                        logo.src = "https://github.com/kyle4news/thporth/blob/main/Super%20lig.png?raw=true";
+                        logo.alt = "Super Lig Logo";
+                        logo.style.width = "14px";
+                        logo.style.height = "14px";
+                        logo.style.objectFit = "contain";
+                        logo.style.marginLeft = "5px";
+                        logo.style.marginRight = "8px";
+                        logo.style.verticalAlign = "middle";
+                        logo.style.display = "inline-block";
+                        logo.style.marginTop = "-2px";
+                        titleContent.appendChild(logo);
+                    } else if (leagueNameKey === "UEFA Europa League") {
+                        const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png";
                     logo.alt = "UEFA Europa League Logo";
                     logo.style.width = "14px";
@@ -7675,6 +7698,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     titleContent.appendChild(logo);
+                    }
                 }
                 
                 const titleText = document.createElement("span");
@@ -10569,6 +10593,62 @@ async function fetchFeaturedGames() {
             return;
         }
         
+        // Special handling for Tennis - show ATP/WTA sub-tabs for Today tab
+        const isTennis = leagueKey === 'Tennis';
+        const tennisTodayTabs = document.getElementById('tennis-today-tabs');
+        const tennisTodayAtpContent = document.getElementById('tennis-today-atp-content');
+        const tennisTodayWtaContent = document.getElementById('tennis-today-wta-content');
+        const todayDefaultContent = document.getElementById('league-schedule-today-default-content');
+        
+        if (isTennis && tennisTodayTabs && tennisTodayAtpContent && tennisTodayWtaContent) {
+            tennisTodayTabs.style.display = 'flex';
+            tennisTodayAtpContent.style.display = 'block';
+            tennisTodayWtaContent.style.display = 'none';
+            if (todayDefaultContent) {
+                todayDefaultContent.style.display = 'none';
+            }
+            
+            // Add click handlers for Today sub-tabs
+            const atpTodayTab = tennisTodayTabs.querySelector('[data-tennis-today-tab="atp"]');
+            const wtaTodayTab = tennisTodayTabs.querySelector('[data-tennis-today-tab="wta"]');
+            
+            if (atpTodayTab && wtaTodayTab) {
+                // Remove existing listeners by cloning
+                const newAtpTodayTab = atpTodayTab.cloneNode(true);
+                const newWtaTodayTab = wtaTodayTab.cloneNode(true);
+                atpTodayTab.parentNode.replaceChild(newAtpTodayTab, atpTodayTab);
+                wtaTodayTab.parentNode.replaceChild(newWtaTodayTab, wtaTodayTab);
+                
+                newAtpTodayTab.addEventListener('click', () => {
+                    newAtpTodayTab.classList.add('active');
+                    newAtpTodayTab.style.color = '#fff';
+                    newAtpTodayTab.style.borderBottom = '2px solid #fff';
+                    newWtaTodayTab.classList.remove('active');
+                    newWtaTodayTab.style.color = '#ccc';
+                    newWtaTodayTab.style.borderBottom = 'none';
+                    tennisTodayAtpContent.style.display = 'block';
+                    tennisTodayWtaContent.style.display = 'none';
+                });
+                
+                newWtaTodayTab.addEventListener('click', () => {
+                    newWtaTodayTab.classList.add('active');
+                    newWtaTodayTab.style.color = '#fff';
+                    newWtaTodayTab.style.borderBottom = '2px solid #fff';
+                    newAtpTodayTab.classList.remove('active');
+                    newAtpTodayTab.style.color = '#ccc';
+                    newAtpTodayTab.style.borderBottom = 'none';
+                    tennisTodayWtaContent.style.display = 'block';
+                    tennisTodayAtpContent.style.display = 'none';
+                });
+            }
+        } else if (!isTennis) {
+            // Hide Tennis sub-tabs for non-Tennis leagues
+            if (tennisTodayTabs) tennisTodayTabs.style.display = 'none';
+            if (tennisTodayAtpContent) tennisTodayAtpContent.style.display = 'none';
+            if (tennisTodayWtaContent) tennisTodayWtaContent.style.display = 'none';
+            if (todayDefaultContent) todayDefaultContent.style.display = 'block';
+        }
+        
         // Reset schedule sub-tabs (Today/Yesterday/Upcoming) - reset ALL tabs to inactive state
         if (scheduleTabsContainer) {
             const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
@@ -10588,7 +10668,12 @@ async function fetchFeaturedGames() {
         }
 
         // Load TODAY schedule - use real-time listener for live score updates
-        todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
+        if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+            tennisTodayAtpContent.innerHTML = '<p style="color: #9ca3af;">Loading ATP schedule...</p>';
+            tennisTodayWtaContent.innerHTML = '<p style="color: #9ca3af;">Loading WTA schedule...</p>';
+        } else {
+            todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
+        }
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/Denver').toISODate();
         
@@ -10617,14 +10702,24 @@ async function fetchFeaturedGames() {
                     // Try one-time fallback check for scheduledDate
                     gamesCollectionRef.where('scheduledDate', '==', todayStr).get().then(fallbackSnapshot => {
                         if (fallbackSnapshot.empty) {
-                            todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                            if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                                tennisTodayAtpContent.innerHTML = `<p>No ATP games found for today.</p>`;
+                                tennisTodayWtaContent.innerHTML = `<p>No WTA games found for today.</p>`;
+                            } else {
+                                todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                            }
                             handleNoTodayGames();
                         } else {
                             processGames(fallbackSnapshot);
                         }
                     }).catch(err => {
                         console.error('Error loading today\'s schedule (fallback):', err);
-                        todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
+                        if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                            tennisTodayAtpContent.innerHTML = '<p style="color: #ef4444;">Error loading ATP schedule.</p>';
+                            tennisTodayWtaContent.innerHTML = '<p style="color: #ef4444;">Error loading WTA schedule.</p>';
+                        } else {
+                            todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
+                        }
                     });
                     return;
                 }
@@ -10632,11 +10727,21 @@ async function fetchFeaturedGames() {
                 processGames(snapshot);
             } catch (error) {
                 console.error('Error loading today\'s schedule:', error);
-                todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
+                if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                    tennisTodayAtpContent.innerHTML = '<p style="color: #ef4444;">Error loading ATP schedule.</p>';
+                    tennisTodayWtaContent.innerHTML = '<p style="color: #ef4444;">Error loading WTA schedule.</p>';
+                } else {
+                    todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
+                }
             }
         }, err => {
             console.error('Error loading today\'s schedule:', err);
-            todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
+            if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                tennisTodayAtpContent.innerHTML = '<p style="color: #ef4444;">Error loading ATP schedule.</p>';
+                tennisTodayWtaContent.innerHTML = '<p style="color: #ef4444;">Error loading WTA schedule.</p>';
+            } else {
+                todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
+            }
         });
         
         // Helper function to process and filter games
@@ -10660,6 +10765,15 @@ async function fetchFeaturedGames() {
                     }
                     // FlashLive sometimes lists Formula 1 sessions under "Motorsport" with GP names
                     if (sportLower === 'motorsport' && leagueNameLower.includes('grand prix')) {
+                        return true;
+                    }
+                }
+
+                // Special handling for Tennis - match any league name that contains "ATP" or "WTA" and Sport is "Tennis"
+                if (leagueKey === 'Tennis') {
+                    const leagueNameLower = gameLeague.toLowerCase();
+                    const sportLower = (game.Sport || '').toLowerCase();
+                    if (sportLower === 'tennis' && (leagueNameLower.includes('atp') || leagueNameLower.includes('wta'))) {
                         return true;
                     }
                 }
@@ -10738,7 +10852,12 @@ async function fetchFeaturedGames() {
             });
 
             if (filteredGamesData.length === 0) {
-                todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                    tennisTodayAtpContent.innerHTML = `<p>No ATP games found for today.</p>`;
+                    tennisTodayWtaContent.innerHTML = `<p>No WTA games found for today.</p>`;
+                } else {
+                    todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                }
                 handleNoTodayGames();
                 return;
             }
@@ -10762,8 +10881,37 @@ async function fetchFeaturedGames() {
             if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
             activateMainTab('schedule');
             
-            const sortedGames = filteredGamesData.sort(sortGames);
-            renderGames(todayScheduleContent, sortedGames, false);
+            // Special handling for Tennis - separate ATP and WTA games
+            if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                const atpGames = filteredGamesData.filter(game => {
+                    const leagueName = (game.League || '').toLowerCase();
+                    return leagueName.includes('atp');
+                });
+                const wtaGames = filteredGamesData.filter(game => {
+                    const leagueName = (game.League || '').toLowerCase();
+                    return leagueName.includes('wta');
+                });
+                
+                const sortedAtpGames = atpGames.sort(sortGames);
+                const sortedWtaGames = wtaGames.sort(sortGames);
+                
+                if (sortedAtpGames.length > 0) {
+                    // Use isGroupedByLeague: true to show league headers (e.g., "ATP Finals (Singles)", "ATP Finals (Doubles)")
+                    renderGames(tennisTodayAtpContent, sortedAtpGames, true);
+                } else {
+                    tennisTodayAtpContent.innerHTML = `<p>No ATP games found for today.</p>`;
+                }
+                
+                if (sortedWtaGames.length > 0) {
+                    // Use isGroupedByLeague: true to show league headers
+                    renderGames(tennisTodayWtaContent, sortedWtaGames, true);
+                } else {
+                    tennisTodayWtaContent.innerHTML = `<p>No WTA games found for today.</p>`;
+                }
+            } else {
+                const sortedGames = filteredGamesData.sort(sortGames);
+                renderGames(todayScheduleContent, sortedGames, false);
+            }
         }
 
         // Load UPCOMING schedule
