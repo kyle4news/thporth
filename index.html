@@ -2526,11 +2526,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- Standings Tab Content (hidden by default) -->
     <div id="standings-tab-content" class="main-tab-content" style="display: none; padding: 5px; height: calc(100% - 18px); flex-direction: column; overflow-y: auto;">
-        <!-- NCAA Standings Sub-Tabs (Top 25, Standings) - only for NCAAF, NCAAM, NCAAW -->
+        <!-- NCAA Standings Sub-Tabs (CFP for NCAAF only, Top 25, Standings) - only for NCAAF, NCAAM, NCAAW -->
         <div id="ncaa-standings-tabs" style="display: none; height: 18px; background-color: #2a2a2a; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%; gap: 2px;">
-            <div class="ncaa-standings-tab active" data-ncaa-standings-tab="top25" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Top 25</div>
+            <div class="ncaa-standings-tab active" data-ncaa-standings-tab="cfp" id="ncaa-cfp-tab" style="display: none; flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">CFP</div>
+            <div class="ncaa-standings-tab" data-ncaa-standings-tab="top25" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Top 25</div>
             <div class="ncaa-standings-tab" data-ncaa-standings-tab="standings" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Standings</div>
         </div>
+        
+        <!-- CFP Content (only for NCAAF) -->
+        <div id="league-cfp-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">CFP rankings coming soon...</p></div>
         
         <!-- Top 25 Content (active by default for NCAA leagues) -->
         <div id="league-top25-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading Top 25...</p></div>
@@ -10341,40 +10345,77 @@ async function fetchFeaturedGames() {
             leagueTodayGamesUnsubscribe = null;
         }
         
-        // Show/hide NCAA standings sub-tabs (Top 25, Standings) for NCAAF, NCAAM, NCAAW
+        // Show/hide NCAA standings sub-tabs (CFP for NCAAF only, Top 25, Standings) for NCAAF, NCAAM, NCAAW
         const isNCALeague = ['NCAAF', 'NCAAM', 'NCAAW'].includes(leagueKey);
         const ncaaStandingsTabs = document.getElementById('ncaa-standings-tabs');
         const top25Content = document.getElementById('league-top25-content');
         const standingsContentOnly = document.getElementById('league-standings-content');
+        const cfpContent = document.getElementById('league-cfp-content');
+        const cfpTab = document.getElementById('ncaa-cfp-tab');
         
         if (ncaaStandingsTabs) {
             ncaaStandingsTabs.style.display = isNCALeague ? 'flex' : 'none';
+        }
+        
+        // Show CFP tab only for NCAAF
+        if (cfpTab) {
+            if (leagueKey === 'NCAAF') {
+                cfpTab.style.display = ''; // Remove display: none to make it a flex item
+            } else {
+                cfpTab.style.display = 'none';
+            }
         }
         
         if (isNCALeague) {
             // Load Top 25 rankings cache for this league
             loadTop25RankingsCache(leagueKey);
             
-            // Set Top 25 tab as active by default
+            // Set CFP tab as active by default for NCAAF, Top 25 for others
             const top25Tab = ncaaStandingsTabs.querySelector('.ncaa-standings-tab[data-ncaa-standings-tab="top25"]');
             const standingsTab = ncaaStandingsTabs.querySelector('.ncaa-standings-tab[data-ncaa-standings-tab="standings"]');
             
-            if (top25Tab && standingsTab) {
-                top25Tab.classList.add('active');
-                top25Tab.style.color = '#fff';
-                top25Tab.style.borderBottom = '2px solid #fff';
-                standingsTab.classList.remove('active');
-                standingsTab.style.color = '#ccc';
-                standingsTab.style.borderBottom = 'none';
+            if (leagueKey === 'NCAAF' && cfpTab) {
+                // For NCAAF, set CFP tab as active by default
+                cfpTab.classList.add('active');
+                cfpTab.style.color = '#fff';
+                cfpTab.style.borderBottom = '2px solid #fff';
+                if (top25Tab) {
+                    top25Tab.classList.remove('active');
+                    top25Tab.style.color = '#ccc';
+                    top25Tab.style.borderBottom = 'none';
+                }
+                if (standingsTab) {
+                    standingsTab.classList.remove('active');
+                    standingsTab.style.color = '#ccc';
+                    standingsTab.style.borderBottom = 'none';
+                }
+                // Show CFP content, hide other content
+                if (cfpContent) {
+                    cfpContent.style.display = 'block';
+                    loadCFPData();
+                }
+                if (top25Content) top25Content.style.display = 'none';
+                if (standingsContentOnly) standingsContentOnly.style.display = 'none';
+            } else {
+                // For NCAAM and NCAAW, set Top 25 tab as active by default
+                if (top25Tab && standingsTab) {
+                    top25Tab.classList.add('active');
+                    top25Tab.style.color = '#fff';
+                    top25Tab.style.borderBottom = '2px solid #fff';
+                    standingsTab.classList.remove('active');
+                    standingsTab.style.color = '#ccc';
+                    standingsTab.style.borderBottom = 'none';
+                }
+                // Show Top 25 content, hide other content
+                if (top25Content) top25Content.style.display = 'block';
+                if (standingsContentOnly) standingsContentOnly.style.display = 'none';
+                if (cfpContent) cfpContent.style.display = 'none';
             }
-            
-            // Show Top 25 content, hide standings content
-            if (top25Content) top25Content.style.display = 'block';
-            if (standingsContentOnly) standingsContentOnly.style.display = 'none';
         } else {
             // For non-NCAA leagues, show standings content only
             if (top25Content) top25Content.style.display = 'none';
             if (standingsContentOnly) standingsContentOnly.style.display = 'block';
+            if (cfpContent) cfpContent.style.display = 'none';
         }
         
         // Hide yesterday content when loading new league
@@ -12802,25 +12843,58 @@ if (mainTabsContainer) {
                 const ncaaStandingsTabs = document.getElementById('ncaa-standings-tabs');
                 const top25Tab = ncaaStandingsTabs ? ncaaStandingsTabs.querySelector('.ncaa-standings-tab[data-ncaa-standings-tab="top25"]') : null;
                 const standingsTab = ncaaStandingsTabs ? ncaaStandingsTabs.querySelector('.ncaa-standings-tab[data-ncaa-standings-tab="standings"]') : null;
+                const cfpTab = document.getElementById('ncaa-cfp-tab');
                 const top25Content = document.getElementById('league-top25-content');
                 const standingsContentOnly = document.getElementById('league-standings-content');
+                const cfpContent = document.getElementById('league-cfp-content');
                 
-                if (top25Tab && standingsTab) {
-                    // Activate Top 25 tab
+                // Show CFP tab only for NCAAF
+                if (cfpTab) {
+                    if (leagueKey === 'NCAAF') {
+                        cfpTab.style.display = ''; // Remove display: none to make it a flex item
+                    } else {
+                        cfpTab.style.display = 'none';
+                    }
+                }
+                
+                if (leagueKey === 'NCAAF' && cfpTab) {
+                    // For NCAAF, activate CFP tab by default
+                    cfpTab.classList.add('active');
+                    cfpTab.style.color = '#fff';
+                    cfpTab.style.borderBottom = '2px solid #fff';
+                    if (top25Tab) {
+                        top25Tab.classList.remove('active');
+                        top25Tab.style.color = '#ccc';
+                        top25Tab.style.borderBottom = 'none';
+                    }
+                    if (standingsTab) {
+                        standingsTab.classList.remove('active');
+                        standingsTab.style.color = '#ccc';
+                        standingsTab.style.borderBottom = 'none';
+                    }
+                    // Show CFP content, hide other content
+                    if (cfpContent) {
+                        cfpContent.style.display = 'block';
+                        loadCFPData();
+                    }
+                    if (top25Content) top25Content.style.display = 'none';
+                    if (standingsContentOnly) standingsContentOnly.style.display = 'none';
+                } else if (top25Tab && standingsTab) {
+                    // For NCAAM and NCAAW, activate Top 25 tab by default
                     top25Tab.classList.add('active');
                     top25Tab.style.color = '#fff';
                     top25Tab.style.borderBottom = '2px solid #fff';
                     standingsTab.classList.remove('active');
                     standingsTab.style.color = '#ccc';
                     standingsTab.style.borderBottom = 'none';
+                    // Show Top 25 content, hide other content
+                    if (top25Content) {
+                        top25Content.style.display = 'block';
+                        loadTop25Data(leagueKey);
+                    }
+                    if (standingsContentOnly) standingsContentOnly.style.display = 'none';
+                    if (cfpContent) cfpContent.style.display = 'none';
                 }
-                
-                // Show Top 25 content, hide standings content
-                if (top25Content) {
-                    top25Content.style.display = 'block';
-                    loadTop25Data(leagueKey);
-                }
-                if (standingsContentOnly) standingsContentOnly.style.display = 'none';
             } else {
                 // For non-NCAA leagues, load standings normally
                 if (leagueKey) {
@@ -12865,15 +12939,25 @@ if (ncaaStandingsTabsContainer) {
         // Show/hide content
         const top25Content = document.getElementById('league-top25-content');
         const standingsContentOnly = document.getElementById('league-standings-content');
+        const cfpContent = document.getElementById('league-cfp-content');
         
-        if (tabType === 'top25') {
+        if (tabType === 'cfp') {
+            if (cfpContent) {
+                cfpContent.style.display = 'block';
+                loadCFPData();
+            }
+            if (top25Content) top25Content.style.display = 'none';
+            if (standingsContentOnly) standingsContentOnly.style.display = 'none';
+        } else if (tabType === 'top25') {
             if (top25Content) {
                 top25Content.style.display = 'block';
                 loadTop25Data(leagueKey);
             }
             if (standingsContentOnly) standingsContentOnly.style.display = 'none';
+            if (cfpContent) cfpContent.style.display = 'none';
         } else if (tabType === 'standings') {
             if (top25Content) top25Content.style.display = 'none';
+            if (cfpContent) cfpContent.style.display = 'none';
             if (standingsContentOnly) {
                 standingsContentOnly.style.display = 'block';
                 const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
@@ -13128,6 +13212,75 @@ function createTop25Table(teams, leagueKey) {
         } else {
             html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + (team.Top25Points || '') + '</td>';
         }
+        html += '</tr>';
+    });
+    
+    html += '</tbody></table></div>';
+    return html;
+}
+
+// --- CFP DATA LOADING AND DISPLAY FUNCTIONS ---
+async function loadCFPData() {
+    const cfpContent = document.getElementById('league-cfp-content');
+    if (!cfpContent) return;
+    
+    cfpContent.innerHTML = '<p style="color: #9ca3af;">Loading CFP rankings...</p>';
+    
+    try {
+        // Get all documents from CFP collection
+        const snapshot = await db.collection('CFP').get();
+        
+        if (snapshot.empty) {
+            cfpContent.innerHTML = '<p style="color: #9ca3af;">No CFP rankings available.</p>';
+            return;
+        }
+        
+        // Convert to array and sort by Rk
+        const rankings = snapshot.docs
+            .map(doc => doc.data())
+            .sort((a, b) => {
+                const rankA = parseInt(a.Rk) || 999;
+                const rankB = parseInt(b.Rk) || 999;
+                return rankA - rankB;
+            });
+        
+        if (rankings.length === 0) {
+            cfpContent.innerHTML = '<p style="color: #9ca3af;">No CFP rankings available.</p>';
+            return;
+        }
+        
+        const html = createCFPTable(rankings);
+        cfpContent.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error loading CFP data:', error);
+        cfpContent.innerHTML = '<p style="color: #ef4444;">Error loading CFP rankings.</p>';
+    }
+}
+
+function createCFPTable(rankings) {
+    let html = '<div class="cfp-standings" style="color: #ffffff;">';
+    html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; table-layout: fixed;">';
+    html += '<colgroup>';
+    html += '<col style="width: 50px;">';
+    html += '<col style="width: auto;">';
+    html += '<col style="width: 100px;">';
+    html += '</colgroup>';
+    html += '<thead>';
+    html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
+    html += '<th style="padding: 8px; text-align: center; border-bottom: 1px solid #666;">Rk</th>';
+    html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
+    html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Record</th>';
+    html += '</tr>';
+    html += '</thead>';
+    html += '<tbody>';
+    
+    rankings.forEach((ranking, index) => {
+        const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+        html += '<tr style="' + rowStyle + '">';
+        html += '<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff;">' + (ranking.Rk || '') + '</td>';
+        html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + (ranking.Team || '') + '</td>';
+        html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + (ranking.Record || '') + '</td>';
         html += '</tr>';
     });
     
