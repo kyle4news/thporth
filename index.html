@@ -111,7 +111,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 }
 .league-title { /* Renamed from .league-header to .league-title for clarity within this context */
     font-size: 14px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.25rem;
     border-bottom: 2px solid #555;
     padding-bottom: 0.3rem;
     padding-left: 10px;
@@ -263,6 +263,11 @@ table.game-table td:nth-child(1) {
     white-space: pre;
     display: block;
     height: 30px;
+}
+/* Remove the pseudo-gap if the separator is the first row in the table (after spacer) */
+.game-table > tbody > tr.game-separator:first-of-type::after,
+.game-table > tbody > tr.game-separator:nth-child(2)::after {
+    display: none;
 }
 .atp-doubles-spacer {
     height: 1.5em;
@@ -4958,7 +4963,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'WORLD: LPGA TOUR', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "Formula 1", "NCAAF", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "NCAAM", "NCAAW", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "AFC Qualifiers", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "NCAAM", "NCAAW", "PGA Tour", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "Campeones Cup", "EFL Cup", "Copa del Rey", "LPGA Tour", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "AFC Qualifiers", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         NFL: "https://www.nfl.com/scores",
@@ -7836,6 +7841,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     subTable.style.tableLayout = "fixed";
                     
                     const subColgroup = document.createElement("colgroup");
+                    // Normal leagues: 4 columns
                     subColgroup.innerHTML = `
                         <col style="width: 32%;">
                         <col style="width: 32%;">
@@ -7845,7 +7851,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     subTable.appendChild(subColgroup);
                     
                     const spacerRow = subTable.insertRow();
-                    spacerRow.innerHTML = '<td colspan="4" style="height: 5px; padding: 0; border: none;"></td>';
+                    spacerRow.innerHTML = `<td colspan="4" style="height: 5px; padding: 0; border: none;"></td>`;
                     
                     leagueSection.appendChild(subTable);
                     return subTable;
@@ -7995,6 +8001,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // Add colgroup with percentage widths to work in both contexts
             const colgroup = document.createElement("colgroup");
+            // Normal leagues: 4 columns
             colgroup.innerHTML = `
                 <col style="width: 32%;">   <!-- time -->
                 <col style="width: 32%;">  <!-- team -->
@@ -8010,9 +8017,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Add spacer row for 5px top padding
             const spacerRow = table.insertRow();
-            spacerRow.innerHTML = '<td colspan="4" style="height: 5px; padding: 0; border: none;"></td>';
+            spacerRow.innerHTML = `<td colspan="4" style="height: 5px; padding: 0; border: none;"></td>`;
 
-            games.forEach(data => {
+            // Process games - handle Boxing separately if needed
+            for (let i = 0; i < games.length; i++) {
+                const data = games[i];
                 const displayLeague = getLeagueDisplayName(data.League, data.Sport);
                 const leagueKey = getLeagueKeyFromGame(data);
                 const homeDisplay = getTeamDisplayName(data["Home Team"] || "", displayLeague);
@@ -8171,7 +8180,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     spacerRow.className = "atp-doubles-spacer";
                     spacerRow.innerHTML = '<td colspan="4" style="height: 1.5em; padding: 0; border: none; line-height: 0;"></td>';
                 }
-            });
+            }
             
             if (shouldPrioritizeImportant) {
                 if (hasHiddenGames) {
@@ -12185,17 +12194,6 @@ async function fetchFeaturedGames() {
             
             // Sort games by time within each date for ALL leagues
             const sortedGames = gamesByDate[dateHeader].sort((a, b) => {
-                // Special sorting for Boxing: group by event first, then by time
-                if (leagueKey === 'Boxing') {
-                    const eventA = a.away || ''; // awayField = 'event'
-                    const eventB = b.away || '';
-                    
-                    // First sort by event name
-                    if (eventA !== eventB) {
-                        return eventA.localeCompare(eventB);
-                    }
-                }
-                
                 // Parse time strings to compare them
                 const timeA = a.time || '';
                 const timeB = b.time || '';
