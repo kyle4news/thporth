@@ -5014,7 +5014,15 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/[^a-z0-9]/g, '');
     }
 
-    const IMPORTANT_NCAA_TEAMS = (() => {
+    // Helper function to create a Set from team names
+    function createImportantTeamsSet(names) {
+        const set = new Set();
+        names.forEach(name => set.add(normalizeNcaaTeamName(name)));
+        return set;
+    }
+
+    // Important teams for NCAAM (Men's Basketball)
+    const IMPORTANT_NCAAM_TEAMS = (() => {
         const names = [
             "Air Force",
             "Alabama",
@@ -5112,19 +5120,226 @@ document.addEventListener('DOMContentLoaded', function () {
             "Wichita St",
             "Xavier"
         ];
-        const set = new Set();
-        names.forEach(name => set.add(normalizeNcaaTeamName(name)));
-        return set;
+        return createImportantTeamsSet(names);
     })();
 
-    function isImportantNcaaTeamName(name) {
-        return IMPORTANT_NCAA_TEAMS.has(normalizeNcaaTeamName(name));
+    // Important teams for NCAAW (Women's Basketball)
+    const IMPORTANT_NCAAW_TEAMS = (() => {
+        const names = [
+            // Add your important NCAAW teams here
+            // For now, using same list as NCAAM - you can customize this
+            "Air Force",
+            "Alabama",
+            "Arizona",
+            "Arizona St",
+            "Arkansas",
+            "Auburn",
+            "Boston College",
+            "Baylor",
+            "Boise St",
+            "BYU",
+            "California",
+            "Cincinnati",
+            "Charlotte",
+            "Clemson",
+            "Colorado",
+            "Colorado St",
+            "Creighton",
+            "DePaul",
+            "Duke",
+            "East Carolina",
+            "FAU",
+            "Florida",
+            "Florida St",
+            "Fresno St",
+            "Georgetown",
+            "Georgia",
+            "Georgia Tech",
+            "Grand Canyon",
+            "Houston",
+            "Illinois",
+            "Indiana",
+            "Iowa",
+            "Iowa State",
+            "Kansas",
+            "Kansas St",
+            "Kentucky",
+            "LSU",
+            "Louisville",
+            "Marquette",
+            "Maryland",
+            "Memphis",
+            "Michigan",
+            "Michigan St",
+            "Minnesota",
+            "Mississippi St",
+            "Missouri",
+            "NC State",
+            "Nevada",
+            "New Mexico",
+            "North Carolina",
+            "North Texas",
+            "Northwestern",
+            "Notre Dame",
+            "Ohio State",
+            "Oklahoma",
+            "Oklahoma St",
+            "Ole Miss",
+            "Penn State",
+            "Pitt",
+            "Providence",
+            "Rice",
+            "Rutgers",
+            "San Diego St",
+            "San José St",
+            "SMU",
+            "South Carolina",
+            "South Florida",
+            "St John's",
+            "Stanford",
+            "Syracuse",
+            "TCU",
+            "Temple",
+            "Tennessee",
+            "Texas",
+            "Texas A&M",
+            "Texas Tech",
+            "Tulane",
+            "Tulsa",
+            "UAB",
+            "UCF",
+            "UCLA",
+            "UNLV",
+            "USC",
+            "Utah",
+            "Utah State",
+            "Vanderbilt",
+            "Villanova",
+            "Virginia",
+            "Virginia Tech",
+            "Wake Forest",
+            "Washington",
+            "West Virginia",
+            "Wisconsin",
+            "Wichita St",
+            "Xavier"
+        ];
+        return createImportantTeamsSet(names);
+    })();
+
+    // Important teams for NCAAF (Football)
+    const IMPORTANT_NCAAF_TEAMS = (() => {
+        const names = [
+            "GA Tech",
+            "Virginia",
+            "Pittsburgh",
+            "Southern Methodist",
+            "Duke",
+            "Miami (FL)",
+            "Louisville",
+            "Wake Forest",
+            "California",
+            "Clemson",
+            "NC State",
+            "North Carolina",
+            "Virginia Tech",
+            "Stanford",
+            "Florida State",
+            "Syracuse",
+            "Boston Coll",
+            "Navy",
+            "North Texas",
+            "USF",
+            "Tulane",
+            "East Carolina",
+            "Memphis",
+            "Army",
+            "Temple",
+            "FAU",
+            "UTSA",
+            "Rice",
+            "UAB",
+            "Tulsa",
+            "Charlotte",
+            "Texas Tech",
+            "Brigham Young",
+            "Cincinnati",
+            "Houston",
+            "Utah",
+            "Arizona State",
+            "Arizona",
+            "TCU",
+            "Baylor",
+            "Kansas State",
+            "Iowa State",
+            "Kansas",
+            "West Virginia",
+            "UCF",
+            "Colorado Buffaloes",
+            "OK State",
+            "Indiana",
+            "Ohio State",
+            "Oregon",
+            "USC",
+            "Michigan",
+            "Iowa",
+            "Nebraska",
+            "Minnesota",
+            "Illinois",
+            "Washington",
+            "Northwestern",
+            "UCLA",
+            "Rutgers",
+            "Maryland",
+            "Wisconsin",
+            "Penn State",
+            "Mich St",
+            "Purdue",
+            "Notre Dame",
+            "Connecticut",
+            "Wash St",
+            "Oregon State",
+            "Texas A&M",
+            "Alabama",
+            "Georgia",
+            "Ole Miss",
+            "Texas",
+            "Vanderbilt",
+            "Oklahoma",
+            "Tennessee",
+            "Missouri",
+            "LSU",
+            "Florida Gators",
+            "Kentucky",
+            "Mississippi St",
+            "Auburn",
+            "S Carolina",
+            "Arkansas"
+        ];
+        return createImportantTeamsSet(names);
+    })();
+
+    function isImportantNcaaTeamName(name, leagueKey) {
+        if (!leagueKey) return false;
+        
+        let teamSet;
+        if (leagueKey === 'NCAAM') {
+            teamSet = IMPORTANT_NCAAM_TEAMS;
+        } else if (leagueKey === 'NCAAW') {
+            teamSet = IMPORTANT_NCAAW_TEAMS;
+        } else if (leagueKey === 'NCAAF') {
+            teamSet = IMPORTANT_NCAAF_TEAMS;
+        } else {
+            return false;
+        }
+        
+        return teamSet.has(normalizeNcaaTeamName(name));
     }
 
     function isImportantNcaaGame(homeTeamName, awayTeamName, leagueKey, gameData) {
-        if (!leagueKey || (leagueKey !== 'NCAAM' && leagueKey !== 'NCAAW')) return false;
+        if (!leagueKey || (leagueKey !== 'NCAAM' && leagueKey !== 'NCAAW' && leagueKey !== 'NCAAF')) return false;
         
-        if (isImportantNcaaTeamName(homeTeamName) || isImportantNcaaTeamName(awayTeamName)) {
+        if (isImportantNcaaTeamName(homeTeamName, leagueKey) || isImportantNcaaTeamName(awayTeamName, leagueKey)) {
             return true;
         }
 
@@ -5389,6 +5604,16 @@ document.addEventListener('DOMContentLoaded', function () {
             return "Formula 1";
         }
         
+        // Fuzzy logic matching for ATP Finals - check if name contains "Finals" AND "ATP" AND "(Singles)" or "(Doubles)"
+        if (name && name.includes("Finals") && name.includes("ATP")) {
+            if (name.includes("(Singles)")) {
+                return "ATP Finals (Singles)";
+            }
+            if (name.includes("(Doubles)")) {
+                return "ATP Finals (Doubles)";
+            }
+        }
+        
         // Special handling for qualification leagues - use prefix matching
         if (name && name.includes("Africa: World Cup - Qualification")) {
             return "CAF Qualifiers";
@@ -5406,7 +5631,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return "CONCACAF Qualifiers";
         }
         
-        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: NBA": "NBA", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: MLS - Play Offs": "MLS", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Spain: Copa del Rey": "Copa del Rey", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup", "England: FA Cup": "FA Cup", "England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "Belgium: Jupiler Pro League": "Belgian Pro League", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "Asia: AFC Asian Cup - Qualification - Third round": "AFC Asian Cup Qualifiers", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "Women's UCL", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Europe: Conference League - League phase": "UEFA Conference League", "Europe: Champions League Women - League phase": "Women's UCL", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera", "Argentina: Torneo Betano - Apertura": "Argentine Primera", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership", "World: World Cup U20": "FIFA U-20 World Cup", "North & Central America: Campeones Cup": "Campeones Cup", "World: ICC World Cup Women": "Women's Cricket World Cup", "World: Test Series": "ICC Test Series", "World: One Day International": "ODI", "World: Twenty20 International": "T20 International", "USA: NBA - Pre-season": "NBA Preseason", "USA: USL Championship": "USL Championship", "World: World Cup U20 - Play Offs": "FIFA U-20 World Cup", "USA: MLB - Play Offs": "MLB", "Canada: OHL": "OHL", "USA: NCAA Hockey": "NCAA Men's Hockey", "World: Friendly International": "International Friendly", "World: World Cup U17": "FIFA U-17 World Cup", "World: World Cup U17 - Play Offs": "FIFA U-17 World Cup", "World: Finals - Turin ATP, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles, hard (indoor)": "ATP Finals (Doubles)" };
+        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: NBA": "NBA", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: MLS - Play Offs": "MLS", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "USA: NWSL Women - Play Offs": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Spain: Copa del Rey": "Copa del Rey", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "England: EFL Cup": "EFL Cup", "England: FA Cup": "FA Cup", "England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "Belgium: Jupiler Pro League": "Belgian Pro League", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "Asia: AFC Asian Cup - Qualification - Third round": "AFC Asian Cup Qualifiers", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "Women's UCL", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Europe: Conference League - League phase": "UEFA Conference League", "Europe: Champions League Women - League phase": "Women's UCL", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera", "Argentina: Torneo Betano - Apertura": "Argentine Primera", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership", "World: World Cup U20": "FIFA U-20 World Cup", "North & Central America: Campeones Cup": "Campeones Cup", "World: ICC World Cup Women": "Women's Cricket World Cup", "World: Test Series": "ICC Test Series", "World: One Day International": "ODI", "World: Twenty20 International": "T20 International", "USA: NBA - Pre-season": "NBA Preseason", "USA: USL Championship": "USL Championship", "World: World Cup U20 - Play Offs": "FIFA U-20 World Cup", "USA: MLB - Play Offs": "MLB", "Canada: OHL": "OHL", "USA: NCAA Hockey": "NCAA Men's Hockey", "World: Friendly International": "International Friendly", "World: World Cup U17": "FIFA U-17 World Cup", "World: World Cup U17 - Play Offs": "FIFA U-17 World Cup", "World: Finals - Turin ATP - Play Offs, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles - Play Offs, hard (indoor)": "ATP Finals (Doubles)", "World: Finals - Turin ATP, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles, hard (indoor)": "ATP Finals (Doubles)" };
         return map[name] || name;
     }
 
@@ -6247,6 +6472,39 @@ document.addEventListener('DOMContentLoaded', function () {
             "Appalachian State": "App State",
             "Central Michigan": "C Michigan",
             "Brigham Young": "BYU",
+            "Boise State": "Boise St",
+            "San Diego State": "San Diego St",
+            "Washington State": "Wash St",
+            "Louisiana Tech": "LA Tech",
+            "Jacksonville State": "Jax State",
+            "Kennesaw State": "Kennesaw",
+            "Mississippi St.": "Mississippi St",
+            "Washington Huskies": "Washington",
+            "Sam Houston State": "Sam Houston",
+            "Delaware Fightin": "Delaware",
+            "Florida International": "FIU",
+            "Coastal Carolina": "Coastal Car",
+            "New Mexico State": "NM State",
+            "Florida Atlantic": "FAU",
+            "Boston College": "Boston Coll",
+            "Georgia Tech": "GA Tech",
+            "San Jose State": "San Jose St",
+            "Texas State Bobcats": "TX State",
+            "James Madison": "JMU",
+            "Western Kentucky": "W Kentucky",
+            "Middle Tennessee St": "Mid TN St",
+            "North Carolina State": "NC State",
+            "Michigan State": "Mich St",
+            "Louisiana-Monroe": "UL-Monroe",
+            "South Alabama": "S Alabama",
+            "Colorado State Rams": "Colorado St",
+            "Georgia State Panthers": "GA State",
+            "Tennessee Tech": "TN Tech",
+            "South Florida": "USF",
+            "Cincinnati Bearcats": "Cincinnati",
+            "South Carolina": "S Carolina",
+            "Eastern Michigan": "E Michigan",
+            "Oklahoma State": "OK State"
         },
         // NCAAW
         NCAAW: {
@@ -6863,8 +7121,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // For Tennis section, never collapse leagues
             const isCollapsedLeague = isGroupedByLeague && !isTennisSection && COLLAPSED_LEAGUES.includes(leagueNameKey);
             let collapsedScoresRow = null;
-            const isSpecialNCAALeague = (leagueNameKey === 'NCAAM' || leagueNameKey === 'NCAAW');
-            const shouldPrioritizeImportant = isGroupedByLeague && isSpecialNCAALeague;
+            const isSpecialNCAALeague = (leagueNameKey === 'NCAAM' || leagueNameKey === 'NCAAW' || leagueNameKey === 'NCAAF');
+            const hasEnoughGames = games && games.length >= 10;
+            const shouldPrioritizeImportant = isGroupedByLeague && isSpecialNCAALeague && hasEnoughGames;
 
             if(isGroupedByLeague) {
                 leagueSection.className = "league-section";
@@ -9172,9 +9431,22 @@ document.addEventListener('DOMContentLoaded', function () {
                             const menHtml = buildGroupedStandingsHtml(rows) || buildStandardStandingsTable(rows);
                             let womenHtml = '<p style="color: #9ca3af;">Loading women\'s rankings...</p>';
                             try {
-                                const womenUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb/pub?gid=0&single=true&output=csv';
-                                const womenRows = await fetchFromGoogleSheetsCSV(womenUrl);
-                                womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
+                                // Try to fetch women's data from Firestore first
+                                const womenDataDoc = await db.collection(collectionName).doc('data-women').get();
+                                if (womenDataDoc.exists) {
+                                    const womenCsvData = womenDataDoc.data();
+                                    if (womenCsvData.headers && womenCsvData.rows) {
+                                        const womenRows = [womenCsvData.headers, ...womenCsvData.rows];
+                                        womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
+                                    } else {
+                                        throw new Error('Invalid women\'s data format in Firestore');
+                                    }
+                                } else {
+                                    // Fallback to Google Sheets if not in Firestore
+                                    const womenUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb/pub?gid=0&single=true&output=csv';
+                                    const womenRows = await fetchFromGoogleSheetsCSV(womenUrl);
+                                    womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
+                                }
                             } catch (womenError) {
                                 console.error('Error loading Boxing women rankings:', womenError);
                                 womenHtml = '<p style="color: #ef4444;">Error loading women\'s rankings.</p>';
@@ -10183,9 +10455,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 const menHtml = buildGroupedStandingsHtml(rows) || buildStandardStandingsTable(rows);
                 let womenHtml = '<p style="color: #9ca3af;">Loading women\'s rankings...</p>';
                 try {
-                    const womenUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb/pub?gid=0&single=true&output=csv';
-                    const womenRows = await fetchFromGoogleSheetsCSV(womenUrl);
-                    womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
+                    // Try to fetch women's data from Firestore first
+                    const collectionName = collectionMap[leagueKey] || 'standings';
+                    const womenDataDoc = await db.collection(collectionName).doc('data-women').get();
+                    if (womenDataDoc.exists) {
+                        const womenCsvData = womenDataDoc.data();
+                        if (womenCsvData.headers && womenCsvData.rows) {
+                            const womenRows = [womenCsvData.headers, ...womenCsvData.rows];
+                            womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
+                        } else {
+                            throw new Error('Invalid women\'s data format in Firestore');
+                        }
+                    } else {
+                        // Fallback to Google Sheets if not in Firestore
+                        const womenUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb/pub?gid=0&single=true&output=csv';
+                        const womenRows = await fetchFromGoogleSheetsCSV(womenUrl);
+                        womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
+                    }
                 } catch (womenError) {
                     console.error('Error loading Boxing women rankings:', womenError);
                     womenHtml = '<p style="color: #ef4444;">Error loading women\'s rankings.</p>';
@@ -10341,10 +10627,16 @@ async function fetchFeaturedGames() {
                     const gamesSnapshot = await gamesRef.where('Game ID', 'in', nonMlbGameIds).get();
                     liveFeaturedGames = gamesSnapshot.docs.map(doc => {
                         const gameData = doc.data();
-                        // Add title, yesterdayTitle, and order from Featured collection
+                        const featuredGame = nonMlbFeaturedGames.find(fg => fg['Game ID'] === gameData['Game ID']);
+                        // Add title, yesterdayTitle, order, and channel from Featured collection
                         gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
                         gameData.yesterdayTitle = gameIdToYesterdayTitleMap[gameData['Game ID']] || '';
                         gameData.order = gameIdToOrderMap[gameData['Game ID']];
+                        // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
+                        if (featuredGame && (!gameData.channel && !gameData.Channel)) {
+                            gameData.channel = featuredGame.channel || featuredGame.Channel || '';
+                            gameData.Channel = featuredGame.channel || featuredGame.Channel || '';
+                        }
                         return gameData;
                     });
                 } else {
@@ -10354,10 +10646,16 @@ async function fetchFeaturedGames() {
                         const gamesSnapshot = await gamesRef.where('Game ID', 'in', batch).get();
                         const batchGames = gamesSnapshot.docs.map(doc => {
                             const gameData = doc.data();
-                            // Add title, yesterdayTitle, and order from Featured collection
+                            const featuredGame = nonMlbFeaturedGames.find(fg => fg['Game ID'] === gameData['Game ID']);
+                            // Add title, yesterdayTitle, order, and channel from Featured collection
                             gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
                             gameData.yesterdayTitle = gameIdToYesterdayTitleMap[gameData['Game ID']] || '';
                             gameData.order = gameIdToOrderMap[gameData['Game ID']];
+                            // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
+                            if (featuredGame && (!gameData.channel && !gameData.Channel)) {
+                                gameData.channel = featuredGame.channel || featuredGame.Channel || '';
+                                gameData.Channel = featuredGame.channel || featuredGame.Channel || '';
+                            }
                             return gameData;
                         });
                         liveFeaturedGames = liveFeaturedGames.concat(batchGames);
@@ -10381,10 +10679,15 @@ async function fetchFeaturedGames() {
                 });
                 
                 if (matchingGame) {
-                    // Add title, yesterdayTitle, and order from Featured collection
+                    // Add title, yesterdayTitle, order, and channel from Featured collection
                     matchingGame.title = featuredGame.title || '';
                     matchingGame.yesterdayTitle = featuredGame.yesterdayTitle || '';
                     matchingGame.order = featuredGame.order;
+                    // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
+                    if (!matchingGame.channel && !matchingGame.Channel) {
+                        matchingGame.channel = featuredGame.channel || featuredGame.Channel || '';
+                        matchingGame.Channel = featuredGame.channel || featuredGame.Channel || '';
+                    }
                     liveFeaturedGames.push(matchingGame);
                 }
                 // Only include featured games that have a matching live game
@@ -10456,8 +10759,13 @@ async function fetchFeaturedGames() {
                         const isLive = matchStatus.includes('IN PROGRESS') || matchStatus.includes('LIVE');
                         const isFinal = matchStatus.includes('FINISHED') || matchStatus.includes('FINAL') || matchStatus.includes('GAME OVER');
 
+                        // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
+                        const channel = (liveGame.channel || liveGame.Channel) ? (liveGame.channel || liveGame.Channel) : (featuredGame.channel || featuredGame.Channel || '');
+
                         return {
                             ...liveGame,
+                            channel: channel,
+                            Channel: channel,
                             title: featuredGame.title || liveGame.title || '',
                             yesterdayTitle: featuredGame.yesterdayTitle || liveGame.yesterdayTitle || '',
                             order: featuredGame.order,
@@ -10479,8 +10787,13 @@ async function fetchFeaturedGames() {
                         const isLive = matchStatus.includes('IN PROGRESS') || matchStatus.includes('LIVE');
                         const isFinal = matchStatus.includes('FINISHED') || matchStatus.includes('FINAL') || matchStatus.includes('GAME OVER');
 
+                        // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
+                        const channel = (liveGame.channel || liveGame.Channel) ? (liveGame.channel || liveGame.Channel) : (featuredGame.channel || featuredGame.Channel || '');
+
                         return {
                             ...liveGame,
+                            channel: channel,
+                            Channel: channel,
                             title: featuredGame.title || liveGame.title || '',
                             yesterdayTitle: featuredGame.yesterdayTitle || liveGame.yesterdayTitle || '',
                             order: featuredGame.order,
@@ -10495,8 +10808,13 @@ async function fetchFeaturedGames() {
                 const isLive = matchStatus.includes('IN PROGRESS') || matchStatus.includes('LIVE');
                 const isFinal = matchStatus.includes('FINISHED') || matchStatus.includes('FINAL') || matchStatus.includes('GAME OVER');
 
+                // Preserve channel from featuredGame (for manual games)
+                const channel = featuredGame.channel || featuredGame.Channel || '';
+
                 return {
                     ...featuredGame,
+                    channel: channel,
+                    Channel: channel,
                     title: featuredGame.title || featuredGame.GameTitle || '',
                     yesterdayTitle: featuredGame.yesterdayTitle || featuredGame.GameYesterdayTitle || '',
                     order: featuredGame.order,
@@ -10530,6 +10848,12 @@ async function fetchFeaturedGames() {
                     const data = doc.data() || {};
                     if (data.order !== undefined && data.order !== null) {
                         data.order = Number(data.order);
+                    }
+                    // Ensure channel is preserved (sync channel and Channel fields)
+                    const channel = data.channel || data.Channel || '';
+                    if (channel) {
+                        data.channel = channel;
+                        data.Channel = channel;
                     }
                     return data;
                 }).sort((a, b) => {
