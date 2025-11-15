@@ -9021,10 +9021,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const standingsContent = document.getElementById('league-standings-content');
         if (!standingsContent) return;
         
-        if (leagueKey === 'WNBA' || leagueKey === 'UFC') {
-            return false;
-        }
-        
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         
         console.log(`📊 Fetching standings for ${leagueKey} from Firestore`);
@@ -9058,7 +9054,24 @@ document.addEventListener('DOMContentLoaded', function () {
             'NCAAM': 'NCAAMStandings',  // New collection format
             'NCAAW': 'NCAAWStandings',  // New collection format
             'UEFAChampionsLeague': 'standings',  // UCL uses generic standings collection
-            'WNBA': 'standings'
+            'WNBA': 'standings',
+            'FormulaOne': 'F1DriverStandings',  // F1 has special handling with Driver/Constructor tabs
+            'FACup': 'FACupStandings',
+            'PGATour': 'PGATourStandings',
+            'LPGATour': 'LPGATourStandings',
+            'UFC': 'UFCStandings',
+            'Boxing': 'BoxingStandings',
+            'NASCARCupSeries': 'NASCARCupSeriesStandings',
+            'Tennis': 'TennisStandings',
+            'LIVGolf': 'LIVGolfStandings',
+            'IndyCar': 'IndyCarStandings',
+            'MotoGP': 'MotoGPStandings',
+            'TrackAndField': 'TrackAndFieldStandings',
+            'Soccer': 'SoccerStandings',
+            'NCAABaseball': 'NCAABaseballStandings',
+            'NCAASoftball': 'NCAASoftballStandings',
+            'WorldCupU17': 'WorldCupU17Standings',
+            'WorldCupU17PlayOffs': 'WorldCupU17PlayOffsStandings'
         };
         
         const firestoreKeyMap = {
@@ -9077,7 +9090,24 @@ document.addEventListener('DOMContentLoaded', function () {
             'NBA': 'NBA',
             'NHL': 'NHL',
             'UEFAChampionsLeague': 'UEFAChampionsLeague',
-            'WNBA': 'WNBA'
+            'WNBA': 'WNBA',
+            'FormulaOne': 'Formula One',
+            'FACup': 'FA Cup',
+            'PGATour': 'PGA Tour',
+            'LPGATour': 'LPGA Tour',
+            'UFC': 'UFC',
+            'Boxing': 'Boxing',
+            'NASCARCupSeries': 'NASCAR Cup Series',
+            'Tennis': 'Tennis',
+            'LIVGolf': 'LIV Golf',
+            'IndyCar': 'IndyCar',
+            'MotoGP': 'MotoGP',
+            'TrackAndField': 'Track and Field',
+            'Soccer': 'Soccer',
+            'NCAABaseball': 'NCAA Baseball',
+            'NCAASoftball': 'NCAA Softball',
+            'WorldCupU17': 'World Cup U17',
+            'WorldCupU17PlayOffs': 'World Cup U17 Play Offs'
         };
         
         const collectionName = collectionMap[leagueKey] || 'standings';
@@ -9091,7 +9121,106 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // Check if this league uses the new collection format (like NFLStandings)
             if (collectionName !== 'standings') {
-                // Fetch all documents from the collection
+                // For Google Sheets-based leagues, check if data is stored in CSV format
+                const dataDoc = await db.collection(collectionName).doc('data').get();
+                
+                if (dataDoc.exists) {
+                    const csvData = dataDoc.data();
+                    // Convert CSV format back to array format for frontend
+                    if (csvData.headers && csvData.rows) {
+                        const rows = [csvData.headers, ...csvData.rows];
+                        // Use the existing CSV display logic
+                        if (leagueKey === 'UFC') {
+                            const menHtml = buildGroupedStandingsHtml(rows) || buildStandardStandingsTable(rows);
+                            let womenHtml = '<p style="color: #9ca3af;">Loading women\'s rankings...</p>';
+                            try {
+                                const womenUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS2Z0QfXw34ib6V0gmcdqVvu6gwy8vHnD6cF3xMhJGZJHpU_s0vwC0h7phvbV0joe4tdVDGHiJ1kBfX/pub?gid=591530521&single=true&output=csv';
+                                const womenRows = await fetchFromGoogleSheetsCSV(womenUrl);
+                                womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
+                            } catch (womenError) {
+                                console.error('Error loading UFC women rankings:', womenError);
+                                womenHtml = '<p style="color: #ef4444;">Error loading women\'s rankings.</p>';
+                            }
+                            standingsContent.innerHTML = `
+                                <div class="ufc-subtabs" style="display: flex; background-color: #2a2a2a; margin-bottom: 6px;">
+                                    <div class="ufc-subtab active" data-ufc-tab="men" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">Men's</div>
+                                    <div class="ufc-subtab" data-ufc-tab="women" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">Women's</div>
+                                </div>
+                                <div class="ufc-subcontent" data-ufc-content="men">${menHtml}</div>
+                                <div class="ufc-subcontent" data-ufc-content="women" style="display: none;">${womenHtml}</div>
+                            `;
+                            const subTabs = standingsContent.querySelectorAll('.ufc-subtab');
+                            const subContents = standingsContent.querySelectorAll('.ufc-subcontent');
+                            subTabs.forEach(tab => {
+                                tab.addEventListener('click', () => {
+                                    const target = tab.dataset.ufcTab;
+                                    subTabs.forEach(t => {
+                                        t.classList.remove('active');
+                                        t.style.color = '#ccc';
+                                        t.style.borderBottom = 'none';
+                                    });
+                                    tab.classList.add('active');
+                                    tab.style.color = '#fff';
+                                    tab.style.borderBottom = '2px solid #fff';
+                                    subContents.forEach(content => {
+                                        content.style.display = content.dataset.ufcContent === target ? 'block' : 'none';
+                                    });
+                                });
+                            });
+                            return true;
+                        } else if (leagueKey === 'Boxing') {
+                            const menHtml = buildGroupedStandingsHtml(rows) || buildStandardStandingsTable(rows);
+                            let womenHtml = '<p style="color: #9ca3af;">Loading women\'s rankings...</p>';
+                            try {
+                                const womenUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb/pub?gid=0&single=true&output=csv';
+                                const womenRows = await fetchFromGoogleSheetsCSV(womenUrl);
+                                womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
+                            } catch (womenError) {
+                                console.error('Error loading Boxing women rankings:', womenError);
+                                womenHtml = '<p style="color: #ef4444;">Error loading women\'s rankings.</p>';
+                            }
+                            standingsContent.innerHTML = `
+                                <div class="boxing-subtabs" style="display: flex; background-color: #2a2a2a; margin-bottom: 6px;">
+                                    <div class="boxing-subtab active" data-boxing-tab="men" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">Men's</div>
+                                    <div class="boxing-subtab" data-boxing-tab="women" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">Women's</div>
+                                </div>
+                                <div class="boxing-subcontent" data-boxing-content="men">${menHtml}</div>
+                                <div class="boxing-subcontent" data-boxing-content="women" style="display: none;">${womenHtml}</div>
+                            `;
+                            const subTabs = standingsContent.querySelectorAll('.boxing-subtab');
+                            const subContents = standingsContent.querySelectorAll('.boxing-subcontent');
+                            subTabs.forEach(tab => {
+                                tab.addEventListener('click', () => {
+                                    const target = tab.dataset.boxingTab;
+                                    subTabs.forEach(t => {
+                                        t.classList.remove('active');
+                                        t.style.color = '#ccc';
+                                        t.style.borderBottom = 'none';
+                                    });
+                                    tab.classList.add('active');
+                                    tab.style.color = '#fff';
+                                    tab.style.borderBottom = '2px solid #fff';
+                                    subContents.forEach(content => {
+                                        content.style.display = content.dataset.boxingContent === target ? 'block' : 'none';
+                                    });
+                                });
+                            });
+                            return true;
+                        } else if (leagueKey === 'Tennis') {
+                            // Tennis has ATP/WTA tabs - but we only have one sheet, so use standard display
+                            const html = buildGroupedStandingsHtml(rows) || buildStandardStandingsTable(rows);
+                            standingsContent.innerHTML = html;
+                            return true;
+                        } else {
+                            // Standard display for other leagues
+                            const html = buildGroupedStandingsHtml(rows) || buildStandardStandingsTable(rows);
+                            standingsContent.innerHTML = html;
+                            return true;
+                        }
+                    }
+                }
+                
+                // Fallback: try old format (individual documents)
                 console.log(`🔍 DEBUG: Fetching from collection: ${collectionName} for leagueKey: ${leagueKey}`);
                 const snapshot = await db.collection(collectionName).get();
                 
