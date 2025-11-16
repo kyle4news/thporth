@@ -5292,7 +5292,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Rutgers",
             "Maryland",
             "Wisconsin",
-            "Penn State",
+            "Penn St",
             "Mich St",
             "Purdue",
             "Notre Dame",
@@ -6504,7 +6504,8 @@ document.addEventListener('DOMContentLoaded', function () {
             "Cincinnati Bearcats": "Cincinnati",
             "South Carolina": "S Carolina",
             "Eastern Michigan": "E Michigan",
-            "Oklahoma State": "OK State"
+            "Oklahoma State": "OK State",
+            "Penn State": "Penn St"
         },
         // NCAAW
         NCAAW: {
@@ -7121,9 +7122,23 @@ document.addEventListener('DOMContentLoaded', function () {
             // For Tennis section, never collapse leagues
             const isCollapsedLeague = isGroupedByLeague && !isTennisSection && COLLAPSED_LEAGUES.includes(leagueNameKey);
             let collapsedScoresRow = null;
-            const isSpecialNCAALeague = (leagueNameKey === 'NCAAM' || leagueNameKey === 'NCAAW' || leagueNameKey === 'NCAAF');
+            
+            // Detect if this is a special NCAA league
+            // For grouped by league: check leagueNameKey
+            // For league-specific pages: check the games data to determine the league
+            let detectedLeagueKey = leagueNameKey;
+            if (!isGroupedByLeague && games && games.length > 0) {
+                // On league-specific pages, detect the league from the first game
+                const firstGame = games[0];
+                const leagueDisplayName = getLeagueDisplayName(firstGame.League, firstGame.Sport);
+                if (leagueDisplayName === 'NCAAM' || leagueDisplayName === 'NCAAW' || leagueDisplayName === 'NCAAF') {
+                    detectedLeagueKey = leagueDisplayName;
+                }
+            }
+            
+            const isSpecialNCAALeague = (detectedLeagueKey === 'NCAAM' || detectedLeagueKey === 'NCAAW' || detectedLeagueKey === 'NCAAF');
             const hasEnoughGames = games && games.length >= 10;
-            const shouldPrioritizeImportant = isGroupedByLeague && isSpecialNCAALeague && hasEnoughGames;
+            const shouldPrioritizeImportant = isSpecialNCAALeague && hasEnoughGames;
 
             if(isGroupedByLeague) {
                 leagueSection.className = "league-section";
@@ -8322,7 +8337,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const leagueKey = getLeagueKeyFromGame(data);
                 const homeDisplay = getTeamDisplayName(data["Home Team"] || "", displayLeague);
                 const awayDisplay = getTeamDisplayName(data["Away Team"] || "", displayLeague);
-                const isImportantGame = shouldPrioritizeImportant ? isImportantNcaaGame(homeDisplay, awayDisplay, leagueKey, data) : true;
+                // Use detectedLeagueKey for important game check to ensure consistency on league-specific pages
+                const leagueKeyForImportance = shouldPrioritizeImportant ? detectedLeagueKey : leagueKey;
+                const isImportantGame = shouldPrioritizeImportant ? isImportantNcaaGame(homeDisplay, awayDisplay, leagueKeyForImportance, data) : true;
                 if (shouldPrioritizeImportant && !isImportantGame) {
                     hasHiddenGames = true;
                 }
