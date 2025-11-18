@@ -5031,7 +5031,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'LPGA Tour', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "LPGA Tour", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "LPGA Tour", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         NFL: "https://www.nfl.com/scores",
@@ -5458,7 +5458,8 @@ document.addEventListener('DOMContentLoaded', function () {
     "NCAA Men's Hockey", 
     "Club Friendly",
     "International Friendly",
-    "ATP Finals (Doubles)"
+    "ATP Finals (Doubles)",
+    "Davis Cup (Doubles)"
     ];
 
     // --- 2. FIREBASE INITIALIZATION (SINGLETON) + CACHING ---
@@ -5681,6 +5682,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         
+        // Fuzzy logic matching for Davis Cup - check if name contains "World: Davis Cup"
+        if (name && name.includes("World: Davis Cup")) {
+            if (name.includes("Doubles")) {
+                return "Davis Cup (Doubles)";
+            } else {
+                return "Davis Cup (Singles)";
+            }
+        }
+        
         // Special handling for qualification leagues - use prefix matching
         if (name && name.includes("Africa: World Cup - Qualification")) {
             return "CAF Qualifiers";
@@ -5778,7 +5788,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // EFL Championship variations
             'EFLChampionship': ['England: Championship', 'EFL Championship'],
             // Formula One variations
-            'FormulaOne': ['Formula 1', 'Formula One', 'World: Formula 1', 'World: Formula One', 'WORLD: FORMULA ONE']
+            'FormulaOne': ['Formula 1', 'Formula One', 'World: Formula 1', 'World: Formula One', 'WORLD: FORMULA ONE'],
+            // Tennis variations (for Davis Cup to show on Tennis page)
+            'Tennis': ['World: Davis Cup', 'Davis Cup', 'Davis Cup (Singles)', 'Davis Cup (Doubles)']
         };
 
         // Check for exact matches first
@@ -6813,8 +6825,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Remove " W" suffix if present (for NWSL)
         let p = name.endsWith(" W") ? name.slice(0, -2) : name;
         
-        // Check if this is a tennis league (ATP, WTA, or any league containing "ATP" or "WTA")
-        const isTennisLeague = league && (league.includes('ATP') || league.includes('WTA') || league === 'Tennis');
+        // Check if this is a tennis league (ATP, WTA, Davis Cup, or any league containing "ATP" or "WTA")
+        const isTennisLeague = league && (league.includes('ATP') || league.includes('WTA') || league.includes('Davis Cup') || league === 'Tennis');
         
         // For tennis player names, remove initial and country code
         // Pattern: "Musetti L. (Ita)" -> "Musetti"
@@ -7470,6 +7482,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/atp.png?raw=true";
                     logo.alt = "Tennis Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
+                } else if (leagueNameKey === "Davis Cup (Singles)" || leagueNameKey === "Davis Cup (Doubles)") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/dEg9oYgU-bkpX8Kj1.png";
+                    logo.alt = "Davis Cup Logo";
                     logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
@@ -11741,11 +11766,11 @@ async function fetchFeaturedGames() {
                     }
                 }
 
-                // Special handling for Tennis - match any league name that contains "ATP" or "WTA" and Sport is "Tennis"
+                // Special handling for Tennis - match any league name that contains "ATP", "WTA", or "Davis Cup" and Sport is "Tennis"
                 if (leagueKey === 'Tennis') {
                     const leagueNameLower = gameLeague.toLowerCase();
                     const sportLower = (game.Sport || '').toLowerCase();
-                    if (sportLower === 'tennis' && (leagueNameLower.includes('atp') || leagueNameLower.includes('wta'))) {
+                    if (sportLower === 'tennis' && (leagueNameLower.includes('atp') || leagueNameLower.includes('wta') || leagueNameLower.includes('davis cup'))) {
                         return true;
                     }
                 }
@@ -11853,11 +11878,11 @@ async function fetchFeaturedGames() {
             if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
             activateMainTab('schedule');
             
-            // Special handling for Tennis - separate ATP and WTA games
+            // Special handling for Tennis - separate ATP, WTA, and Davis Cup games
             if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
                 const atpGames = filteredGamesData.filter(game => {
                     const leagueName = (game.League || '').toLowerCase();
-                    return leagueName.includes('atp');
+                    return leagueName.includes('atp') || leagueName.includes('davis cup');
                 });
                 const wtaGames = filteredGamesData.filter(game => {
                     const leagueName = (game.League || '').toLowerCase();
@@ -11868,7 +11893,7 @@ async function fetchFeaturedGames() {
                 const sortedWtaGames = wtaGames.sort(sortGames);
                 
                 if (sortedAtpGames.length > 0) {
-                    // Use isGroupedByLeague: true to show league headers (e.g., "ATP Finals (Singles)", "ATP Finals (Doubles)")
+                    // Use isGroupedByLeague: true to show league headers (e.g., "ATP Finals (Singles)", "ATP Finals (Doubles)", "Davis Cup (Singles)", "Davis Cup (Doubles)")
                     renderGames(tennisTodayAtpContent, sortedAtpGames, true);
                 } else {
                     tennisTodayAtpContent.innerHTML = `<p>No ATP games found for today.</p>`;
