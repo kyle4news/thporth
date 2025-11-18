@@ -709,17 +709,78 @@ table.game-table td:nth-child(1) {
     width: 165px;
     height: 18px;
     background-color: #3c3c3c;
-    padding-left: 2px;
     display: flex;
     align-items: center;
     position: sticky;
     top: 0;
     z-index: 2;
+    overflow: hidden;
   }
-
-  #menuTopBox img {
+  
+  .menu-logo-section {
+    width: 10%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 2px;
+    flex-shrink: 0;
+  }
+  
+  .menu-logo-section img {
     height: 18px;
     display: block;
+  }
+  
+  .menu-support-section {
+    width: 90%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .support-button {
+    width: 100%;
+    height: 100%;
+    background-color: #ff2424;
+    color: white;
+    font-size: 10px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    position: relative;
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    z-index: 3;
+  }
+  
+  .support-button.visible {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .support-button:hover {
+    background-color: #e02020;
+  }
+  
+  /* Hide support button on mobile */
+  @media (max-width: 768px) {
+    .menu-support-section {
+      display: none;
+    }
+    
+    .menu-logo-section {
+      width: 100%;
+    }
+    
+    #menuTopBox {
+      padding-left: 2px;
+    }
   }
 
   #menuSearch {
@@ -2063,10 +2124,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      <!-- MAIN MENU COLUMN -->
       <div class="column main-menu">
         <div id="menuTopBox">
-          <img
-            src="https://github.com/kyle4news/thporth/blob/main/THPORTH%20logo.png?raw=true"
-            alt="Logo"
-          />
+          <div class="menu-logo-section">
+            <img
+              src="https://github.com/kyle4news/thporth/blob/main/THPORTH%20logo.png?raw=true"
+              alt="Logo"
+            />
+          </div>
+          <div class="menu-support-section">
+            <a href="https://ko-fi.com/ajolly2" target="_blank" rel="noopener noreferrer" id="supportButton" class="support-button">
+              SUPPORT THPORTH&nbsp;&nbsp;<img src="https://github.com/kyle4news/thporth/blob/main/new-tab.png?raw=true" alt="" style="height: 10px; vertical-align: middle; display: inline-block;">
+            </a>
+          </div>
         </div>
         <input type="text" id="menuSearch" placeholder="Search leagues" />
         <div id="menuFilters">
@@ -4963,7 +5031,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'LPGA Tour', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "LPGA Tour", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "AFC Qualifiers", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "LPGA Tour", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "AFC Qualifiers", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         NFL: "https://www.nfl.com/scores",
@@ -6479,7 +6547,19 @@ document.addEventListener('DOMContentLoaded', function () {
             "Tennessee State": "TN State",
             "Western Kentucky": "W Kentucky",
             "Morehead State": "Morehead St",
-            "Kennesaw State": "Ken'saw St"
+            "Kennesaw State": "Ken'saw St",
+            "Rhodes Lynx": "Rhodes",
+            "VCU Rams": "VCU",
+            "Louisiana Monroe": "UL-Monroe",
+            "Tennessee Tech": "TN Tech",
+            "Coastal Georgia": "Coastal GA",
+            "Southwest Adventist": "SW Adventist",
+            "Florida Atlantic": "FAU",
+            "Western Illinois": "W Illinois",
+            "Alabama State": "Ala St",
+            "CSU Bakersfield": "CSU-B'field",
+            "Eastern Oregon": "E Oregon",
+            "UCF Knights": "UCF"
         },
         // NCAAF
         NCAAF: {
@@ -6631,7 +6711,48 @@ document.addEventListener('DOMContentLoaded', function () {
             "Houston Cougars": "Houston",
             "North Carolina": "UNC",
             "Towson Tigers": "Towson",
-            "American University": "American"
+            "American University": "American",
+            "Alabama": "Alabama",
+            "Alabama A&M": "Ala A&M",
+            "Auburn": "Auburn",
+            "Bard College": "Bard",
+            "Benedictine (AZ)": "Benedictine",
+            "Cal Poly": "Cal Poly",
+            "California Golden Bears": "California",
+            "Chicago State": "Chicago St",
+            "Delaware": "Delaware",
+            "DePaul": "DePaul",
+            "East. Washington": "E Wash",
+            "Erskine": "Erskine",
+            "George Washington": "G Wash",
+            "Georgia State": "GA State",
+            "Harvard Crimson": "Harvard",
+            "Howard": "Howard",
+            "Indiana East": "Indiana E",
+            "Lindenwood": "Lindenwood",
+            "Longwood": "Longwood",
+            "LSU Tigers": "LSU",
+            "Maine Black Bears": "Maine",
+            "New Haven Chargers": "New Haven",
+            "Northwestern": "Northwestern",
+            "Oral Roberts": "Oral Roberts",
+            "Prairie View A&M": "P View A&M",
+            "Presbyterian College": "Presbyterian",
+            "Sam Houston St.": "Sam Houston",
+            "San Diego": "San Diego",
+            "South Carolina State": "So Car St",
+            "South Carolina Upstate": "SC Upstate",
+            "Southern Indiana": "So Indiana",
+            "Stephen F. Austin": "SF Austin",
+            "Stonehill Skyhawks": "Stonehill",
+            "Texas State Bobcats": "TX State",
+            "Tulane Green Wave": "Tulane",
+            "Tulsa Golden Hurricane": "Tulsa",
+            "UTRGV": "UTRGV",
+            "UMKC": "UMKC",
+            "Utah Valley Wolverines": "Utah Valley",
+            "VCU": "VCU",
+            "Colorado State": "Colorado St"
         },
         // UEFA Champions League
         UEFAChampionsLeague: {
@@ -6664,6 +6785,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // CONCACAF Qualifiers
         "CONCACAF Qualifiers": {
             "Trinidad & Tobago": "Trin. & Tob."
+        },
+        // UEFA Qualifiers
+        "UEFA Qualifiers": {
+            "Czech Republic": "Czechia",
+            "Northern Ireland": "N Ireland"
         }
     };
     
@@ -7515,6 +7641,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/premierleague.png?raw=true";
                     logo.alt = "Premier League Logo";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
+                } else if (leagueNameKey === "USMNT") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://cdn.sanity.io/images/oyf3dba6/production/bf72ee7b299178803e565d6c872cdb4baf2aef2d-640x877.png";
+                    logo.alt = "USMNT Logo";
                     logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
@@ -15647,6 +15786,15 @@ function showMLSTab(conference) {
     window.addEventListener('load', ensureFullHeight);
     window.addEventListener('resize', ensureFullHeight);
   </script>
+  
+  <script>
+    // Support button animation - wait 5 seconds then slide up
+    setTimeout(function() {
+      const supportButton = document.getElementById('supportButton');
+      if (supportButton) {
+        supportButton.classList.add('visible');
+      }
+    }, 5000);
+  </script>
   </body>
-</html>
 </html>
