@@ -8296,6 +8296,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 let currentTitle = null;
                 let currentTable = null;
                 let lastDisplayedTimeLabel = null;
+                let previousGameTimeLabel = null; // Track previous game's time for separator logic
+                let gameIndexInTable = 0; // Track game index within current table
                 
                 const createSubHeaderAndTable = (titleText) => {
                     const subHeader = document.createElement("div");
@@ -8349,6 +8351,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         currentTitle = titleText;
                         currentTable = createSubHeaderAndTable(titleText);
                         lastDisplayedTimeLabel = null;
+                        previousGameTimeLabel = null; // Reset when starting new table
+                        gameIndexInTable = 0; // Reset game index for new table
                     }
                     
                     if (!currentTable) continue;
@@ -8400,14 +8404,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
 
                     let displayTimeLabel = currentTimeLabel;
-                    if (!isLive && !isFinal) {
-                        const normalizedTimeLabel = normalizeDisplayTime(currentTimeLabel);
-                        if (normalizedTimeLabel && normalizedTimeLabel !== 'TBD') {
-                            if (normalizedTimeLabel === lastDisplayedTimeLabel) {
-                                displayTimeLabel = "";
-                            } else {
-                                lastDisplayedTimeLabel = normalizedTimeLabel;
-                            }
+                    const normalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(currentTimeLabel) : null;
+                    if (!isLive && !isFinal && normalizedTimeLabel && normalizedTimeLabel !== 'TBD') {
+                        if (normalizedTimeLabel === lastDisplayedTimeLabel) {
+                            displayTimeLabel = "";
+                        } else {
+                            lastDisplayedTimeLabel = normalizedTimeLabel;
                         }
                     }
                         
@@ -8481,11 +8483,45 @@ document.addEventListener('DOMContentLoaded', function () {
                         : (nextData.title || getLeagueDisplayName(nextData.League, nextData.Sport) || "Other");
                     // Only add separator if next game is in the same table (same title)
                     if (nextTitleText === titleText) {
+                        // Get the NEXT game's time label to determine if the line above it should be full width
+                        const nextRawStart = nextData["Start Time"];
+                        const nextMatchStatus = (nextData["Match Status"] || "").toUpperCase();
+                        const nextIsLive = isYesterdayScores ? false : (nextMatchStatus.includes("IN PROGRESS") || nextMatchStatus.includes("LIVE"));
+                        const nextIsFinal = isYesterdayScores || nextMatchStatus.includes("FINISHED") || nextMatchStatus.includes("FINAL") || nextMatchStatus.includes("GAME OVER");
+                        let nextTimeLabel = "";
+                        
+                        if (nextData.timeString === '') {
+                            nextTimeLabel = "";
+                        } else if (nextIsLive) {
+                            nextTimeLabel = "Live";
+                        } else if (nextIsFinal) {
+                            nextTimeLabel = "F";
+                        } else if (nextRawStart && nextRawStart.toDate) {
+                            nextTimeLabel = luxon.DateTime.fromJSDate(nextRawStart.toDate()).toFormat('h:mm a');
+                        } else {
+                            nextTimeLabel = "TBD";
+                        }
+                        
+                        const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
+                        const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabel;
+                        
+                        // Check if next game has a different start time from current game
+                        const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
+                        const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
+                        
+                        // If next game has different time, full width (colspan="4"), otherwise partial width (colspan="3")
+                        const colspan = isDifferentTime ? 4 : 3;
+                        const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
+                        
                         const separatorRow = currentTable.insertRow();
                         separatorRow.className = "game-separator-line";
-                        separatorRow.innerHTML = '<td style="padding: 0; border: none; width: 32%;"></td><td colspan="3" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 2px solid #000000; margin: 0;"></div></td>';
+                        separatorRow.innerHTML = `${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 2px solid #000000; margin: 0;"></div></td>`;
                     }
                 }
+                
+                // Update previous game time label and increment game index for next iteration
+                previousGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
+                gameIndexInTable++;
                     
                     // Add spacer row after ATP doubles matches for extra spacing
                     if (isAtpDoubles) {
@@ -8518,6 +8554,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             let lastDisplayedTimeLabel = null;
             let lastDisplayedTimeLabelAll = null;
+            let previousGameTimeLabel = null; // Track previous game's time for separator logic
             const gameRowPairs = [];
             let hasHiddenGames = false;
 
@@ -8691,10 +8728,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Add separator line between games (but not after the last game)
                 if (i < games.length - 1) {
+                    // Get the NEXT game's time label to determine if the line above it should be full width
+                    const nextData = games[i + 1];
+                    const nextRawStart = nextData["Start Time"];
+                    const nextMatchStatus = (nextData["Match Status"] || "").toUpperCase();
+                    const nextIsLive = isYesterdayScores ? false : (nextMatchStatus.includes("IN PROGRESS") || nextMatchStatus.includes("LIVE"));
+                    const nextIsFinal = isYesterdayScores || nextMatchStatus.includes("FINISHED") || nextMatchStatus.includes("FINAL") || nextMatchStatus.includes("GAME OVER");
+                    let nextTimeLabel = "";
+                    
+                    if (nextData.timeString === '') {
+                        nextTimeLabel = "";
+                    } else if (nextIsLive) {
+                        nextTimeLabel = "Live";
+                    } else if (nextIsFinal) {
+                        nextTimeLabel = "F";
+                    } else if (nextRawStart && nextRawStart.toDate) {
+                        nextTimeLabel = luxon.DateTime.fromJSDate(nextRawStart.toDate()).toFormat('h:mm a');
+                    } else {
+                        nextTimeLabel = "TBD";
+                    }
+                    
+                    const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
+                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabel;
+                    
+                    // Check if next game has a different start time from current game
+                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
+                    const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
+                    
+                    // If next game has different time, full width (colspan="4"), otherwise partial width (colspan="3")
+                    const colspan = isDifferentTime ? 4 : 3;
+                    const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
+                    
                     const separatorRow = table.insertRow();
                     separatorRow.className = "game-separator-line";
-                    separatorRow.innerHTML = '<td style="padding: 0; border: none; width: 32%;"></td><td colspan="3" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 2px solid #000000; margin: 0;"></div></td>';
+                    separatorRow.innerHTML = `${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 2px solid #000000; margin: 0;"></div></td>`;
                 }
+                
+                // Update previous game time label for next iteration
+                previousGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
                 
                 // Add spacer row after ATP doubles matches for extra spacing
                 if (isAtpDoubles) {
