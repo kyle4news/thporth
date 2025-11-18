@@ -5070,7 +5070,10 @@ document.addEventListener('DOMContentLoaded', function () {
         "ATP": "https://www.atptour.com/en/scores/current",
         "Davis Cup (Singles)": "https://www.daviscup.com/en/live-centre",
         "Davis Cup (Doubles)": "https://www.daviscup.com/en/live-centre",
-        "Boxing": "https://box.live/fight-results"
+        "Boxing": "https://box.live/fight-results",
+        "USMNT": "https://www.fotmob.com/teams/6713/fixtures/usa",
+        "AFC Asian Cup Qualifiers": "https://www.fotmob.com/leagues/10609/fixtures/asian-cup-qualification-playoff?group=by-round",
+        "NCAA Men's Hockey": "https://www.ncaa.com/scoreboard/icehockey-men/d1"
     };
 
     function normalizeNcaaTeamName(name) {
@@ -7494,7 +7497,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     titleContent.appendChild(logo);
                 } else if (leagueNameKey === "Davis Cup (Singles)" || leagueNameKey === "Davis Cup (Doubles)") {
                     const logo = document.createElement("img");
-                    logo.src = "https://static.flashscore.com/res/image/data/dEg9oYgU-bkpX8Kj1.png";
+                    logo.src = "https://r2.thesportsdb.com/images/media/league/badge/i0qscy1672325773.png/medium";
                     logo.alt = "Davis Cup Logo";
                     logo.style.width = "14px";
                     logo.style.height = "14px";
