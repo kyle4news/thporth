@@ -8722,20 +8722,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 const channelDisplay = (channelToDisplay && !isFinal) ? channelToDisplay : '';
                 
+                // Check if both teams are doubles (for spacing between first and second team)
+                const isDoublesMatch = isHomeDoubles && isAwayDoubles;
+                const row2TeamCellPadding = isDoublesMatch ? 'padding: 7px 1px 2px 1px;' : 'padding: 2px 1px;'; // Add 5px extra top padding for doubles
+                
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    // Add 5px margin-top to row2 if both teams are doubles (for spacing between first and second team)
-                    const isDoublesMatch = isHomeDoubles && isAwayDoubles;
-                    const row2MarginTop = isDoublesMatch ? 'margin-top: 5px;' : '';
                     row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td>`;
-                    row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}; ${row2MarginTop}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
+                    row2.innerHTML = `<td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                    // Add 5px margin-top to row2 if both teams are doubles (for spacing between first and second team)
-                    const isDoublesMatch = isHomeDoubles && isAwayDoubles;
-                    const row2MarginTop = isDoublesMatch ? 'margin-top: 5px;' : '';
                     row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td>`;
-                    row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}; ${row2MarginTop}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
+                    row2.innerHTML = `<td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                 }
 
                 if (shouldPrioritizeImportant) {
@@ -8819,6 +8817,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     const spacerRow = table.insertRow();
                     spacerRow.className = "atp-doubles-spacer";
                     spacerRow.innerHTML = '<td colspan="4" style="height: 1.5em; padding: 0; border: none; line-height: 0;"></td>';
+                }
+                
+                // Add 12px spacer row after last game in each league
+                if (i === games.length - 1) {
+                    const spacerRow = table.insertRow();
+                    spacerRow.innerHTML = '<td colspan="4" style="height: 12px; padding: 0; border: none;"></td>';
+                    
+                    // Add extra 12px spacer for Davis Cup (Doubles)
+                    if (displayLeague === "Davis Cup (Doubles)") {
+                        const extraSpacerRow = table.insertRow();
+                        extraSpacerRow.innerHTML = '<td colspan="4" style="height: 12px; padding: 0; border: none;"></td>';
+                    }
                 }
             }
             
@@ -9066,7 +9076,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             leagueSection.appendChild(table);
-            if (isGroupedByLeague && !isCollapsedLeague) {
+            // Ensure consistent spacing for Davis Cup leagues
+            if (isGroupedByLeague && (leagueNameKey === "Davis Cup (Singles)" || leagueNameKey === "Davis Cup (Doubles)")) {
+                leagueSection.style.marginBottom = "1.5em";
+            } else if (isGroupedByLeague && !isCollapsedLeague) {
                 leagueSection.style.marginBottom = "1.5em";
             } else if (isGroupedByLeague) {
                 leagueSection.style.marginBottom = "";
