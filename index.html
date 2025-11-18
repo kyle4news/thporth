@@ -2,11 +2,11 @@
 <html lang="en">
   <head>
     <meta name="google-site-verification" content="VoA7EfXHDZCU-Em6FGijJneXQVJfMKXUFZNcGNew_i8" />
-	  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script> <!-- ✅ NEW -->
-<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
-    <!-- Luxon for date/time handling - MOVED HERE to ensure it loads before dependent scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3.x/build/global/luxon.min.js"></script>
+	  <script defer src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script> <!-- ✅ NEW -->
+<script defer src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
+    <!-- Luxon for date/time handling - Deferred to improve page load performance -->
+    <script defer src="https://cdn.jsdelivr.net/npm/luxon@3.x/build/global/luxon.min.js"></script>
 	 <style>
       /* RESTORED: Original CSS for news tabs */
       .news-tab[data-tab="fantasy"],
@@ -38,6 +38,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
     <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <!-- Preconnect to external domains for faster DNS resolution -->
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://static.flashscore.com">
+    <link rel="dns-prefetch" href="https://www.flashscore.com">
+    <link rel="dns-prefetch" href="https://github.com">
+    <link rel="dns-prefetch" href="https://raw.githubusercontent.com">
+    <link rel="dns-prefetch" href="https://r2.thesportsdb.com">
+    
     <meta name="description" content="Get the latest sports news, social buzz, and live scores for NFL, NBA, MLB, and more — all in one place.">
     <meta name="robots" content="index, follow" />
     <title>THPORTH | Breaking news. Highlights. Social. Videos.</title>
@@ -2128,11 +2139,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <img
               src="https://github.com/kyle4news/thporth/blob/main/THPORTH%20logo.png?raw=true"
               alt="Logo"
+              width="54"
+              height="18"
             />
           </div>
           <div class="menu-support-section">
             <a href="https://ko-fi.com/ajolly2" target="_blank" rel="noopener noreferrer" id="supportButton" class="support-button">
-              SUPPORT THPORTH&nbsp;&nbsp;<img src="https://github.com/kyle4news/thporth/blob/main/new-tab.png?raw=true" alt="" style="height: 10px; vertical-align: middle; display: inline-block;">
+              SUPPORT THPORTH&nbsp;&nbsp;<img src="https://github.com/kyle4news/thporth/blob/main/new-tab.png?raw=true" alt="" width="10" height="10" style="height: 10px; vertical-align: middle; display: inline-block;">
             </a>
           </div>
         </div>
@@ -2145,50 +2158,50 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div id="menuList">
           <!-- 123 FILTER LIST -->
           <ul id="menuList-123" style="margin-top: 0; padding-top: 0;">
-            <li data-section="Home" class="selected"><img src="https://github.com/kyle4news/thporth/blob/main/Screenshot%202025-09-27%20at%2009.04.02.png?raw=true" alt="ALL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">ALL</li>
-            <li data-section="NFL"><img src="https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png" alt="NFL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NFL</li>
-            <li data-section="NBA"><img src="https://static.flashscore.com/res/image/data/OhgQNlXI-nyYPIw0n.png" alt="NBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NBA</li>
-            <li data-section="MLB"><img src="https://www.flashscore.com/res/image/data/QPJ3alWI-pS3BMXxt.png" alt="MLB" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">MLB</li>
-            <li data-section="NHL"><img src="https://github.com/kyle4news/thporth/blob/main/nhl.png?raw=true" alt="NHL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NHL</li>
-            <li data-section="FormulaOne"><img src="https://github.com/kyle4news/thporth/blob/main/f1.png?raw=true" alt="Formula One" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Formula One</li>
-            <li data-section="NCAAF"><img src="https://github.com/kyle4news/thporth/blob/main/ncaaf.png?raw=true" alt="NCAAF" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAF</li>
-            <li data-section="Soccer"><img src="https://github.com/kyle4news/thporth/blob/main/Soccer.png?raw=true" alt="Soccer" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Soccer
+            <li data-section="Home" class="selected"><img src="https://github.com/kyle4news/thporth/blob/main/Screenshot%202025-09-27%20at%2009.04.02.png?raw=true" alt="ALL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">ALL</li>
+            <li data-section="NFL"><img src="https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png" alt="NFL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NFL</li>
+            <li data-section="NBA"><img src="https://static.flashscore.com/res/image/data/OhgQNlXI-nyYPIw0n.png" alt="NBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NBA</li>
+            <li data-section="MLB"><img src="https://www.flashscore.com/res/image/data/QPJ3alWI-pS3BMXxt.png" alt="MLB" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">MLB</li>
+            <li data-section="NHL"><img src="https://github.com/kyle4news/thporth/blob/main/nhl.png?raw=true" alt="NHL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NHL</li>
+            <li data-section="FormulaOne"><img src="https://github.com/kyle4news/thporth/blob/main/f1.png?raw=true" alt="Formula One" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Formula One</li>
+            <li data-section="NCAAF"><img src="https://github.com/kyle4news/thporth/blob/main/ncaaf.png?raw=true" alt="NCAAF" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NCAAF</li>
+            <li data-section="Soccer"><img src="https://github.com/kyle4news/thporth/blob/main/Soccer.png?raw=true" alt="Soccer" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Soccer
               <ul class="nested">
-                <li data-section="PremierLeague"><img src="https://github.com/kyle4news/thporth/blob/main/premierleague.png?raw=true" alt="Premier League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Premier League</li>
-                <li data-section="UEFAChampionsLeague"><img src="https://github.com/kyle4news/thporth/blob/main/UCL.png?raw=true" alt="UEFA Champions League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UEFA Champions League</li>
-                <li data-section="MLS"><img src="https://github.com/kyle4news/thporth/blob/main/mls.png?raw=true" alt="MLS" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">MLS</li>
-                <li data-section="LaLiga"><img src="https://static.flashscore.com/res/image/data/6aNYx0jD-A3tOPy9B.png" alt="LaLiga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">LaLiga</li>
-                <li data-section="SerieA"><img src="https://static.flashscore.com/res/image/data/rFHMayEO-2exwJQks.png" alt="Serie A" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Serie A</li>
-                <li data-section="Bundesliga"><img src="https://static.flashscore.com/res/image/data/fqltz6CO-4ATnefbq.png" alt="Bundesliga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Bundesliga</li>
-                <li data-section="FACup"><img src="https://github.com/kyle4news/thporth/blob/main/FACup.png?raw=true" alt="FA Cup" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">FA Cup</li>
-                <li data-section="LigaMX"><img src="https://github.com/kyle4news/thporth/blob/main/ligamx.png?raw=true" alt="Liga MX" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Liga MX</li>
-                <li data-section="NWSL"><img src="https://github.com/kyle4news/thporth/blob/main/nwsl.png?raw=true" alt="NWSL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NWSL</li>
-                <li data-section="Ligue1"><img src="https://github.com/kyle4news/thporth/blob/main/LIgue%201.png?raw=true" alt="Ligue 1" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Ligue 1</li>
-                <li data-section="UEFAEuropaLeague"><img src="https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png" alt="UEFA Europa League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UEFA Europa League</li>
-                <li data-section="UEFAConferenceLeague"><img src="https://static.flashscore.com/res/image/data/6a9THkA7-fmGCnzrf.png" alt="UEFA Conference League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UEFA Conference League</li>
+                <li data-section="PremierLeague"><img src="https://github.com/kyle4news/thporth/blob/main/premierleague.png?raw=true" alt="Premier League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Premier League</li>
+                <li data-section="UEFAChampionsLeague"><img src="https://github.com/kyle4news/thporth/blob/main/UCL.png?raw=true" alt="UEFA Champions League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UEFA Champions League</li>
+                <li data-section="MLS"><img src="https://github.com/kyle4news/thporth/blob/main/mls.png?raw=true" alt="MLS" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">MLS</li>
+                <li data-section="LaLiga"><img src="https://static.flashscore.com/res/image/data/6aNYx0jD-A3tOPy9B.png" alt="LaLiga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">LaLiga</li>
+                <li data-section="SerieA"><img src="https://static.flashscore.com/res/image/data/rFHMayEO-2exwJQks.png" alt="Serie A" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Serie A</li>
+                <li data-section="Bundesliga"><img src="https://static.flashscore.com/res/image/data/fqltz6CO-4ATnefbq.png" alt="Bundesliga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Bundesliga</li>
+                <li data-section="FACup"><img src="https://github.com/kyle4news/thporth/blob/main/FACup.png?raw=true" alt="FA Cup" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">FA Cup</li>
+                <li data-section="LigaMX"><img src="https://github.com/kyle4news/thporth/blob/main/ligamx.png?raw=true" alt="Liga MX" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Liga MX</li>
+                <li data-section="NWSL"><img src="https://github.com/kyle4news/thporth/blob/main/nwsl.png?raw=true" alt="NWSL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NWSL</li>
+                <li data-section="Ligue1"><img src="https://github.com/kyle4news/thporth/blob/main/LIgue%201.png?raw=true" alt="Ligue 1" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Ligue 1</li>
+                <li data-section="UEFAEuropaLeague"><img src="https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png" alt="UEFA Europa League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UEFA Europa League</li>
+                <li data-section="UEFAConferenceLeague"><img src="https://static.flashscore.com/res/image/data/6a9THkA7-fmGCnzrf.png" alt="UEFA Conference League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UEFA Conference League</li>
               </ul>
             </li>
-            <li data-section="NCAAM"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAM" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAM</li>
-            <li data-section="NCAAW"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAW" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAW</li>
-            <li data-section="PGATour"><img src="https://github.com/kyle4news/thporth/blob/main/PGATour.png?raw=true" alt="PGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">PGA Tour</li>
-            <li data-section="UFC"><img src="https://github.com/kyle4news/thporth/blob/main/ufc.png?raw=true" alt="UFC" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UFC</li>
-            <li data-section="Boxing"><img src="https://github.com/kyle4news/thporth/blob/main/Github%20boxing.png?raw=true" alt="Boxing" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Boxing</li>
-            <li data-section="NASCARCupSeries"><img src="https://github.com/kyle4news/thporth/blob/main/nascar.png?raw=true" alt="NASCAR Cup Series" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NASCAR Cup Series</li>
-            <li data-section="Tennis"><img src="https://github.com/kyle4news/thporth/blob/main/atp.png?raw=true" alt="Tennis" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Tennis</li>
-            <li data-section="WNBA"><img src="https://github.com/kyle4news/thporth/blob/main/WNBA.png?raw=true" alt="WNBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">WNBA</li>
-            <li data-section="LIVGolf"><img src="https://github.com/kyle4news/thporth/blob/main/LIVGolf.png?raw=true" alt="LIV Golf" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">LIV Golf</li>
-            <li data-section="IndyCar"><img src="https://github.com/kyle4news/thporth/blob/main/indycar.png?raw=true" alt="IndyCar" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">IndyCar</li>
+            <li data-section="NCAAM"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAM" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NCAAM</li>
+            <li data-section="NCAAW"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAW" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NCAAW</li>
+            <li data-section="PGATour"><img src="https://github.com/kyle4news/thporth/blob/main/PGATour.png?raw=true" alt="PGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">PGA Tour</li>
+            <li data-section="UFC"><img src="https://github.com/kyle4news/thporth/blob/main/ufc.png?raw=true" alt="UFC" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UFC</li>
+            <li data-section="Boxing"><img src="https://github.com/kyle4news/thporth/blob/main/Github%20boxing.png?raw=true" alt="Boxing" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Boxing</li>
+            <li data-section="NASCARCupSeries"><img src="https://github.com/kyle4news/thporth/blob/main/nascar.png?raw=true" alt="NASCAR Cup Series" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NASCAR Cup Series</li>
+            <li data-section="Tennis"><img src="https://github.com/kyle4news/thporth/blob/main/atp.png?raw=true" alt="Tennis" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Tennis</li>
+            <li data-section="WNBA"><img src="https://github.com/kyle4news/thporth/blob/main/WNBA.png?raw=true" alt="WNBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">WNBA</li>
+            <li data-section="LIVGolf"><img src="https://github.com/kyle4news/thporth/blob/main/LIVGolf.png?raw=true" alt="LIV Golf" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">LIV Golf</li>
+            <li data-section="IndyCar"><img src="https://github.com/kyle4news/thporth/blob/main/indycar.png?raw=true" alt="IndyCar" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">IndyCar</li>
            <!-- <li data-section="UFL">UFL</li> -->
-           <!-- <li data-section="NCAABaseball"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png" alt="NCAA Baseball" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAA Baseball</li> -->
-           <!-- <li data-section="NCAASoftball"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png" alt="NCAA Softball" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAA Softball</li> -->
-            <li data-section="MotoGP"><img src="https://github.com/kyle4news/thporth/blob/main/motogp.png?raw=true" alt="MotoGP" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">MotoGP</li>
-            <li data-section="LPGATour"><img src="https://github.com/kyle4news/thporth/blob/main/LPGATour.png?raw=true" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">LPGA Tour</li>
-           <!-- <li data-section="TrackAndField"><img src="https://github.com/kyle4news/thporth/blob/main/Screenshot%202025-09-27%20at%2005,05,08-Picsart-BackgroundRemover.png?raw=true" alt="Track & Field" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Track & Field</li> -->
+           <!-- <li data-section="NCAABaseball"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png" alt="NCAA Baseball" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NCAA Baseball</li> -->
+           <!-- <li data-section="NCAASoftball"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png" alt="NCAA Softball" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NCAA Softball</li> -->
+            <li data-section="MotoGP"><img src="https://github.com/kyle4news/thporth/blob/main/motogp.png?raw=true" alt="MotoGP" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">MotoGP</li>
+            <li data-section="LPGATour"><img src="https://github.com/kyle4news/thporth/blob/main/LPGATour.png?raw=true" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">LPGA Tour</li>
+           <!-- <li data-section="TrackAndField"><img src="https://github.com/kyle4news/thporth/blob/main/Screenshot%202025-09-27%20at%2005,05,08-Picsart-BackgroundRemover.png?raw=true" alt="Track & Field" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Track & Field</li> -->
             <br><br><br><br><br><br><br><br>
           </ul>
           <!-- A‑Z FILTER LIST (Complete) -->
         <ul id="menuList-az" style="display: none;">
-            <li data-section="Home"><img src="https://github.com/kyle4news/thporth/blob/main/Screenshot%202025-09-27%20at%2009.04.02.png?raw=true" alt="ALL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">ALL</li>
+            <li data-section="Home"><img src="https://github.com/kyle4news/thporth/blob/main/Screenshot%202025-09-27%20at%2009.04.02.png?raw=true" alt="ALL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">ALL</li>
            <!-- <li data-section="AFCChampionsLeagueElite">AFC Champions League Elite</li>
             <li data-section="AFL">AFL</li>
             <li data-section="AfricaCupOfNations">Africa Cup of Nations</li>
@@ -2196,9 +2209,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li data-section="ArgentinePrimera">Argentine Primera</li>
             <li data-section="BelgianProLeague">Belgian Pro League</li>
             <li data-section="BigBashLeague">Big Bash League</li> -->
-            <li data-section="Boxing"><img src="https://github.com/kyle4news/thporth/blob/main/Github%20boxing.png?raw=true" alt="Boxing" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Boxing</li>
+            <li data-section="Boxing"><img src="https://github.com/kyle4news/thporth/blob/main/Github%20boxing.png?raw=true" alt="Boxing" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Boxing</li>
           <!--   <li data-section="Brasileirao">Brasileirão</li> -->
-            <li data-section="Bundesliga"><img src="https://static.flashscore.com/res/image/data/fqltz6CO-4ATnefbq.png" alt="Bundesliga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Bundesliga</li>
+            <li data-section="Bundesliga"><img src="https://static.flashscore.com/res/image/data/fqltz6CO-4ATnefbq.png" alt="Bundesliga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Bundesliga</li>
          <!--    <li data-section="CAFChampionsLeague">CAF Champions League</li>
             <li data-section="CanadianPremierLeague">Canadian Premier League</li>
             <li data-section="CarabaoCup">Carabao Cup</li>
@@ -2216,66 +2229,66 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li data-section="DFBPokal">DFB-Pokal</li>
             <li data-section="EFLChampionship">EFL Championship</li>
             <li data-section="EuroLeague">EuroLeague</li> -->
-            <li data-section="FACup"><img src="https://github.com/kyle4news/thporth/blob/main/FACup.png?raw=true" alt="FA Cup" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">FA Cup</li>
+            <li data-section="FACup"><img src="https://github.com/kyle4news/thporth/blob/main/FACup.png?raw=true" alt="FA Cup" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">FA Cup</li>
          <!--    <li data-section="FIFAClubWorldCup">FIFA Club World Cup</li>
             <li data-section="FigureSkating">Figure Skating</li> -->
-            <li data-section="FormulaOne"><img src="https://github.com/kyle4news/thporth/blob/main/f1.png?raw=true" alt="Formula One" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Formula 1</li>
+            <li data-section="FormulaOne"><img src="https://github.com/kyle4news/thporth/blob/main/f1.png?raw=true" alt="Formula One" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Formula 1</li>
          <!--    <li data-section="Formula2">Formula 2</li>
             <li data-section="Formula3">Formula 3</li>
             <li data-section="Gymnastics">Gymnastics</li>
             <li data-section="HorseRacing">Horse Racing</li> -->
-            <li data-section="IndyCar"><img src="https://github.com/kyle4news/thporth/blob/main/indycar.png?raw=true" alt="IndyCar" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">IndyCar</li>
+            <li data-section="IndyCar"><img src="https://github.com/kyle4news/thporth/blob/main/indycar.png?raw=true" alt="IndyCar" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">IndyCar</li>
          <!--    <li data-section="KornFerryTour">Korn Ferry Tour</li> -->
-            <li data-section="LaLiga"><img src="https://static.flashscore.com/res/image/data/6aNYx0jD-A3tOPy9B.png" alt="LaLiga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">LaLiga</li>
-            <li data-section="LigaMX"><img src="https://github.com/kyle4news/thporth/blob/main/ligamx.png?raw=true" alt="Liga MX" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Liga MX</li>
+            <li data-section="LaLiga"><img src="https://static.flashscore.com/res/image/data/6aNYx0jD-A3tOPy9B.png" alt="LaLiga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">LaLiga</li>
+            <li data-section="LigaMX"><img src="https://github.com/kyle4news/thporth/blob/main/ligamx.png?raw=true" alt="Liga MX" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Liga MX</li>
          <!--    <li data-section="LigaPortugal">Liga Portugal</li> -->
-            <li data-section="Ligue1"><img src="https://github.com/kyle4news/thporth/blob/main/LIgue%201.png?raw=true" alt="Ligue 1" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Ligue 1</li>
+            <li data-section="Ligue1"><img src="https://github.com/kyle4news/thporth/blob/main/LIgue%201.png?raw=true" alt="Ligue 1" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Ligue 1</li>
         <!--     <li data-section="LittleLeagueSoftballWorldSeries">Little League Softball</li>
             <li data-section="LittleLeagueWorldSeries">Little League World Series</li> -->
-            <li data-section="LIVGolf"><img src="https://github.com/kyle4news/thporth/blob/main/LIVGolf.png?raw=true" alt="LIV Golf" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">LIV Golf</li>
-            <li data-section="LPGATour"><img src="https://github.com/kyle4news/thporth/blob/main/LPGATour.png?raw=true" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">LPGA Tour</li>
+            <li data-section="LIVGolf"><img src="https://github.com/kyle4news/thporth/blob/main/LIVGolf.png?raw=true" alt="LIV Golf" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">LIV Golf</li>
+            <li data-section="LPGATour"><img src="https://github.com/kyle4news/thporth/blob/main/LPGATour.png?raw=true" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">LPGA Tour</li>
         <!--     <li data-section="MajorLeagueRugby">Major League Rugby</li> -->
-            <li data-section="MLB"><img src="https://www.flashscore.com/res/image/data/QPJ3alWI-pS3BMXxt.png" alt="MLB" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">MLB</li>
-            <li data-section="MLS"><img src="https://github.com/kyle4news/thporth/blob/main/mls.png?raw=true" alt="MLS" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">MLS</li>
+            <li data-section="MLB"><img src="https://www.flashscore.com/res/image/data/QPJ3alWI-pS3BMXxt.png" alt="MLB" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">MLB</li>
+            <li data-section="MLS"><img src="https://github.com/kyle4news/thporth/blob/main/mls.png?raw=true" alt="MLS" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">MLS</li>
           <!--   <li data-section="MMA">MMA</li> -->
-            <li data-section="MotoGP"><img src="https://github.com/kyle4news/thporth/blob/main/motogp.png?raw=true" alt="MotoGP" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">MotoGP</li>
-            <li data-section="NASCARCupSeries"><img src="https://github.com/kyle4news/thporth/blob/main/nascar.png?raw=true" alt="NASCAR Cup Series" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NASCAR Cup Series</li>
-            <li data-section="NBA"><img src="https://static.flashscore.com/res/image/data/OhgQNlXI-nyYPIw0n.png" alt="NBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NBA</li>
+            <li data-section="MotoGP"><img src="https://github.com/kyle4news/thporth/blob/main/motogp.png?raw=true" alt="MotoGP" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">MotoGP</li>
+            <li data-section="NASCARCupSeries"><img src="https://github.com/kyle4news/thporth/blob/main/nascar.png?raw=true" alt="NASCAR Cup Series" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NASCAR Cup Series</li>
+            <li data-section="NBA"><img src="https://static.flashscore.com/res/image/data/OhgQNlXI-nyYPIw0n.png" alt="NBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NBA</li>
          <!--    <li data-section="NBAGLeague">NBA G League</li>
             <li data-section="NCAAB">NCAAB</li> -->
-            <li data-section="NCAAF"><img src="https://github.com/kyle4news/thporth/blob/main/ncaaf.png?raw=true" alt="NCAAF" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAF</li>
-            <li data-section="NCAAM"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAM" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAM</li>
-            <li data-section="NCAAW"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAW" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAW</li>
+            <li data-section="NCAAF"><img src="https://github.com/kyle4news/thporth/blob/main/ncaaf.png?raw=true" alt="NCAAF" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NCAAF</li>
+            <li data-section="NCAAM"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAM" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NCAAM</li>
+            <li data-section="NCAAW"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAW" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NCAAW</li>
            <!-- <li data-section="NCAABaseball">NCAA Baseball</li> -->
         <!--     <li data-section="NCAAMensHockey">NCAA Men's Hockey</li> -->
            <!-- <li data-section="NCAASoftball">NCAA Softball</li> -->
-            <li data-section="NFL"><img src="https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png" alt="NFL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NFL</li>
-            <li data-section="NHL"><img src="https://github.com/kyle4news/thporth/blob/main/nhl.png?raw=true" alt="NHL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NHL</li>
+            <li data-section="NFL"><img src="https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png" alt="NFL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NFL</li>
+            <li data-section="NHL"><img src="https://github.com/kyle4news/thporth/blob/main/nhl.png?raw=true" alt="NHL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NHL</li>
          <!--    <li data-section="NHRA">NHRA</li> -->
-          <li data-section="NWSL"><img src="https://github.com/kyle4news/thporth/blob/main/nwsl.png?raw=true" alt="NWSL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NWSL</li>
+          <li data-section="NWSL"><img src="https://github.com/kyle4news/thporth/blob/main/nwsl.png?raw=true" alt="NWSL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NWSL</li>
           <!--  <li data-section="Olympics">Olympics</li>
             <li data-section="PGAChampions">PGA Champions</li> -->
-            <li data-section="PGATour"><img src="https://github.com/kyle4news/thporth/blob/main/PGATour.png?raw=true" alt="PGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">PGA Tour</li>
-          <li data-section="PremierLeague"><img src="https://github.com/kyle4news/thporth/blob/main/premierleague.png?raw=true" alt="Premier League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Premier League</li>
+            <li data-section="PGATour"><img src="https://github.com/kyle4news/thporth/blob/main/PGATour.png?raw=true" alt="PGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">PGA Tour</li>
+          <li data-section="PremierLeague"><img src="https://github.com/kyle4news/thporth/blob/main/premierleague.png?raw=true" alt="Premier League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Premier League</li>
          <!--    <li data-section="PremiershipRugby">Premiership Rugby</li>
             <li data-section="SaudiProLeague">Saudi Pro League</li>
             <li data-section="ScottishPremiership">Scottish Premiership</li> -->
-      <li data-section="SerieA"><img src="https://static.flashscore.com/res/image/data/rFHMayEO-2exwJQks.png" alt="Serie A" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Serie A</li>
-              <li data-section="Soccer"><img src="https://github.com/kyle4news/thporth/blob/main/Soccer.png?raw=true" alt="Soccer" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Soccer</li>
-            <li data-section="Tennis"><img src="https://github.com/kyle4news/thporth/blob/main/atp.png?raw=true" alt="Tennis" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Tennis</li>
+      <li data-section="SerieA"><img src="https://static.flashscore.com/res/image/data/rFHMayEO-2exwJQks.png" alt="Serie A" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Serie A</li>
+              <li data-section="Soccer"><img src="https://github.com/kyle4news/thporth/blob/main/Soccer.png?raw=true" alt="Soccer" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Soccer</li>
+            <li data-section="Tennis"><img src="https://github.com/kyle4news/thporth/blob/main/atp.png?raw=true" alt="Tennis" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Tennis</li>
          <!--   <li data-section="TGL">TGL</li> -->
            <!-- <li data-section="TrackAndField">Track & Field</li> -->
 <!--
             <li data-section="USOpenCup">U.S. Open Cup</li> -->
-            <li data-section="UFC"><img src="https://github.com/kyle4news/thporth/blob/main/ufc.png?raw=true" alt="UFC" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UFC</li>
+            <li data-section="UFC"><img src="https://github.com/kyle4news/thporth/blob/main/ufc.png?raw=true" alt="UFC" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UFC</li>
             <!-- <li data-section="UFL">UFL</li> -->
-            <li data-section="UEFAChampionsLeague"><img src="https://github.com/kyle4news/thporth/blob/main/UCL.png?raw=true" alt="UEFA Champions League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UEFA Champions League</li>
-            <li data-section="UEFAConferenceLeague"><img src="https://static.flashscore.com/res/image/data/6a9THkA7-fmGCnzrf.png" alt="UEFA Conference League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UEFA Conference League</li>
-            <li data-section="UEFAEuropaLeague"><img src="https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png" alt="UEFA Europa League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UEFA Europa League</li>
+            <li data-section="UEFAChampionsLeague"><img src="https://github.com/kyle4news/thporth/blob/main/UCL.png?raw=true" alt="UEFA Champions League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UEFA Champions League</li>
+            <li data-section="UEFAConferenceLeague"><img src="https://static.flashscore.com/res/image/data/6a9THkA7-fmGCnzrf.png" alt="UEFA Conference League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UEFA Conference League</li>
+            <li data-section="UEFAEuropaLeague"><img src="https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png" alt="UEFA Europa League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UEFA Europa League</li>
         <!--      <li data-section="UEFANationsLeague">UEFA Nations League</li>
               <li data-section="UEFAWChampionsLeague">Women's UCL</li>
             <li data-section="Volleyball">Volleyball</li> -->
-            <li data-section="WNBA"><img src="https://github.com/kyle4news/thporth/blob/main/WNBA.png?raw=true" alt="WNBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">WNBA</li>
+            <li data-section="WNBA"><img src="https://github.com/kyle4news/thporth/blob/main/WNBA.png?raw=true" alt="WNBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">WNBA</li>
            <!--   <li data-section="WomensSuperLeague">Women's Super League</li>
             <li data-section="XGames">X Games</li> -->
             <li class="spacer-line"></li>
@@ -2288,7 +2301,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li class="spacer-line"></li>
             <li><strong>FOOTBALL</strong></li>
             <ul style="padding-left: 10px;">
-              <li data-section="NFL"><img src="https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png" alt="NFL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NFL</li>
+              <li data-section="NFL"><img src="https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png" alt="NFL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NFL</li>
                <!-- <li data-section="NCAAF">NCAAF</li> -->
              <!-- <li data-section="UFL">UFL)-->
               <!-- <li data-section="CFL">CFL)-->
@@ -2296,35 +2309,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li class="spacer-line"></li>
             <li><strong>BASEBALL</strong></li>
             <ul style="padding-left: 10px;">
-              <li data-section="MLB"><img src="https://www.flashscore.com/res/image/data/QPJ3alWI-pS3BMXxt.png" alt="MLB" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">MLB</li>
+              <li data-section="MLB"><img src="https://www.flashscore.com/res/image/data/QPJ3alWI-pS3BMXxt.png" alt="MLB" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">MLB</li>
              <!-- <li data-section="NCAABaseball">NCAA Baseball</li> -->
               <!-- <li data-section="LittleLeagueWorldSeries">Little League World Series</li> -->
             </ul>
             <li class="spacer-line"></li>
             <li><strong>BASKETBALL</strong></li>
             <ul style="padding-left: 10px;">
-              <li data-section="NBA"><img src="https://static.flashscore.com/res/image/data/OhgQNlXI-nyYPIw0n.png" alt="NBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NBA</li>
-              <li data-section="WNBA"><img src="https://github.com/kyle4news/thporth/blob/main/WNBA.png?raw=true" alt="WNBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">WNBA</li>
-              <li data-section="NCAAM"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAM" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAM</li>
-              <li data-section="NCAAW"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAW" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NCAAW</li>
+              <li data-section="NBA"><img src="https://static.flashscore.com/res/image/data/OhgQNlXI-nyYPIw0n.png" alt="NBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NBA</li>
+              <li data-section="WNBA"><img src="https://github.com/kyle4news/thporth/blob/main/WNBA.png?raw=true" alt="WNBA" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">WNBA</li>
+              <li data-section="NCAAM"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAM" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NCAAM</li>
+              <li data-section="NCAAW"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png" alt="NCAAW" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NCAAW</li>
              <!--  <li data-section="NBAGLeague">NBA G League</li> -->
              <!--  <li data-section="EuroLeague">EuroLeague</li> -->
             </ul>
             <li class="spacer-line"></li>
             <li><strong>SOCCER</strong></li>
             <ul style="padding-left: 10px;">
-              <li data-section="PremierLeague"><img src="https://github.com/kyle4news/thporth/blob/main/premierleague.png?raw=true" alt="Premier League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Premier League</li>
-              <li data-section="UEFAChampionsLeague"><img src="https://github.com/kyle4news/thporth/blob/main/UCL.png?raw=true" alt="UEFA Champions League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UEFA Champions League</li>
-              <li data-section="MLS"><img src="https://github.com/kyle4news/thporth/blob/main/mls.png?raw=true" alt="MLS" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">MLS</li>
-              <li data-section="LaLiga"><img src="https://static.flashscore.com/res/image/data/6aNYx0jD-A3tOPy9B.png" alt="LaLiga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">LaLiga</li>
-              <li data-section="SerieA"><img src="https://static.flashscore.com/res/image/data/rFHMayEO-2exwJQks.png" alt="Serie A" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Serie A</li>
-              <li data-section="Bundesliga"><img src="https://static.flashscore.com/res/image/data/fqltz6CO-4ATnefbq.png" alt="Bundesliga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Bundesliga</li>
-              <li data-section="FACup"><img src="https://github.com/kyle4news/thporth/blob/main/FACup.png?raw=true" alt="FA Cup" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">FA Cup</li>
-              <li data-section="LigaMX"><img src="https://github.com/kyle4news/thporth/blob/main/ligamx.png?raw=true" alt="Liga MX" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Liga MX</li>
-              <li data-section="NWSL"><img src="https://github.com/kyle4news/thporth/blob/main/nwsl.png?raw=true" alt="NWSL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NWSL</li>
-              <li data-section="Ligue1"><img src="https://github.com/kyle4news/thporth/blob/main/LIgue%201.png?raw=true" alt="Ligue 1" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Ligue 1</li>
-              <li data-section="UEFAEuropaLeague"><img src="https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png" alt="UEFA Europa League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UEFA Europa League</li>
-              <li data-section="UEFAConferenceLeague"><img src="https://static.flashscore.com/res/image/data/6a9THkA7-fmGCnzrf.png" alt="UEFA Conference League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UEFA Conference League</li>
+              <li data-section="PremierLeague"><img src="https://github.com/kyle4news/thporth/blob/main/premierleague.png?raw=true" alt="Premier League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Premier League</li>
+              <li data-section="UEFAChampionsLeague"><img src="https://github.com/kyle4news/thporth/blob/main/UCL.png?raw=true" alt="UEFA Champions League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UEFA Champions League</li>
+              <li data-section="MLS"><img src="https://github.com/kyle4news/thporth/blob/main/mls.png?raw=true" alt="MLS" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">MLS</li>
+              <li data-section="LaLiga"><img src="https://static.flashscore.com/res/image/data/6aNYx0jD-A3tOPy9B.png" alt="LaLiga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">LaLiga</li>
+              <li data-section="SerieA"><img src="https://static.flashscore.com/res/image/data/rFHMayEO-2exwJQks.png" alt="Serie A" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Serie A</li>
+              <li data-section="Bundesliga"><img src="https://static.flashscore.com/res/image/data/fqltz6CO-4ATnefbq.png" alt="Bundesliga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Bundesliga</li>
+              <li data-section="FACup"><img src="https://github.com/kyle4news/thporth/blob/main/FACup.png?raw=true" alt="FA Cup" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">FA Cup</li>
+              <li data-section="LigaMX"><img src="https://github.com/kyle4news/thporth/blob/main/ligamx.png?raw=true" alt="Liga MX" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Liga MX</li>
+              <li data-section="NWSL"><img src="https://github.com/kyle4news/thporth/blob/main/nwsl.png?raw=true" alt="NWSL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NWSL</li>
+              <li data-section="Ligue1"><img src="https://github.com/kyle4news/thporth/blob/main/LIgue%201.png?raw=true" alt="Ligue 1" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Ligue 1</li>
+              <li data-section="UEFAEuropaLeague"><img src="https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png" alt="UEFA Europa League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UEFA Europa League</li>
+              <li data-section="UEFAConferenceLeague"><img src="https://static.flashscore.com/res/image/data/6a9THkA7-fmGCnzrf.png" alt="UEFA Conference League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UEFA Conference League</li>
              <!--  <li class="soccer-more-toggle" style="cursor: pointer; color: #bebebe;" onclick="toggleSoccerMore()">More…</li> -->
             </ul>
             <!-- <div id="soccer-more" style="display: none;">
@@ -2360,16 +2373,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li class="spacer-line"></li>
             <li><strong>HOCKEY</strong></li>
             <ul style="padding-left: 10px;">
-              <li data-section="NHL"><img src="https://github.com/kyle4news/thporth/blob/main/nhl.png?raw=true" alt="NHL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NHL</li>
+              <li data-section="NHL"><img src="https://github.com/kyle4news/thporth/blob/main/nhl.png?raw=true" alt="NHL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NHL</li>
              <!--  <li data-section="NCAAMensHockey">NCAA Men's Hockey</li> -->
             </ul>
             <li class="spacer-line"></li>
             <li><strong>MOTORSPORTS</strong></li>
             <ul style="padding-left: 10px;">
-              <li data-section="FormulaOne"><img src="https://github.com/kyle4news/thporth/blob/main/f1.png?raw=true" alt="Formula One" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Formula 1</li>
-              <li data-section="NASCARCupSeries"><img src="https://github.com/kyle4news/thporth/blob/main/nascar.png?raw=true" alt="NASCAR Cup Series" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">NASCAR Cup Series</li>
-              <li data-section="IndyCar"><img src="https://github.com/kyle4news/thporth/blob/main/indycar.png?raw=true" alt="IndyCar" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">IndyCar</li>
-              <li data-section="MotoGP"><img src="https://github.com/kyle4news/thporth/blob/main/motogp.png?raw=true" alt="MotoGP" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">MotoGP</li>
+              <li data-section="FormulaOne"><img src="https://github.com/kyle4news/thporth/blob/main/f1.png?raw=true" alt="Formula One" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Formula 1</li>
+              <li data-section="NASCARCupSeries"><img src="https://github.com/kyle4news/thporth/blob/main/nascar.png?raw=true" alt="NASCAR Cup Series" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">NASCAR Cup Series</li>
+              <li data-section="IndyCar"><img src="https://github.com/kyle4news/thporth/blob/main/indycar.png?raw=true" alt="IndyCar" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">IndyCar</li>
+              <li data-section="MotoGP"><img src="https://github.com/kyle4news/thporth/blob/main/motogp.png?raw=true" alt="MotoGP" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">MotoGP</li>
            <!--    <li data-section="NHRA">NHRA</li>
               <li data-section="NASCARXfinitySeries">NASCAR Xfinity Series</li>
               <li data-section="NASCARTruckSeries">NASCAR Truck Series</li>
@@ -2380,10 +2393,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li class="spacer-line"></li>
             <li><strong>GOLF</strong></li>
             <ul style="padding-left: 10px;">
-              <li data-section="PGATour"><img src="https://github.com/kyle4news/thporth/blob/main/PGATour.png?raw=true" alt="PGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">PGA Tour</li>
-              <li data-section="LIVGolf"><img src="https://github.com/kyle4news/thporth/blob/main/LIVGolf.png?raw=true" alt="LIV Golf" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">LIV Golf</li>
+              <li data-section="PGATour"><img src="https://github.com/kyle4news/thporth/blob/main/PGATour.png?raw=true" alt="PGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">PGA Tour</li>
+              <li data-section="LIVGolf"><img src="https://github.com/kyle4news/thporth/blob/main/LIVGolf.png?raw=true" alt="LIV Golf" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">LIV Golf</li>
            <!--    <li data-section="TGL">TGL</li> -->
-              <li data-section="LPGATour"><img src="https://github.com/kyle4news/thporth/blob/main/LPGATour.png?raw=true" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">LPGA Tour</li>
+              <li data-section="LPGATour"><img src="https://github.com/kyle4news/thporth/blob/main/LPGATour.png?raw=true" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">LPGA Tour</li>
          <!--      <li data-section="PGAChampions">PGA Champions</li>
               <li data-section="DPWorldTour">DP World Tour</li>
               <li data-section="KornFerryTour">Korn Ferry Tour</li> -->
@@ -2391,8 +2404,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li class="spacer-line"></li>
             <li><strong>FIGHTING</strong></li>
             <ul style="padding-left: 10px;">
-              <li data-section="UFC"><img src="https://github.com/kyle4news/thporth/blob/main/ufc.png?raw=true" alt="UFC" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">UFC</li>
-              <li data-section="Boxing"><img src="https://github.com/kyle4news/thporth/blob/main/Github%20boxing.png?raw=true" alt="Boxing" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Boxing</li>
+              <li data-section="UFC"><img src="https://github.com/kyle4news/thporth/blob/main/ufc.png?raw=true" alt="UFC" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">UFC</li>
+              <li data-section="Boxing"><img src="https://github.com/kyle4news/thporth/blob/main/Github%20boxing.png?raw=true" alt="Boxing" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Boxing</li>
             <!--   <li data-section="MMA">MMA</li> -->
             </ul>
             <li class="spacer-line"></li>
@@ -2432,7 +2445,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <li data-section="Volleyball">Volleyball</li>
               <li data-section="XGames">XGames</li>
             -->
-              <li data-section="Tennis"><img src="https://github.com/kyle4news/thporth/blob/main/atp.png?raw=true" alt="Tennis" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;">Tennis</li>
+              <li data-section="Tennis"><img src="https://github.com/kyle4news/thporth/blob/main/atp.png?raw=true" alt="Tennis" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; display: inline-block;" width="12" height="12">Tennis</li>
              <!-- <li data-section="TrackAndField">Track & Field</li> -->
               <li class="spacer-line"></li>
               <li class="spacer-line"></li>
@@ -7343,6 +7356,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         const logo = document.createElement("img");
                         logo.src = "https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png";
                         logo.alt = "NFL Logo";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.height = 14;
                         logo.style.width = "14px";
                         logo.style.height = "14px";
                         logo.style.objectFit = "contain";
@@ -7356,6 +7372,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         const logo = document.createElement("img");
                         logo.src = "https://static.flashscore.com/res/image/data/tOAXV6hU-QJIQNuDK.png";
                         logo.alt = "Ligue 1 Logo";
+                        logo.width = 14;
+                        logo.height = 14;
                         logo.style.width = "14px";
                         logo.style.height = "14px";
                         logo.style.objectFit = "contain";
@@ -7369,6 +7387,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         const logo = document.createElement("img");
                         logo.src = "https://github.com/kyle4news/thporth/blob/main/CFL.png?raw=true";
                         logo.alt = "CFL Logo";
+                        logo.width = 14;
+                        logo.height = 14;
                         logo.style.width = "14px";
                         logo.style.height = "14px";
                         logo.style.objectFit = "contain";
@@ -7382,6 +7402,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         const logo = document.createElement("img");
                         logo.src = "https://github.com/kyle4news/thporth/blob/main/Super%20lig.png?raw=true";
                         logo.alt = "Super Lig Logo";
+                        logo.width = 14;
+                        logo.height = 14;
                         logo.style.width = "14px";
                         logo.style.height = "14px";
                         logo.style.objectFit = "contain";
@@ -7395,7 +7417,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png";
                     logo.alt = "UEFA Europa League Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7408,7 +7432,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/6a9THkA7-fmGCnzrf.png";
                     logo.alt = "UEFA Conference League Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7421,7 +7447,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/f1.png?raw=true";
                     logo.alt = "Formula 1 Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7434,7 +7462,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/EqLxVbkd-QwJbqIgc.png";
                     logo.alt = "EFL Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7447,7 +7477,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/SzmaHcmd-nqEux76Q.png";
                     logo.alt = "Copa del Rey Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7460,7 +7492,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/GIfP8XA7-nRUFcF5U.png";
                     logo.alt = "DFB-Pokal Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7473,7 +7507,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/ncaaf.png?raw=true";
                     logo.alt = "NCAAF Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7486,7 +7522,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/atp.png?raw=true";
                     logo.alt = "Tennis Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7499,7 +7537,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://r2.thesportsdb.com/images/media/league/badge/i0qscy1672325773.png/medium";
                     logo.alt = "Davis Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7512,7 +7552,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/WNBA.png?raw=true";
                     logo.alt = "WNBA Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7525,7 +7567,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/LIVGolf.png?raw=true";
                     logo.alt = "LIV Golf Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7538,7 +7582,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/indycar.png?raw=true";
                     logo.alt = "IndyCar Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7551,7 +7597,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/UN5z4YU1-x4aPTEVr.png";
                     logo.alt = "NCAA Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7564,7 +7612,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/motogp.png?raw=true";
                     logo.alt = "MotoGP Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7577,7 +7627,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/PGATour.png?raw=true";
                     logo.alt = "PGA Tour Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7590,7 +7642,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/LPGATour.png?raw=true";
                     logo.alt = "LPGA Tour Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7603,7 +7657,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/OhgQNlXI-nyYPIw0n.png";
                     logo.alt = "NBA Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7616,7 +7672,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://www.flashscore.com/res/image/data/QPJ3alWI-pS3BMXxt.png";
                     logo.alt = "MLB Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7629,7 +7687,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/82tQHwgU-r9l5Je0r.png";
                     logo.alt = "MLS Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7642,7 +7702,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/G6WqthjD-rgOxvTTi.png";
                     logo.alt = "FA Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7655,7 +7717,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/6aNYx0jD-A3tOPy9B.png";
                     logo.alt = "LaLiga Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7668,7 +7732,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/rFHMayEO-2exwJQks.png";
                     logo.alt = "Serie A Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7681,7 +7747,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/premierleague.png?raw=true";
                     logo.alt = "Premier League Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7694,7 +7762,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://cdn.sanity.io/images/oyf3dba6/production/bf72ee7b299178803e565d6c872cdb4baf2aef2d-640x877.png";
                     logo.alt = "USMNT Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7707,7 +7777,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/fqltz6CO-4ATnefbq.png";
                     logo.alt = "Bundesliga Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7720,7 +7792,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/b/b5/2025_Women%27s_Cricket_World_Cup_logo.svg/500px-2025_Women%27s_Cricket_World_Cup_logo.svg.png";
                     logo.alt = "Women's Cricket World Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7733,7 +7807,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-icc.png?raw=true";
                     logo.alt = "ICC Test Series Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7746,7 +7822,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://www.sportmonks.com/wp-content/uploads/2023/01/one-day-international.png";
                     logo.alt = "ODI Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7759,7 +7837,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-t20.png?raw=true";
                     logo.alt = "T20 International Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7772,7 +7852,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/URiA2CjD-tGWdkkzC.png";
                     logo.alt = "UEFA Women's Champions League Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7785,7 +7867,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/rHzeKoXI-nN00V7HJ.png";
                     logo.alt = "USL Championship Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7798,7 +7882,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://www.ncaa.com/modules/custom/casablanca_core/img/sportbanners/icehockey-men.png";
                     logo.alt = "NCAA Men's Hockey Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7811,7 +7897,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/8/8f/OHL_Logo.svg/500px-OHL_Logo.svg.png";
                     logo.alt = "OHL Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7824,7 +7912,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/7/72/Confederation_of_African_Football_logo.svg/410px-Confederation_of_African_Football_logo.svg.png";
                     logo.alt = "CAF Qualifiers Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7837,7 +7927,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://a4.espncdn.com/combiner/i?img=%2Fi%2Fleaguelogos%2Fsoccer%2F500%2F67.png";
                     logo.alt = "UEFA Qualifiers Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7850,7 +7942,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/2/28/Asian_Football_Confederation_logo_2025.svg/500px-Asian_Football_Confederation_logo_2025.svg.png";
                     logo.alt = leagueNameKey + " Logo";
-                    logo.style.width = "14px";
+                    logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7863,7 +7957,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Concacaf_logo.svg/500px-Concacaf_logo.svg.png";
                     logo.alt = "CONCACAF Qualifiers Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7876,7 +7972,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Soccer.png?raw=true";
                     logo.alt = "Club Friendly Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7889,7 +7987,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Soccer.png?raw=true";
                     logo.alt = "International Friendly Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7902,7 +8002,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/nhl.png?raw=true";
                     logo.alt = "NHL Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7915,7 +8017,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/nwsl.png?raw=true";
                     logo.alt = "NWSL Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7928,7 +8032,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/nascar.png?raw=true";
                     logo.alt = "NASCAR Cup Series Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7941,7 +8047,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/ufc.png?raw=true";
                     logo.alt = "UFC Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7954,7 +8062,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Github%20boxing.png?raw=true";
                     logo.alt = "Boxing Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7967,7 +8077,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/mls.png?raw=true";
                     logo.alt = "MLS Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7980,7 +8092,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/G6WqthjD-rgOxvTTi.png";
                     logo.alt = "FA Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7993,7 +8107,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/CopaSudamericana.png?raw=true";
                     logo.alt = "Copa Sudamericana Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8006,7 +8122,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/FACup.png?raw=true";
                     logo.alt = "FA Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8019,7 +8137,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/UCL.png?raw=true";
                     logo.alt = "UEFA Champions League Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8032,7 +8152,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/CoppaItalia.png?raw=true";
                     logo.alt = "Coppa Italia Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8045,7 +8167,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/CopaLibertadores.png?raw=true";
                     logo.alt = "Copa Libertadores Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8058,7 +8182,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/RSL.png?raw=true";
                     logo.alt = "Saudi Pro League Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8071,7 +8197,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/ligamx.png?raw=true";
                     logo.alt = "Liga MX Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8084,7 +8212,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Ryder%20Cup.png?raw=true";
                     logo.alt = "Ryder Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8097,7 +8227,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Eredivisie.png?raw=true";
                     logo.alt = "Eredivisie Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8110,7 +8242,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/EFL%20Championship.png?raw=true";
                     logo.alt = "EFL Championship Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8123,7 +8257,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/Brasileirao.png?raw=true";
                     logo.alt = "Brasileirão Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8136,7 +8272,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/88Ble6kd-Q780vzyI.png";
                     logo.alt = "Belgian Pro League Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8149,7 +8287,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-Argentina%20Torneo%20Betano.png?raw=true";
                     logo.alt = "LPF Playoffs Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8162,7 +8302,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-Argentina%20Torneo%20Betano.png?raw=true";
                     logo.alt = "Argentine Primera Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8175,7 +8317,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-ScottishCup.png?raw=true";
                     logo.alt = "Scottish Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8188,7 +8332,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-WSL.png?raw=true";
                     logo.alt = "Women's Super League Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8201,7 +8347,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-Liga%20Portugal.png?raw=true";
                     logo.alt = "Liga Portugal Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8214,7 +8362,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/png-SPFL.png?raw=true";
                     logo.alt = "Scottish Premiership Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8227,7 +8377,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/CampeonesCup.png?raw=true";
                     logo.alt = "Campeones Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8240,7 +8392,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/KrHaXEVI-4AahbJk8.png";
                     logo.alt = "FIFA U-17 World Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8253,7 +8407,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/4/43/2025_FIFA_U-20_World_Cup_logo.svg/315px-2025_FIFA_U-20_World_Cup_logo.svg.png";
                     logo.alt = "FIFA U-20 World Cup Logo";
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
