@@ -5031,7 +5031,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'LPGA Tour', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "LPGA Tour", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "AFC Qualifiers", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "LPGA Tour", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         NFL: "https://www.nfl.com/scores",
@@ -5446,7 +5446,6 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Leagues that should be collapsed by default on the home page
     const COLLAPSED_LEAGUES = [
-    "AFC Qualifiers", 
     "AFC Asian Cup Qualifiers",
     "CAF Qualifiers", 
     "NHL Preseason", 
@@ -6448,6 +6447,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Oklahoma State": "OK State",
             "Arkansas Baptist": "Ark Baptist",
             "NC Greensboro": "UNC-Greensb",
+            "NC Wilmington": "UNC Wilm",
             "Missouri Southern State": "MO So. State",
             "Penn State-York": "Penn St-York",
             "UMBC Retrievers": "UMBC",
@@ -6507,12 +6507,14 @@ document.addEventListener('DOMContentLoaded', function () {
             "North Dakota St": "ND State",
             "Northwest Indian": "NW Indian",
             "North Alabama": "N Alabama",
+            "North Carolina": "UNC",
             "Long Beach State": "LB State",
             "Ottawa Spirit": "Ottowa (AZ)",
             "Pacific Lutheran": "Pac. Lutheran",
             "East. Washington": "EWU",
             "Loyola Marymount": "Loyola Mary.",
             "Boston University": "Boston U",
+            "Boston College": "Boston Coll",
             "Colorado State": "Colorado St",
             "Colorado State Rams": "Colorado St",
             "Coppin State": "Coppin St",
@@ -6561,6 +6563,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Alabama State": "Ala St",
             "CSU Bakersfield": "CSU-B'field",
             "Eastern Oregon": "E Oregon",
+            "Stephen F. Austin": "SF Austin",
             "UCF Knights": "UCF"
         },
         // NCAAF
@@ -6594,6 +6597,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Middle Tennessee St": "Mid TN St",
             "North Carolina State": "NC State",
             "Michigan State": "Mich St",
+            "Western Michigan": "W Michigan",
             "Louisiana-Monroe": "UL-Monroe",
             "South Alabama": "S Alabama",
             "Colorado State Rams": "Colorado St",
@@ -6728,6 +6732,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Erskine": "Erskine",
             "George Washington": "G Wash",
             "Georgia State": "GA State",
+            "Grand Canyon": "GCU",
             "Harvard Crimson": "Harvard",
             "Howard": "Howard",
             "Indiana East": "Indiana E",
@@ -6791,7 +6796,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // UEFA Qualifiers
         "UEFA Qualifiers": {
             "Czech Republic": "Czechia",
-            "Northern Ireland": "N Ireland"
+            "Northern Ireland": "N Ireland",
+            "Bosnia & Herzegovina": "Bosnia & H",
+            "North Macedonia": "N Macedonia"
         }
     };
     
@@ -8330,7 +8337,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     return subTable;
                 };
                 
-                sortedFeaturedGames.forEach(data => {
+                for (let i = 0; i < sortedFeaturedGames.length; i++) {
+                    const data = sortedFeaturedGames[i];
                     const titleText = isYesterdayScores 
                         ? (data.yesterdayTitle || data.title || getLeagueDisplayName(data.League, data.Sport) || "Other")
                         : (data.title || getLeagueDisplayName(data.League, data.Sport) || "Other");
@@ -8341,7 +8349,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         lastDisplayedTimeLabel = null;
                     }
                     
-                    if (!currentTable) return;
+                    if (!currentTable) continue;
                     
                         const displayLeague = getLeagueDisplayName(data.League, data.Sport);
                         const leagueKey = getLeagueKeyFromGame(data);
@@ -8450,10 +8458,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     
                     if (isSoccerLeague) {
-                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${featuredChannelDisplay}</div></td>`;
+                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: calc(100% - 4px);">${featuredChannelDisplay}</div></td>`;
                         row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                     } else {
-                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${featuredChannelDisplay}</div></td>`;
+                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: calc(100% - 4px);">${featuredChannelDisplay}</div></td>`;
                         row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                     }
 
@@ -8463,13 +8471,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     row1.classList.add(gameStatusClass);
                     row2.classList.add(gameStatusClass);
                     
+                // Add separator line between games (but not after the last game in the same table)
+                if (i < sortedFeaturedGames.length - 1) {
+                    const nextData = sortedFeaturedGames[i + 1];
+                    const nextTitleText = isYesterdayScores 
+                        ? (nextData.yesterdayTitle || nextData.title || getLeagueDisplayName(nextData.League, nextData.Sport) || "Other")
+                        : (nextData.title || getLeagueDisplayName(nextData.League, nextData.Sport) || "Other");
+                    // Only add separator if next game is in the same table (same title)
+                    if (nextTitleText === titleText) {
+                        const separatorRow = currentTable.insertRow();
+                        separatorRow.className = "game-separator-line";
+                        separatorRow.innerHTML = '<td style="padding: 0; border: none; width: 32%;"></td><td colspan="3" style="padding: 1px 0; border: none; height: 0;"><div style="border-top: 2px solid #000000; margin: 0;"></div></td>';
+                    }
+                }
+                    
                     // Add spacer row after ATP doubles matches for extra spacing
                     if (isAtpDoubles) {
                         const spacerRow = currentTable.insertRow();
                         spacerRow.className = "atp-doubles-spacer";
                         spacerRow.innerHTML = '<td colspan="4" style="height: 1.5em; padding: 0; border: none; line-height: 0;"></td>';
                     }
-                });
+                }
                 
                 container.appendChild(leagueSection);
                 return; // Skip normal rendering for FEATURED
@@ -8636,11 +8658,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
+                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: calc(100% - 4px);">${channelDisplay}</div></td>`;
                     row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
-                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
+                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: calc(100% - 4px);">${channelDisplay}</div></td>`;
                     row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                 }
 
@@ -8664,6 +8686,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (isFinal) gameStatusClass = 'final-game';
                 row1.classList.add(gameStatusClass);
                 row2.classList.add(gameStatusClass);
+                
+                // Add separator line between games (but not after the last game)
+                if (i < games.length - 1) {
+                    const separatorRow = table.insertRow();
+                    separatorRow.className = "game-separator-line";
+                    separatorRow.innerHTML = '<td style="padding: 0; border: none; width: 32%;"></td><td colspan="3" style="padding: 1px 0; border: none; height: 0;"><div style="border-top: 2px solid #000000; margin: 0;"></div></td>';
+                }
                 
                 // Add spacer row after ATP doubles matches for extra spacing
                 if (isAtpDoubles) {
