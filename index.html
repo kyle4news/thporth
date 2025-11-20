@@ -122,7 +122,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 }
 .league-title { /* Renamed from .league-header to .league-title for clarity within this context */
     font-size: 14px;
-    margin-bottom: 0.25rem;
+    margin-bottom: 7px;
     border-bottom: 2px solid #555;
     padding-bottom: 0.3rem;
     padding-left: 10px;
@@ -6997,14 +6997,14 @@ document.addEventListener('DOMContentLoaded', function () {
             return game.Stage;
         }
         
-        // NHL - Period-based sport
-        if (displayLeague === 'NHL') {
+        // Hockey - Period-based sport (NHL, OHL, and all hockey leagues)
+        if (game.Sport === 'Hockey') {
             if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
                 // Format period and time remaining
                 let period = game.Stage || '';
                 // Remove _PERIOD suffix and normalize
                 period = period.replace(/_PERIOD/gi, '').replace(/_/g, '').trim();
-                // Convert FIRST/SECOND/THIRD to 1st/2nd/3rd, and PAUSE to INT
+                // Convert FIRST_PERIOD/SECOND_PERIOD/THIRD_PERIOD to 1st/2nd/3rd, and PAUSE to INT
                 if (period === "FIRST" || period === "1ST") period = "1st";
                 else if (period === "SECOND" || period === "2ND") period = "2nd";
                 else if (period === "THIRD" || period === "3RD") period = "3rd";
@@ -7021,7 +7021,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (period) {
                 // Remove _PERIOD suffix and normalize
                 period = period.replace(/_PERIOD/gi, '').replace(/_/g, '').trim();
-                // Convert FIRST/SECOND/THIRD to 1st/2nd/3rd, and PAUSE to INT
+                // Convert FIRST_PERIOD/SECOND_PERIOD/THIRD_PERIOD to 1st/2nd/3rd, and PAUSE to INT
                 if (period === "FIRST" || period === "1ST") period = "1st";
                 else if (period === "SECOND" || period === "2ND") period = "2nd";
                 else if (period === "THIRD" || period === "3RD") period = "3rd";
