@@ -234,7 +234,7 @@ table.game-table td:nth-child(1) {
     text-align: center !important;
     white-space: normal !important;
     overflow-wrap: anywhere !important;
-}
+    }
 }
 .game-table td:nth-child(3) { /* Override default padding for score column */
     padding-left: 4px;
@@ -655,7 +655,7 @@ table.game-table td:nth-child(1) {
     padding: 0;
   }
 
-.column.tv-listings {
+  .column.tv-listings {
     flex: 0 1 247px;
     min-width: 200px;
     width: min(247px, 100vw);
@@ -679,7 +679,7 @@ table.game-table td:nth-child(1) {
 .column.tv-listings .game-row.hidden-row,
 .column.tv-listings .game-row.game-separator.hidden-row {
     display: none !important;
-}
+  }
 
   .main-menu {
     background-color: #151515;
@@ -2136,9 +2136,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="column main-menu">
         <div id="menuTopBox">
           <div class="menu-logo-section">
-            <img
-              src="https://github.com/kyle4news/thporth/blob/main/THPORTH%20logo.png?raw=true"
-              alt="Logo"
+          <img
+            src="https://github.com/kyle4news/thporth/blob/main/THPORTH%20logo.png?raw=true"
+            alt="Logo"
               width="54"
               height="18"
             />
@@ -2419,7 +2419,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <ul style="padding-left: 10px;">
               <li data-section="NCAASoftball">NCAA Softball</li>
                <li data-section="LittleLeagueSoftballWorldSeries">Little League Softball</li>
-            </ul> 
+            </ul>
             <li class="spacer-line"></li> -->
            <!--  <li><strong>RUGBY</strong></li>
             <ul style="padding-left: 10px;">
@@ -2428,14 +2428,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <li data-section="MajorLeagueRugby">Major League Rugby</li>
             </ul>
             <li class="spacer-line"></li>
-           <li><strong>CRICKET</strong></li>
+            <li><strong>CRICKET</strong></li>
             <ul style="padding-left: 10px;">
               <li data-section="BigBashLeague">Big Bash League</li>
             </ul> 
             <li class="spacer-line"></li> -->
             <li><strong>OTHER</strong></li>
             <ul style="padding-left: 10px;">
-            <!--
+<!--
               <li data-section="AFL">AFL</li>
               <li data-section="Cycling">Cycling</li>
               <li data-section="FigureSkating">Figure Skating</li>
@@ -2509,7 +2509,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="f1-main-tab active" data-f1-main-tab="schedule" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #fff; color: #000; font-weight: bold;">SCHEDULE</div>
           <div class="f1-main-tab" data-f1-main-tab="standings" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">STANDINGS</div>
       </div>
-
+  
       <!-- Schedule Tab Content (active by default) -->
       <div id="f1-schedule-tab-content" class="f1-main-tab-content" style="display: block; height: calc(100% - 36px); flex-direction: column;">
           <!-- Schedule Sub-Tabs (Yesterday, Today, Upcoming) -->
@@ -2517,8 +2517,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <!-- <div class="f1-schedule-tab" data-f1-schedule-tab="yesterday" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Yesterday</div> -->
               <div class="f1-schedule-tab" data-f1-schedule-tab="today" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Today</div>
               <div class="f1-schedule-tab active" data-f1-schedule-tab="upcoming" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Upcoming</div>
-          </div>
-          
+</div>
+  
           <!-- Schedule Content Panes -->
           <div style="flex: 1; overflow-y: auto;">
               <div id="f1-yesterday-content" class="f1-schedule-content-pane" style="display: none; padding: 1rem;">
@@ -2534,7 +2534,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </div>
           </div>
       </div>
-
+  
       <!-- Standings Tab Content -->
       <div id="f1-standings-tab-content" class="f1-main-tab-content" style="display: none; height: calc(100% - 36px); flex-direction: column;">
           <!-- Standings Sub-Tabs (Driver, Constructor) -->
@@ -2546,35 +2546,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <!-- Standings Content Panes -->
           <div style="flex: 1; overflow-y: auto; padding: 0.5rem;">
               <div id="f1-driver-standings-content" class="f1-standings-content-pane">
-                  <div id="driver-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading driver standings...</div>
-                  <div id="driver-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
-                  <table id="driver-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
-                      <thead>
-                          <tr style="text-align: left;">
-                              <th style="padding: 6px 4px; width: 25px;">#</th>
-                              <th style="padding: 6px 4px;">Driver</th>
-                              <th style="padding: 6px 4px; text-align: right;">Pts</th>
+              <div id="driver-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading driver standings...</div>
+              <div id="driver-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
+              <table id="driver-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
+                <thead>
+                  <tr style="text-align: left;">
+                    <th style="padding: 6px 4px; width: 25px;">#</th>
+                    <th style="padding: 6px 4px;">Driver</th>
+                    <th style="padding: 6px 4px; text-align: right;">Pts</th>
                               <th style="padding: 6px 4px; text-align: right;">Wins</th>
-                          </tr>
-                      </thead>
-                      <tbody id="driver-tbody"></tbody>
-                  </table>
-              </div>
+                  </tr>
+                </thead>
+                <tbody id="driver-tbody"></tbody>
+              </table>
+            </div>
               <div id="f1-constructor-standings-content" class="f1-standings-content-pane" style="display: none;">
-                  <div id="constructor-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading constructor standings...</div>
-                  <div id="constructor-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
-                  <table id="constructor-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
-                      <thead>
-                          <tr style="text-align: left;">
-                              <th style="padding: 6px 4px; width: 25px;">#</th>
+              <div id="constructor-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading constructor standings...</div>
+              <div id="constructor-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
+              <table id="constructor-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
+                <thead>
+                  <tr style="text-align: left;">
+                    <th style="padding: 6px 4px; width: 25px;">#</th>
                               <th style="padding: 6px 4px;">Constructor</th>
-                              <th style="padding: 6px 4px; text-align: right;">Pts</th>
+                    <th style="padding: 6px 4px; text-align: right;">Pts</th>
                               <th style="padding: 6px 4px; text-align: right;">Wins</th>
-                          </tr>
-                      </thead>
-                      <tbody id="constructor-tbody"></tbody>
-                  </table>
-              </div>
+                  </tr>
+                </thead>
+                <tbody id="constructor-tbody"></tbody>
+              </table>
+            </div>
           </div>
       </div>
   </div>
@@ -3592,7 +3592,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <script>
  // Map of league to an array of RSS.app feed IDs (for cycling)
-const rssFeeds = {
+ const rssFeeds = {
    Home: [
      "_dQv2W26Lxax1n3sC",
      "4kPf5TwmnRhc9JOI",
@@ -4599,12 +4599,12 @@ async function loadDriverStandings() {
         
         tbody.innerHTML = '';
         drivers.forEach(driver => {
-            const tr = document.createElement('tr');
-            tr.style.borderTop = '1px solid #374151';
+                const tr = document.createElement('tr');
+                tr.style.borderTop = '1px solid #374151';
             const driverName = formatDriverName(driver.Driver);
             const teamName = driver.Team || '';
             
-            tr.innerHTML = `
+                tr.innerHTML = `
                 <td style="padding: 6px 4px;">${driver.Rank}</td>
                 <td style="padding: 6px 4px;">
                     <div style="color: #fff;">${driverName}</div>
@@ -4612,8 +4612,8 @@ async function loadDriverStandings() {
                 </td>
                 <td style="padding: 6px 4px; text-align: right; font-weight: bold;">${driver.Points}</td>
                 <td style="padding: 6px 4px; text-align: right;">${driver.Wins}</td>
-            `;
-            tbody.appendChild(tr);
+                `;
+                tbody.appendChild(tr);
         });
         
         loadingDiv.style.display = 'none';
@@ -4670,16 +4670,16 @@ async function loadConstructorStandings() {
         
         tbody.innerHTML = '';
         constructors.forEach(constructor => {
-            const tr = document.createElement('tr');
-            tr.style.borderTop = '1px solid #374151';
+                const tr = document.createElement('tr');
+                tr.style.borderTop = '1px solid #374151';
             
-            tr.innerHTML = `
+                tr.innerHTML = `
                 <td style="padding: 6px 4px;">${constructor.Rank}</td>
                 <td style="padding: 6px 4px;">${constructor.Constructor}</td>
                 <td style="padding: 6px 4px; text-align: right; font-weight: bold;">${constructor.Points}</td>
                 <td style="padding: 6px 4px; text-align: right;">${constructor.Wins}</td>
-            `;
-            tbody.appendChild(tr);
+                `;
+                tbody.appendChild(tr);
         });
         
         loadingDiv.style.display = 'none';
@@ -4823,8 +4823,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     const endDateTime = startDateTime.plus({ hours: durationHours });
                     
                     events.push({
-                        start: startDateTime,
-                        end: endDateTime,
+                    start: startDateTime,
+                    end: endDateTime,
                         eventHead: home,
                         eventSub: away,
                         channel: channel
@@ -4940,11 +4940,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const localStart = event.start.setZone('local');
                 const dateKey = localStart.toFormat('yyyy-MM-dd');
                 if (!acc[dateKey]) acc[dateKey] = [];
-                acc[dateKey].push(event);
-                return acc;
-            }, {});
-
-            let html = '';
+            acc[dateKey].push(event);
+            return acc;
+        }, {});
+        
+        let html = '';
             const sortedDates = Object.keys(groupedByDate).sort();
 
             sortedDates.forEach(dateKey => {
@@ -4952,10 +4952,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const dateHeader = dateObj.toFormat('MMMM d');
                 html += `<div style="background-color: #2a2a2a; color: white; padding: 1px 8px; margin: 10px 0 5px 0; font-size: 11px; font-weight: bold;">${dateHeader}</div>`;
 
-                groupedByDate[dateKey].forEach(event => {
+            groupedByDate[dateKey].forEach(event => {
                     const localStart = event.start.setZone('local');
                     const timeDisplay = localStart.toFormat('h:mm a');
-                    html += `
+                html += `
                         <div style="display: flex; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid #333; font-size: 11px;">
                             <div style="flex-grow: 1; color: white;">
                                 <div style="font-weight: bold;">${event.eventHead}</div>
@@ -4963,8 +4963,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                             <div style="color: #ccc; font-weight: normal; margin-left: 10px; min-width: 50px; text-align: right;">${timeDisplay}</div>
                         </div>
-                    `;
-                });
+                `;
+            });
             });
 
             scheduleContainer.innerHTML = html || `<p style="color: #9ca3af;">No upcoming events found.</p>`;
@@ -4996,7 +4996,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (upcomingContent && upcomingContent.style.display !== 'none') {
         // Wait a bit for Firebase to initialize
         setTimeout(() => {
-            updateSchedule();
+    updateSchedule();
         }, 500);
     }
 });
@@ -5595,15 +5595,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     .where('gameDate', '==', gameDate)
                     .get();
                 
-            const gamesData = allGamesSnapshot.docs
-                .map(doc => doc.data())
-                .filter(game => {
+                const gamesData = allGamesSnapshot.docs
+                    .map(doc => doc.data())
+                    .filter(game => {
                     if (leagueIdLower.includes('formula one') || leagueIdLower.includes('formula 1') || leagueIdLower === 'formulaone') {
                         return isFormulaOneGame(game);
                     }
                     const gameLeague = (game.League || '').toLowerCase();
                     return gameLeague.includes(leagueIdLower) || leagueIdLower.includes(gameLeague);
-                });
+                    });
                 
                 cache.set(cacheKey, gamesData);
                 return gamesData;
@@ -7352,74 +7352,74 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Add league logo if applicable (skip for Tennis sections)
                 if (!isTennisSection) {
-                    if (leagueNameKey === "NFL") {
-                        const logo = document.createElement("img");
-                        logo.src = "https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png";
-                        logo.alt = "NFL Logo";
+                if (leagueNameKey === "NFL") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png";
+                    logo.alt = "NFL Logo";
                         logo.width = 14;
                         logo.height = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
-                        logo.style.height = "14px";
-                        logo.style.objectFit = "contain";
-                        logo.style.marginLeft = "5px";
-                        logo.style.marginRight = "8px";
-                        logo.style.verticalAlign = "middle";
-                        logo.style.display = "inline-block";
-                        logo.style.marginTop = "-2px";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
                         titleContent.appendChild(logo);
-                    } else if (leagueNameKey === "Ligue 1") {
-                        const logo = document.createElement("img");
-                        logo.src = "https://static.flashscore.com/res/image/data/tOAXV6hU-QJIQNuDK.png";
-                        logo.alt = "Ligue 1 Logo";
+                } else if (leagueNameKey === "Ligue 1") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/tOAXV6hU-QJIQNuDK.png";
+                    logo.alt = "Ligue 1 Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
-                        logo.style.height = "14px";
-                        logo.style.objectFit = "contain";
-                        logo.style.marginLeft = "5px";
-                        logo.style.marginRight = "8px";
-                        logo.style.verticalAlign = "middle";
-                        logo.style.display = "inline-block";
-                        logo.style.marginTop = "-2px";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
                         titleContent.appendChild(logo);
-                    } else if (leagueNameKey === "CFL") {
-                        const logo = document.createElement("img");
-                        logo.src = "https://github.com/kyle4news/thporth/blob/main/CFL.png?raw=true";
-                        logo.alt = "CFL Logo";
+                } else if (leagueNameKey === "CFL") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://github.com/kyle4news/thporth/blob/main/CFL.png?raw=true";
+                    logo.alt = "CFL Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
-                        logo.style.height = "14px";
-                        logo.style.objectFit = "contain";
-                        logo.style.marginLeft = "5px";
-                        logo.style.marginRight = "8px";
-                        logo.style.verticalAlign = "middle";
-                        logo.style.display = "inline-block";
-                        logo.style.marginTop = "-2px";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
                         titleContent.appendChild(logo);
-                    } else if (leagueNameKey === "Super Lig") {
-                        const logo = document.createElement("img");
-                        logo.src = "https://github.com/kyle4news/thporth/blob/main/Super%20lig.png?raw=true";
-                        logo.alt = "Super Lig Logo";
+                } else if (leagueNameKey === "Super Lig") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://github.com/kyle4news/thporth/blob/main/Super%20lig.png?raw=true";
+                    logo.alt = "Super Lig Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
-                        logo.style.height = "14px";
-                        logo.style.objectFit = "contain";
-                        logo.style.marginLeft = "5px";
-                        logo.style.marginRight = "8px";
-                        logo.style.verticalAlign = "middle";
-                        logo.style.display = "inline-block";
-                        logo.style.marginTop = "-2px";
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
                         titleContent.appendChild(logo);
-                    } else if (leagueNameKey === "UEFA Europa League") {
-                        const logo = document.createElement("img");
+                } else if (leagueNameKey === "UEFA Europa League") {
+                    const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png";
                     logo.alt = "UEFA Europa League Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7434,7 +7434,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "UEFA Conference League Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7449,7 +7449,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Formula 1 Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7509,7 +7509,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "NCAAF Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7524,7 +7524,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Tennis Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7554,7 +7554,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "WNBA Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7569,7 +7569,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "LIV Golf Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7584,7 +7584,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "IndyCar Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7599,7 +7599,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "NCAA Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7614,7 +7614,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "MotoGP Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7644,7 +7644,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "LPGA Tour Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7659,7 +7659,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "NBA Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7674,7 +7674,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "MLB Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7719,7 +7719,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "LaLiga Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7734,7 +7734,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Serie A Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7749,7 +7749,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Premier League Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -7779,7 +7779,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Bundesliga Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8004,7 +8004,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "NHL Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8019,7 +8019,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "NWSL Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8034,7 +8034,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "NASCAR Cup Series Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8049,7 +8049,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "UFC Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8079,7 +8079,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "MLS Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8109,7 +8109,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Copa Sudamericana Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8124,7 +8124,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "FA Cup Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8139,7 +8139,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "UEFA Champions League Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8154,7 +8154,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Coppa Italia Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8169,7 +8169,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Copa Libertadores Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8184,7 +8184,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Saudi Pro League Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8199,7 +8199,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Liga MX Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8214,7 +8214,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Ryder Cup Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8229,7 +8229,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Eredivisie Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8244,7 +8244,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "EFL Championship Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8259,7 +8259,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Brasileirão Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8289,7 +8289,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "LPF Playoffs Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8319,7 +8319,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Scottish Cup Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8334,7 +8334,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Women's Super League Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8349,7 +8349,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Liga Portugal Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8364,7 +8364,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Scottish Premiership Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8379,7 +8379,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "Campeones Cup Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8409,7 +8409,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.alt = "FIFA U-20 World Cup Logo";
                         logo.width = 14;
                         logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8557,11 +8557,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         const homeScore = data["Home Score"] || data["HomeScore"] || data.homeScore || '';
                         const awayScore = data["Away Score"] || data["AwayScore"] || data.awayScore || '';
                         const matchStatus = (data["Match Status"] || "").toUpperCase();
+                        const stageValue = (data["Stage"] || "").toUpperCase();
+                        const stageTypeValue = (data["StageType"] || "").toUpperCase();
+                        const statusValue = (data["Status"] || "").toUpperCase();
                         const rawStart = data["Start Time"];
+                        
+                        // Check if POSTPONED is in any field (Stage, Status, StageType, or Match Status)
+                        const isPostponed = stageValue.includes("POSTPONED") || statusValue.includes("POSTPONED") || stageTypeValue.includes("POSTPONED") || matchStatus.includes("POSTPONED");
+                        // Check if CANCELED is in any field (Stage, Status, StageType, or Match Status)
+                        const isCanceled = stageValue.includes("CANCELED") || statusValue.includes("CANCELED") || stageTypeValue.includes("CANCELED") || matchStatus.includes("CANCELED");
                         
                         // For yesterdayScores, never show live; always treat as final
                         const isLive = isYesterdayScores ? false : (matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE"));
                         const isFinal = isYesterdayScores || matchStatus.includes("FINISHED") || matchStatus.includes("FINAL") || matchStatus.includes("GAME OVER");
+                        const isPostponedFinal = isFinal && isPostponed;
+                        const isCanceledFinal = isFinal && isCanceled;
                         let currentTimeLabel = "";
 
                         // Check if timeString field exists and is empty (manual games with blank time)
@@ -8580,6 +8590,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                 parsedStatus = getGranularLiveStatus(data);
                             }
                             currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
+                        } else if (isPostponed) {
+                            currentTimeLabel = '<span style="color: #545353;">PPD</span>';
+                        } else if (isCanceled) {
+                            currentTimeLabel = '<span style="color: #545353;">Canceled</span>';
                         } else if (isFinal) {
                             currentTimeLabel = "F";
                         } else if (rawStart && rawStart.toDate) {
@@ -8616,14 +8630,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     let homeScoreColor = '';
                     let awayScoreColor = '';
                     if (isFinal) {
-                        const homeScoreNum = parseFloat(homeScore) || 0;
-                        const awayScoreNum = parseFloat(awayScore) || 0;
-                        if (homeScoreNum < awayScoreNum) {
-                            homeColor = 'color: #7f7f7f;';
-                            homeScoreColor = 'color: #7f7f7f;';
-                        } else if (awayScoreNum < homeScoreNum) {
-                            awayColor = 'color: #7f7f7f;';
-                            awayScoreColor = 'color: #7f7f7f;';
+                        if (isPostponedFinal) {
+                            // All text in postponed games is #545353
+                            homeColor = 'color: #545353;';
+                            awayColor = 'color: #545353;';
+                            homeScoreColor = 'color: #545353;';
+                            awayScoreColor = 'color: #545353;';
+                        } else {
+                            const homeScoreNum = parseFloat(homeScore) || 0;
+                            const awayScoreNum = parseFloat(awayScore) || 0;
+                            if (homeScoreNum < awayScoreNum) {
+                                homeColor = 'color: #7f7f7f;';
+                                homeScoreColor = 'color: #7f7f7f;';
+                            } else if (awayScoreNum < homeScoreNum) {
+                                awayColor = 'color: #7f7f7f;';
+                                awayScoreColor = 'color: #7f7f7f;';
+                            }
                         }
                     }
 
@@ -8671,14 +8693,27 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Get the NEXT game's time label to determine if the line above it should be full width
                         const nextRawStart = nextData["Start Time"];
                         const nextMatchStatus = (nextData["Match Status"] || "").toUpperCase();
+                        const nextStageValue = (nextData["Stage"] || "").toUpperCase();
+                        const nextStageTypeValue = (nextData["StageType"] || "").toUpperCase();
+                        const nextStatusValue = (nextData["Status"] || "").toUpperCase();
+                        // Check if POSTPONED is in any field (Stage, Status, StageType, or Match Status)
+                        const nextIsPostponed = nextStageValue.includes("POSTPONED") || nextStatusValue.includes("POSTPONED") || nextStageTypeValue.includes("POSTPONED") || nextMatchStatus.includes("POSTPONED");
+                        // Check if CANCELED is in any field (Stage, Status, StageType, or Match Status)
+                        const nextIsCanceled = nextStageValue.includes("CANCELED") || nextStatusValue.includes("CANCELED") || nextStageTypeValue.includes("CANCELED") || nextMatchStatus.includes("CANCELED");
                         const nextIsLive = isYesterdayScores ? false : (nextMatchStatus.includes("IN PROGRESS") || nextMatchStatus.includes("LIVE"));
                         const nextIsFinal = isYesterdayScores || nextMatchStatus.includes("FINISHED") || nextMatchStatus.includes("FINAL") || nextMatchStatus.includes("GAME OVER");
+                        const nextIsPostponedFinal = nextIsFinal && nextIsPostponed;
+                        const nextIsCanceledFinal = nextIsFinal && nextIsCanceled;
                         let nextTimeLabel = "";
                         
                         if (nextData.timeString === '') {
                             nextTimeLabel = "";
                         } else if (nextIsLive) {
                             nextTimeLabel = "Live";
+                        } else if (nextIsPostponed) {
+                            nextTimeLabel = '<span style="color: #545353;">PPD</span>';
+                        } else if (nextIsCanceled) {
+                            nextTimeLabel = '<span style="color: #545353;">Canceled</span>';
                         } else if (nextIsFinal) {
                             nextTimeLabel = "F";
                         } else if (nextRawStart && nextRawStart.toDate) {
@@ -8772,11 +8807,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 const homeScore = data["Home Score"] || data["HomeScore"] || data.homeScore || '';
                 const awayScore = data["Away Score"] || data["AwayScore"] || data.awayScore || '';
                 const matchStatus = (data["Match Status"] || "").toUpperCase();
+                const stageValue = (data["Stage"] || "").toUpperCase();
+                const stageTypeValue = (data["StageType"] || "").toUpperCase();
+                const statusValue = (data["Status"] || "").toUpperCase();
                 const rawStart = data["Start Time"];
+                
+                // Check if POSTPONED is in any field (Stage, Status, StageType, or Match Status)
+                const isPostponed = stageValue.includes("POSTPONED") || statusValue.includes("POSTPONED") || stageTypeValue.includes("POSTPONED") || matchStatus.includes("POSTPONED");
+                // Check if CANCELED is in any field (Stage, Status, StageType, or Match Status)
+                const isCanceled = stageValue.includes("CANCELED") || statusValue.includes("CANCELED") || stageTypeValue.includes("CANCELED") || matchStatus.includes("CANCELED");
                 
                 // For yesterdayScores, never show live; always treat as final
                 const isLive = isYesterdayScores ? false : (matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE"));
                 const isFinal = isYesterdayScores || matchStatus.includes("FINISHED") || matchStatus.includes("FINAL") || matchStatus.includes("GAME OVER");
+                const isPostponedFinal = isFinal && isPostponed;
+                const isCanceledFinal = isFinal && isCanceled;
                 let currentTimeLabel = "";
 
                 // Check if timeString field exists and is empty (manual games with blank time)
@@ -8794,6 +8839,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         parsedStatus = getGranularLiveStatus(data);
                     }
                     currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
+                } else if (isPostponed) {
+                    currentTimeLabel = '<span style="color: #545353;">PPD</span>';
+                } else if (isCanceled) {
+                    currentTimeLabel = '<span style="color: #545353;">Canceled</span>';
                 } else if (isFinal) {
                     currentTimeLabel = "F";
                 } else if (rawStart && rawStart.toDate) {
@@ -8844,14 +8893,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 let homeScoreColor = '';
                 let awayScoreColor = '';
                 if (isFinal) {
-                    const homeScoreNum = parseFloat(homeScore) || 0;
-                    const awayScoreNum = parseFloat(awayScore) || 0;
-                    if (homeScoreNum < awayScoreNum) {
-                        homeColor = 'color: #7f7f7f;';
-                        homeScoreColor = 'color: #7f7f7f;';
-                    } else if (awayScoreNum < homeScoreNum) {
-                        awayColor = 'color: #7f7f7f;';
-                        awayScoreColor = 'color: #7f7f7f;';
+                    if (isPostponedFinal || isCanceledFinal) {
+                        // All text in postponed or canceled games is #545353
+                        homeColor = 'color: #545353;';
+                        awayColor = 'color: #545353;';
+                        homeScoreColor = 'color: #545353;';
+                        awayScoreColor = 'color: #545353;';
+                    } else {
+                        const homeScoreNum = parseFloat(homeScore) || 0;
+                        const awayScoreNum = parseFloat(awayScore) || 0;
+                        if (homeScoreNum < awayScoreNum) {
+                            homeColor = 'color: #7f7f7f;';
+                            homeScoreColor = 'color: #7f7f7f;';
+                        } else if (awayScoreNum < homeScoreNum) {
+                            awayColor = 'color: #7f7f7f;';
+                            awayScoreColor = 'color: #7f7f7f;';
+                        }
                     }
                 }
 
@@ -8922,14 +8979,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     const nextData = games[i + 1];
                     const nextRawStart = nextData["Start Time"];
                     const nextMatchStatus = (nextData["Match Status"] || "").toUpperCase();
+                    const nextStageValue = (nextData["Stage"] || "").toUpperCase();
+                    const nextStageTypeValue = (nextData["StageType"] || "").toUpperCase();
+                    const nextStatusValue = (nextData["Status"] || "").toUpperCase();
+                    // Check if POSTPONED is in any field (Stage, Status, StageType, or Match Status)
+                    const nextIsPostponed = nextStageValue.includes("POSTPONED") || nextStatusValue.includes("POSTPONED") || nextStageTypeValue.includes("POSTPONED") || nextMatchStatus.includes("POSTPONED");
+                    // Check if CANCELED is in any field (Stage, Status, StageType, or Match Status)
+                    const nextIsCanceled = nextStageValue.includes("CANCELED") || nextStatusValue.includes("CANCELED") || nextStageTypeValue.includes("CANCELED") || nextMatchStatus.includes("CANCELED");
                     const nextIsLive = isYesterdayScores ? false : (nextMatchStatus.includes("IN PROGRESS") || nextMatchStatus.includes("LIVE"));
                     const nextIsFinal = isYesterdayScores || nextMatchStatus.includes("FINISHED") || nextMatchStatus.includes("FINAL") || nextMatchStatus.includes("GAME OVER");
+                    const nextIsPostponedFinal = nextIsFinal && nextIsPostponed;
+                    const nextIsCanceledFinal = nextIsFinal && nextIsCanceled;
                     let nextTimeLabel = "";
                     
                     if (nextData.timeString === '') {
                         nextTimeLabel = "";
                     } else if (nextIsLive) {
                         nextTimeLabel = "Live";
+                    } else if (nextIsPostponed) {
+                        nextTimeLabel = '<span style="color: #545353;">PPD</span>';
+                    } else if (nextIsCanceled) {
+                        nextTimeLabel = '<span style="color: #545353;">Canceled</span>';
                     } else if (nextIsFinal) {
                         nextTimeLabel = "F";
                     } else if (nextRawStart && nextRawStart.toDate) {
@@ -9276,8 +9346,8 @@ document.addEventListener('DOMContentLoaded', function () {
         return 0;
     }
      function fetchLeagueSchedule(leagueId, leagueName) {
-         scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
-         const { DateTime } = luxon;
+        scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
+        const { DateTime } = luxon;
          // Match home column logic (Denver) for gameDate equality
          const todayStr = DateTime.now().setZone('America/Denver').toISODate();
          
@@ -9300,8 +9370,8 @@ document.addEventListener('DOMContentLoaded', function () {
              if (!snapshot.empty) {
                  const gamesData = snapshot.docs.map(d => d.data()).sort(sortGames);
                  renderGames(scheduleContent, gamesData, false);
-                 return;
-             }
+            return;
+        }
              // 2) Fallback to exact League + scheduledDate (if backend provided it)
              let q2 = gamesCollectionRef.where('League', '==', leagueId).where('scheduledDate', '==', todayStr);
              if (leagueId === 'USA: NCAA') {
@@ -9320,8 +9390,8 @@ document.addEventListener('DOMContentLoaded', function () {
                  if (!s2.empty) {
                      const gamesData2 = s2.docs.map(d => d.data()).sort(sortGames);
                      renderGames(scheduleContent, gamesData2, false);
-                     return;
-                 }
+                    return;
+                }
                  scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
              }, _err => {
                  scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>';
@@ -9956,7 +10026,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     const csvData = dataDoc.data();
                     // Convert CSV format back to array format for frontend
                     if (csvData.headers && csvData.rows) {
-                        const rows = [csvData.headers, ...csvData.rows];
+                        // Convert row objects back to arrays (Firestore doesn't allow nested arrays)
+                        const convertedRows = csvData.rows.map(rowObj => {
+                            // rowObj is an object with numeric string keys like { "0": "value1", "1": "value2" }
+                            const numKeys = Object.keys(rowObj).map(k => parseInt(k)).sort((a, b) => a - b);
+                            return numKeys.map(key => rowObj[key.toString()] || '');
+                        });
+                        const rows = [csvData.headers, ...convertedRows];
                         // Use the existing CSV display logic
                         if (leagueKey === 'UFC') {
                             const menHtml = buildGroupedStandingsHtml(rows) || buildStandardStandingsTable(rows);
@@ -10005,7 +10081,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 if (womenDataDoc.exists) {
                                     const womenCsvData = womenDataDoc.data();
                                     if (womenCsvData.headers && womenCsvData.rows) {
-                                        const womenRows = [womenCsvData.headers, ...womenCsvData.rows];
+                                        // Convert row objects back to arrays (Firestore doesn't allow nested arrays)
+                                        const convertedWomenRows = womenCsvData.rows.map(rowObj => {
+                                            const numKeys = Object.keys(rowObj).map(k => parseInt(k)).sort((a, b) => a - b);
+                                            return numKeys.map(key => rowObj[key.toString()] || '');
+                                        });
+                                        const womenRows = [womenCsvData.headers, ...convertedWomenRows];
                                         womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
                                     } else {
                                         throw new Error('Invalid women\'s data format in Firestore');
@@ -11030,7 +11111,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (womenDataDoc.exists) {
                         const womenCsvData = womenDataDoc.data();
                         if (womenCsvData.headers && womenCsvData.rows) {
-                            const womenRows = [womenCsvData.headers, ...womenCsvData.rows];
+                            // Convert row objects back to arrays (Firestore doesn't allow nested arrays)
+                            const convertedWomenRows = womenCsvData.rows.map(rowObj => {
+                                const numKeys = Object.keys(rowObj).map(k => parseInt(k)).sort((a, b) => a - b);
+                                return numKeys.map(key => rowObj[key.toString()] || '');
+                            });
+                            const womenRows = [womenCsvData.headers, ...convertedWomenRows];
                             womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
                         } else {
                             throw new Error('Invalid women\'s data format in Firestore');
@@ -11431,7 +11517,7 @@ async function fetchFeaturedGames() {
                     return orderA - orderB;
                 });
                 mergeFeaturedWithLive();
-            }, err => {
+            }, err => { 
                 console.error("Error fetching featured games: ", err);
             });
         
@@ -11697,7 +11783,7 @@ async function fetchFeaturedGames() {
                 tab.style.color = '#ccc';
                 tab.style.fontWeight = 'normal';
             });
-
+            
             if (scheduleTabContentEl) scheduleTabContentEl.style.display = 'none';
             if (standingsTabContentEl) standingsTabContentEl.style.display = 'none';
             if (statsTabContentEl) statsTabContentEl.style.display = 'none';
@@ -11713,7 +11799,7 @@ async function fetchFeaturedGames() {
                 setActiveStyles(standingsMainTab);
                 if (standingsTabContentEl) standingsTabContentEl.style.display = 'block';
             } else {
-                if (scheduleMainTab) {
+            if (scheduleMainTab) {
                     setActiveStyles(scheduleMainTab);
                 }
                 if (scheduleTabContentEl) scheduleTabContentEl.style.display = 'block';
@@ -11848,7 +11934,7 @@ async function fetchFeaturedGames() {
             tennisTodayAtpContent.innerHTML = '<p style="color: #9ca3af;">Loading ATP schedule...</p>';
             tennisTodayWtaContent.innerHTML = '<p style="color: #9ca3af;">Loading WTA schedule...</p>';
         } else {
-            todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
+        todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
         }
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/Denver').toISODate();
@@ -11868,7 +11954,7 @@ async function fetchFeaturedGames() {
                         renderGames(todayScheduleContent, sortedFormulaGames, false);
                         activateMainTab('schedule');
                     } else {
-                        todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                    todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
                         handleNoTodayGames();
                     }
                     return;
@@ -11922,15 +12008,15 @@ async function fetchFeaturedGames() {
         
         // Helper function to process and filter games
         function processGames(snapshot) {
-            // Filter games by league using flexible matching
+                // Filter games by league using flexible matching
             const allGames = snapshot.docs.map(doc => doc.data());
-            const gamesData = allGames.filter(game => {
-                const gameLeague = game.League || '';
-                
-                // First try exact match
-                if (gameLeague === leagueInfo.leagueId) {
-                    return true;
-                }
+                const gamesData = allGames.filter(game => {
+                    const gameLeague = game.League || '';
+                    
+                    // First try exact match
+                    if (gameLeague === leagueInfo.leagueId) {
+                        return true;
+                    }
 
                 // Special handling for Formula One - match any league name that contains "Formula 1" or "Formula One"
                 if (leagueKey === 'FormulaOne') {
@@ -11953,32 +12039,32 @@ async function fetchFeaturedGames() {
                         return true;
                     }
                 }
-
-                // Then try flexible matching based on league key
-                const gameLeagueKey = getLeagueKeyFromDatabaseName(gameLeague);
-                const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueInfo.leagueId);
+                    
+                    // Then try flexible matching based on league key
+                    const gameLeagueKey = getLeagueKeyFromDatabaseName(gameLeague);
+                    const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueInfo.leagueId);
+                    
+                    // If both have matching league keys, include the game
+                    if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) {
+                        return true;
+                    }
+                    
+                    // Fallback: check if the database league name contains the target league name
+                    const targetLeagueName = leagueInfo.leagueId.toLowerCase();
+                    const gameLeagueName = gameLeague.toLowerCase();
+                    
+                    // For UEFA Champions League, check for "champions league" in the name
+                    if (targetLeagueName.includes('champions league') && gameLeagueName.includes('champions league')) {
+                        return true;
+                    }
+                    // For other leagues, check for partial matches
+                    if (gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName)) {
+                        return true;
+                    }
+                    
+                    return false;
+                });
                 
-                // If both have matching league keys, include the game
-                if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) {
-                    return true;
-                }
-                
-                // Fallback: check if the database league name contains the target league name
-                const targetLeagueName = leagueInfo.leagueId.toLowerCase();
-                const gameLeagueName = gameLeague.toLowerCase();
-                
-                // For UEFA Champions League, check for "champions league" in the name
-                if (targetLeagueName.includes('champions league') && gameLeagueName.includes('champions league')) {
-                    return true;
-                }
-                // For other leagues, check for partial matches
-                if (gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName)) {
-                    return true;
-                }
-                
-                return false;
-            });
-            
             // For NCAAF, filter out hockey games
             // For NCAAF, filter out NCAAW games and only show American Football
             // For NCAAM, filter out NCAAW games (women's games)
@@ -12035,24 +12121,24 @@ async function fetchFeaturedGames() {
                     todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
                 }
                 handleNoTodayGames();
-                return;
-            }
-            
-            // If there ARE games today, activate Today tab with proper styling
-            const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
-            const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
-            if (todayScheduleTab) {
-                todayScheduleTab.classList.add('active');
-                todayScheduleTab.style.backgroundColor = '#2a2a2a';
-                todayScheduleTab.style.color = '#fff';
-                todayScheduleTab.style.borderBottom = '2px solid #fff';
-            }
-            if (upcomingScheduleTab) {
-                upcomingScheduleTab.classList.remove('active');
-                upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
-                upcomingScheduleTab.style.color = '#ccc';
-                upcomingScheduleTab.style.borderBottom = 'none';
-            }
+                    return;
+                }
+                
+                // If there ARE games today, activate Today tab with proper styling
+                const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+                const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
+                if (todayScheduleTab) {
+            todayScheduleTab.classList.add('active');
+                    todayScheduleTab.style.backgroundColor = '#2a2a2a';
+                    todayScheduleTab.style.color = '#fff';
+                    todayScheduleTab.style.borderBottom = '2px solid #fff';
+                }
+                if (upcomingScheduleTab) {
+            upcomingScheduleTab.classList.remove('active');
+                    upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
+                    upcomingScheduleTab.style.color = '#ccc';
+                    upcomingScheduleTab.style.borderBottom = 'none';
+                }
             if (todayScheduleContent) todayScheduleContent.style.display = 'block';
             if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
             activateMainTab('schedule');
@@ -12483,11 +12569,22 @@ async function fetchFeaturedGames() {
                     const homeScore = game['Home Score'] || '';
                     const awayScore = game['Away Score'] || '';
                     const status = game['Match Status'] || '';
+                    const matchStatus = (game['Match Status'] || '').toUpperCase();
+                    const stageValue = (game['Stage'] || '').toUpperCase();
+                    const stageTypeValue = (game['StageType'] || '').toUpperCase();
+                    const statusValue = (game['Status'] || '').toUpperCase();
+                    
+                    // Check if POSTPONED is in any field (Stage, Status, StageType, or Match Status)
+                    const isPostponed = stageValue.includes("POSTPONED") || statusValue.includes("POSTPONED") || stageTypeValue.includes("POSTPONED") || matchStatus.includes("POSTPONED");
+                    // Check if CANCELED is in any field (Stage, Status, StageType, or Match Status)
+                    const isCanceled = stageValue.includes("CANCELED") || statusValue.includes("CANCELED") || stageTypeValue.includes("CANCELED") || matchStatus.includes("CANCELED");
                     
                     // Format time/status display (same logic as home page)
                     let timeDisplay = '';
                     const isLive = status.includes("IN PROGRESS") || status.includes("LIVE");
                     const isFinal = status.includes("FINISHED") || status.includes("FINAL") || status.includes("GAME OVER");
+                    const isPostponedFinal = isFinal && isPostponed;
+                    const isCanceledFinal = isFinal && isCanceled;
                     
                     if (isLive) {
                         // Show live status instead of start time
@@ -12502,6 +12599,10 @@ async function fetchFeaturedGames() {
                             parsedStatus = getGranularLiveStatus(game);
                         }
                         timeDisplay = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
+                    } else if (isPostponed) {
+                        timeDisplay = '<span style="color: #545353;">PPD</span>';
+                    } else if (isCanceled) {
+                        timeDisplay = '<span style="color: #545353;">Canceled</span>';
                     } else if (isFinal) {
                         timeDisplay = "F";
                     } else {
@@ -12571,14 +12672,22 @@ async function fetchFeaturedGames() {
                     let homeScoreColor = '';
                     let awayScoreColor = '';
                     if (isFinal) {
-                        const homeScoreNum = parseFloat(homeScore) || 0;
-                        const awayScoreNum = parseFloat(awayScore) || 0;
-                        if (homeScoreNum < awayScoreNum) {
-                            homeColor = 'color: #7f7f7f;';
-                            homeScoreColor = 'color: #7f7f7f;';
-                        } else if (awayScoreNum < homeScoreNum) {
-                            awayColor = 'color: #7f7f7f;';
-                            awayScoreColor = 'color: #7f7f7f;';
+                        if (isPostponedFinal) {
+                            // All text in postponed games is #545353
+                            homeColor = 'color: #545353;';
+                            awayColor = 'color: #545353;';
+                            homeScoreColor = 'color: #545353;';
+                            awayScoreColor = 'color: #545353;';
+                        } else {
+                            const homeScoreNum = parseFloat(homeScore) || 0;
+                            const awayScoreNum = parseFloat(awayScore) || 0;
+                            if (homeScoreNum < awayScoreNum) {
+                                homeColor = 'color: #7f7f7f;';
+                                homeScoreColor = 'color: #7f7f7f;';
+                            } else if (awayScoreNum < homeScoreNum) {
+                                awayColor = 'color: #7f7f7f;';
+                                awayScoreColor = 'color: #7f7f7f;';
+                            }
                         }
                     }
                     
@@ -13070,7 +13179,7 @@ async function fetchFeaturedGames() {
                 });
                 return;
             }
-            
+
             const away = data[awayField] || "";
             const home = data[homeField] || "";
             let timeStr = "";
@@ -13161,7 +13270,7 @@ async function fetchFeaturedGames() {
                 if (defaultContent && defaultContent.style.display !== 'none') {
                     defaultContent.innerHTML = "<p>No upcoming games found.</p>";
                 } else {
-                    upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
+                upcomingScheduleContent.innerHTML = "<p>No upcoming games found.</p>";
                 }
                 console.log('NHL: No games after processing - check date filtering logic');
                 return;
@@ -13522,15 +13631,15 @@ async function fetchFeaturedGames() {
                     // LPGATour, PGATour: Skip in table format - handled separately above
                     // This should not be reached for golf tournaments, but keep fallback
                     if (!game.isGolfTournament) {
-                        html += `
-                            <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
-                                <div class="teams" style="flex: 1; margin-right: 8px;">
+                    html += `
+                        <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
+                            <div class="teams" style="flex: 1; margin-right: 8px;">
                                     <div class="tournament" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home || ''}</div>
-                                    <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
-                                </div>
-                                <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;"></div>
+                                <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
                             </div>
-                        `;
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;"></div>
+                        </div>
+                    `;
                     }
                 } else if (['NASCARCupSeries'].includes(leagueKey)) {
                     // NASCARCupSeries: Race on top, Location on bottom, time on right
@@ -13579,7 +13688,7 @@ async function fetchFeaturedGames() {
             if (defaultContent && defaultContent.style.display !== 'none') {
                 defaultContent.innerHTML = html;
             } else {
-                upcomingScheduleContent.innerHTML = html;
+            upcomingScheduleContent.innerHTML = html;
             }
         }
         }).catch(error => {
@@ -13592,7 +13701,7 @@ async function fetchFeaturedGames() {
             if (defaultContent && defaultContent.style.display !== 'none') {
                 defaultContent.innerHTML = `<div class="error" style="color: #c00;">Error loading schedule: ${error.message}</div>`;
             } else {
-                upcomingScheduleContent.innerHTML = `<div class="error" style="color: #c00;">Error loading schedule: ${error.message}</div>`;
+            upcomingScheduleContent.innerHTML = `<div class="error" style="color: #c00;">Error loading schedule: ${error.message}</div>`;
             }
         }
         });
@@ -13673,23 +13782,23 @@ if (gamesTabsContainer) {
     };
 
     if (scoresTab) {
-        scoresTab.addEventListener('click', () => {
-            if (activeListenerUnsubscribe) {
-                activeListenerUnsubscribe();
-                activeListenerUnsubscribe = null;
-            }
-            
-            todayTab.classList.remove('active');
+    scoresTab.addEventListener('click', () => {
+        if (activeListenerUnsubscribe) {
+            activeListenerUnsubscribe();
+            activeListenerUnsubscribe = null;
+        }
+        
+        todayTab.classList.remove('active');
             if (liveFilter) {
-                liveFilter.classList.remove('active');
+        liveFilter.classList.remove('active');
             }
-            scoresTab.classList.add('active');
+        scoresTab.classList.add('active');
 
-            document.getElementById('tv-listings-scores').style.display = 'block';
-            document.getElementById('tv-listings-today').style.display = 'none';
+        document.getElementById('tv-listings-scores').style.display = 'block';
+        document.getElementById('tv-listings-today').style.display = 'none';
 
-            fetchYesterdayScores();
-        });
+        fetchYesterdayScores();
+    });
     }
 
     todayTab.addEventListener('click', () => {
@@ -13699,10 +13808,10 @@ if (gamesTabsContainer) {
         }
 
         if (scoresTab) {
-            scoresTab.classList.remove('active');
+        scoresTab.classList.remove('active');
         }
         if (liveFilter) {
-            liveFilter.classList.remove('active');
+        liveFilter.classList.remove('active');
         }
         todayTab.classList.add('active');
         
@@ -13713,7 +13822,7 @@ if (gamesTabsContainer) {
     });
 
     if (liveFilter) {
-        liveFilter.addEventListener('click', () => {
+    liveFilter.addEventListener('click', () => {
         // Always switch to TODAY tab first, then apply LIVE filter
         if (!todayTab.classList.contains('active')) {
             // Switch to TODAY tab
@@ -13723,7 +13832,7 @@ if (gamesTabsContainer) {
             }
             
                 if (scoresTab) {
-                    scoresTab.classList.remove('active');
+            scoresTab.classList.remove('active');
                 }
             todayTab.classList.add('active');
             
@@ -13740,7 +13849,7 @@ if (gamesTabsContainer) {
             liveFilter.classList.toggle('active');
             applyLiveFilter();
         }
-        });
+    });
     }
 
     // Initial load
