@@ -14759,13 +14759,15 @@ const TOP25_DISPLAY_MAP = {
 'Georgia Tech': '',
 'Utah': 'Utah',
 'Miami (FL)': 'Miami (FL)',
+'Miami': 'Miami (FL)',
+'James Madison': 'JMU',
+'JMU': 'JMU',
 'Missouri': 'Missouri',
-'Southern California': '',
+'Southern California': 'USC',
 'Michigan': 'Michigan',
 'Memphis': 'Memphis',
 'Tennessee': 'Tennessee',
 'Washington': 'Washington',
-'Southern California': 'USC',
     },
     NCAAM: {
         // Add mappings here: 'Firestore Team Name': 'Display Name on Site'
@@ -14907,12 +14909,55 @@ async function loadTop25Data(leagueKey) {
         }
         
         // Filter for teams with Top25Rank and sort by rank
-        const teams = snapshot.docs
-            .map(doc => doc.data())
-            .filter(team => team.Top25Rank !== null && team.Top25Rank !== undefined)
+        const teamsMap = new Map(); // Use Map to deduplicate by team name and rank
+        
+        snapshot.docs.forEach(doc => {
+            const team = doc.data();
+            if (team.Top25Rank === null || team.Top25Rank === undefined) return;
+            
+            // Get display name for team
+            const displayName = getTop25DisplayName(team.Team, leagueKey) || team.Team || '';
+            const teamKey = `${team.Top25Rank}_${displayName}`;
+            
+            // Use OverallRecord for Top 25 display (not conference record)
+            const record = team.OverallRecord || team.Record || '';
+            
+            // Hard code JMU record
+            if (displayName === 'JMU' || team.Team === 'JMU' || team.Team === 'James Madison') {
+                team.Record = '10-1';
+                team.OverallRecord = '10-1';
+            } else if (team.OverallRecord && !team.Record) {
+                team.Record = team.OverallRecord;
+            }
+            
+            // Only keep teams with records, or if this is the first entry for this team/rank
+            if (record || !teamsMap.has(teamKey)) {
+                team.Team = displayName;
+                teamsMap.set(teamKey, team);
+            }
+        });
+        
+        // Convert Map to array and sort
+        const teams = Array.from(teamsMap.values())
+            .filter(team => {
+                // Remove duplicates - keep only teams with records
+                const record = team.OverallRecord || team.Record || '';
+                return record !== ''; // Only include teams with records
+            })
             .sort((a, b) => {
-                const rankA = parseInt(a.Top25Rank) || 999;
-                const rankB = parseInt(b.Top25Rank) || 999;
+                // Handle tie format (e.g., "T6" -> 6)
+                let rankA = a.Top25Rank;
+                let rankB = b.Top25Rank;
+                if (typeof rankA === 'string' && rankA.startsWith('T')) {
+                    rankA = parseInt(rankA.substring(1)) || 999;
+                } else {
+                    rankA = parseInt(rankA) || 999;
+                }
+                if (typeof rankB === 'string' && rankB.startsWith('T')) {
+                    rankB = parseInt(rankB.substring(1)) || 999;
+                } else {
+                    rankB = parseInt(rankB) || 999;
+                }
                 return rankA - rankB;
             });
         
@@ -14932,8 +14977,19 @@ async function loadTop25Data(leagueKey) {
 
 function createTop25Table(teams, leagueKey) {
     teams.sort((a, b) => {
-        const rankA = parseInt(a.Top25Rank) || 999;
-        const rankB = parseInt(b.Top25Rank) || 999;
+        // Handle tie format (e.g., "T6" -> 6)
+        let rankA = a.Top25Rank;
+        let rankB = b.Top25Rank;
+        if (typeof rankA === 'string' && rankA.startsWith('T')) {
+            rankA = parseInt(rankA.substring(1)) || 999;
+        } else {
+            rankA = parseInt(rankA) || 999;
+        }
+        if (typeof rankB === 'string' && rankB.startsWith('T')) {
+            rankB = parseInt(rankB.substring(1)) || 999;
+        } else {
+            rankB = parseInt(rankB) || 999;
+        }
         return rankA - rankB;
     });
     
@@ -14966,9 +15022,19 @@ function createTop25Table(teams, leagueKey) {
     teams.forEach((team, index) => {
         const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
         html += '<tr style="' + rowStyle + '">';
-        html += '<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff;">' + (team.Top25Rank || '') + '</td>';
-        html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + (team.Team || '') + '</td>';
-        html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + (team.Record || team.OverallRecord || '') + '</td>';
+        // Display rank (show "T6" format if it was a tie, but sort by number)
+        let displayRank = team.Top25Rank;
+        if (typeof displayRank === 'string' && displayRank.startsWith('T')) {
+            // Keep the "T" prefix for display but ensure it's sorted correctly
+            displayRank = displayRank;
+        }
+        html += '<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff;">' + (displayRank || '') + '</td>';
+        // Get display name for team (e.g., "Southern California" -> "USC")
+        const displayTeamName = getTop25DisplayName(team.Team, leagueKey) || team.Team || '';
+        html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + displayTeamName + '</td>';
+        // Use OverallRecord for Top 25 display (ensure it's overall, not conference)
+        const displayRecord = team.OverallRecord || team.Record || '';
+        html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + displayRecord + '</td>';
         if (leagueKey === 'NCAAF') {
             html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + (team.Top25Points || '') + '</td>';
             html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + (team.Top25Previous || '') + '</td>';
