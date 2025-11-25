@@ -12131,7 +12131,7 @@ async function fetchFeaturedGames() {
                     if (sportLower === 'tennis' && (leagueNameLower.includes('atp') || leagueNameLower.includes('wta') || leagueNameLower.includes('davis cup'))) {
                         return true;
                     }
-                }
+                    }
                     
                     // Then try flexible matching based on league key
                     const gameLeagueKey = getLeagueKeyFromDatabaseName(gameLeague);
@@ -12652,7 +12652,7 @@ async function fetchFeaturedGames() {
                 
                 let lastDisplayedTimeLabel = null;
                 
-                games.forEach(game => {
+                games.forEach((game, gameIndex) => {
                     const displayLeague = getLeagueDisplayName(game.League, game.Sport);
                     const leagueKey = getLeagueKeyFromGame(game);
                     const homeDisplay = getTeamDisplayName(game['Home Team'] || '', displayLeague);
@@ -12740,6 +12740,13 @@ async function fetchFeaturedGames() {
                         }
                     }
                     
+                    // Store raw time value for separator comparison (before HTML formatting)
+                    let rawTimeDisplay = timeDisplay;
+                    if (isLive) {
+                        // Extract text from HTML for comparison
+                        rawTimeDisplay = timeDisplay.replace(/<[^>]*>/g, '').trim();
+                    }
+                    
                     // Prevent duplicate time display (same logic as renderGames function)
                     let displayTimeLabel = timeDisplay;
                     if (!isLive && !isFinal) {
@@ -12803,6 +12810,74 @@ async function fetchFeaturedGames() {
                     html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${awayTeam}</td>`;
                     html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${awayScoreDisplay}</td>`;
                     html += `</tr>`;
+                    
+                    // Add separator line between games (but not after the last game)
+                    if (gameIndex < games.length - 1) {
+                        const nextGame = games[gameIndex + 1];
+                        const nextStatus = nextGame['Match Status'] || '';
+                        const nextIsLive = nextStatus.includes("IN PROGRESS") || nextStatus.includes("LIVE");
+                        const nextIsFinal = nextStatus.includes("FINISHED") || nextStatus.includes("FINAL") || nextStatus.includes("GAME OVER");
+                        
+                        let nextRawTimeDisplay = '';
+                        if (nextIsLive) {
+                            let parsedStatus = '';
+                            const nextDisplayLeague = getLeagueDisplayName(nextGame.League, nextGame.Sport);
+                            if (nextDisplayLeague === "MLB") {
+                                const inningHalf = nextGame.inningHalf || "";
+                                const currentInning = nextGame.currentInning || "";
+                                parsedStatus = `${inningHalf} ${currentInning}`.trim();
+                            } else {
+                                parsedStatus = getGranularLiveStatus(nextGame);
+                            }
+                            nextRawTimeDisplay = parsedStatus || 'Live';
+                        } else if (nextIsFinal) {
+                            nextRawTimeDisplay = "F";
+                        } else {
+                            if (typeof nextGame['Start Time'] === 'number') {
+                                const { DateTime } = luxon;
+                                const gameTime = DateTime.fromMillis(nextGame['Start Time']).setZone('local');
+                                nextRawTimeDisplay = gameTime.toFormat('h:mm a');
+                            } else if (nextGame['Start Time'] && typeof nextGame['Start Time'] === 'object' && nextGame['Start Time'].seconds) {
+                                const { DateTime } = luxon;
+                                const gameTime = DateTime.fromSeconds(nextGame['Start Time'].seconds).setZone('local');
+                                nextRawTimeDisplay = gameTime.toFormat('h:mm a');
+                            } else {
+                                const timeStr = nextGame['Start Time'] || '';
+                                if (timeStr && timeStr.includes(':')) {
+                                    const { DateTime } = luxon;
+                                    try {
+                                        let easternTime = DateTime.fromFormat(timeStr, 'h:mm:ss a', { zone: 'America/New_York' });
+                                        if (!easternTime.isValid) {
+                                            easternTime = DateTime.fromFormat(timeStr, 'h:mm a', { zone: 'America/New_York' });
+                                        }
+                                        if (easternTime.isValid) {
+                                            const localTime = easternTime.toLocal();
+                                            nextRawTimeDisplay = localTime.toFormat('h:mm a');
+                                        } else {
+                                            nextRawTimeDisplay = timeStr.replace(/:\d{2}(?=\s*[AP]M)/, '');
+                                        }
+                                    } catch (e) {
+                                        nextRawTimeDisplay = timeStr.replace(/:\d{2}(?=\s*[AP]M)/, '');
+                                    }
+                                } else {
+                                    nextRawTimeDisplay = timeStr || 'TBD';
+                                }
+                            }
+                        }
+                        
+                        const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextRawTimeDisplay) : null;
+                        const nextGameTimeLabel = nextNormalizedTimeLabel || nextRawTimeDisplay;
+                        
+                        const currentNormalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(rawTimeDisplay) : null;
+                        const currentGameTimeLabel = currentNormalizedTimeLabel || rawTimeDisplay;
+                        
+                        const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
+                        
+                        const colspan = isDifferentTime ? 4 : 3;
+                        const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
+                        
+                        html += `<tr class="game-separator-line">${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td></tr>`;
+                    }
                 });
                 
                 html += `</table></div>`;
