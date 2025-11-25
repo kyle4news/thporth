@@ -8536,18 +8536,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             // Special handling for FEATURED section - group by title or league
             if (leagueNameKey === 'FEATURED' && isGroupedByLeague) {
-                // Sort all games by displayOrder to preserve Google Sheets row order
-                // This ensures that within each league/title group, games appear in the order they were in the sheet
+                // Sort all games by order to preserve Google Sheets row order
+                // This ensures that games appear in the exact order they were in the Google Sheets document
                 const sortedFeaturedGames = [...games].sort((a, b) => {
-                    // Primary sort: by displayOrder (preserves Google Sheets row order)
-                    const orderA = (a && a.displayOrder !== undefined) ? a.displayOrder : 999999;
-                    const orderB = (b && b.displayOrder !== undefined) ? b.displayOrder : 999999;
+                    // Primary sort: by order (preserves Google Sheets row order)
+                    const orderA = (a && a.order !== undefined) ? a.order : 999999;
+                    const orderB = (b && b.order !== undefined) ? b.order : 999999;
                     if (orderA !== orderB) {
                         return orderA - orderB;
                     }
-                    // Secondary sort: by order (for games without displayOrder)
-                    const fallbackOrderA = (a && a.order !== undefined) ? a.order : 999999;
-                    const fallbackOrderB = (b && b.order !== undefined) ? b.order : 999999;
+                    // Secondary sort: by displayOrder (fallback for games without order)
+                    const fallbackOrderA = (a && a.displayOrder !== undefined) ? a.displayOrder : 999999;
+                    const fallbackOrderB = (b && b.displayOrder !== undefined) ? b.displayOrder : 999999;
                     return fallbackOrderA - fallbackOrderB;
                 });
                 
@@ -11434,6 +11434,13 @@ async function fetchFeaturedGames() {
                 // Only include featured games that have a matching live game
                 // Do not include non-live featured games
             }
+            
+            // Sort by order field to preserve Google Sheets row order
+            liveFeaturedGames.sort((a, b) => {
+                const orderA = (a && a.order !== undefined) ? a.order : 999999;
+                const orderB = (b && b.order !== undefined) ? b.order : 999999;
+                return orderA - orderB;
+            });
             
             return liveFeaturedGames;
         } catch (error) {
@@ -15998,7 +16005,7 @@ const VIDEOS_CONFIG = {
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
         'NFL': {
-            highlights: 'Zn503KLDsGiEM8AM',
+            highlights: 'qt6iiToUElXHGk2u',
             allVideos: 'vsvgWNVcJ1m95kd9'
         },
         'NCAAF': {
