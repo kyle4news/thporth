@@ -5476,7 +5476,8 @@ document.addEventListener('DOMContentLoaded', function () {
     "NCAA Men's Hockey", 
     "Club Friendly",
     "International Friendly",
-    "ATP Finals (Doubles)"
+    "ATP Finals (Doubles)",
+    "Coupe de France"
     ];
 
     // --- 2. FIREBASE INITIALIZATION (SINGLETON) + CACHING ---
@@ -5725,7 +5726,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return "CONCACAF Qualifiers";
         }
         
-        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: NBA": "NBA", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: MLS - Play Offs": "MLS", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "USA: NWSL Women - Play Offs": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Spain: Copa del Rey": "Copa del Rey", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "Mexico: Liga MX - Apertura - Play In": "Liga MX", "Mexico: Liga MX - Apertura - Play Offs": "Liga MX", "England: EFL Cup": "EFL Cup", "England: FA Cup": "FA Cup", "England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "Belgium: Jupiler Pro League": "Belgian Pro League", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "Asia: AFC Asian Cup - Qualification - Third round": "AFC Asian Cup Qualifiers", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "Women's UCL", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Europe: Conference League - League phase": "UEFA Conference League", "Europe: Champions League Women - League phase": "Women's UCL", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera", "Argentina: Torneo Betano - Apertura": "Argentine Primera", "Argentina: Torneo Betano - Clausura - Play Offs": "LPF Playoffs", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership", "World: World Cup U20": "FIFA U-20 World Cup", "North & Central America: Campeones Cup": "Campeones Cup", "World: ICC World Cup Women": "Women's Cricket World Cup", "World: Test Series": "ICC Test Series", "World: One Day International": "ODI", "World: Twenty20 International": "T20 International", "USA: NBA - Pre-season": "NBA Preseason", "USA: USL Championship": "USL Championship", "World: World Cup U20 - Play Offs": "FIFA U-20 World Cup", "USA: MLB - Play Offs": "MLB", "Canada: OHL": "OHL", "USA: NCAA Hockey": "NCAA Men's Hockey", "World: Friendly International": "International Friendly", "World: World Cup U17": "FIFA U-17 World Cup", "World: World Cup U17 - Play Offs": "FIFA U-17 World Cup", "World: Finals - Turin ATP - Play Offs, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles - Play Offs, hard (indoor)": "ATP Finals (Doubles)", "World: Finals - Turin ATP, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles, hard (indoor)": "ATP Finals (Doubles)" };
+        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: NBA": "NBA", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: MLS - Play Offs": "MLS", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "USA: NWSL Women - Play Offs": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "France: Coupe de France": "Coupe de France", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Spain: Copa del Rey": "Copa del Rey", "Mexico: Liga MX": "Liga MX", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "Mexico: Liga MX - Apertura - Play In": "Liga MX", "Mexico: Liga MX - Apertura - Play Offs": "Liga MX", "England: EFL Cup": "EFL Cup", "England: FA Cup": "FA Cup", "England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "Belgium: Jupiler Pro League": "Belgian Pro League", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "Asia: AFC Asian Cup - Qualification - Third round": "AFC Asian Cup Qualifiers", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "CopaSudamericana": "Copa Sudamericana", "South America: Copa Sudamericana": "Copa Sudamericana", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "Women's UCL", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Europe: Conference League - League phase": "UEFA Conference League", "Europe: Champions League Women - League phase": "Women's UCL", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera", "Argentina: Torneo Betano - Apertura": "Argentine Primera", "Argentina: Torneo Betano - Clausura - Play Offs": "LPF Playoffs", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership", "World: World Cup U20": "FIFA U-20 World Cup", "North & Central America: Campeones Cup": "Campeones Cup", "World: ICC World Cup Women": "Women's Cricket World Cup", "World: Test Series": "ICC Test Series", "World: One Day International": "ODI", "World: Twenty20 International": "T20 International", "USA: NBA - Pre-season": "NBA Preseason", "USA: USL Championship": "USL Championship", "World: World Cup U20 - Play Offs": "FIFA U-20 World Cup", "USA: MLB - Play Offs": "MLB", "Canada: OHL": "OHL", "USA: NCAA Hockey": "NCAA Men's Hockey", "World: Friendly International": "International Friendly", "World: World Cup U17": "FIFA U-17 World Cup", "World: World Cup U17 - Play Offs": "FIFA U-17 World Cup", "World: Finals - Turin ATP - Play Offs, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles - Play Offs, hard (indoor)": "ATP Finals (Doubles)", "World: Finals - Turin ATP, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles, hard (indoor)": "ATP Finals (Doubles)" };
         return map[name] || name;
     }
 
@@ -5781,6 +5782,8 @@ document.addEventListener('DOMContentLoaded', function () {
             'DFBPokal': ['Germany: DFB Pokal', 'DFB Pokal'],
             // Coppa Italia variations
             'CoppaItalia': ['Italy: Coppa Italia', 'Coppa Italia'],
+            // Coupe de France variations
+            'CoupeDeFrance': ['France: Coupe de France', 'Coupe de France'],
             // EFL Cup variations
             'EFLCup': ['England: EFL Cup', 'EFL Cup'],
             // Super Lig variations
@@ -6057,6 +6060,12 @@ document.addEventListener('DOMContentLoaded', function () {
             "West Ham": "West Ham",
             "Nottingham": "Forest",
             "Wolves": "Wolves",
+        },
+        // EFL Championship
+        EFLChampionship: {
+            "Middlesbrough": "M'brough",
+            "Preston North End": "Preston",
+            "Charlton Athletic": "Charlton"
         },
         // Bundesliga
         Bundesliga: {
@@ -6521,6 +6530,9 @@ document.addEventListener('DOMContentLoaded', function () {
             "Dallas Univ.": "Dallas U",
             "Prairie View A&M": "Prairie View",
             "Dickinson Red Devils": "Dickinson",
+            "Brigham Young": "BYU",
+            "San Jose State": "San Jose St",
+            "Southern Univ.": "Southern",
             "Md.-East. Shore": "MD E. Shore",
             "Delaware State": "Delaware St",
             "Washington & Lee": "Wash & Lee",
@@ -6600,7 +6612,21 @@ document.addEventListener('DOMContentLoaded', function () {
             "Mercyhurst Lakers": "Mercyhurst",
             "Miami (Ohio)": "Miami (OH)",
             "Nobel Knights": "Nobel",
-            "Rockford University": "Rockford"
+            "Rockford University": "Rockford",
+            "Florida Gulf Coast": "FGCU",
+            "Cal State Bakersfield": "Cal St Bak.",
+            "Mississippi Valley State": "MS Vall St",
+            "Bethune-Cookman": "Beth-Cook",
+            "Tennessee Southern": "TN Southern",
+            "Washington College (MD)": "Wash Coll",
+            "California Baptist": "CA Baptist",
+            "Purdue Fort Wayne": "Purdue FW",
+            "Rutgers-Camden": "Rutgers-Cam",
+            "North Carolina Central": "NC Central",
+            "Charleston Southern": "Charleston",
+            "Eastern Illinois": "E Illinois",
+            "George Mason": "Geo Maso",
+            "Northern Illinois": "N Illinois"
         },
         // NCAAF
         NCAAF: {
@@ -6802,13 +6828,23 @@ document.addEventListener('DOMContentLoaded', function () {
             "UMKC": "UMKC",
             "Utah Valley Wolverines": "Utah Valley",
             "VCU": "VCU",
-            "Colorado State": "Colorado St"
+            "Colorado State": "Colorado St",
+            "Louisiana Monroe": "LA-Monroe",
+            "Georgia Southwestern": "Georgia SW",
+            "Charleston Southern": "Charleston",
+            "South Alabama": "S Alabama",
+            "George Mason": "Geo Mason",
+            "New Hampshire": "New Hamp",
+            "North American": "N American"
         },
         // UEFA Champions League
         UEFAChampionsLeague: {
             "Royale Union SG": "Royale USG",
             "Olympiacos Piraeus": "Olympiacos",
-            "FC Copenhagen": "Copenhagen"
+            "FC Copenhagen": "Copenhagen",
+            "Union Saint-Gilloise": "Union SG",
+            "Newcastle United": "Newcastle",
+            "Olympique Marseille": "Marseille"
         },
         // UEFA Europa League
         UEFAEuropaLeague: {
@@ -8176,6 +8212,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     titleContent.appendChild(logo);
+                } else if (leagueNameKey === "Coupe de France") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/bPpsXPTp-6ao77VtB.png";
+                    logo.alt = "Coupe de France Logo";
+                        logo.width = 14;
+                        logo.height = 14;
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
                 } else if (leagueNameKey === "Copa Libertadores") {
                     const logo = document.createElement("img");
                     logo.src = "https://github.com/kyle4news/thporth/blob/main/CopaLibertadores.png?raw=true";
@@ -8485,10 +8536,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             // Special handling for FEATURED section - group by title or league
             if (leagueNameKey === 'FEATURED' && isGroupedByLeague) {
+                // Sort all games by displayOrder to preserve Google Sheets row order
+                // This ensures that within each league/title group, games appear in the order they were in the sheet
                 const sortedFeaturedGames = [...games].sort((a, b) => {
-                    const orderA = (a && a.order !== undefined) ? a.order : 999;
-                    const orderB = (b && b.order !== undefined) ? b.order : 999;
-                    return orderA - orderB;
+                    // Primary sort: by displayOrder (preserves Google Sheets row order)
+                    const orderA = (a && a.displayOrder !== undefined) ? a.displayOrder : 999999;
+                    const orderB = (b && b.displayOrder !== undefined) ? b.displayOrder : 999999;
+                    if (orderA !== orderB) {
+                        return orderA - orderB;
+                    }
+                    // Secondary sort: by order (for games without displayOrder)
+                    const fallbackOrderA = (a && a.order !== undefined) ? a.order : 999999;
+                    const fallbackOrderB = (b && b.order !== undefined) ? b.order : 999999;
+                    return fallbackOrderA - fallbackOrderB;
                 });
                 
                 let currentTitle = null;
@@ -8590,19 +8650,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Check if timeString field exists and is empty (manual games with blank time)
                         if (data.timeString === '') {
                             currentTimeLabel = ""; // Display as empty for blank times
-                        } else if (isLive) {
-                            // Use EXACT same logic as individual league sections
-                            let parsedStatus = '';
-                            const displayLeague = getLeagueDisplayName(data.League, data.Sport);
-                            if (displayLeague === "MLB") {
-                                const inningHalf = data.inningHalf || "";
-                                const currentInning = data.currentInning || "";
-                                if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
-                            } else {
-                                // Use granular live status for ALL sports (including NFL, MLS, etc.)
-                                parsedStatus = getGranularLiveStatus(data);
-                            }
-                            currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
+                        // TEMPORARILY DISABLED: Live data display - only show start time, not live status
+                        // } else if (isLive) {
+                        //     // Use EXACT same logic as individual league sections
+                        //     let parsedStatus = '';
+                        //     const displayLeague = getLeagueDisplayName(data.League, data.Sport);
+                        //     if (displayLeague === "MLB") {
+                        //         const inningHalf = data.inningHalf || "";
+                        //         const currentInning = data.currentInning || "";
+                        //         if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
+                        //     } else {
+                        //         // Use granular live status for ALL sports (including NFL, MLS, etc.)
+                        //         parsedStatus = getGranularLiveStatus(data);
+                        //     }
+                        //     currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
                         } else if (isPostponed) {
                             currentTimeLabel = '<span style="color: #545353;">PPD</span>';
                         } else if (isCanceled) {
@@ -8610,7 +8671,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else if (isFinal) {
                             currentTimeLabel = "F";
                         } else if (rawStart && rawStart.toDate) {
-                            currentTimeLabel = luxon.DateTime.fromJSDate(rawStart.toDate()).toFormat('h:mm a');
+                            // Firestore timestamps are in UTC - convert to user's local time
+                            currentTimeLabel = luxon.DateTime.fromJSDate(rawStart.toDate(), { zone: 'utc' }).setZone('local').toFormat('h:mm a');
                         } else {
                             currentTimeLabel = "TBD";
                         }
@@ -8673,9 +8735,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (isAtpDoubles) {
                         row2.classList.add("atp-doubles-match");
                     }
-                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(displayLeagueForCheck);
+                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(displayLeagueForCheck);
                     
                     // Set channel display - use Tennis Channel for ATP leagues
+                    // If channel is blank in the data, it will display as blank (no hiding logic needed)
                     let featuredChannelDisplay = (!isFinal && data.channel) ? data.channel : '';
                     if (data.League && data.League.includes('ATP')) {
                         featuredChannelDisplay = (!isFinal) ? 'Tennis Channel' : '';
@@ -8938,7 +9001,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Check if this is a soccer league - soccer leagues show home on top, away on bottom
                 // displayLeague already declared above
-                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'Copa Libertadores', 'Copa Sudamericana', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly'].includes(displayLeague);
+                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'Copa Libertadores', 'Copa Sudamericana', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly'].includes(displayLeague);
                 
                 // Check if we're rendering in the league-specific column (for font size adjustment)
                 const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
@@ -9339,20 +9402,30 @@ document.addEventListener('DOMContentLoaded', function () {
         if (isFinalA && !isFinalB) return 1;
         if (!isFinalA && isFinalB) return -1;
         
-        // Check if both are manual games (Game ID starts with "manual-")
-        const isManualA = a["Game ID"] && a["Game ID"].startsWith("manual-");
-        const isManualB = b["Game ID"] && b["Game ID"].startsWith("manual-");
+        // Check if both are manual games (Game ID starts with "manual-" or "sheet-")
+        const isManualA = a["Game ID"] && (a["Game ID"].startsWith("manual-") || a["Game ID"].startsWith("sheet-"));
+        const isManualB = b["Game ID"] && (b["Game ID"].startsWith("manual-") || b["Game ID"].startsWith("sheet-"));
         
         // For all games, sort by time first (this ensures chronological order)
         const timeDiff = a["Start Time"] - b["Start Time"];
         if (timeDiff !== 0) return timeDiff;
         
-        // If times are equal and both are manual games from the same league, use displayOrder as tiebreaker
+        // If times are equal and both are manual/sheet games from the same league, use displayOrder as tiebreaker
         // This preserves Google Sheet order for games that have the same start time
         if (isManualA && isManualB && a["League"] === b["League"]) {
             const orderA = a["displayOrder"] !== undefined ? a["displayOrder"] : 999999;
             const orderB = b["displayOrder"] !== undefined ? b["displayOrder"] : 999999;
             return orderA - orderB;
+        }
+        
+        // If times are equal and at least one is a manual/sheet game from the same league, prioritize displayOrder
+        // This ensures header rows (with channel) appear before individual games
+        if ((isManualA || isManualB) && a["League"] === b["League"]) {
+            const orderA = a["displayOrder"] !== undefined ? a["displayOrder"] : 999999;
+            const orderB = b["displayOrder"] !== undefined ? b["displayOrder"] : 999999;
+            if (orderA !== 999999 || orderB !== 999999) {
+                return orderA - orderB;
+            }
         }
         
         // For mixed or non-manual games with same time, maintain original order (no change)
@@ -15925,7 +15998,7 @@ const VIDEOS_CONFIG = {
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
         'NFL': {
-            highlights: 's31VB4Z4CURW6OQL',
+            highlights: 'Zn503KLDsGiEM8AM',
             allVideos: 'vsvgWNVcJ1m95kd9'
         },
         'NCAAF': {
