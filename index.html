@@ -3779,58 +3779,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             fetchFeed(`#${source}-feed`, url);
         });
 
-        // --- Firestore Listener Cleanup System (prevents memory leaks on mobile) ---
-        const firestoreUnsubscribers = [];
-        
-        function cleanupFirestoreListeners() {
-            // Clean up all tracked Firestore listeners
-            firestoreUnsubscribers.forEach(unsubscribe => {
-                if (unsubscribe && typeof unsubscribe === 'function') {
-                    try {
-                        unsubscribe();
-                    } catch (e) {
-                        console.warn('Error unsubscribing listener:', e);
-                    }
-                }
-            });
-            firestoreUnsubscribers.length = 0;
-            
-            // Also clean up activeListenerUnsubscribe if it exists
-            if (typeof activeListenerUnsubscribe !== 'undefined' && activeListenerUnsubscribe) {
-                try {
-                    activeListenerUnsubscribe();
-                    activeListenerUnsubscribe = null;
-                } catch (e) {
-                    console.warn('Error unsubscribing active listener:', e);
-                }
-            }
-            
-            // Also clean up leagueTodayGamesUnsubscribe if it exists
-            if (typeof leagueTodayGamesUnsubscribe !== 'undefined' && leagueTodayGamesUnsubscribe) {
-                try {
-                    leagueTodayGamesUnsubscribe();
-                    leagueTodayGamesUnsubscribe = null;
-                } catch (e) {
-                    console.warn('Error unsubscribing league listener:', e);
-                }
-            }
-            
-            // Force garbage collection hint on mobile (Safari)
-            if (window.gc && typeof window.gc === 'function') {
-                try {
-                    window.gc();
-                } catch (e) {
-                    // Ignore if gc is not available
-                }
-            }
-        }
-        
-        function addUnsubscriber(unsubscribe) {
-            if (unsubscribe && typeof unsubscribe === 'function') {
-                firestoreUnsubscribers.push(unsubscribe);
-            }
-        }
-
         // --- Main Menu and Page Switching Logic ---
         let selectedSection = "Home";
         document.querySelectorAll("#menuList li").forEach(item => {
@@ -3840,9 +3788,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     return;
                 }
                 e.stopPropagation();
-                
-                // Clean up all Firestore listeners before switching pages (prevents mobile crashes)
-                cleanupFirestoreListeners();
                 
                 // Scroll to top when navigating to a new page
                 window.scrollTo(0, 0);
@@ -6120,20 +6065,7 @@ document.addEventListener('DOMContentLoaded', function () {
         EFLChampionship: {
             "Middlesbrough": "M'brough",
             "Preston North End": "Preston",
-            "Charlton Athletic": "Charlton",
-            "Queens Park Rangers": "QPR",
-            "QPR": "QPR",
-            "Blackburn Rovers": "Blackburn",
-            "Blackburn": "Blackburn",
-            "Sheffield Wednesday": "Sheff Wed",
-            "Sheff Wed": "Sheff Wed",
-            "Sheffield United": "Sheffield Utd",
-            "Sheffield Utd": "Sheffield Utd",
-            "Birmingham City": "B'ham City",
-            "B'ham City": "B'ham City",
-            "West Bromwich Albion": "WBA",
-            "WBA": "WBA",
-            "West Brom": "WBA"
+            "Charlton Athletic": "Charlton"
         },
         // Bundesliga
         Bundesliga: {
@@ -6191,8 +6123,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         // Liga MX
         LigaMX: {
-            "Cruz Azul": "Cruz Azúl",
-            "Cruz Azúl": "Cruz Azúl",
+            "Cruz Azul": "Cruz Azul",
             "Toluca": "Toluca",
             "Club América": "Club América",
             "Club America": "Club América",
@@ -6453,7 +6384,9 @@ document.addEventListener('DOMContentLoaded', function () {
             "FC Barcelona": "Barcelona",
             "Villarreal": "Villarreal",
             "Villarreal CF": "Villarreal",
-            "Atletico Madrid": "Atlético",
+            "Atlético Madrid": "Atlético Madrid",
+            "Atletico Madrid": "Atlético Madrid",
+            "Atletico": "Atlético Madrid",
             "Espanyol": "Espanyol",
             "RCD Espanyol": "Espanyol",
             "Getafe": "Getafe",
@@ -6693,12 +6626,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Charleston Southern": "Charleston",
             "Eastern Illinois": "E Illinois",
             "George Mason": "Geo Maso",
-            "Northern Illinois": "N Illinois",
-            "SMU Mustangs": "SMU",
-            "SMU": "SMU",
-            "VTSU Johnson": "VTSU-Johns.",
-            "University of Puget Sound": "Puget Sound",
-            "Puget Sound": "Puget Sound"
+            "Northern Illinois": "N Illinois"
         },
         // NCAAF
         NCAAF: {
@@ -6907,26 +6835,16 @@ document.addEventListener('DOMContentLoaded', function () {
             "South Alabama": "S Alabama",
             "George Mason": "Geo Mason",
             "New Hampshire": "New Hamp",
-            "North American": "N American",
-            "Loyola Chicago": "Loyola CHI",
-            "Morehead State": "Morehead St",
-            "Boston University": "Boston U",
-            "Louisiana Tech": "LA Tech",
-            "St. Bonaventure": "St. Bon.",
-            "Western Kentucky": "W Kentucky"
+            "North American": "N American"
         },
         // UEFA Champions League
         UEFAChampionsLeague: {
             "Royale Union SG": "Royale USG",
             "Olympiacos Piraeus": "Olympiacos",
-            "Olympiakos Piraeus": "Olympiakos",
             "FC Copenhagen": "Copenhagen",
             "Union Saint-Gilloise": "Union SG",
             "Newcastle United": "Newcastle",
-            "Olympique Marseille": "Marseille",
-            "Atlético Madrid": "Atlético",
-            "Internazionale": "Inter Milan",
-            "Inter Milan": "Inter Milan"
+            "Olympique Marseille": "Marseille"
         },
         // UEFA Europa League
         UEFAEuropaLeague: {
@@ -9534,7 +9452,7 @@ document.addEventListener('DOMContentLoaded', function () {
          if (leagueId === 'USA: NCAA Women') {
              q = q.where('Sport', '==', 'Basketball');
          }
-         const unsubscribe1 = q.onSnapshot(snapshot => {
+         q.onSnapshot(snapshot => {
              if (!snapshot.empty) {
                  const gamesData = snapshot.docs.map(d => d.data()).sort(sortGames);
                  renderGames(scheduleContent, gamesData, false);
@@ -9554,7 +9472,7 @@ document.addEventListener('DOMContentLoaded', function () {
              if (leagueId === 'USA: NCAA Women') {
                  q2 = q2.where('Sport', '==', 'Basketball');
              }
-             const unsubscribe2 = q2.onSnapshot(s2 => {
+             q2.onSnapshot(s2 => {
                  if (!s2.empty) {
                      const gamesData2 = s2.docs.map(d => d.data()).sort(sortGames);
                      renderGames(scheduleContent, gamesData2, false);
@@ -9564,11 +9482,9 @@ document.addEventListener('DOMContentLoaded', function () {
              }, _err => {
                  scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>';
              });
-             addUnsubscriber(unsubscribe2);
          }, _err => {
              scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>';
          });
-         addUnsubscriber(unsubscribe1);
      }
 
     async function fetchYesterdayScoresForLeague(leagueId, leagueName) {
@@ -11560,7 +11476,6 @@ async function fetchFeaturedGames() {
                 console.error("Error fetching regular games: ", err);
                 errorDiv.textContent = "Failed to load real-time data.";
             });
-        addUnsubscriber(regularGamesUnsubscribe);
 
         // Store featured games data and live games data separately
         let featuredGamesData = [];
