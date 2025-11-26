@@ -3814,6 +3814,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     console.warn('Error unsubscribing league listener:', e);
                 }
             }
+            
+            // Force garbage collection hint on mobile (Safari)
+            if (window.gc && typeof window.gc === 'function') {
+                try {
+                    window.gc();
+                } catch (e) {
+                    // Ignore if gc is not available
+                }
+            }
         }
         
         function addUnsubscriber(unsubscribe) {
@@ -6111,7 +6120,20 @@ document.addEventListener('DOMContentLoaded', function () {
         EFLChampionship: {
             "Middlesbrough": "M'brough",
             "Preston North End": "Preston",
-            "Charlton Athletic": "Charlton"
+            "Charlton Athletic": "Charlton",
+            "Queens Park Rangers": "QPR",
+            "QPR": "QPR",
+            "Blackburn Rovers": "Blackburn",
+            "Blackburn": "Blackburn",
+            "Sheffield Wednesday": "Sheff Wed",
+            "Sheff Wed": "Sheff Wed",
+            "Sheffield United": "Sheffield Utd",
+            "Sheffield Utd": "Sheffield Utd",
+            "Birmingham City": "B'ham City",
+            "B'ham City": "B'ham City",
+            "West Bromwich Albion": "WBA",
+            "WBA": "WBA",
+            "West Brom": "WBA"
         },
         // Bundesliga
         Bundesliga: {
@@ -6169,7 +6191,8 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         // Liga MX
         LigaMX: {
-            "Cruz Azul": "Cruz Azul",
+            "Cruz Azul": "Cruz Azúl",
+            "Cruz Azúl": "Cruz Azúl",
             "Toluca": "Toluca",
             "Club América": "Club América",
             "Club America": "Club América",
@@ -6430,9 +6453,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "FC Barcelona": "Barcelona",
             "Villarreal": "Villarreal",
             "Villarreal CF": "Villarreal",
-            "Atlético Madrid": "Atlético Madrid",
-            "Atletico Madrid": "Atlético Madrid",
-            "Atletico": "Atlético Madrid",
+            "Atletico Madrid": "Atlético",
             "Espanyol": "Espanyol",
             "RCD Espanyol": "Espanyol",
             "Getafe": "Getafe",
@@ -6672,7 +6693,12 @@ document.addEventListener('DOMContentLoaded', function () {
             "Charleston Southern": "Charleston",
             "Eastern Illinois": "E Illinois",
             "George Mason": "Geo Maso",
-            "Northern Illinois": "N Illinois"
+            "Northern Illinois": "N Illinois",
+            "SMU Mustangs": "SMU",
+            "SMU": "SMU",
+            "VTSU Johnson": "VTSU-Johns.",
+            "University of Puget Sound": "Puget Sound",
+            "Puget Sound": "Puget Sound"
         },
         // NCAAF
         NCAAF: {
@@ -6881,16 +6907,26 @@ document.addEventListener('DOMContentLoaded', function () {
             "South Alabama": "S Alabama",
             "George Mason": "Geo Mason",
             "New Hampshire": "New Hamp",
-            "North American": "N American"
+            "North American": "N American",
+            "Loyola Chicago": "Loyola CHI",
+            "Morehead State": "Morehead St",
+            "Boston University": "Boston U",
+            "Louisiana Tech": "LA Tech",
+            "St. Bonaventure": "St. Bon.",
+            "Western Kentucky": "W Kentucky"
         },
         // UEFA Champions League
         UEFAChampionsLeague: {
             "Royale Union SG": "Royale USG",
             "Olympiacos Piraeus": "Olympiacos",
+            "Olympiakos Piraeus": "Olympiakos",
             "FC Copenhagen": "Copenhagen",
             "Union Saint-Gilloise": "Union SG",
             "Newcastle United": "Newcastle",
-            "Olympique Marseille": "Marseille"
+            "Olympique Marseille": "Marseille",
+            "Atlético Madrid": "Atlético",
+            "Internazionale": "Inter Milan",
+            "Inter Milan": "Inter Milan"
         },
         // UEFA Europa League
         UEFAEuropaLeague: {
