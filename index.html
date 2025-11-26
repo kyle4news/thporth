@@ -3779,6 +3779,49 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             fetchFeed(`#${source}-feed`, url);
         });
 
+        // --- Firestore Listener Cleanup System (prevents memory leaks on mobile) ---
+        const firestoreUnsubscribers = [];
+        
+        function cleanupFirestoreListeners() {
+            // Clean up all tracked Firestore listeners
+            firestoreUnsubscribers.forEach(unsubscribe => {
+                if (unsubscribe && typeof unsubscribe === 'function') {
+                    try {
+                        unsubscribe();
+                    } catch (e) {
+                        console.warn('Error unsubscribing listener:', e);
+                    }
+                }
+            });
+            firestoreUnsubscribers.length = 0;
+            
+            // Also clean up activeListenerUnsubscribe if it exists
+            if (typeof activeListenerUnsubscribe !== 'undefined' && activeListenerUnsubscribe) {
+                try {
+                    activeListenerUnsubscribe();
+                    activeListenerUnsubscribe = null;
+                } catch (e) {
+                    console.warn('Error unsubscribing active listener:', e);
+                }
+            }
+            
+            // Also clean up leagueTodayGamesUnsubscribe if it exists
+            if (typeof leagueTodayGamesUnsubscribe !== 'undefined' && leagueTodayGamesUnsubscribe) {
+                try {
+                    leagueTodayGamesUnsubscribe();
+                    leagueTodayGamesUnsubscribe = null;
+                } catch (e) {
+                    console.warn('Error unsubscribing league listener:', e);
+                }
+            }
+        }
+        
+        function addUnsubscriber(unsubscribe) {
+            if (unsubscribe && typeof unsubscribe === 'function') {
+                firestoreUnsubscribers.push(unsubscribe);
+            }
+        }
+
         // --- Main Menu and Page Switching Logic ---
         let selectedSection = "Home";
         document.querySelectorAll("#menuList li").forEach(item => {
@@ -3788,6 +3831,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     return;
                 }
                 e.stopPropagation();
+                
+                // Clean up all Firestore listeners before switching pages (prevents mobile crashes)
+                cleanupFirestoreListeners();
                 
                 // Scroll to top when navigating to a new page
                 window.scrollTo(0, 0);
@@ -9452,7 +9498,7 @@ document.addEventListener('DOMContentLoaded', function () {
          if (leagueId === 'USA: NCAA Women') {
              q = q.where('Sport', '==', 'Basketball');
          }
-         q.onSnapshot(snapshot => {
+         const unsubscribe1 = q.onSnapshot(snapshot => {
              if (!snapshot.empty) {
                  const gamesData = snapshot.docs.map(d => d.data()).sort(sortGames);
                  renderGames(scheduleContent, gamesData, false);
@@ -9472,7 +9518,7 @@ document.addEventListener('DOMContentLoaded', function () {
              if (leagueId === 'USA: NCAA Women') {
                  q2 = q2.where('Sport', '==', 'Basketball');
              }
-             q2.onSnapshot(s2 => {
+             const unsubscribe2 = q2.onSnapshot(s2 => {
                  if (!s2.empty) {
                      const gamesData2 = s2.docs.map(d => d.data()).sort(sortGames);
                      renderGames(scheduleContent, gamesData2, false);
@@ -9482,9 +9528,11 @@ document.addEventListener('DOMContentLoaded', function () {
              }, _err => {
                  scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>';
              });
+             addUnsubscriber(unsubscribe2);
          }, _err => {
              scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>';
          });
+         addUnsubscriber(unsubscribe1);
      }
 
     async function fetchYesterdayScoresForLeague(leagueId, leagueName) {
@@ -11476,6 +11524,7 @@ async function fetchFeaturedGames() {
                 console.error("Error fetching regular games: ", err);
                 errorDiv.textContent = "Failed to load real-time data.";
             });
+        addUnsubscriber(regularGamesUnsubscribe);
 
         // Store featured games data and live games data separately
         let featuredGamesData = [];
