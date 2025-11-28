@@ -11954,6 +11954,8 @@ async function fetchFeaturedGames() {
 
         if (mainTabsContainer) {
             const standingsMainTab = mainTabsContainer.querySelector('.main-tab[data-main-tab=\"standings\"]');
+            const statsMainTab = mainTabsContainer.querySelector('.main-tab[data-main-tab=\"stats\"]');
+            
             if (standingsMainTab) {
                 if (leagueKey === 'FACup') {
                     standingsMainTab.style.display = 'none';
@@ -11964,9 +11966,21 @@ async function fetchFeaturedGames() {
                     standingsMainTab.style.display = '';
                 }
             }
+            
+            // Show stats tab for NBA and MLB
+            if (statsMainTab) {
+                if (leagueKey === 'NBA' || leagueKey === 'MLB') {
+                    statsMainTab.style.display = '';
+                } else {
+                    statsMainTab.style.display = 'none';
+                }
+            }
         }
 
         activateMainTab('schedule');
+        
+        // Update stats category menu based on league
+        updateStatsCategoryMenu(leagueKey);
         
         // Special handling for Soccer page - consolidated view
         if (leagueKey === 'Soccer') {
@@ -14152,8 +14166,11 @@ function loadStatsCategory(category, displayElementId) {
     if (currentLeague === 'MLB') {
         console.log('Loading MLB stats for category:', category);
         loadMLBStats(category, displayElement);
+    } else if (currentLeague === 'NBA') {
+        console.log('Loading NBA stats for category:', category);
+        loadNBAStats(category, displayElement);
     } else {
-        console.log('Non-MLB league, showing placeholder for:', currentLeague);
+        console.log('Non-MLB/NBA league, showing placeholder for:', currentLeague);
         // For other leagues, show placeholder
         setTimeout(() => {
             displayElement.innerHTML = `<p style="color: #9ca3af;">${category} statistics for ${currentLeague} will be implemented here...</p>`;
@@ -14407,6 +14424,150 @@ function displayMLBStatsFromFirestore(statsData, category, displayElement) {
     displayElement.innerHTML = html;
 }
 
+// --- LOAD NBA STATS FROM FIRESTORE ---
+async function loadNBAStatsFromFirestore(section) {
+    try {
+        const docRef = db.collection('nbaStats').doc(section);
+        const doc = await docRef.get();
+        
+        if (doc.exists) {
+            const data = doc.data();
+            const statsData = data.stats || {};
+            console.log('✅ Loaded NBA stats for section:', section);
+            return statsData;
+        } else {
+            console.log('❌ No stats found for section:', section);
+            return null;
+        }
+    } catch (error) {
+        console.error('❌ Error loading NBA stats from Firestore:', error);
+        return null;
+    }
+}
+
+// --- LOAD NBA STATS ---
+async function loadNBAStats(category, displayElement) {
+    const cacheKey = `nba_stats_${category}`;
+    let cachedData = statsCache.get(cacheKey);
+    
+    if (cachedData) {
+        console.log('Using cached NBA stats for', category);
+        displayNBAStatsFromFirestore(cachedData, category, displayElement);
+        return;
+    }
+    
+    try {
+        console.log('Fetching fresh NBA stats from Firestore for', category);
+        
+        // Map category to Firestore section
+        const sectionMap = {
+            'seasonLeaders': 'seasonLeaders',
+            'forwards': 'forwards',
+            'guards': 'guards',
+            'rookies': 'rookies',
+            'centers': 'centers',
+            'seasonTotals': 'seasonTotals',
+            'advanced': 'advanced',
+            'miscellaneous': 'miscellaneous',
+            'trackingDrives': 'trackingDrives',
+            'trackingShooting': 'trackingShooting',
+            'trackingPassing': 'trackingPassing',
+            'trackingSpeed': 'trackingSpeed',
+            'clutch': 'clutch',
+            'scoring': 'scoring',
+            'bioStats': 'bioStats'
+        };
+        
+        const section = sectionMap[category] || category;
+        const statsData = await loadNBAStatsFromFirestore(section);
+        
+        if (statsData) {
+            // Cache the data for 12 hours
+            statsCache.set(cacheKey, statsData);
+            displayNBAStatsFromFirestore(statsData, category, displayElement);
+        } else {
+            displayElement.innerHTML = `<p style="color: #9ca3af;">No ${category} data available. Please run the upload script.</p>`;
+        }
+        
+    } catch (error) {
+        console.error('Error loading NBA stats from Firestore:', error);
+        displayElement.innerHTML = `<p style="color: #ef4444;">Error loading NBA statistics. Please try again later.</p>`;
+    }
+}
+
+// --- DISPLAY NBA STATS FROM FIRESTORE ---
+function displayNBAStatsFromFirestore(statsData, category, displayElement) {
+    let html = `<div style="color: white;">`;
+    
+    // Category display names
+    const categoryNames = {
+        'seasonLeaders': 'Season Leaders',
+        'forwards': 'Forwards',
+        'guards': 'Guards',
+        'rookies': 'Rookies',
+        'centers': 'Centers',
+        'seasonTotals': 'Season Totals',
+        'advanced': 'Advanced',
+        'miscellaneous': 'Miscellaneous',
+        'trackingDrives': 'Player Tracking - Drives',
+        'trackingShooting': 'Player Tracking - Shooting',
+        'trackingPassing': 'Player Tracking - Passing',
+        'trackingSpeed': 'Player Tracking - Speed',
+        'clutch': 'Clutch',
+        'scoring': 'Scoring',
+        'bioStats': 'Bio Stats'
+    };
+    
+    const categoryName = categoryNames[category] || category;
+    html += `<h4 style="color: #fff; font-size: 12px; margin-bottom: 10px; border-bottom: 1px solid #4a4a4a; padding-bottom: 5px;">NBA ${categoryName}</h4>`;
+    
+    if (statsData && Object.keys(statsData).length > 0) {
+        // Display each stat category within the section
+        Object.keys(statsData).forEach(statKey => {
+            const players = statsData[statKey];
+            if (players && players.length > 0) {
+                // Stat name formatting
+                const statName = statKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+                
+                html += `<div style="margin-bottom: 15px;">`;
+                html += `<h5 style="color: #fff; font-size: 11px; margin-bottom: 5px; margin-top: 10px;">${statName}</h5>`;
+                html += `<table style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 10px;">`;
+                html += `<thead><tr style="border-bottom: 1px solid #4a4a4a;">`;
+                html += `<th style="padding: 3px 4px; text-align: left; color: #ccc; width: 20px;">#</th>`;
+                html += `<th style="padding: 3px 4px; text-align: left; color: #ccc;">Player</th>`;
+                html += `<th style="padding: 3px 4px; text-align: left; color: #ccc;"></th>`;
+                html += `<th style="padding: 3px 4px; text-align: right; color: #ccc;"></th>`;
+                html += `</tr></thead><tbody>`;
+                
+                players.slice(0, 10).forEach((player, index) => {
+                    const value = typeof player.value === 'number' 
+                        ? (player.value < 1 && (statKey.includes('Pct') || statKey.includes('Percentage')) 
+                            ? (player.value * 100).toFixed(1) + '%'
+                            : player.value.toFixed(1))
+                        : player.value;
+                    
+                    html += `<tr style="border-bottom: 1px solid #333;">`;
+                    html += `<td style="padding: 3px 4px; color: #ccc;">${index + 1}</td>`;
+                    html += `<td style="padding: 3px 4px; color: white; font-weight: 500;">${player.name}</td>`;
+                    html += `<td style="padding: 3px 4px; color: #ccc;">${player.team}</td>`;
+                    html += `<td style="padding: 3px 4px; color: #ccc; text-align: right;">${value}</td>`;
+                    html += `</tr>`;
+                });
+                
+                html += `</tbody></table>`;
+                html += `</div>`;
+            }
+        });
+    } else {
+        html += `<p style="color: #9ca3af;">No ${category} statistics available.</p>`;
+    }
+    
+    html += `<p style="color: #666; font-size: 9px; margin-top: 10px;">Data from NBA.com</p>`;
+    html += `</div>`;
+    
+    displayElement.innerHTML = html;
+}
+
 // --- DAILY REFRESH SCHEDULER ---
 function startDailyStatsRefresh() {
     // Clear cache at midnight every day
@@ -14563,6 +14724,72 @@ async function testBaseballReferenceScraper() {
 // Make test function available globally
 window.testBaseballScraper = testBaseballReferenceScraper;
 
+// --- UPDATE STATS CATEGORY MENU BASED ON LEAGUE ---
+function updateStatsCategoryMenu(leagueKey) {
+    const playerCategoryMenu = document.getElementById('player-category-menu');
+    if (!playerCategoryMenu) return;
+    
+    // Clear existing menu items
+    playerCategoryMenu.innerHTML = '';
+    
+    if (leagueKey === 'NBA') {
+        // NBA categories
+        const nbaCategories = [
+            { key: 'seasonLeaders', name: 'Season Leaders' },
+            { key: 'forwards', name: 'Forwards' },
+            { key: 'guards', name: 'Guards' },
+            { key: 'rookies', name: 'Rookies' },
+            { key: 'centers', name: 'Centers' },
+            { key: 'seasonTotals', name: 'Season Totals' },
+            { key: 'advanced', name: 'Advanced' },
+            { key: 'miscellaneous', name: 'Miscellaneous' },
+            { key: 'trackingDrives', name: 'Tracking - Drives' },
+            { key: 'trackingShooting', name: 'Tracking - Shooting' },
+            { key: 'trackingPassing', name: 'Tracking - Passing' },
+            { key: 'trackingSpeed', name: 'Tracking - Speed' },
+            { key: 'clutch', name: 'Clutch' },
+            { key: 'scoring', name: 'Scoring' },
+            { key: 'bioStats', name: 'Bio Stats' }
+        ];
+        
+        nbaCategories.forEach((cat, index) => {
+            const item = document.createElement('div');
+            item.className = 'stats-category-item';
+            item.dataset.category = cat.key;
+            item.style.cssText = index === 0 
+                ? 'padding: 8px 2px; cursor: pointer; border-bottom: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 9px; margin-bottom: 1px;'
+                : 'padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;';
+            item.textContent = cat.name;
+            playerCategoryMenu.appendChild(item);
+        });
+        
+        // Re-initialize the menu
+        initializeStatsCategoryMenu('player-category-menu', 'player-stats-content-area');
+    } else if (leagueKey === 'MLB') {
+        // MLB categories (default)
+        const mlbCategories = [
+            { key: 'batting', name: 'Batting' },
+            { key: 'pitching', name: 'Pitching' },
+            { key: 'fielding', name: 'Fielding' },
+            { key: 'advanced', name: 'Advanced' }
+        ];
+        
+        mlbCategories.forEach((cat, index) => {
+            const item = document.createElement('div');
+            item.className = 'stats-category-item';
+            item.dataset.category = cat.key;
+            item.style.cssText = index === 0 
+                ? 'padding: 8px 2px; cursor: pointer; border-bottom: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 9px; margin-bottom: 1px;'
+                : 'padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;';
+            item.textContent = cat.name;
+            playerCategoryMenu.appendChild(item);
+        });
+        
+        // Re-initialize the menu
+        initializeStatsCategoryMenu('player-category-menu', 'player-stats-content-area');
+    }
+}
+
 // --- RESET STATS TABS TO DEFAULT ---
 function resetStatsTabsToDefault() {
     // Reset Player/Team sub-tabs to Player active
@@ -14588,10 +14815,14 @@ function resetStatsTabsToDefault() {
         document.getElementById('team-stats-content').style.display = 'none';
     }
     
-    // Reset Player category menu to first item (Batting) active
+    // Get current league to determine first category
+    const leagueHeader = document.getElementById('league-specific-header');
+    const currentLeague = leagueHeader ? leagueHeader.innerText : null;
+    
+    // Reset Player category menu to first item active
     const playerCategoryMenu = document.getElementById('player-category-menu');
     if (playerCategoryMenu) {
-        const firstCategoryItem = playerCategoryMenu.querySelector('.stats-category-item[data-category="batting"]');
+        const firstCategoryItem = playerCategoryMenu.querySelector('.stats-category-item');
         
         // Reset all category items
         playerCategoryMenu.querySelectorAll('.stats-category-item').forEach(item => {
@@ -14602,7 +14833,7 @@ function resetStatsTabsToDefault() {
             item.style.fontWeight = 'normal';
         });
         
-        // Activate first category (Batting)
+        // Activate first category
         if (firstCategoryItem) {
             firstCategoryItem.classList.add('active');
             firstCategoryItem.style.borderBottom = '1px solid #fff';
