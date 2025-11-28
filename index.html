@@ -6122,11 +6122,11 @@ document.addEventListener('DOMContentLoaded', function () {
             "Augsburg": "Augsburg",
             "FC St. Pauli": "FC St. Pauli",
             "St. Pauli": "FC St. Pauli",
-            "Borussia Mönchengladbach": "Mönchengladbach",
-            "Mönchengladbach": "Mönchengladbach",
-            "Gladbach": "Mönchengladbach",
-            "Borussia M'gladbach": "Mönchengladbach",
-            "B. Monchengladbach": "B. M'gladbach",
+            "Borussia Mönchengladbach": "M'gladbach",
+            "Mönchengladbach": "M'gladbach",
+            "Gladbach": "M'gladbach",
+            "Borussia M'gladbach": "M'gladbach",
+            "B. Monchengladbach": "M'gladbach",
             "1. FSV Mainz 05": "Mainz",
             "Mainz 05": "Mainz",
             "Mainz": "Mainz",
@@ -6497,6 +6497,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Oklahoma State": "OK State",
             "Arkansas Baptist": "Ark Baptist",
             "NC Greensboro": "UNC-Greensb",
+            "South Alabama": "S Alabama",
             "NC Wilmington": "UNC Wilm",
             "Missouri Southern State": "MO So. State",
             "Penn State-York": "Penn St-York",
@@ -6659,7 +6660,9 @@ document.addEventListener('DOMContentLoaded', function () {
             "Louisiana Tech": "LA Tech",
             "Jacksonville State": "Jax State",
             "Kennesaw State": "Kennesaw",
-            "Mississippi St.": "Mississippi St",
+            "Mississippi State": "MS State",
+            "Mississippi St.": "MS State",
+            "Mississippi St": "MS State",
             "Washington Huskies": "Washington",
             "Sam Houston State": "Sam Houston",
             "Delaware Fightin": "Delaware",
@@ -6679,6 +6682,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Western Michigan": "W Michigan",
             "Louisiana-Monroe": "UL-Monroe",
             "South Alabama": "S Alabama",
+            "Colorado State": "Colorado St",
             "Colorado State Rams": "Colorado St",
             "Georgia State Panthers": "GA State",
             "Tennessee Tech": "TN Tech",
@@ -6789,7 +6793,19 @@ document.addEventListener('DOMContentLoaded', function () {
             "Westminster UT": "Westminster",
             "William & Mary": "Wm & Mary",
             "Colorado State": "Colorado St",
+            "Arkansas State": "Arkansas St",
             "Arkansas Razorbacks": "Arkansas",
+            "Bethune-Cookman": "Beth-Cook",
+            "Seattle U Redhawks": "Seattle U",
+            "Seattle U": "Seattle U",
+            "UC Santa Barbara": "UC-SB",
+            "UC-SB": "UC-SB",
+            "Western Carolina": "W Carolina",
+            "Wisconsin Badgers": "Wisconsin",
+            "Wisconsin": "Wisconsin",
+            "Eastern Illinois": "E Illinois",
+            "Memphis Tigers": "Memphis",
+            "Memphis": "Memphis",
             "Carroll College": "Carrol Coll.",
             "USC Trojans": "USC",
             "Frostburg State Bobcats": "Frostburg St",
@@ -6906,6 +6922,28 @@ document.addEventListener('DOMContentLoaded', function () {
             "Bosnia & Herzegovina": "Bosnia & H",
             "North Macedonia": "N Macedonia",
             "Turkey": "Türkiye"
+        },
+        // Liga Portugal
+        LigaPortugal: {
+            "Vitória Guimarães": "Vitória G",
+            "Vitoria Guimaraes": "Vitória G"
+        },
+        // Brasileirao
+        Brasileirao: {
+            "Santos Laguna": "Santos L.",
+            "Santos": "Santos L."
+        },
+        // Belgian Pro League
+        BelgianProLeague: {
+            "Standard Liège": "S. Liège",
+            "Standard Liege": "S. Liège",
+            "Standard": "S. Liège"
+        },
+        // Coupe de France
+        CoupeDeFrance: {
+            "Stade Briochin": "S. Briochin",
+            "Grenoble Foot 38": "Grenoble 38",
+            "Sarreguemines": "S'guemines"
         }
     };
     
@@ -14162,13 +14200,22 @@ function loadStatsCategory(category, displayElementId) {
     const currentLeague = leagueHeader ? leagueHeader.innerText : null;
     console.log('Current league detected:', currentLeague);
     
+    // Check if this is player or team stats
+    const statsSubTabsContainer = document.getElementById('stats-sub-tabs');
+    const isTeamStats = statsSubTabsContainer && statsSubTabsContainer.querySelector('.stats-sub-tab[data-stats-sub-tab="team"]')?.classList.contains('active');
+    
     // Load stats based on league and category
     if (currentLeague === 'MLB') {
         console.log('Loading MLB stats for category:', category);
         loadMLBStats(category, displayElement);
     } else if (currentLeague === 'NBA') {
-        console.log('Loading NBA stats for category:', category);
-        loadNBAStats(category, displayElement);
+        if (isTeamStats) {
+            console.log('Loading NBA team stats for category:', category);
+            loadNBATeamStats(category, displayElement);
+        } else {
+            console.log('Loading NBA player stats for category:', category);
+            loadNBAStats(category, displayElement);
+        }
     } else {
         console.log('Non-MLB/NBA league, showing placeholder for:', currentLeague);
         // For other leagues, show placeholder
@@ -14533,7 +14580,6 @@ function displayNBAStatsFromFirestore(statsData, category, displayElement) {
                 html += `<h5 style="color: #fff; font-size: 11px; margin-bottom: 5px; margin-top: 10px;">${statName}</h5>`;
                 html += `<table style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 10px;">`;
                 html += `<thead><tr style="border-bottom: 1px solid #4a4a4a;">`;
-                html += `<th style="padding: 3px 4px; text-align: left; color: #ccc; width: 20px;">#</th>`;
                 html += `<th style="padding: 3px 4px; text-align: left; color: #ccc;">Player</th>`;
                 html += `<th style="padding: 3px 4px; text-align: left; color: #ccc;"></th>`;
                 html += `<th style="padding: 3px 4px; text-align: right; color: #ccc;"></th>`;
@@ -14547,9 +14593,162 @@ function displayNBAStatsFromFirestore(statsData, category, displayElement) {
                         : player.value;
                     
                     html += `<tr style="border-bottom: 1px solid #333;">`;
-                    html += `<td style="padding: 3px 4px; color: #ccc;">${index + 1}</td>`;
                     html += `<td style="padding: 3px 4px; color: white; font-weight: 500;">${player.name}</td>`;
                     html += `<td style="padding: 3px 4px; color: #ccc;">${player.team}</td>`;
+                    html += `<td style="padding: 3px 4px; color: #ccc; text-align: right;">${value}</td>`;
+                    html += `</tr>`;
+                });
+                
+                html += `</tbody></table>`;
+                html += `</div>`;
+            }
+        });
+    } else {
+        html += `<p style="color: #9ca3af;">No ${category} statistics available.</p>`;
+    }
+    
+    html += `<p style="color: #666; font-size: 9px; margin-top: 10px;">Data from NBA.com</p>`;
+    html += `</div>`;
+    
+    displayElement.innerHTML = html;
+}
+
+// --- LOAD NBA TEAM STATS FROM FIRESTORE ---
+async function loadNBATeamStatsFromFirestore(section) {
+    try {
+        const docRef = db.collection('nbaTeamStats').doc(section);
+        const doc = await docRef.get();
+        
+        if (doc.exists) {
+            const data = doc.data();
+            const statsData = data.stats || {};
+            const lastUpdated = data.lastUpdated;
+            console.log('✅ Loaded NBA team stats for section:', section);
+            return { stats: statsData, lastUpdated: lastUpdated };
+        } else {
+            console.log('❌ No team stats found for section:', section);
+            return null;
+        }
+    } catch (error) {
+        console.error('❌ Error loading NBA team stats from Firestore:', error);
+        return null;
+    }
+}
+
+// --- LOAD NBA TEAM STATS ---
+async function loadNBATeamStats(category, displayElement) {
+    const cacheKey = `nba_team_stats_${category}`;
+    let cachedData = statsCache.get(cacheKey);
+    
+    // Check if cached data exists and is still valid (same lastUpdated timestamp)
+    if (cachedData && cachedData.stats) {
+        // We'll verify the timestamp matches when we fetch from Firestore
+        // For now, just proceed to fetch and compare
+    }
+    
+    try {
+        console.log('Fetching fresh NBA team stats from Firestore for', category);
+        
+        // Map category to Firestore section
+        const sectionMap = {
+            'seasonLeaders': 'seasonLeaders',
+            'scoring': 'scoring',
+            'bench': 'bench',
+            'statsInWins': 'statsInWins',
+            'regularSeasonTotals': 'regularSeasonTotals',
+            'advanced': 'advanced',
+            'miscellaneous': 'miscellaneous',
+            'tracking': 'tracking',
+            'trackingDrives': 'trackingDrives',
+            'trackingShooting': 'trackingShooting',
+            'trackingPassing': 'trackingPassing',
+            'trackingSpeed': 'trackingSpeed',
+            'hustle': 'hustle',
+            'clutch': 'clutch'
+        };
+        
+        const section = sectionMap[category] || category;
+        const result = await loadNBATeamStatsFromFirestore(section);
+        
+        if (result && result.stats) {
+            // Check if we have cached data with the same lastUpdated timestamp
+            const cachedEntry = statsCache.get(cacheKey);
+            if (cachedEntry && cachedEntry.lastUpdated && result.lastUpdated) {
+                // Compare timestamps - if they match, use cache
+                const cachedTime = cachedEntry.lastUpdated.toMillis ? cachedEntry.lastUpdated.toMillis() : cachedEntry.lastUpdated;
+                const newTime = result.lastUpdated.toMillis ? result.lastUpdated.toMillis() : result.lastUpdated;
+                if (cachedTime === newTime) {
+                    console.log('Using cached NBA team stats (same timestamp)');
+                    displayNBATeamStatsFromFirestore(cachedEntry.stats, category, displayElement);
+                    return;
+                }
+            }
+            
+            // Cache the data with lastUpdated timestamp
+            statsCache.set(cacheKey, { stats: result.stats, lastUpdated: result.lastUpdated });
+            displayNBATeamStatsFromFirestore(result.stats, category, displayElement);
+        } else {
+            displayElement.innerHTML = `<p style="color: #9ca3af;">No ${category} data available. Please run the upload script.</p>`;
+        }
+        
+    } catch (error) {
+        console.error('Error loading NBA team stats from Firestore:', error);
+        displayElement.innerHTML = `<p style="color: #ef4444;">Error loading NBA team statistics. Please try again later.</p>`;
+    }
+}
+
+// --- DISPLAY NBA TEAM STATS FROM FIRESTORE ---
+function displayNBATeamStatsFromFirestore(statsData, category, displayElement) {
+    let html = `<div style="color: white;">`;
+    
+    // Category display names
+    const categoryNames = {
+        'seasonLeaders': 'Season Leaders',
+        'scoring': 'Scoring',
+        'bench': 'Bench',
+        'statsInWins': 'Stats in Wins',
+        'regularSeasonTotals': 'Regular Season Totals',
+        'advanced': 'Advanced',
+        'miscellaneous': 'Miscellaneous',
+        'tracking': 'Tracking',
+        'trackingDrives': 'Tracking - Drives',
+        'trackingShooting': 'Tracking - Shooting',
+        'trackingPassing': 'Tracking - Passing',
+        'trackingSpeed': 'Tracking - Speed',
+        'hustle': 'Hustle',
+        'clutch': 'Clutch'
+    };
+    
+    const categoryName = categoryNames[category] || category;
+    html += `<h4 style="color: #fff; font-size: 12px; margin-bottom: 10px; border-bottom: 1px solid #4a4a4a; padding-bottom: 5px;">NBA ${categoryName}</h4>`;
+    
+    if (statsData && Object.keys(statsData).length > 0) {
+        // Display each stat category within the section
+        Object.keys(statsData).forEach(statKey => {
+            const teams = statsData[statKey];
+            if (teams && teams.length > 0) {
+                // Stat name formatting
+                const statName = statKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+                
+                html += `<div style="margin-bottom: 15px;">`;
+                html += `<h5 style="color: #fff; font-size: 11px; margin-bottom: 5px; margin-top: 10px;">${statName}</h5>`;
+                html += `<table style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 10px;">`;
+                html += `<thead><tr style="border-bottom: 1px solid #4a4a4a;">`;
+                html += `<th style="padding: 3px 4px; text-align: left; color: #ccc;">Team</th>`;
+                html += `<th style="padding: 3px 4px; text-align: left; color: #ccc;"></th>`;
+                html += `<th style="padding: 3px 4px; text-align: right; color: #ccc;"></th>`;
+                html += `</tr></thead><tbody>`;
+                
+                teams.slice(0, 10).forEach((team, index) => {
+                    const value = typeof team.value === 'number' 
+                        ? (team.value < 1 && (statKey.includes('Pct') || statKey.includes('Percentage') || statKey.includes('efg')) 
+                            ? (team.value * 100).toFixed(1) + '%'
+                            : team.value.toFixed(1))
+                        : team.value;
+                    
+                    html += `<tr style="border-bottom: 1px solid #333;">`;
+                    html += `<td style="padding: 3px 4px; color: white; font-weight: 500;">${team.name}</td>`;
+                    html += `<td style="padding: 3px 4px; color: #ccc;"></td>`;
                     html += `<td style="padding: 3px 4px; color: #ccc; text-align: right;">${value}</td>`;
                     html += `</tr>`;
                 });
@@ -14787,6 +14986,68 @@ function updateStatsCategoryMenu(leagueKey) {
         
         // Re-initialize the menu
         initializeStatsCategoryMenu('player-category-menu', 'player-stats-content-area');
+    }
+    
+    // Update team category menu
+    const teamCategoryMenu = document.getElementById('team-category-menu');
+    if (teamCategoryMenu) {
+        // Clear existing menu items
+        teamCategoryMenu.innerHTML = '';
+        
+        if (leagueKey === 'NBA') {
+            // NBA team categories
+            const nbaTeamCategories = [
+                { key: 'seasonLeaders', name: 'Season Leaders' },
+                { key: 'scoring', name: 'Scoring' },
+                { key: 'bench', name: 'Bench' },
+                { key: 'statsInWins', name: 'Stats in Wins' },
+                { key: 'regularSeasonTotals', name: 'Regular Season Totals' },
+                { key: 'advanced', name: 'Advanced' },
+                { key: 'miscellaneous', name: 'Miscellaneous' },
+                { key: 'trackingDrives', name: 'Tracking - Drives' },
+                { key: 'trackingShooting', name: 'Tracking - Shooting' },
+                { key: 'trackingPassing', name: 'Tracking - Passing' },
+                { key: 'trackingSpeed', name: 'Tracking - Speed' },
+                { key: 'hustle', name: 'Hustle' },
+                { key: 'clutch', name: 'Clutch' }
+            ];
+            
+            nbaTeamCategories.forEach((cat, index) => {
+                const item = document.createElement('div');
+                item.className = 'stats-category-item';
+                item.dataset.category = cat.key;
+                item.style.cssText = index === 0 
+                    ? 'padding: 8px 2px; cursor: pointer; border-bottom: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 9px; margin-bottom: 1px;'
+                    : 'padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;';
+                item.textContent = cat.name;
+                teamCategoryMenu.appendChild(item);
+            });
+            
+            // Re-initialize the menu
+            initializeStatsCategoryMenu('team-category-menu', 'team-stats-content-area');
+        } else if (leagueKey === 'MLB') {
+            // MLB team categories (default)
+            const mlbTeamCategories = [
+                { key: 'standings', name: 'Standings' },
+                { key: 'offense', name: 'Offense' },
+                { key: 'defense', name: 'Defense' },
+                { key: 'pitching', name: 'Pitching' }
+            ];
+            
+            mlbTeamCategories.forEach((cat, index) => {
+                const item = document.createElement('div');
+                item.className = 'stats-category-item';
+                item.dataset.category = cat.key;
+                item.style.cssText = index === 0 
+                    ? 'padding: 8px 2px; cursor: pointer; border-bottom: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 9px; margin-bottom: 1px;'
+                    : 'padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;';
+                item.textContent = cat.name;
+                teamCategoryMenu.appendChild(item);
+            });
+            
+            // Re-initialize the menu
+            initializeStatsCategoryMenu('team-category-menu', 'team-stats-content-area');
+        }
     }
 }
 
