@@ -3649,33 +3649,117 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
    return feeds[idx];
  }
 
- function loadSocialFeed(section) {
-   const container = document.getElementById("social-feed-container");
-   if (!container) return;
-   if (currentFeedSection === section) return;
-   container.innerHTML = "";
-   const feedId = getNextFeedId(section);
-   if (feedId) {
-     const feedTag = document.createElement("rssapp-feed");
-     feedTag.setAttribute("id", feedId);
-     container.appendChild(feedTag);
+function loadSocialFeed(section) {
+  const container = document.getElementById("social-feed-container");
+  if (!container) return;
+  if (currentFeedSection === section) return;
+  container.innerHTML = "";
+  const feedId = getNextFeedId(section);
+  if (feedId) {
+    // Check if feedId is a URL (custom RSS feed) or an ID (RSS.app widget)
+    if (feedId.startsWith('http://') || feedId.startsWith('https://')) {
+      // Custom RSS feed URL - load directly
+      loadCustomRSSFeed(feedId, container);
+    } else {
+      // RSS.app widget ID - use RSS.app widget
+      const feedTag = document.createElement("rssapp-feed");
+      feedTag.setAttribute("id", feedId);
+      container.appendChild(feedTag);
 
-     // Remove any previous RSS.app script
-     const oldScript = container.querySelector('script[data-rssapp]');
-     if (oldScript) oldScript.remove();
+      // Remove any previous RSS.app script
+      const oldScript = container.querySelector('script[data-rssapp]');
+      if (oldScript) oldScript.remove();
 
-     // Add the RSS.app script dynamically
-     const script = document.createElement("script");
-     script.src = "https://widget.rss.app/v1/feed.js";
-     script.async = true;
-     script.setAttribute('data-rssapp', 'true');
-     container.appendChild(script);
-   } else {
-     container.innerHTML =
-       "<div style='padding: 10px; font-size: 12px;'>No social feed available for this section.</div>";
-   }
-   currentFeedSection = section;
- }
+      // Add the RSS.app script dynamically
+      const script = document.createElement("script");
+      script.src = "https://widget.rss.app/v1/feed.js";
+      script.async = true;
+      script.setAttribute('data-rssapp', 'true');
+      container.appendChild(script);
+    }
+  } else {
+    container.innerHTML =
+      "<div style='padding: 10px; font-size: 12px;'>No social feed available for this section.</div>";
+  }
+  currentFeedSection = section;
+}
+
+// Load custom RSS feed from our RSS service
+function loadCustomRSSFeed(feedUrl, container) {
+  container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">Loading feed...</div>';
+  
+  // Use CORS proxy or direct fetch if same domain
+  fetch(feedUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(xml => {
+      // Parse RSS XML and display
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xml, 'text/xml');
+      
+      // Check for parsing errors
+      const parserError = xmlDoc.querySelector('parsererror');
+      if (parserError) {
+        throw new Error('Failed to parse RSS feed');
+      }
+      
+      // Extract feed items
+      const items = xmlDoc.querySelectorAll('item');
+      if (items.length === 0) {
+        container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">No items in feed.</div>';
+        return;
+      }
+      
+      // Build HTML for feed items
+      let html = '<div style="padding: 10px;">';
+      items.forEach((item, index) => {
+        if (index >= 100) return; // Limit to 100 items (increased from 20)
+        
+        const title = item.querySelector('title')?.textContent || 'No title';
+        const link = item.querySelector('link')?.textContent || '#';
+        const description = item.querySelector('description')?.textContent || '';
+        const pubDate = item.querySelector('pubDate')?.textContent || '';
+        // Try multiple selectors for thumbnail (YouTube uses media:content, others use media:thumbnail)
+        const thumbnail = item.querySelector('media\\:content[type="image/jpeg"], media\\:content[type^="image"]')?.getAttribute('url') ||
+                         item.querySelector('media\\:thumbnail')?.getAttribute('url') ||
+                         item.querySelector('thumbnail')?.getAttribute('url') ||
+                         item.querySelector('enclosure[type^="image"]')?.getAttribute('url') || '';
+        
+        // Format date
+        let formattedDate = '';
+        if (pubDate) {
+          try {
+            const date = new Date(pubDate);
+            formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          } catch (e) {
+            formattedDate = pubDate;
+          }
+        }
+        
+        html += `
+          <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #333;">
+            ${thumbnail ? `<img src="${thumbnail}" style="width: 100%; max-width: 400px; margin-bottom: 8px; border-radius: 4px;" alt="${title}" />` : ''}
+            <h3 style="margin: 0 0 5px 0; font-size: 14px; font-weight: bold;">
+              <a href="${link}" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: none;">${title}</a>
+            </h3>
+            ${formattedDate ? `<div style="font-size: 11px; color: #9ca3af; margin-bottom: 5px;">${formattedDate}</div>` : ''}
+            ${description ? `<div style="font-size: 12px; color: #ccc; line-height: 1.4;">${description.substring(0, 200)}${description.length > 200 ? '...' : ''}</div>` : ''}
+          </div>
+        `;
+      });
+      html += '</div>';
+      
+      container.innerHTML = html;
+    })
+    .catch(error => {
+      console.error('Error loading RSS feed:', error);
+      container.innerHTML = `<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading feed: ${error.message}</div>`;
+    });
+}
 
  document.addEventListener("DOMContentLoaded", () => {
    // Load default feed (Home) on page load
@@ -5021,6 +5105,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'WNBA': { leagueId: 'USA: WNBA', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMWPTh0lOh89-qkXYbx63Vs8FQ7gUoT0333Pa9ZgPg4WWBMgB-xERDMM_U2yIUgS3TSPOXOD5M7sVl/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'WNBA' },
   'Soccer': { leagueId: 'WORLD: SOCCER', standingsUrl: 'YOUR_SOCCER_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'Soccer' },
   'UEFAChampionsLeague': { leagueId: 'Europe: Champions League - League phase', standingsUrl: 'YOUR_UEFACHAMPIONSLEAGUE_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'UEFAChampionsLeague' },
+  'AFCElite': { leagueId: 'Asia: AFC Elite', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8lEnnlz6Uhb47U4yOnsSUOcsfBS3TrpEXri3g6S2Yj2FUkq1rSSgE4SveKPoAJQsu6U2kkfdGtmhO/pub?gid=3&single=true&output=csv', upcomingCollectionName: 'AFCElite' },
   'FACup': { leagueId: 'ENGLAND: FA CUP', standingsUrl: 'YOUR_FACUP_STANDINGS_CSV_URL_HERE', upcomingCollectionName: 'FACup' },
   'LigaMX': { leagueId: 'MEXICO: LIGA MX', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSL_7HJC0jqhF1jy4tiIrrh5RLewsiH9RezMKDx6TpZtz2JHB8D7Dlx7yyZRWZ7rU5txoTasyiHk7M4/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LigaMX' },
   'NWSL': { leagueId: 'USA: NWSL Women', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJn_hnVeNfnXsDpeer_hgh6dxOcL2VOJzHKsE8cv-OTaX8EzWRYIGNLqLztvuAeuJbM4oEElA-LoiU/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'NWSL' },
@@ -5044,7 +5129,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'LPGA Tour', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "LPGA Tour", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "AFC Elite", "PGA Tour", "LPGA Tour", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         NFL: "https://www.nfl.com/scores",
@@ -5735,6 +5820,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const leagueMatches = {
             // UEFA Champions League variations
             'UEFAChampionsLeague': ['Europe: Champions League', 'Champions League'],
+            // AFC Elite variations
+            'AFCElite': ['Asia: AFC Elite', 'AFC Elite'],
             // UEFA Europa League variations  
             'UEFAEuropaLeague': ['Europe: Europa League', 'Europa League'],
             // UEFA Conference League variations
@@ -6043,6 +6130,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Arsenal": "Arsenal",
             "Manchester City": "Man City",
             "Liverpool": "Liverpool",
+            "AFC Bournemouth": "Bournemouth",
             "Bournemouth": "Bournemouth",
             "Tottenham": "Tottenham",
             "Chelsea": "Chelsea",
@@ -6399,6 +6487,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Villarreal": "Villarreal",
             "Villarreal CF": "Villarreal",
             "Atletico Madrid": "Atlético",
+            "Atlético Madrid": "Atleti",
             "Espanyol": "Espanyol",
             "RCD Espanyol": "Espanyol",
             "Getafe": "Getafe",
@@ -6644,7 +6733,30 @@ document.addEventListener('DOMContentLoaded', function () {
             "SMU": "SMU",
             "VTSU Johnson": "VTSU-Johns.",
             "University of Puget Sound": "Puget Sound",
-            "Puget Sound": "Puget Sound"
+            "Puget Sound": "Puget Sound",
+            "North Carolina A&T": "NC A&T",
+            "Maryland Eastern Shore": "MD E Shore",
+            "Mount Marty College": "Mt Marty",
+            "Houston Christian": "Hou Christian",
+            "Grand Canyon": "GCU",
+            "Virginia-Lynchburg": "VA-Lynch",
+            "East Tennessee State": "E TN St",
+            "William & Mary": "Wm & Mary",
+            "SUNY-Maritime": "SUNY-Mari",
+            "Eastern Michigan": "E Michigan",
+            "UNC Greensboro": "UNC G'boro",
+            "Indiana University East": "IU East",
+            "Long Island University": "LIU",
+            "Saint Mary of the Woods College": "St Mary Woods",
+            "Central Michigan": "C Michigan",
+            "Arkansas State": "Ark St",
+            "Washington State": "Wash St",
+            "Manhattan Christian": "Manhatt Chr",
+            "Abilene Christian": "Abilene Chr",
+            "Columbia College (SC)": "Columbia (SC)",
+            "Evergreen State": "Evergreen St",
+            "North Carolina Central": "NC Central",
+            "UT Rio Grande Valley": "UTRGV"
         },
         // NCAAF
         NCAAF: {
@@ -6874,7 +6986,27 @@ document.addEventListener('DOMContentLoaded', function () {
             "Boston University": "Boston U",
             "Louisiana Tech": "LA Tech",
             "St. Bonaventure": "St. Bon.",
-            "Western Kentucky": "W Kentucky"
+            "Western Kentucky": "W Kentucky",
+            "North Carolina A&T": "NC A&T",
+            "Maryland Eastern Shore": "MD E Shore",
+            "Mount Marty College": "Mt Marty",
+            "Virginia-Lynchburg": "VA-Lynch",
+            "East Tennessee State": "E TN St",
+            "SUNY-Maritime": "SUNY-Mari",
+            "Eastern Michigan": "E Michigan",
+            "UNC Greensboro": "UNC G'boro",
+            "Indiana University East": "IU East",
+            "Long Island University": "LIU",
+            "Saint Mary of the Woods College": "St Mary Woods",
+            "Central Michigan": "C Michigan",
+            "Arkansas State": "Ark St",
+            "Washington State": "Wash St",
+            "Manhattan Christian": "Manhatt Chr",
+            "Abilene Christian": "Abilene Chr",
+            "Columbia College (SC)": "Columbia (SC)",
+            "Evergreen State": "Evergreen St",
+            "North Carolina Central": "NC Central",
+            "UT Rio Grande Valley": "UTRGV"
         },
         // UEFA Champions League
         UEFAChampionsLeague: {
@@ -8067,6 +8199,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     titleContent.appendChild(logo);
+                } else if (leagueNameKey === "AFC Elite") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/vyvCT5Tp-ttKzJSJq.png";
+                    logo.alt = "AFC Elite Logo";
+                    logo.width = 14;
+                    logo.height = 14;
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
                 } else if (leagueNameKey === "CONCACAF Qualifiers") {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Concacaf_logo.svg/500px-Concacaf_logo.svg.png";
@@ -8800,7 +8947,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (isAtpDoubles) {
                         row2.classList.add("atp-doubles-match");
                     }
-                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(displayLeagueForCheck);
+                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Elite', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(displayLeagueForCheck);
                     
                     // Set channel display - use Tennis Channel for ATP leagues
                     // If channel is blank in the data, it will display as blank (no hiding logic needed)
@@ -9066,7 +9213,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Check if this is a soccer league - soccer leagues show home on top, away on bottom
                 // displayLeague already declared above
-                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'Copa Libertadores', 'Copa Sudamericana', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly'].includes(displayLeague);
+                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Elite', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'Copa Libertadores', 'Copa Sudamericana', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly'].includes(displayLeague);
                 
                 // Check if we're rendering in the league-specific column (for font size adjustment)
                 const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
@@ -10103,6 +10250,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'NCAAM': 'NCAAMStandings',  // New collection format
             'NCAAW': 'NCAAWStandings',  // New collection format
             'UEFAChampionsLeague': 'standings',  // UCL uses generic standings collection
+            'AFCElite': 'AFCEliteStandings',
             'WNBA': 'standings',
             'FormulaOne': 'F1DriverStandings',  // F1 has special handling with Driver/Constructor tabs
             'FACup': 'FACupStandings',
@@ -10139,6 +10287,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'NBA': 'NBA',
             'NHL': 'NHL',
             'UEFAChampionsLeague': 'UEFAChampionsLeague',
+            'AFCElite': 'AFC Elite',
             'WNBA': 'WNBA',
             'FormulaOne': 'Formula One',
             'FACup': 'FA Cup',
@@ -13331,7 +13480,7 @@ async function fetchFeaturedGames() {
                 homeField = 'home';
                 timeField = 'time';
                 dateField = 'date';
-            } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLB', 'NBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball', 'NFL', 'NHL', 'NWSL', 'SerieA', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'WNBA', 'FACup'].includes(leagueKey)) {
+            } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'MLB', 'NBA', 'NCAAM', 'NCAAW', 'NCAABaseball', 'NCAASoftball', 'NFL', 'NHL', 'NWSL', 'SerieA', 'UEFAChampionsLeague', 'AFCElite', 'UEFAConferenceLeague', 'UEFAEuropaLeague', 'WNBA', 'FACup'].includes(leagueKey)) {
                 awayField = 'away';
                 homeField = 'home';
                 timeField = 'time';
@@ -13733,7 +13882,7 @@ async function fetchFeaturedGames() {
                     
                     // Update previous game time label for next iteration
                     previousGameTimeLabel = normalizedTimeLabel || timeDisplayRaw;
-                } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'Ligue1', 'MLS', 'NWSL', 'PremierLeague', 'SerieA', 'UEFAEuropaLeague', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'FIFAWorldCupAfricanQualifiers', 'FIFAWorldCupEuropeanQualifiers', '2027AFCAsianCupQualifiers', 'FIFAWorldCupAsianQualifiers', 'FIFAWorldCupCONCACAFQualifiers', 'ClubFriendly', 'FACup'].includes(leagueKey)) {
+                } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'Ligue1', 'MLS', 'NWSL', 'PremierLeague', 'SerieA', 'UEFAEuropaLeague', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'AFCElite', 'FIFAWorldCupAfricanQualifiers', 'FIFAWorldCupEuropeanQualifiers', '2027AFCAsianCupQualifiers', 'FIFAWorldCupAsianQualifiers', 'FIFAWorldCupCONCACAFQualifiers', 'ClubFriendly', 'FACup'].includes(leagueKey)) {
                     // Format for soccer leagues: Use same table format as home page (soccer shows home on top, away on bottom)
                     const timeDisplayRaw = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
                     let displayTimeLabel = timeDisplayRaw;
@@ -14137,6 +14286,34 @@ if (statsSubTabsContainer) {
         // Show team content, hide player content
         document.getElementById('player-stats-content').style.display = 'none';
         document.getElementById('team-stats-content').style.display = 'flex';
+        
+        // Automatically load the first category in the team stats menu
+        const teamCategoryMenu = document.getElementById('team-category-menu');
+        if (teamCategoryMenu) {
+            const firstCategoryItem = teamCategoryMenu.querySelector('.stats-category-item');
+            if (firstCategoryItem) {
+                // Activate the first category
+                teamCategoryMenu.querySelectorAll('.stats-category-item').forEach(item => {
+                    item.classList.remove('active');
+                    item.style.borderBottom = 'none';
+                    item.style.backgroundColor = '#141414';
+                    item.style.color = '#BFBFBF';
+                    item.style.fontWeight = 'normal';
+                });
+                
+                firstCategoryItem.classList.add('active');
+                firstCategoryItem.style.borderBottom = '1px solid #fff';
+                firstCategoryItem.style.backgroundColor = '#000';
+                firstCategoryItem.style.color = '#fff';
+                firstCategoryItem.style.fontWeight = 'bold';
+                
+                // Load the stats for the first category
+                const firstCategory = firstCategoryItem.dataset.category;
+                if (firstCategory) {
+                    loadStatsCategory(firstCategory, 'team-stats-content-area');
+                }
+            }
+        }
     });
 }
 
@@ -14212,7 +14389,7 @@ function loadStatsCategory(category, displayElementId) {
         if (isTeamStats) {
             console.log('Loading NBA team stats for category:', category);
             loadNBATeamStats(category, displayElement);
-        } else {
+    } else {
             console.log('Loading NBA player stats for category:', category);
             loadNBAStats(category, displayElement);
         }
@@ -14655,7 +14832,6 @@ async function loadNBATeamStats(category, displayElement) {
             'scoring': 'scoring',
             'bench': 'bench',
             'statsInWins': 'statsInWins',
-            'regularSeasonTotals': 'regularSeasonTotals',
             'advanced': 'advanced',
             'miscellaneous': 'miscellaneous',
             'tracking': 'tracking',
@@ -14707,7 +14883,6 @@ function displayNBATeamStatsFromFirestore(statsData, category, displayElement) {
         'scoring': 'Scoring',
         'bench': 'Bench',
         'statsInWins': 'Stats in Wins',
-        'regularSeasonTotals': 'Regular Season Totals',
         'advanced': 'Advanced',
         'miscellaneous': 'Miscellaneous',
         'tracking': 'Tracking',
@@ -14727,8 +14902,23 @@ function displayNBATeamStatsFromFirestore(statsData, category, displayElement) {
         Object.keys(statsData).forEach(statKey => {
             const teams = statsData[statKey];
             if (teams && teams.length > 0) {
-                // Stat name formatting
-                const statName = statKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+                // Stat name formatting with special handling for common patterns
+                let statName = statKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+                
+                // Fix common naming issues
+                if (statKey === 'fastBreakPointsPerGame') {
+                    statName = 'Fast Break Points Per Game';
+                } else if (statKey === 'secondChancePointsPerGame') {
+                    statName = '2nd Chance Points Per Game';
+                } else if (statKey === 'pointsInPaintPerGame') {
+                    statName = 'Points In The Paint Per Game';
+                } else if (statKey === 'pctPoints3PT') {
+                    statName = '% of Points Three Pointers';
+                } else if (statKey === 'pctPointsInPaint') {
+                    statName = '% of Points In The Paint';
+                } else if (statKey === 'pctPointsMidRange') {
+                    statName = '% of Points Mid-Range';
+                }
                 
                 html += `<div style="margin-bottom: 15px;">`;
                 html += `<h5 style="color: #fff; font-size: 11px; margin-bottom: 5px; margin-top: 10px;">${statName}</h5>`;
@@ -14740,11 +14930,29 @@ function displayNBATeamStatsFromFirestore(statsData, category, displayElement) {
                 html += `</tr></thead><tbody>`;
                 
                 teams.slice(0, 10).forEach((team, index) => {
-                    const value = typeof team.value === 'number' 
-                        ? (team.value < 1 && (statKey.includes('Pct') || statKey.includes('Percentage') || statKey.includes('efg')) 
-                            ? (team.value * 100).toFixed(1) + '%'
-                            : team.value.toFixed(1))
-                        : team.value;
+                    // Check if this is a percentage stat (starts with 'pct' or contains 'Percentage' or 'efg')
+                    const isPercentage = statKey.toLowerCase().startsWith('pct') || 
+                                        statKey.includes('Percentage') || 
+                                        statKey.includes('efg') ||
+                                        statKey.includes('Pct');
+                    
+                    let value;
+                    if (typeof team.value === 'number') {
+                        // For percentage stats, always format as percentage
+                        if (isPercentage) {
+                            // If value is less than 1, it's a decimal (0.487 = 48.7%)
+                            // If value is >= 1, it's already a percentage (48.7 = 48.7%)
+                            if (team.value < 1) {
+                                value = (team.value * 100).toFixed(1) + '%';
+                            } else {
+                                value = team.value.toFixed(1) + '%';
+                            }
+                        } else {
+                            value = team.value.toFixed(1);
+                        }
+                    } else {
+                        value = team.value;
+                    }
                     
                     html += `<tr style="border-bottom: 1px solid #333;">`;
                     html += `<td style="padding: 3px 4px; color: white; font-weight: 500;">${team.name}</td>`;
@@ -15001,7 +15209,6 @@ function updateStatsCategoryMenu(leagueKey) {
                 { key: 'scoring', name: 'Scoring' },
                 { key: 'bench', name: 'Bench' },
                 { key: 'statsInWins', name: 'Stats in Wins' },
-                { key: 'regularSeasonTotals', name: 'Regular Season Totals' },
                 { key: 'advanced', name: 'Advanced' },
                 { key: 'miscellaneous', name: 'Miscellaneous' },
                 { key: 'trackingDrives', name: 'Tracking - Drives' },
@@ -15518,8 +15725,8 @@ async function loadTop25Data(leagueKey) {
             
             // Hard code JMU record
             if (displayName === 'JMU' || team.Team === 'JMU' || team.Team === 'James Madison') {
-                team.Record = '10-1';
-                team.OverallRecord = '10-1';
+                team.Record = '11-1';
+                team.OverallRecord = '11-1';
             } else if (team.OverallRecord && !team.Record) {
                 team.Record = team.OverallRecord;
             }
@@ -15590,12 +15797,11 @@ function createTop25Table(teams, leagueKey) {
     let html = '<div class="top25-standings" style="color: #ffffff;">';
     html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; table-layout: fixed;">';
     html += '<colgroup>';
-    html += '<col style="width: 50px;">';
+    html += '<col style="width: 60px;">';
     html += '<col style="width: auto;">';
     html += '<col style="width: 100px;">';
-    if (leagueKey === 'NCAAF') {
+    if (leagueKey !== 'NCAAF') {
         html += '<col style="width: 80px;">';
-        html += '<col style="width: 60px;">';
     }
     html += '</colgroup>';
     html += '<thead>';
@@ -15603,10 +15809,7 @@ function createTop25Table(teams, leagueKey) {
     html += '<th style="padding: 8px; text-align: center; border-bottom: 1px solid #666;">Rank</th>';
     html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
     html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Record</th>';
-    if (leagueKey === 'NCAAF') {
-        html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Points</th>';
-        html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Prev</th>';
-    } else {
+    if (leagueKey !== 'NCAAF') {
         html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Points</th>';
     }
     html += '</tr>';
@@ -15629,10 +15832,7 @@ function createTop25Table(teams, leagueKey) {
         // Use OverallRecord for Top 25 display (ensure it's overall, not conference)
         const displayRecord = team.OverallRecord || team.Record || '';
         html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + displayRecord + '</td>';
-        if (leagueKey === 'NCAAF') {
-            html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + (team.Top25Points || '') + '</td>';
-            html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + (team.Top25Previous || '') + '</td>';
-        } else {
+        if (leagueKey !== 'NCAAF') {
             html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + (team.Top25Points || '') + '</td>';
         }
         html += '</tr>';
@@ -16636,7 +16836,7 @@ const VIDEOS_CONFIG = {
         'Bundesliga': 'mPIKuLJkRaEWJJ5b',
         'FormulaOne': 'zKsXNd2g50iFJFdA',
         'NCAAM': '_ZgwKEQLehKNcAR7r',
-        'NCAAW': '_1Rj5hKg2lz8yJ874',
+        'NCAAW': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaaw-videos.xml',
         'WNBA': 'al6x45CL8geoEccA',
         'Boxing': '_9vKUVdBIc1b9s6XI',
         'FACup': 'eETusreqvR3bo30j',
@@ -16774,19 +16974,26 @@ function switchVideosTab(activeTab) {
     });
 }
 
-// Display RSS.app widget
+// Display RSS.app widget or custom RSS feed
 function displayRSSWidget(widgetId, container) {
     if (!widgetId || !container) return;
     
-    container.innerHTML = '<rssapp-feed id="' + widgetId + '"></rssapp-feed>';
-    
-    // Only add the script tag once
-    if (!document.querySelector('script[src="https://widget.rss.app/v1/feed.js"]')) {
-        const script = document.createElement('script');
-        script.src = 'https://widget.rss.app/v1/feed.js';
-        script.type = 'text/javascript';
-        script.async = true;
-        document.head.appendChild(script);
+    // Check if widgetId is a URL (custom RSS feed) or an ID (RSS.app widget)
+    if (widgetId.startsWith('http://') || widgetId.startsWith('https://')) {
+        // Custom RSS feed URL - load directly
+        loadCustomRSSFeed(widgetId, container);
+    } else {
+        // RSS.app widget ID - use RSS.app widget
+        container.innerHTML = '<rssapp-feed id="' + widgetId + '"></rssapp-feed>';
+        
+        // Only add the script tag once
+        if (!document.querySelector('script[src="https://widget.rss.app/v1/feed.js"]')) {
+            const script = document.createElement('script');
+            script.src = 'https://widget.rss.app/v1/feed.js';
+            script.type = 'text/javascript';
+            script.async = true;
+            document.head.appendChild(script);
+        }
     }
 }
 
