@@ -332,6 +332,70 @@ table.game-table td:nth-child(1) {
             background-color: #000000;
         }
 
+        /* Ensure all video thumbnails are the same size and spacing - target all possible selectors including universal */
+        #dynamicVideosContent img,
+        #dynamicVideosContent .video-thumbnail,
+        rssapp-feed img,
+        rssapp-feed .rssapp-item img,
+        rssapp-feed .rssapp-item-image img,
+        rssapp-feed .rssapp-item-content img,
+        rssapp-feed a img,
+        rssapp-feed div img,
+        rssapp-feed * img {
+            width: 100% !important;
+            max-width: 400px !important;
+            height: 225px !important;
+            min-height: 225px !important;
+            max-height: 225px !important;
+            object-fit: cover !important;
+            display: block !important;
+            margin-bottom: 8px !important;
+            margin-top: 0 !important;
+            border-radius: 4px !important;
+            aspect-ratio: 16/9 !important;
+        }
+        
+        /* Ensure consistent spacing for video titles - target all possible selectors */
+        #dynamicVideosContent h3,
+        rssapp-feed h3,
+        rssapp-feed .rssapp-item-title,
+        rssapp-feed .rssapp-item h3,
+        rssapp-feed .rssapp-item-title a,
+        rssapp-feed .rssapp-item-content h3,
+        rssapp-feed a h3,
+        rssapp-feed * h3 {
+            margin: 0 0 8px 0 !important;
+            margin-top: 0 !important;
+            padding: 0 !important;
+            line-height: 1.2 !important;
+        }
+        
+        /* Ensure h3 links don't add extra spacing */
+        #dynamicVideosContent h3 a {
+            display: block !important;
+            line-height: 1.2 !important;
+        }
+        
+        /* Target RSS.app item containers to ensure proper spacing */
+        rssapp-feed .rssapp-item,
+        rssapp-feed .rssapp-item-content,
+        rssapp-feed > div,
+        rssapp-feed .rssapp-item-image,
+        rssapp-feed .rssapp-item-image-wrapper {
+            margin-bottom: 15px !important;
+        }
+        
+        /* Specifically override inline styles for images with different aspect ratios (16:9, 4:3, etc.) */
+        rssapp-feed img[style*="aspect-ratio"],
+        rssapp-feed img[style*="width: 100%"],
+        rssapp-feed img[style*="height: auto"],
+        rssapp-feed .rssapp-item img[style*="aspect-ratio"],
+        rssapp-feed .rssapp-item img[style*="width: 100%"],
+        rssapp-feed * img[style*="margin"] {
+            margin-bottom: 2px !important;
+            margin-top: 0 !important;
+        }
+
 .video-item {
     border-bottom: 1px solid #333333;
     padding: 8px 0;
@@ -2742,13 +2806,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div style="display: flex; height: calc(100% - 18px);">
                
                 <div id="headlines-tabs-MLB" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab active" data-url="https://rss.app/feeds/Kcftj40UrmoGhLBA.xml">MLB.com</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/HOpwhDoXxePVbZxP.xml">ESPN</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/Bv6N7qiA79eXbSl6.xml">CBS Sports</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/BKInO41JsrUscMDQ.xml">Yahoo</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/unWxzeL5zRi6VjgR.xml">FOX Sports</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/h2rZtVYvCl4WpXQE.xml">FanGraphs</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/qGFj8TG2O53TYIL3.xml">The Athletic</div>
+                    <div class="headlines-tab active" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/mlb-rss.xml">MLB.com</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/espn-mlb-rss.xml">ESPN</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/cbs-mlb-rss.xml">CBS Sports</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/yahoo-mlb-rss.xml">Yahoo</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/foxsports-mlb-api.xml">FOX Sports</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/fangraphs-rss.xml">FanGraphs</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/athletic-mlb.xml">MLBTR</div>
                 </div>
                
                 <div id="headlines-content-MLB" class="news-feed-content" style="width: 80%; overflow-y: auto;">
@@ -2780,11 +2844,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-NBA" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
                     <div class="headlines-tab active" data-url="https://rss.app/feeds/gpNdeo4WRun54WuS.xml">NBA.com</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/pbw0uEDOop5lPZ1h.xml">ESPN</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/XNu5yCjXjSTjFNuz.xml">CBS Sports</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/Xc90gEP7aCpQkKAc.xml">Yahoo</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/espn-nba-rss.xml">ESPN</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/cbs-nba-rss.xml">CBS Sports</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/yahoo-nba-rss.xml">Yahoo</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/0MaiPBu2UKvcQmyT.xml">SI</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/bGCDWYzMpS4kpEEJ.xml">FOX Sports</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/foxsports-nba-api.xml">FOX Sports</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/k6Vxs5GaPOehD9B3.xml">B/R</div>
 					
                 </div>
@@ -2793,7 +2857,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/akV2j729WtUvltyb.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-nba.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-NBA" style="display: block;"></div>
         </div>
@@ -2807,20 +2871,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-NFL" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
                     <div class="headlines-tab active" data-url="https://rss.app/feeds/RzsFiWRkJWt232Z1.xml">NFL.com</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/cexYuRoRAMSoUAp8.xml">ESPN</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/espn-nfl-rss.xml">ESPN</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/YUKCB1afohjvJMle.xml">PFT</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/PlvW7vqF4AaGbwcp.xml">CBS Sports</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/cbs-nfl-rss.xml">CBS Sports</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/KoszNpQLJ70ZBJbs.xml">SI</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/yQjCNVjNGrK8PYed.xml">FOX Sports</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/foxsports-nfl-api.xml">FOX Sports</div>
                     <div class="headlines-tab" data-url="https://rss.app/feeds/LCbkYBU74yt9AnT5.xml">B/R</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/rHWxXQ9YaXdlGVjA.xml">Yahoo</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/yahoo-nfl-rss.xml">Yahoo</div>
                 </div>
                 <div id="headlines-content-NFL" class="news-feed-content" style="width: 80%; overflow-y: auto;"></div>
             </div>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/kjurR9A5jgpHvsLg.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-nfl.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-NFL" style="display: block;"></div>
         </div>
@@ -2834,10 +2898,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-NHL" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
                     <div class="headlines-tab active" data-url="https://rss.app/feeds/tjqR23Xwa5us4EGS.xml">NHL.com</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/aEOH2tj5bfjq4oJd.xml">ESPN</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/xtqmDS6UnTyXSmXG.xml">CBS Sports</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/espn-nhl-rss.xml">ESPN</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/cbs-nhl-rss.xml">CBS Sports</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/Zf7Ng96ruXO870Ee.xml">The Hockey Writers</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/6gjSXkILFAiwYPLU.xml">Yahoo</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/yahoo-nhl-rss.xml">Yahoo</div>
       				<div class="headlines-tab" data-url="https://rss.app/feeds/V79dVmqWDC7pLACZ.xml">The Hockey News</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/6DIuDmmR4diUZR4q.xml">The Athletic</div>
 					
@@ -2848,7 +2912,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/0piSZjcFTmeW7hqi.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-nhl.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-NHL" style="display: block;"></div>
         </div>
@@ -2861,11 +2925,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-Soccer" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/3SZSbvRR7GXi7Al1.xml">ESPN FC</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/espn-soccer-rss.xml">ESPN FC</div>
 					<div class="headlines-tab active" data-url="https://rss.app/feeds/SBZfeZPSsLT2mwmU.xml">OneFootball</div>
 					<div class="headlines-tab active" data-url="https://rss.app/feeds/qKDoR3HZOMRmExUP.xml">Sports Mole</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/tWKu85yTZrmms6lo.xml">Goal</div>
-					<div class="headlines-tab active" data-url="https://rss.app/feeds/SlUe5H1aOykHQcvX.xml">Yahoo</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/goal-com.xml">Goal</div>
+					<div class="headlines-tab active" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/yahoo-soccer-rss.xml">Yahoo</div>
 					<div class="headlines-tab active" data-url="https://rss.app/feeds/7sTylsAUGavU2YDz.xml">Sky Sports</div>
 					<div class="headlines-tab active" data-url="https://rss.app/feeds/B9IZq10WgLEwHyYf.xml">The Guardian</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/KIxs5SCBkVuAWcRr.xml">BBC</div>
@@ -2873,7 +2937,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/UM3B0Vem8qh04dDU.xml">AS</div>
                     <div class="headlines-tab" data-url="https://rss.app/feeds/W5qj2Lq2skC4hTyn.xml">Transfermarkt</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/bXOgyqHWCvZHvUmF.xml">FourFourTwo</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/10xrZLK2Mn4xhAqJ.xml">CBS Sports</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/cbs-soccer-rss.xml">CBS Sports</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/joZlHdOrkZ6ijBM8.xml">FOX Sports</div>
                 </div>
                 <div id="headlines-content-Soccer" class="news-feed-content" style="width: 80%; overflow-y: auto;"></div>
@@ -2881,7 +2945,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/3V06VrWkV19SDcqR.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-soccer.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-Soccer" style="display: block;"></div>
         </div>
@@ -2903,7 +2967,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/j3EAnbrpQMEYzW57.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-championsleague.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-UEFAChampionsLeague" style="display: block;"></div>
         </div>
@@ -2916,11 +2980,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-PremierLeague" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-					<div class="headlines-tab" data-url="https://rss.app/feeds/9rFQ7zMHhTXb4Mxs.xml">BBC</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/CgpGWf4RQSblPcSP.xml">SI</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/OlgI95YoXAeS1Lyb.xml">OneFootball</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/qVMKN8SmPBqcCH7z.xml">Sports Mole</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/IrtseC3G2pfQi6Va.xml">Sky</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/bbc-premierleague.xml">BBC</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/4ztlqsjqgVdJj7Gz.xml">Football Talk</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/3J967vogi1qGdK1Y.xml">Sporting News</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/co5skijSzgAW0vTJ.xml">Daily Mail</div>
@@ -2933,7 +2997,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/V6GJiuM6jBXVG34K.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-premierleague.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-PremierLeague" style="display: block;"></div>
         </div>
@@ -2955,7 +3019,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/iuBiYyHPmlifaUUK.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-mls.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-MLS" style="display: block;"></div>
         </div>
@@ -2977,7 +3041,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/t8z976udlBJCMLSW.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-laliga.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-LaLiga" style="display: block;"></div>
         </div>
@@ -2990,10 +3054,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-SerieA" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab active" data-url="https://rss.app/feeds/64sPxSy8RzyuVNFy.xml">Football Italia</div>
-					 <div class="headlines-tab" data-url="https://rss.app/feeds/NeOHPCIlHddJXJCU.xml">Cult of Calcio</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/7YSOeJAQ5WMbRdsS.xml">OneFootball</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/fyCV7KEfBBxSFsOL.xml">Yahoo</div>
+                    <div class="headlines-tab active" data-url="https://rss.app/feeds/NeOHPCIlHddJXJCU.xml">Cult of Calcio</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/football-italia.xml">FootItalia</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/onefootball-seriea.xml">OneFootball</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/yahoo-seriea-rss.xml">Yahoo</div>
                    
                 </div>
                 <div id="headlines-content-SerieA" class="news-feed-content" style="width: 80%; overflow-y: auto;"></div>
@@ -3001,7 +3065,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/HSwo9xgOL1OUFqS0.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-seriea.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-SerieA" style="display: block;"></div>
         </div>
@@ -3015,7 +3079,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-Bundesliga" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
                     <div class="headlines-tab active" data-url="https://rss.app/feeds/zIPPZ5Zh9GDpvIbV.xml">Bulinews</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/ixvULiUvb7Hm3fDx.xml">GGFN</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/getfootballnewsgermany-bundesliga.xml">GGFN</div>
                     <div class="headlines-tab" data-url="https://rss.app/feeds/fg5UIrrq1YikBxyg.xml">Bundesliga.com</div>
                 
                 </div>
@@ -3024,7 +3088,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/qeqYXeDvgq5bpYsL.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-bundesliga.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-Bundesliga" style="display: block;"></div>
         </div>
@@ -3036,7 +3100,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="news-section ligamx-headlines-section" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0;">
       <div id="ligamxtabs-LigaMX" class="headlines-tabs" style="display:flex; border-bottom:1px solid #374151; flex:0 0 auto;">
         <div class="headlines-tab active" data-source="headlines" data-url="https://rss.app/feeds/tr10VModrXb2evce.xml">Headlines</div>
-        <div class="headlines-tab" data-source="breaking" data-url="https://rss.app/feeds/Eh9IrBhQ1Pk3MxVu.xml">Breaking</div>
+        <div class="headlines-tab" data-source="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-ligamx.xml">Breaking</div>
         <div class="headlines-tab" data-source="reddit" data-url="https://rss.app/feeds/o3KVLBimGj35TqzR.xml">Reddit</div>
       </div>
 
@@ -3052,7 +3116,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="news-section" style="flex: 1 1 auto; min-height: 0;">
             <div id="news-content-FACup" class="news-feed-content" style="overflow-y: auto; height: 100%;">
                 <div class="news-section-header">
-                    <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/6hu4o6gj1agGCz5i.xml">Breaking</span>
+                    <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-facup.xml">Breaking</span>
                 </div>
                 <div class="news-content-pane" id="breaking-content-FACup" style="display: block;"></div>
                 </div>
@@ -3126,7 +3190,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-FormulaOne" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
                     <div class="headlines-tab active" data-url="https://rss.app/feeds/JVcUSNygCvK6E5WZ.xml">F1.com</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/Pii5mbx6w0A3lFW9.xml">Racer</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/racer-f1.xml">Racer</div>
                     <div class="headlines-tab" data-url="https://rss.app/feeds/1RmEBIvrTB2Vl8wg.xml">Motorsport</div>
                     <div class="headlines-tab" data-url="https://rss.app/feeds/4gKjQaVgX2DJolme.xml">The Race</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/FTRMdb2vszxBak3x.xml">Autosport</div>
@@ -3152,10 +3216,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-NCAAF" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab active" data-url="https://rss.app/feeds/Z2rHcU1BGE8RLayI.xml">ESPN</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/Zzvx41Fx8M8WXUS1.xml">FOX Sports</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/1wcMh76GcHSPwTvk.xml">CBS Sports</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/cYgsxfZK9RmqKiOn.xml">Yahoo</div>
+                    <div class="headlines-tab active" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/espn-ncf-rss.xml">ESPN</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/foxsports-cfb-api.xml">FOX Sports</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/cbs-collegefootball-rss.xml">CBS Sports</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/yahoo-collegefootball-rss.xml">Yahoo</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/L3knSpnVPuEqu9F3.xml">On3</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/LsKtD2ijrBKLHTPy.xml">SDS</div>
 					<div class="headlines-tab" data-url="https://bleacherreport.com/college-football">B/R</div>
@@ -3265,9 +3329,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-NASCARCupSeries" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab active" data-url="https://rss.app/feeds/xeURjeTipf28mKLG.xml">Motorsport</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/7s14Wy95VNsBu7cz.xml">Jayski</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/nVgWip8Buc8cf2Hz.xml">Racing Experts</div>
+                    <div class="headlines-tab active" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/motorsport-nascar.xml">Motorsport</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/jayski-rss.xml">Jayski</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/racingexperts-rss.xml">Racing Experts</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/tYnJ3vf80OY9CXes.xml">Headlines</div>
                 </div>
                 <div id="headlines-content-NASCARCupSeries" class="news-feed-content" style="width: 80%; overflow-y: auto;"></div>
@@ -3287,11 +3351,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-Tennis" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab active" data-url="https://rss.app/feeds/77st0I3EaI2gj5hS.xml">Tennis.com</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/8G5VEs3jgZKwLro8.xml">Tennis Gazette</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/SFGaRWY1jKqWalZ5.xml">ESPN</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/svblOw3GOcN9k9yE.xml">Yahoo</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/STKyz5OXGhXnVMxr.xml">BBC</div>
+                    <div class="headlines-tab active" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/tennis-com.xml">Tennis.com</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/tennisgazette.xml">Tennis Gazette</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/espn-tennis-rss.xml">ESPN</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/yahoo-tennis-rss.xml">Yahoo</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/bbc-tennis-rss.xml">BBC</div>
                 </div>
                 <div id="headlines-content-Tennis" class="news-feed-content" style="width: 80%; overflow-y: auto;"></div>
             </div>
@@ -3311,13 +3375,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-WNBA" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab active" data-url="https://rss.app/feeds/SPK3iRYrr92qDN2x.xml">Yardbarker</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/nYXiP4BC0oLybtz7.xml">FOX Sports</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/ZE2N0SqE5GuqHZpU.xml">SI</div>
+                    <div class="headlines-tab active" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/yardbarker-wnba.xml">WNBA.com</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/foxsports-wnba.xml">FOX Sports</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/si-wnba.xml">SI</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/ajdh1dv5KEX5WqD5.xml">Reddit</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/6limDrwPcbr0FTHr.xml">Yahoo</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/f5T3RefZNcbsCZa6.xml">B/R</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/9gpVpTsmLKCeYnBu.xml">The Athletic</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/yahoo-wnba-rss.xml">Yahoo</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/bleacherreport-wnba.xml">B/R</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/athletic-wnba.xml">The Athletic</div>
                 </div>
                 <div id="headlines-content-WNBA" class="news-feed-content" style="width: 80%; overflow-y: auto;"></div>
             </div>
@@ -3366,8 +3430,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-NCAAM" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
                     <div class="headlines-tab active" data-url="https://rss.app/feeds/tZc6gJ6RpwkMyxaI.xml">Headlines</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/fUqOHZ8e4EOUcVP0.xml">ESPN</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/2JdMuTjfABmhXGEQ.xml">CBS Sports</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/espn-ncb-rss.xml">ESPN</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/cbs-ncaam-rss.xml">CBS Sports</div>
 					<div class="headlines-tab" data-url="https://rss.app/feeds/vf2zYxzTRTJ0llPk.xml ">Reddit</div>
                 </div>
                 <div id="headlines-content-NCAAM" class="news-feed-content" style="width: 80%; overflow-y: auto;"></div>
@@ -3427,18 +3491,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-MotoGP" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-					<div class="headlines-tab active" data-url="https://rss.app/feeds/a5gHM6AQ6OaVlU3y.xml">MotoGP News</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/MHL7sSU4Y6MJK5gJ.xml">Autosport</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/Dw91HiLTs9sO1Ghv.xml">Motorsport</div>
+					<div class="headlines-tab active" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/motogpnews-rss.xml">MotoGP News</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/autosport-motogp.xml">Autosport</div>
+                    <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/motorsport-motogp.xml">Motorsport</div>
                     <div class="headlines-tab" data-url="https://rss.app/feeds/WO8Gk2ceUxexrwlh.xml">Reddit</div>
-					<div class="headlines-tab" data-url="https://rss.app/feeds/XvexqCjSQ9YuCKUH.xml">MotoGP.com</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/motogp-com.xml">MotoGP.com</div>
                 </div>
                 <div id="headlines-content-MotoGP" class="news-feed-content" style="width: 80%; overflow-y: auto;"></div>
             </div>
         </div>
         <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
             <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss.app/feeds/w2ntdqvo8uCoR01z.xml">Breaking</span>
+                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/newsnow-motogp.xml">Breaking</span>
             </div>
             <div class="news-content-pane" id="breaking-content-MotoGP" style="display: block;"></div>
         </div>
@@ -3462,7 +3526,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="news-main-container" style="display:flex; flex-direction:column; height:100%; min-height:0;">
     <div class="news-section trackandfield-headlines-section" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0;">
       <div id="trackandfieldtabs-TrackAndField" class="headlines-tabs" style="display:flex; border-bottom:1px solid #374151; flex:0 0 auto;">
-        <div class="headlines-tab active" data-source="headlines" data-url="https://rss.app/feeds/wR4WbSpa3kRgWcdl.xml">Headlines</div>
+        <div class="headlines-tab active" data-source="headlines" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/trackandfieldnews.xml">Headlines</div>
         <div class="headlines-tab" data-source="breaking" data-url="https://rss.app/feeds/VqavgJOoX0LKkfkb.xml">Breaking</div>
       </div>
       <div class="news-feed-content" id="headlines-feed-TrackAndField" style="display:block; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
@@ -3707,27 +3771,184 @@ function loadCustomRSSFeed(feedUrl, container) {
         throw new Error('Failed to parse RSS feed');
       }
       
-      // Extract feed items
-      const items = xmlDoc.querySelectorAll('item');
+      // Extract feed items (support both RSS <item> and Atom <entry>)
+      // Handle namespaces for Atom feeds (YouTube uses Atom with namespaces)
+      // IMPORTANT: querySelector doesn't work well with namespaced XML, use getElementsByTagNameNS
+      let items = xmlDoc.getElementsByTagName('item');
       if (items.length === 0) {
+        // Try Atom format (<entry>) - MUST use getElementsByTagNameNS for namespaced XML
+        items = xmlDoc.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'entry');
+        if (items.length === 0) {
+          // Try without namespace (some parsers strip namespaces)
+          items = xmlDoc.getElementsByTagName('entry');
+        }
+        if (items.length === 0) {
+          // Last resort: search all elements
+          const allElements = xmlDoc.getElementsByTagName('*');
+          items = Array.from(allElements).filter(el => {
+            const localName = el.localName || el.tagName?.toLowerCase();
+            return localName === 'entry' || localName === 'item';
+          });
+        }
+      }
+      
+      // Convert NodeList to Array for easier manipulation
+      items = Array.from(items);
+      
+      if (items.length === 0) {
+        console.error('No items found in feed. XML structure:', xml.substring(0, 1000));
+        console.error('XML Namespaces:', Array.from(xmlDoc.documentElement.attributes).map(a => `${a.name}="${a.value}"`).join(', '));
         container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">No items in feed.</div>';
         return;
       }
+      
+      console.log(`Found ${items.length} items in feed`);
       
       // Build HTML for feed items
       let html = '<div style="padding: 10px;">';
       items.forEach((item, index) => {
         if (index >= 100) return; // Limit to 100 items (increased from 20)
         
-        const title = item.querySelector('title')?.textContent || 'No title';
-        const link = item.querySelector('link')?.textContent || '#';
-        const description = item.querySelector('description')?.textContent || '';
-        const pubDate = item.querySelector('pubDate')?.textContent || '';
-        // Try multiple selectors for thumbnail (YouTube uses media:content, others use media:thumbnail)
-        const thumbnail = item.querySelector('media\\:content[type="image/jpeg"], media\\:content[type^="image"]')?.getAttribute('url') ||
-                         item.querySelector('media\\:thumbnail')?.getAttribute('url') ||
-                         item.querySelector('thumbnail')?.getAttribute('url') ||
-                         item.querySelector('enclosure[type^="image"]')?.getAttribute('url') || '';
+        // Handle both RSS and Atom formats
+        const isAtom = item.localName === 'entry' || item.tagName === 'entry' || item.tagName?.toLowerCase() === 'entry';
+        
+        // Get title - MUST use getElementsByTagNameNS for namespaced XML
+        let title = 'No title';
+        const titleNS = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'title')[0];
+        const titleRSS = item.getElementsByTagName('title')[0];
+        if (titleNS) {
+          title = titleNS.textContent || 'No title';
+        } else if (titleRSS) {
+          title = titleRSS.textContent || 'No title';
+        }
+        
+        // Get link - Atom uses <link href="...">, RSS uses <link>text</link>
+        let link = '#';
+        if (isAtom) {
+          // Atom: link is an element with href attribute
+          const links = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'link');
+          for (let i = 0; i < links.length; i++) {
+            const rel = links[i].getAttribute('rel');
+            if (!rel || rel === 'alternate') {
+              link = links[i].getAttribute('href') || '#';
+              break;
+            }
+          }
+          // Fallback: try regular getElementsByTagName
+          if (link === '#') {
+            const linksFallback = item.getElementsByTagName('link');
+            for (let i = 0; i < linksFallback.length; i++) {
+              const rel = linksFallback[i].getAttribute('rel');
+              if (!rel || rel === 'alternate') {
+                link = linksFallback[i].getAttribute('href') || '#';
+                break;
+              }
+            }
+          }
+        } else {
+          // RSS: link is text content
+          const linkEl = item.getElementsByTagName('link')[0];
+          link = linkEl?.textContent || '#';
+        }
+        
+        // Get description/summary/content - MUST use getElementsByTagNameNS
+        let description = '';
+        const summaryNS = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'summary')[0];
+        const contentNS = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'content')[0];
+        const descRSS = item.getElementsByTagName('description')[0];
+        const summaryRSS = item.getElementsByTagName('summary')[0];
+        const contentRSS = item.getElementsByTagName('content')[0];
+        
+        if (summaryNS) {
+          description = summaryNS.textContent || '';
+        } else if (contentNS) {
+          description = contentNS.textContent || '';
+        } else if (descRSS) {
+          description = descRSS.textContent || '';
+        } else if (summaryRSS) {
+          description = summaryRSS.textContent || '';
+        } else if (contentRSS) {
+          description = contentRSS.textContent || '';
+        }
+        
+        // Get date - MUST use getElementsByTagNameNS
+        let pubDate = '';
+        const publishedNS = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'published')[0];
+        const updatedNS = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'updated')[0];
+        const pubDateRSS = item.getElementsByTagName('pubDate')[0];
+        const publishedRSS = item.getElementsByTagName('published')[0];
+        const updatedRSS = item.getElementsByTagName('updated')[0];
+        
+        if (publishedNS) {
+          pubDate = publishedNS.textContent || '';
+        } else if (updatedNS) {
+          pubDate = updatedNS.textContent || '';
+        } else if (pubDateRSS) {
+          pubDate = pubDateRSS.textContent || '';
+        } else if (publishedRSS) {
+          pubDate = publishedRSS.textContent || '';
+        } else if (updatedRSS) {
+          pubDate = updatedRSS.textContent || '';
+        }
+        
+        // Get thumbnail - YouTube uses media:group with media:thumbnail
+        // MUST use getElementsByTagNameNS for media namespace
+        let thumbnail = '';
+        const mediaNS = 'http://search.yahoo.com/mrss/';
+        
+        // Try media:group first (YouTube format)
+        const mediaGroupNS = item.getElementsByTagNameNS(mediaNS, 'group')[0];
+        if (mediaGroupNS) {
+          const thumbNS = mediaGroupNS.getElementsByTagNameNS(mediaNS, 'thumbnail')[0];
+          if (thumbNS) {
+            thumbnail = thumbNS.getAttribute('url') || '';
+          }
+        }
+        
+        // Fallback: try media:thumbnail directly
+        if (!thumbnail) {
+          const thumbDirectNS = item.getElementsByTagNameNS(mediaNS, 'thumbnail')[0];
+          if (thumbDirectNS) {
+            thumbnail = thumbDirectNS.getAttribute('url') || '';
+          }
+        }
+        
+        // Fallback: try regular getElementsByTagName (for non-namespaced)
+        if (!thumbnail) {
+          const mediaGroup = item.getElementsByTagName('media:group')[0];
+          if (mediaGroup) {
+            const thumb = mediaGroup.getElementsByTagName('media:thumbnail')[0];
+            if (thumb) {
+              thumbnail = thumb.getAttribute('url') || '';
+            }
+          }
+        }
+        
+        // Last resort: try enclosure or other image sources
+        if (!thumbnail) {
+          const enclosure = item.getElementsByTagName('enclosure')[0];
+          if (enclosure && enclosure.getAttribute('type')?.startsWith('image')) {
+            thumbnail = enclosure.getAttribute('url') || '';
+          }
+        }
+        
+        // If no thumbnail found in media elements, try extracting from description HTML
+        if (!thumbnail && description) {
+          try {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = description;
+            const imgTag = tempDiv.querySelector('img');
+            if (imgTag) {
+              thumbnail = imgTag.getAttribute('src') || '';
+            }
+          } catch (e) {
+            // If parsing fails, try regex as fallback
+            const imgMatch = description.match(/<img[^>]+src=["']([^"']+)["']/i);
+            if (imgMatch) {
+              thumbnail = imgMatch[1];
+            }
+          }
+        }
         
         // Format date
         let formattedDate = '';
@@ -3740,14 +3961,29 @@ function loadCustomRSSFeed(feedUrl, container) {
           }
         }
         
+        // Clean description - remove any HTML images since we're using the thumbnail
+        let cleanDescription = description;
+        if (description) {
+          try {
+            // Remove img tags from description to avoid duplicate/conflicting images
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = description;
+            const images = tempDiv.querySelectorAll('img');
+            images.forEach(img => img.remove());
+            cleanDescription = tempDiv.textContent || tempDiv.innerText || '';
+          } catch (e) {
+            // If parsing fails, use regex to remove img tags
+            cleanDescription = description.replace(/<img[^>]*>/gi, '').replace(/<br\s*\/?>/gi, ' ').trim();
+          }
+        }
+        
         html += `
-          <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #333;">
-            ${thumbnail ? `<img src="${thumbnail}" style="width: 100%; max-width: 400px; margin-bottom: 8px; border-radius: 4px;" alt="${title}" />` : ''}
-            <h3 style="margin: 0 0 5px 0; font-size: 14px; font-weight: bold;">
-              <a href="${link}" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: none;">${title}</a>
+          <div style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #333;">
+            <h3 style="margin: 0 0 8px 0; padding: 0; font-size: 14px; font-weight: normal; line-height: 1.2;">
+              <a href="${link}" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: none; display: block;">${title}</a>
             </h3>
-            ${formattedDate ? `<div style="font-size: 11px; color: #9ca3af; margin-bottom: 5px;">${formattedDate}</div>` : ''}
-            ${description ? `<div style="font-size: 12px; color: #ccc; line-height: 1.4;">${description.substring(0, 200)}${description.length > 200 ? '...' : ''}</div>` : ''}
+            ${thumbnail ? `<img src="${thumbnail}" class="video-thumbnail" style="width: 100% !important; max-width: 400px !important; height: 225px !important; min-height: 225px !important; max-height: 225px !important; object-fit: cover !important; aspect-ratio: 16/9 !important; margin: 0 0 8px 0 !important; padding: 0 !important; border-radius: 4px !important; display: block !important; vertical-align: top !important;" alt="${title}" />` : ''}
+            ${formattedDate ? `<div style="font-size: 11px; color: #9ca3af; margin: 0; padding: 0; line-height: 1;">${formattedDate}</div>` : ''}
           </div>
         `;
       });
@@ -16625,7 +16861,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const trackandfieldtabs = document.getElementById('trackandfieldtabs-TrackAndField');
 
   const feedMapTrackAndField = {
-    headlines: "https://rss.app/feeds/wR4WbSpa3kRgWcdl.xml",
+    headlines: "https://rss-feed-service-124291936014.us-central1.run.app/feeds/trackandfieldnews.xml",
     breaking: "https://rss.app/feeds/VqavgJOoX0LKkfkb.xml"
   };
 
@@ -16828,21 +17064,21 @@ document.addEventListener('DOMContentLoaded', function() {
 const VIDEOS_CONFIG = {
     // Single tab pages (just "Videos" header)
     singleTab: {
-        'Home': '_S4vCO7EXWQbgfcVZ',
-        'MLS': 'TTfWQ2SKVZMPKGD9',
-        'NBA': '6TVMNSk3afZmhsLi',
-        'LaLiga': 'dbiFC60cU9Yj94dT',
+        'Home': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/home-videos.xml',
+        'MLS': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLcj4z4KsbIoVYKuevRiaE94KlwPuXqLHy.xml',
+        'NBA': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/NBA.xml',
+        'LaLiga': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/LaLiga.xml',
         'UFC': 'IlJbcKJuWHSyc7ZV',
-        'Bundesliga': 'mPIKuLJkRaEWJJ5b',
-        'FormulaOne': 'zKsXNd2g50iFJFdA',
-        'NCAAM': '_ZgwKEQLehKNcAR7r',
+        'Bundesliga': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/bundesliga.xml',
+        'FormulaOne': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/Formula1.xml',
+        'NCAAM': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaam-videos.xml',
         'NCAAW': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaaw-videos.xml',
         'WNBA': 'al6x45CL8geoEccA',
-        'Boxing': '_9vKUVdBIc1b9s6XI',
+        'Boxing': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/boxing-videos.xml',
         'FACup': 'eETusreqvR3bo30j',
-        'Tennis': '_NdxWHqMOZskfRRqd',
-        'PremierLeague': 'lqRsEOc63yyGxmb1',
-        'UEFAEuropaLeague': 'LuEqqJcBqxYDekLP',
+        'Tennis': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/tennis-videos.xml',
+        'PremierLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLXEMPXZ3PY1hMzinDc1TvSm8U2NUyz-0E.xml',
+        'UEFAEuropaLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLF1A3xcj_XjauRnOMIAX0CQbMhJbbcDvN.xml',
         'UEFAConferenceLeague': 'blQJnM5CaqeYnasx',
         'LIVGolf': 'GeRvu9qsqnL2eJ93',
         'MotoGP': 'Q9fZUMXCK1a58Qx8',
@@ -16852,33 +17088,33 @@ const VIDEOS_CONFIG = {
         'NASCARCupSeries': '2dUaX0gxCaMUq1tn',
         'TrackAndField': 'mgPf2SFmqKywYMCA',
         'LigaMX': 'diq9IDhkm2VA44jI',
-        'SerieA': 'inlvkId7SYqCfnec',
-        'Ligue1': 'Yq808yRh1vipxkCz',
+        'SerieA': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/seriea.xml',
+        'Ligue1': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/Ligue1.xml',
         'IndyCar': 'kyz4SCYCsuNDt3mC',
-        'NWSL': 'j3Vmv9t0tUZurgOq',
-        'UEFAChampionsLeague': 'VMoUhMONqIK5UmoT',
+        'NWSL': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/NWSLsoccer.xml',
+        'UEFAChampionsLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLkwBiY2Dq-oaG6vHAhmcCOc3Q_-To2dlA.xml',
         'NCAABaseball': 'vSnjvx8lfhvdkJCI',
         'NCAASoftball': '0icHbpkIigOmSTpJ',
-        'Soccer': '_zeLCah3ozvgMgS1t'
+        'Soccer': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/soccer-videos.xml'
     },
     
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
         'NFL': {
             highlights: 'qt6iiToUElXHGk2u',
-            allVideos: 'vsvgWNVcJ1m95kd9'
+            allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/NFL.xml'
         },
         'NCAAF': {
-            highlights: '_UtSzOkumvAmcekwE',
-            allVideos: '_fIhQHk7eKkZlafg4'
+            highlights: 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaaf-highlights.xml',
+            allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaaf-videos.xml'
         },
         'MLB': {
-            highlights: 'VTAPXtLpRtEGkfzO',
-            allVideos: '0r7sMjvCjaspA2dD'
+            highlights: 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLL-lmlkrmJanq-c41voXY4cCbxVR0bjxR.xml',
+            allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/MLB.xml'
         },
         'NHL': {
             highlights: '6hslZAxd7onqWIfw',
-            allVideos: 'Rj2KNuQXoY7IdWW8'
+            allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/NHL.xml'
         }
         // Add more two-tab configurations as needed
     }
