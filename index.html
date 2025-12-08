@@ -3749,6 +3749,7 @@ function loadSocialFeed(section) {
 }
 
 // Load custom RSS feed from our RSS service
+
 function loadCustomRSSFeed(feedUrl, container) {
   container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">Loading feed...</div>';
   
@@ -3977,12 +3978,19 @@ function loadCustomRSSFeed(feedUrl, container) {
           }
         }
         
+        // Build video HTML - make thumbnail clickable to open video in new tab
+        let videoContent = '';
+        if (thumbnail) {
+          // Thumbnail is clickable to open video in new tab
+          videoContent = `<a href="${link}" target="_blank" rel="noopener noreferrer"><img src="${thumbnail}" class="video-thumbnail" style="width: 100% !important; max-width: 400px !important; height: 225px !important; min-height: 225px !important; max-height: 225px !important; object-fit: cover !important; aspect-ratio: 16/9 !important; margin: 0 0 8px 0 !important; padding: 0 !important; border-radius: 4px !important; display: block !important; vertical-align: top !important; cursor: pointer;" alt="${title}" /></a>`;
+        }
+        
         html += `
           <div style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #333;">
             <h3 style="margin: 0 0 8px 0; padding: 0; font-size: 14px; font-weight: normal; line-height: 1.2;">
               <a href="${link}" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: none; display: block;">${title}</a>
             </h3>
-            ${thumbnail ? `<img src="${thumbnail}" class="video-thumbnail" style="width: 100% !important; max-width: 400px !important; height: 225px !important; min-height: 225px !important; max-height: 225px !important; object-fit: cover !important; aspect-ratio: 16/9 !important; margin: 0 0 8px 0 !important; padding: 0 !important; border-radius: 4px !important; display: block !important; vertical-align: top !important;" alt="${title}" />` : ''}
+            ${videoContent}
             ${formattedDate ? `<div style="font-size: 11px; color: #9ca3af; margin: 0; padding: 0; line-height: 1;">${formattedDate}</div>` : ''}
           </div>
         `;
@@ -6383,7 +6391,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Burnley": "Burnley",
             "West Ham": "West Ham",
             "Nottingham": "Forest",
-            "Wolves": "Wolves",
+            "Wolverhampton Wanderers": "Wolves",
         },
         // EFL Championship
         EFLChampionship: {
@@ -7001,7 +7009,10 @@ document.addEventListener('DOMContentLoaded', function () {
             "Northwestern State": "NW State",
             "Cleary University": "Cleary",
             "Central Connecticut": "Central CT",
-            "West Virginia": "W Virginia"
+            "West Virginia": "W Virginia",
+            "Southern Wesleyan": "S Wesleyan",
+            "South Carolina State": "So Car St",
+            "Texas Southern": "TX Southern"
         },
         // NCAAF
         NCAAF: {
@@ -7058,7 +7069,10 @@ document.addEventListener('DOMContentLoaded', function () {
             "Northwestern State": "NW State",
             "Cleary University": "Cleary",
             "Central Connecticut": "Central CT",
-            "West Virginia": "W Virginia"
+            "West Virginia": "W Virginia",
+            "Southern Wesleyan": "S Wesleyan",
+            "South Carolina State": "So Car St",
+            "Texas Southern": "TX Southern"
         },
         // NCAAW
         NCAAW: {
@@ -7217,6 +7231,8 @@ document.addEventListener('DOMContentLoaded', function () {
             "San Diego": "San Diego",
             "South Carolina State": "So Car St",
             "South Carolina Upstate": "SC Upstate",
+            "Southern Wesleyan": "S Wesleyan",
+            "Texas Southern": "TX Southern",
             "Southern Indiana": "So Indiana",
             "Stephen F. Austin": "SF Austin",
             "Stonehill Skyhawks": "Stonehill",
@@ -9221,11 +9237,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Elite', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly'].includes(displayLeagueForCheck);
                     
-                    // Set channel display - use Tennis Channel for ATP leagues
-                    // If channel is blank in the data, it will display as blank (no hiding logic needed)
-                    let featuredChannelDisplay = (!isFinal && data.channel) ? data.channel : '';
+                    // Set channel display - use Tennis Channel for ATP leagues, otherwise use data.channel
+                    let featuredChannelToDisplay = data.channel || '';
                     if (data.League && data.League.includes('ATP')) {
-                        featuredChannelDisplay = (!isFinal) ? 'Tennis Channel' : '';
+                        featuredChannelToDisplay = 'Tennis Channel';
+                    }
+                    let featuredChannelDisplay = (!isFinal && featuredChannelToDisplay) ? featuredChannelToDisplay : '';
+                    
+                    // For UFC and Boxing: if no channel, make team names gray (#C0C0C0)
+                    const isFeaturedUFCOrBoxing = displayLeagueForCheck === 'UFC' || displayLeagueForCheck === 'Boxing';
+                    if (isFeaturedUFCOrBoxing && !isFinal) {
+                        if (!featuredChannelDisplay || featuredChannelDisplay.trim() === '') {
+                            // Only apply gray color if there's no existing color set (not a final game with losing team color)
+                            if (!homeColor) {
+                                homeColor = 'color: #C0C0C0;';
+                            }
+                            if (!awayColor) {
+                                awayColor = 'color: #C0C0C0;';
+                            }
+                        }
                     }
                     
                     if (isSoccerLeague) {
@@ -9473,6 +9503,27 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
+                
+                // Set channel display - use Tennis Channel for ATP leagues, otherwise use data.channel
+                let channelToDisplay = data.channel || '';
+                if (data.League && data.League.includes('ATP')) {
+                    channelToDisplay = 'Tennis Channel';
+                }
+                const channelDisplay = (channelToDisplay && !isFinal) ? channelToDisplay : '';
+                
+                // For UFC and Boxing: if no channel, make team names gray (#C0C0C0)
+                const isUFCOrBoxing = displayLeague === 'UFC' || displayLeague === 'Boxing';
+                if (isUFCOrBoxing && !isFinal) {
+                    if (!channelDisplay || channelDisplay.trim() === '') {
+                        // Only apply gray color if there's no existing color set (not a final game with losing team color)
+                        if (!homeColor) {
+                            homeColor = 'color: #C0C0C0;';
+                        }
+                        if (!awayColor) {
+                            awayColor = 'color: #C0C0C0;';
+                        }
+                    }
+                }
 
                 const row1 = table.insertRow();
                 row1.className = "game-row";
@@ -9492,13 +9543,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Check if we're rendering in the league-specific column (for font size adjustment)
                 const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
                 const timeFontSize = isLeagueSpecificColumn ? '10px' : '11px';
-                
-                // Set channel display - use Tennis Channel for ATP leagues, otherwise use data.channel
-                let channelToDisplay = data.channel || '';
-                if (data.League && data.League.includes('ATP')) {
-                    channelToDisplay = 'Tennis Channel';
-                }
-                const channelDisplay = (channelToDisplay && !isFinal) ? channelToDisplay : '';
                 
                 // Check if both teams are doubles (for spacing between first and second team)
                 const isDoublesMatch = isHomeDoubles && isAwayDoubles;
@@ -17104,18 +17148,18 @@ const VIDEOS_CONFIG = {
     singleTab: {
         'Home': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/home-videos.xml',
         'MLS': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLcj4z4KsbIoVYKuevRiaE94KlwPuXqLHy.xml',
-        'NBA': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/NBA.xml',
-        'LaLiga': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/LaLiga.xml',
+        'NBA': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nba.xml',
+        'LaLiga': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-laliga.xml',
         'UFC': 'IlJbcKJuWHSyc7ZV',
-        'Bundesliga': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/bundesliga.xml',
-        'FormulaOne': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/Formula1.xml',
+        'Bundesliga': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-bundesliga.xml',
+        'FormulaOne': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-formula1.xml',
         'NCAAM': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaam-videos.xml',
         'NCAAW': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaaw-videos.xml',
         'WNBA': 'al6x45CL8geoEccA',
         'Boxing': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/boxing-videos.xml',
         'FACup': 'eETusreqvR3bo30j',
         'Tennis': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/tennis-videos.xml',
-        'PremierLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLXEMPXZ3PY1hMzinDc1TvSm8U2NUyz-0E.xml',
+        'PremierLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-premierleague-playlist-2.xml',
         'UEFAEuropaLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLF1A3xcj_XjauRnOMIAX0CQbMhJbbcDvN.xml',
         'UEFAConferenceLeague': 'blQJnM5CaqeYnasx',
         'LIVGolf': 'GeRvu9qsqnL2eJ93',
@@ -17126,11 +17170,11 @@ const VIDEOS_CONFIG = {
         'NASCARCupSeries': '2dUaX0gxCaMUq1tn',
         'TrackAndField': 'mgPf2SFmqKywYMCA',
         'LigaMX': 'diq9IDhkm2VA44jI',
-        'SerieA': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/seriea.xml',
-        'Ligue1': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/Ligue1.xml',
+        'SerieA': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-seriea.xml',
+        'Ligue1': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-ligue1.xml',
         'IndyCar': 'kyz4SCYCsuNDt3mC',
-        'NWSL': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/NWSLsoccer.xml',
-        'UEFAChampionsLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLkwBiY2Dq-oaG6vHAhmcCOc3Q_-To2dlA.xml',
+        'NWSL': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nwsl.xml',
+        'UEFAChampionsLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-premierleague-playlist-3.xml',
         'NCAABaseball': 'vSnjvx8lfhvdkJCI',
         'NCAASoftball': '0icHbpkIigOmSTpJ',
         'Soccer': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/soccer-videos.xml'
@@ -17140,19 +17184,19 @@ const VIDEOS_CONFIG = {
     twoTabs: {
         'NFL': {
             highlights: 'qt6iiToUElXHGk2u',
-            allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/NFL.xml'
+            allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nfl.xml'
         },
         'NCAAF': {
             highlights: 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaaf-highlights.xml',
             allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaaf-videos.xml'
         },
         'MLB': {
-            highlights: 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLL-lmlkrmJanq-c41voXY4cCbxVR0bjxR.xml',
-            allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/MLB.xml'
+            highlights: 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-mlb-playlist.xml',
+            allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-mlb.xml'
         },
         'NHL': {
             highlights: '6hslZAxd7onqWIfw',
-            allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/channel/NHL.xml'
+            allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nhl.xml'
         }
         // Add more two-tab configurations as needed
     }
@@ -17198,8 +17242,22 @@ function loadVideosWithTabs(section) {
     if (!config) return;
     
     // Set up tab event listeners
-    const highlightsTab = document.querySelector('.videos-tab[data-tab="highlights"]');
-    const allVideosTab = document.querySelector('.videos-tab[data-tab="all-videos"]');
+    let highlightsTab = document.querySelector('.videos-tab[data-tab="highlights"]');
+    let allVideosTab = document.querySelector('.videos-tab[data-tab="all-videos"]');
+    const videosContent = document.getElementById('dynamicVideosContent');
+    
+    // Remove any existing event listeners by cloning and replacing the elements
+    // This prevents duplicate event listeners from accumulating
+    if (highlightsTab && highlightsTab.parentNode) {
+        const newHighlightsTab = highlightsTab.cloneNode(true);
+        highlightsTab.parentNode.replaceChild(newHighlightsTab, highlightsTab);
+        highlightsTab = newHighlightsTab;
+    }
+    if (allVideosTab && allVideosTab.parentNode) {
+        const newAllVideosTab = allVideosTab.cloneNode(true);
+        allVideosTab.parentNode.replaceChild(newAllVideosTab, allVideosTab);
+        allVideosTab = newAllVideosTab;
+    }
     
     // Customize tab labels for NHL, reset for others
     if (section === 'NHL') {
@@ -17219,23 +17277,43 @@ function loadVideosWithTabs(section) {
         }
     }
     
+    // Clear container before setting up new listeners
+    if (videosContent) {
+        videosContent.innerHTML = '';
+    }
+    
+    // Store section-specific config in a way that won't be affected by section changes
+    const highlightsFeed = config.highlights;
+    const allVideosFeed = config.allVideos;
+    
     if (highlightsTab) {
         highlightsTab.addEventListener('click', () => {
             switchVideosTab('highlights');
-            displayRSSWidget(config.highlights, document.getElementById('dynamicVideosContent'));
+            const container = document.getElementById('dynamicVideosContent');
+            if (container) {
+                container.innerHTML = ''; // Clear before loading
+                displayRSSWidget(highlightsFeed, container);
+            }
         });
     }
     
     if (allVideosTab) {
         allVideosTab.addEventListener('click', () => {
             switchVideosTab('all-videos');
-            displayRSSWidget(config.allVideos, document.getElementById('dynamicVideosContent'));
+            const container = document.getElementById('dynamicVideosContent');
+            if (container) {
+                container.innerHTML = ''; // Clear before loading
+                displayRSSWidget(allVideosFeed, container);
+            }
         });
     }
     
     // Load highlights by default
     switchVideosTab('highlights');
-    displayRSSWidget(config.highlights, document.getElementById('dynamicVideosContent'));
+    if (videosContent) {
+        videosContent.innerHTML = ''; // Clear before loading
+        displayRSSWidget(highlightsFeed, videosContent);
+    }
 }
 // Switch between video tabs
 function switchVideosTab(activeTab) {
