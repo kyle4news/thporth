@@ -16043,8 +16043,8 @@ async function loadTop25Data(leagueKey) {
             
             // Hard code JMU record
             if (displayName === 'JMU' || team.Team === 'JMU' || team.Team === 'James Madison') {
-                team.Record = '11-1';
-                team.OverallRecord = '11-1';
+                team.Record = '12-1';
+                team.OverallRecord = '12-1';
             } else if (team.OverallRecord && !team.Record) {
                 team.Record = team.OverallRecord;
             }
@@ -17183,7 +17183,7 @@ const VIDEOS_CONFIG = {
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
         'NFL': {
-            highlights: 'qt6iiToUElXHGk2u',
+            highlights: 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLRdw3IjKY2gngxLmdCouF4seR20NDrviF.xml',
             allVideos: 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nfl.xml'
         },
         'NCAAF': {
