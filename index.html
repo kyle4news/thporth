@@ -3750,7 +3750,230 @@ function loadSocialFeed(section) {
 
 // Load custom RSS feed from our RSS service
 
+// Load multiple RSS feeds, combine, sort by date, and display
+async function loadMultipleRSSFeeds(feedUrls, container) {
+  container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">Loading feeds...</div>';
+  
+  try {
+    // Fetch all feeds in parallel
+    const feedPromises = feedUrls.map(url => 
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status} for ${url}`);
+          }
+          return response.text();
+        })
+        .then(xml => ({ url, xml, success: true }))
+        .catch(error => {
+          console.error(`Error fetching feed ${url}:`, error);
+          return { url, xml: null, success: false, error: error.message };
+        })
+    );
+    
+    const feedResults = await Promise.all(feedPromises);
+    
+    // Parse all feeds and collect items
+    const allItems = [];
+    const parser = new DOMParser();
+    
+    feedResults.forEach(({ url, xml, success }) => {
+      if (!success || !xml) return;
+      
+      try {
+        const xmlDoc = parser.parseFromString(xml, 'text/xml');
+        const parserError = xmlDoc.querySelector('parsererror');
+        if (parserError) {
+          console.error(`Failed to parse feed ${url}`);
+          return;
+        }
+        
+        // Extract items (support both RSS and Atom)
+        let items = xmlDoc.getElementsByTagName('item');
+        if (items.length === 0) {
+          items = xmlDoc.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'entry');
+          if (items.length === 0) {
+            items = xmlDoc.getElementsByTagName('entry');
+          }
+        }
+        
+        items = Array.from(items);
+        
+        items.forEach(item => {
+          const isAtom = item.localName === 'entry' || item.tagName === 'entry' || item.tagName?.toLowerCase() === 'entry';
+          
+          // Get title
+          let title = 'No title';
+          const titleNS = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'title')[0];
+          const titleRSS = item.getElementsByTagName('title')[0];
+          if (titleNS) {
+            title = titleNS.textContent || 'No title';
+          } else if (titleRSS) {
+            title = titleRSS.textContent || 'No title';
+          }
+          
+          // Get link
+          let link = '#';
+          if (isAtom) {
+            const links = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'link');
+            for (let i = 0; i < links.length; i++) {
+              const rel = links[i].getAttribute('rel');
+              if (!rel || rel === 'alternate') {
+                link = links[i].getAttribute('href') || '#';
+                break;
+              }
+            }
+            if (link === '#') {
+              const linksFallback = item.getElementsByTagName('link');
+              for (let i = 0; i < linksFallback.length; i++) {
+                const rel = linksFallback[i].getAttribute('rel');
+                if (!rel || rel === 'alternate') {
+                  link = linksFallback[i].getAttribute('href') || '#';
+                  break;
+                }
+              }
+            }
+          } else {
+            const linkEl = item.getElementsByTagName('link')[0];
+            link = linkEl?.textContent || '#';
+          }
+          
+          // Get date
+          let pubDate = '';
+          const publishedNS = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'published')[0];
+          const updatedNS = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'updated')[0];
+          const pubDateRSS = item.getElementsByTagName('pubDate')[0];
+          const publishedRSS = item.getElementsByTagName('published')[0];
+          const updatedRSS = item.getElementsByTagName('updated')[0];
+          
+          if (publishedNS) {
+            pubDate = publishedNS.textContent || '';
+          } else if (updatedNS) {
+            pubDate = updatedNS.textContent || '';
+          } else if (pubDateRSS) {
+            pubDate = pubDateRSS.textContent || '';
+          } else if (publishedRSS) {
+            pubDate = publishedRSS.textContent || '';
+          } else if (updatedRSS) {
+            pubDate = updatedRSS.textContent || '';
+          }
+          
+          // Get thumbnail
+          let thumbnail = '';
+          const mediaNS = 'http://search.yahoo.com/mrss/';
+          const mediaGroupNS = item.getElementsByTagNameNS(mediaNS, 'group')[0];
+          if (mediaGroupNS) {
+            const thumbNS = mediaGroupNS.getElementsByTagNameNS(mediaNS, 'thumbnail')[0];
+            if (thumbNS) {
+              thumbnail = thumbNS.getAttribute('url') || '';
+            }
+          }
+          if (!thumbnail) {
+            const thumbDirectNS = item.getElementsByTagNameNS(mediaNS, 'thumbnail')[0];
+            if (thumbDirectNS) {
+              thumbnail = thumbDirectNS.getAttribute('url') || '';
+            }
+          }
+          if (!thumbnail) {
+            const mediaGroup = item.getElementsByTagName('media:group')[0];
+            if (mediaGroup) {
+              const thumb = mediaGroup.getElementsByTagName('media:thumbnail')[0];
+              if (thumb) {
+                thumbnail = thumb.getAttribute('url') || '';
+              }
+            }
+          }
+          
+          // Get description
+          let description = '';
+          const summaryNS = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'summary')[0];
+          const contentNS = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'content')[0];
+          const descRSS = item.getElementsByTagName('description')[0];
+          
+          if (summaryNS) {
+            description = summaryNS.textContent || '';
+          } else if (contentNS) {
+            description = contentNS.textContent || '';
+          } else if (descRSS) {
+            description = descRSS.textContent || '';
+          }
+          
+          allItems.push({
+            title,
+            link,
+            pubDate,
+            thumbnail,
+            description
+          });
+        });
+      } catch (error) {
+        console.error(`Error parsing feed ${url}:`, error);
+      }
+    });
+    
+    // Remove duplicates by link
+    const seenLinks = new Set();
+    const uniqueItems = allItems.filter(item => {
+      if (seenLinks.has(item.link)) {
+        return false;
+      }
+      seenLinks.add(item.link);
+      return true;
+    });
+    
+    // Sort by date (newest first)
+    uniqueItems.sort((a, b) => {
+      const dateA = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+      const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+      return dateB - dateA; // Descending order (newest first)
+    });
+    
+    // Limit to 100 items
+    const displayItems = uniqueItems.slice(0, 100);
+    
+    // Build HTML
+    let html = '<div style="padding: 10px;">';
+    displayItems.forEach(item => {
+      let formattedDate = '';
+      if (item.pubDate) {
+        try {
+          const date = new Date(item.pubDate);
+          formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        } catch (e) {
+          formattedDate = item.pubDate;
+        }
+      }
+      
+      let videoContent = '';
+      if (item.thumbnail) {
+        videoContent = `<a href="${item.link}" target="_blank" rel="noopener noreferrer"><img src="${item.thumbnail}" class="video-thumbnail" style="width: 100% !important; max-width: 400px !important; height: 225px !important; min-height: 225px !important; max-height: 225px !important; object-fit: cover !important; aspect-ratio: 16/9 !important; margin: 0 0 8px 0 !important; padding: 0 !important; border-radius: 4px !important; display: block !important; vertical-align: top !important; cursor: pointer;" alt="${item.title}" /></a>`;
+      }
+      
+      html += `
+        <div style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #333;">
+          <h3 style="margin: 0 0 8px 0; padding: 0; font-size: 14px; font-weight: normal; line-height: 1.2;">
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: none; display: block;">${item.title}</a>
+          </h3>
+          ${videoContent}
+          ${formattedDate ? `<div style="font-size: 11px; color: #9ca3af; margin: 0; padding: 0; line-height: 1;">${formattedDate}</div>` : ''}
+        </div>
+      `;
+    });
+    html += '</div>';
+    
+    container.innerHTML = html;
+  } catch (error) {
+    console.error('Error loading multiple RSS feeds:', error);
+    container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading feeds.</div>';
+  }
+}
+
 function loadCustomRSSFeed(feedUrl, container) {
+  // Check if feedUrl is an array (multiple feeds)
+  if (Array.isArray(feedUrl)) {
+    return loadMultipleRSSFeeds(feedUrl, container);
+  }
+  
   container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">Loading feed...</div>';
   
   // Use CORS proxy or direct fetch if same domain
@@ -17179,43 +17402,131 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Videos Column JavaScript -->
 <script>
 // Videos RSS Feed Configuration
+// Helper function to get direct YouTube RSS URL
+// For playlists: use direct YouTube RSS feed
+// For channels: use our RSS service (which handles channel ID lookup)
+// Later we can replace with direct YouTube URLs once we have channel IDs
+function getYouTubeRSSUrl(handleOrPlaylistId, isPlaylist = false) {
+    if (isPlaylist) {
+        return `https://www.youtube.com/feeds/videos.xml?playlist_id=${handleOrPlaylistId}`;
+    }
+    // For channels, use our RSS service for now (it handles channel ID lookup)
+    // TODO: Replace with direct YouTube RSS URLs once we have channel IDs
+    return `https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-${handleOrPlaylistId.toLowerCase()}.xml`;
+}
+
 const VIDEOS_CONFIG = {
     // Single tab pages (just "Videos" header)
     singleTab: {
-        'Home': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/home-videos.xml',
-        'MLS': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLcj4z4KsbIoVYKuevRiaE94KlwPuXqLHy.xml',
-        'NBA': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nba.xml',
-        'LaLiga': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-laliga.xml',
-        'UFC': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-ufc.xml',
-        'Bundesliga': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-bundesliga.xml',
-        'FormulaOne': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-formula1.xml',
-        'NCAAM': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaam-videos.xml',
-        'NCAAW': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaaw-videos.xml',
-        'WNBA': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-wnba.xml',
-        'Boxing': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/boxing-videos.xml',
-        'FACup': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-facup.xml',
-        'Tennis': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/tennis-videos.xml',
-        'PremierLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-premierleague-playlist-2.xml',
-        'UEFAEuropaLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLF1A3xcj_XjauRnOMIAX0CQbMhJbbcDvN.xml',
-        'UEFAConferenceLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLF1A3xcj_XjYWfzeXvnO8Uy8K3Q8JIQ5z.xml',
-        'LIVGolf': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-livgolf.xml',
-        'MotoGP': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-motogp.xml',
-        'UFC': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-ufc.xml',
-        'LPGATour': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-lpga.xml',
-        'PGATour': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-pgatour.xml',
-        'NASCARCupSeries': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nascar.xml',
+        'Home': [
+            getYouTubeRSSUrl('NBA'),
+            getYouTubeRSSUrl('Formula1'),
+            getYouTubeRSSUrl('MLB'),
+            getYouTubeRSSUrl('espncfb'),
+            getYouTubeRSSUrl('LaLiga'),
+            getYouTubeRSSUrl('PLmkjXprBSRGPTiKLn8i8KIdN5I3nPP9sx', true), // ncaaf-playlist-4
+            getYouTubeRSSUrl('PLXEMPXZ3PY1gD1F0DJeQYZjN_CKWsH911', true), // ncaaf-playlist-1
+            getYouTubeRSSUrl('seriea'),
+            getYouTubeRSSUrl('NWSLsoccer'),
+            getYouTubeRSSUrl('PLSrXjFYZsRuP1HW8mkTM7Z5q2PExbltfj', true), // ncaaf-playlist-2
+            getYouTubeRSSUrl('PLXEMPXZ3PY1hMzinDc1TvSm8U2NUyz-0E', true), // premierleague-playlist-2
+            getYouTubeRSSUrl('bundesliga'),
+            getYouTubeRSSUrl('PLtKVUJ3gZpTu0ApQHGUVeZa-tez87ucO6', true), // ncaaf-playlist-3
+            getYouTubeRSSUrl('NHL'),
+            getYouTubeRSSUrl('PLcj4z4KsbIoVYKuevRiaE94KlwPuXqLHy', true), // premierleague-playlist-1
+            getYouTubeRSSUrl('PL87LlAF-2PIwKpIUaKO4_p5QNmjxhYUFG', true), // ncaaf-playlist-6
+            getYouTubeRSSUrl('PLJOfoNRMTY5z5QvxedrpMNi01zflJJpUN', true), // ncaaf-playlist-5
+            getYouTubeRSSUrl('PLkwBiY2Dq-oaG6vHAhmcCOc3Q_-To2dlA', true), // premierleague-playlist-3
+            getYouTubeRSSUrl('NFL'),
+            getYouTubeRSSUrl('CBSSportsCFB')
+        ],
+        'MLS': getYouTubeRSSUrl('PLcj4z4KsbIoVYKuevRiaE94KlwPuXqLHy', true),
+        'NBA': getYouTubeRSSUrl('NBA'),
+        'LaLiga': getYouTubeRSSUrl('LaLiga'),
+        'UFC': getYouTubeRSSUrl('ufc'),
+        'Bundesliga': getYouTubeRSSUrl('bundesliga'),
+        'FormulaOne': getYouTubeRSSUrl('Formula1'),
+        'NCAAM': [
+            getYouTubeRSSUrl('PLn3nHXu50t5zIzgZhRCXRsZcRIfapIxEV', true),
+            getYouTubeRSSUrl('PLSoN6Th-EepPKUIUbnOMTwOpdBb5eNonz', true),
+            getYouTubeRSSUrl('PLSrXjFYZsRuMeW1ttMkXz4cQy9bap9fIB', true),
+            getYouTubeRSSUrl('PLhh7fyF6r5qVV2_RonsHodwkwe-GGt_Jl', true),
+            getYouTubeRSSUrl('PL2RRF9GtC9s1v7L7tO5Astcl4Z8xq3BqQ', true)
+        ],
+        'NCAAW': [
+            getYouTubeRSSUrl('PLn3nHXu50t5ycOprei1VvRrS6rgFyNamo', true),
+            getYouTubeRSSUrl('PLhh7fyF6r5qXCuhDgwdKKfCIzXkgF4fqx', true),
+            getYouTubeRSSUrl('PLSrXjFYZsRuPigBvTe-tB2PWDWZr6Eks_', true),
+            getYouTubeRSSUrl('PL2RRF9GtC9s32jHtkN74wyLXRtTR5Ash8', true)
+        ],
+        'WNBA': getYouTubeRSSUrl('WNBA'),
+        'Boxing': [
+            getYouTubeRSSUrl('PremierBoxingChampions'),
+            getYouTubeRSSUrl('toprank'),
+            getYouTubeRSSUrl('MatchroomBoxing'),
+            getYouTubeRSSUrl('DAZNBoxing'),
+            getYouTubeRSSUrl('RingMagazine')
+        ],
+        'FACup': getYouTubeRSSUrl('thefacup'),
+        'Tennis': [
+            getYouTubeRSSUrl('WTA'),
+            getYouTubeRSSUrl('TennisChannel'),
+            getYouTubeRSSUrl('tennistv'),
+            getYouTubeRSSUrl('ATPTour')
+        ],
+        'PremierLeague': getYouTubeRSSUrl('PLXEMPXZ3PY1hMzinDc1TvSm8U2NUyz-0E', true),
+        'UEFAEuropaLeague': getYouTubeRSSUrl('PLF1A3xcj_XjauRnOMIAX0CQbMhJbbcDvN', true),
+        'UEFAConferenceLeague': getYouTubeRSSUrl('PLF1A3xcj_XjYWfzeXvnO8Uy8K3Q8JIQ5z', true),
+        'LIVGolf': getYouTubeRSSUrl('LIVGolf'),
+        'MotoGP': getYouTubeRSSUrl('motogp'),
+        'LPGATour': getYouTubeRSSUrl('LPGA'),
+        'PGATour': getYouTubeRSSUrl('PGATOUR'),
+        'NASCARCupSeries': getYouTubeRSSUrl('NASCAR'),
         'TrackAndField': 'mgPf2SFmqKywYMCA',
-        'LigaMX': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-ligamx.xml',
-        'SerieA': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-seriea.xml',
-        'Ligue1': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-ligue1.xml',
-        'IndyCar': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-indycar.xml',
-        'NWSL': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nwsl.xml',
-        'UEFAChampionsLeague': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-premierleague-playlist-3.xml',
+        'LigaMX': getYouTubeRSSUrl('ligabbvamx'),
+        'SerieA': getYouTubeRSSUrl('seriea'),
+        'Ligue1': getYouTubeRSSUrl('Ligue1'),
+        'IndyCar': getYouTubeRSSUrl('indycar'),
+        'NWSL': getYouTubeRSSUrl('NWSLsoccer'),
+        'UEFAChampionsLeague': getYouTubeRSSUrl('PLkwBiY2Dq-oaG6vHAhmcCOc3Q_-To2dlA', true),
         'NCAABaseball': 'vSnjvx8lfhvdkJCI',
         'NCAASoftball': '0icHbpkIigOmSTpJ',
-        'Soccer': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/soccer-videos.xml',
-        'NHL': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/nhl-all.xml',
-        'NCAAF': 'https://rss-feed-service-124291936014.us-central1.run.app/bundle/ncaaf-all.xml'
+        'Soccer': [
+            getYouTubeRSSUrl('LaLiga'),
+            getYouTubeRSSUrl('seriea'),
+            getYouTubeRSSUrl('NWSLsoccer'),
+            getYouTubeRSSUrl('PLXEMPXZ3PY1hMzinDc1TvSm8U2NUyz-0E', true),
+            getYouTubeRSSUrl('bundesliga'),
+            getYouTubeRSSUrl('PLcj4z4KsbIoVYKuevRiaE94KlwPuXqLHy', true),
+            getYouTubeRSSUrl('PLkwBiY2Dq-oaG6vHAhmcCOc3Q_-To2dlA', true),
+            getYouTubeRSSUrl('Ligue1'),
+            'https://www.youtube.com/feeds/videos.xml?channel_id=UCChcWqwYXCEs657MQ00qVWA', // @thefacup
+            'https://www.youtube.com/feeds/videos.xml?channel_id=UCq8BPLXtFeiSFOvmJrknWGg', // @ligabbvamx
+            'https://www.youtube.com/feeds/videos.xml?channel_id=UC7am34-1rGU_ky1vWYnoOJQ', // @GermanFootball
+            'https://www.youtube.com/feeds/videos.xml?channel_id=UCET00YnetHT7tOpu12v8jxg', // @cbssportsgolazo
+            'https://www.youtube.com/feeds/videos.xml?channel_id=UCf8YPuOWXlpTS7RibaJlP4g', // @CBSSportsGolazoEurope
+            'https://www.youtube.com/feeds/videos.xml?channel_id=UCh4tni-ICN9z0eMIPcf2r2g', // @golazoamerica
+            getYouTubeRSSUrl('PLF1A3xcj_XjYWfzeXvnO8Uy8K3Q8JIQ5z', true),
+            getYouTubeRSSUrl('PLF1A3xcj_XjahwjjdI5ovP1Rg9gKuY6tX', true),
+            getYouTubeRSSUrl('PLF1A3xcj_XjauRnOMIAX0CQbMhJbbcDvN', true),
+            getYouTubeRSSUrl('PLF1A3xcj_XjbjS6GrxUE_6FUdBsqJC8J7', true),
+            getYouTubeRSSUrl('PLF1A3xcj_XjZK-NiI5-H2L2I2WpWXn-b0', true)
+        ],
+        'NHL': [
+            'https://rss-feed-service-124291936014.us-central1.run.app/feeds/nhl-video-recaps.xml', // Non-YouTube source
+            getYouTubeRSSUrl('NHL')
+        ],
+        'NCAAF': [
+            getYouTubeRSSUrl('PLmkjXprBSRGPTiKLn8i8KIdN5I3nPP9sx', true), // ncaaf-playlist-4
+            getYouTubeRSSUrl('PLSrXjFYZsRuP1HW8mkTM7Z5q2PExbltfj', true), // ncaaf-playlist-2
+            getYouTubeRSSUrl('PLtKVUJ3gZpTu0ApQHGUVeZa-tez87ucO6', true), // ncaaf-playlist-3
+            getYouTubeRSSUrl('PL87LlAF-2PIwKpIUaKO4_p5QNmjxhYUFG', true), // ncaaf-playlist-6
+            getYouTubeRSSUrl('PLJOfoNRMTY5z5QvxedrpMNi01zflJJpUN', true), // ncaaf-playlist-5
+            getYouTubeRSSUrl('espncfb'),
+            getYouTubeRSSUrl('CFBonFOX'),
+            getYouTubeRSSUrl('PLXEMPXZ3PY1gD1F0DJeQYZjN_CKWsH911', true), // ncaaf-playlist-1
+            getYouTubeRSSUrl('CBSSportsCFB')
+        ]
     },
     
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
@@ -17359,6 +17670,12 @@ function switchVideosTab(activeTab) {
 // Display RSS.app widget or custom RSS feed
 function displayRSSWidget(widgetId, container) {
     if (!widgetId || !container) return;
+    
+    // Check if widgetId is an array (multiple feeds)
+    if (Array.isArray(widgetId)) {
+        loadCustomRSSFeed(widgetId, container);
+        return;
+    }
     
     // Check if widgetId is a URL (custom RSS feed) or an ID (RSS.app widget)
     if (widgetId.startsWith('http://') || widgetId.startsWith('https://')) {
