@@ -3078,7 +3078,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-Bundesliga" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab active" data-url="https://rss.app/feeds/zIPPZ5Zh9GDpvIbV.xml">Bulinews</div>
+                    <div class="headlines-tab active" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/bulinews.xml">Bulinews</div>
                     <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/getfootballnewsgermany-bundesliga.xml">GGFN</div>
                     <div class="headlines-tab" data-url="https://rss-feed-service-124291936014.us-central1.run.app/feeds/bundesliga-com.xml">Bundesliga.com</div>
                 
@@ -3683,7 +3683,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
    UEFAChampionsLeague: ["UMleWQY5zVMDG3RE"],
    PremierLeague: ["d972MWUX8N4NiXWc"],
    MLS: ["J2tGf8v6qaD6GjFC"],
-   Bundesliga: ["UyGDFP6qD7OQBkAg"],
+   Bundesliga: ["pqS6JLI45o7NYCkr"],
    LaLiga: ["8ZkcLZl1mdrw2loE"],
    SerieA: ["vFegYItzKVnhgmre"],
    Soccer: ["S2jMmGyBQoDlvZ4D"],
@@ -6995,57 +6995,59 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         // MLS
         MLS: {
+            "Philadelphia Union": "Union",
+            "FC Cincinnati": "Cincinnati",
+            "Inter Miami CF": "Miami",
+            "Inter Miami": "Miami",
+            "Charlotte FC": "Charlotte",
+            "Charlotte": "Charlotte",
+            "New York City FC": "NYCFC",
+            "New York City": "NYCFC",
+            "NYCFC": "NYCFC",
+            "Nashville SC": "Nashville",
+            "Nashville": "Nashville",
+            "Columbus Crew": "Columbus",
+            "Chicago Fire FC": "Chicago",
+            "Chicago Fire": "Chicago",
+            "Orlando City SC": "Orlando",
+            "Orlando City": "Orlando",
+            "New York Red Bulls": "Red Bulls",
+            "NY Red Bulls": "Red Bulls",
+            "New England Revolution": "Revolution",
+            "Revolution": "Revolution",
+            "Toronto FC": "Toronto",
+            "CF Montréal": "Montréal",
+            "CF Montreal": "Montréal",
+            "Atlanta United FC": "Atlanta",
+            "Atlanta United": "Atlanta",
+            "Atlanta Utd": "Atlanta",
+            "D.C. United": "DC United",
+            "DC United": "DC United",
             "San Diego FC": "San Diego",
             "Vancouver Whitecaps": "Vancouver",
             "Vancouver Whitecaps FC": "Vancouver",
             "Los Angeles FC": "LAFC",
             "LAFC": "LAFC",
-            "Minnesota United": "MN United",
-            "Minnesota United FC": "MN United",
-            "Seattle Sounders": "Sounders",
-            "Seattle Sounders FC": "Sounders",
-            "Austin FC": "Austin FC",
-            "FC Dallas": "FC Dallas",
-            "Portland Timbers": "Timbers",
-            "Portland Timbers FC": "Timbers",
-            "Real Salt Lake": "Real Salt Lake",
-            "San Jose Earthquakes": "Earthquakes",
-            "Colorado Rapids": "Rapids",
-            "Houston Dynamo": "Dynamo",
-            "Houston Dynamo FC": "Dynamo",
-            "St. Louis City": "St. Louis City",
-            "St. Louis City SC": "St. Louis City",
+            "Minnesota United FC": "MNUFC",
+            "Minnesota United": "MNUFC",
+            "Seattle Sounders FC": "Seattle",
+            "Seattle Sounders": "Seattle",
+            "Austin FC": "Austin",
+            "FC Dallas": "Dallas",
+            "Portland Timbers": "Portland",
+            "Portland Timbers FC": "Portland",
+            "Real Salt Lake": "Salt Lake",
+            "San Jose Earthquakes": "San José",
+            "Colorado Rapids": "Colorado",
+            "Houston Dynamo FC": "Houston",
+            "Houston Dynamo": "Houston",
+            "St. Louis CITY SC": "St Louis",
+            "St. Louis City SC": "St Louis",
+            "St. Louis City": "St Louis",
             "Los Angeles Galaxy": "LA Galaxy",
             "LA Galaxy": "LA Galaxy",
-            "Sporting Kansas City": "Sporting KC",
-            "Sporting KC": "Sporting KC",
-            "Philadelphia Union": "Union",
-            "FC Cincinnati": "Cincinnati",
-            "Inter Miami": "Inter Miami",
-            "Inter Miami CF": "Inter Miami",
-            "Charlotte": "Charlotte",
-            "Charlotte FC": "Charlotte",
-            "New York City": "NYCFC",
-            "NYCFC": "NYCFC",
-            "New York City FC": "NYCFC",
-            "Nashville SC": "Nashville",
-            "Nashville": "Nashville",
-            "Columbus Crew": "Columbus",
-            "Chicago Fire": "Chicago",
-            "Chicago Fire FC": "Chicago",
-            "Orlando City": "Orlando",
-            "Orlando City SC": "Orlando",
-            "New York Red Bulls": "NY Red Bulls",
-            "NY Red Bulls": "NY Red Bulls",
-            "New England Revolution": "Revolution",
-            "Revolution": "Revolution",
-            "Toronto FC": "Toronto FC",
-            "CF Montreal": "CF Montreal",
-            "Atlanta Utd": "Atlanta Utd",
-            "Atlanta United": "Atlanta Utd",
-            "Atlanta United FC": "Atlanta Utd",
-            "DC United": "DC United",
-            "D.C. United": "DC United"
+            "Sporting Kansas City": "Sporting",
+            "Sporting KC": "Sporting"
         },
         // NCAAM
         NCAAM: {
@@ -10723,9 +10725,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 teams.forEach((team, index) => {
                     const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                    const displayTeamName = getTeamDisplayName(team.Team, leagueKey);
                     html += `<tr style="${rowStyle}">`;
                     html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank}</td>`;
-                    html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team}</td>`;
+                    html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${displayTeamName}</td>`;
                 html += `<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">${Math.round(team.Points)}</td>`;
                 html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.MP || team.MatchesPlayed || 0}</td>`;
                     html += `<td style="padding: 8px; text-align: center; font-size: 12px;">${team.Wins}</td>`;
@@ -11357,7 +11360,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let html = '<div class="conference-section">';
         html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
         html += '<thead>';
-        html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
+        html += '<tr style="background-color: #4a4a4a; font-size: 9px; font-weight: 600;">';
         html += '<th style="padding: 8px; text-align: left; width: 20px;"></th>';
         html += '<th style="padding: 8px; text-align: left;">Team</th>';
         html += '<th style="padding: 8px; text-align: center; width: 50px;">Pts</th>';
@@ -11372,14 +11375,15 @@ document.addEventListener('DOMContentLoaded', function () {
         teams.forEach((team, index) => {
             const rank = team.Rank || (index + 1);
             const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+            const displayTeamName = getTeamDisplayName(team.Team, 'MLS');
             html += '<tr style="' + rowStyle + '">';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #9ca3af;">' + rank + '</td>';
-            html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600;">' + (team.Points || 0) + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.MP || 0) + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.Wins || 0) + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.Draws || 0) + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + (team.Losses || 0) + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 10px; color: #9ca3af;">' + rank + '</td>';
+            html += '<td style="padding: 8px; text-align: left; font-size: 10px; font-weight: 500;">' + displayTeamName + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 10px; font-weight: 600;">' + (team.Points || 0) + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 10px;">' + (team.MP || 0) + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 10px;">' + (team.Wins || 0) + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 10px;">' + (team.Draws || 0) + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 10px;">' + (team.Losses || 0) + '</td>';
             html += '</tr>';
         });
         
@@ -17427,7 +17431,7 @@ const VIDEOS_CONFIG = {
             'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nfl.xml',
             'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-cbssportscfb.xml'
         ],
-        'MLS': 'https://rss-feed-service-124291936014.us-central1.run.app/youtube/playlist/PLcj4z4KsbIoVYKuevRiaE94KlwPuXqLHy.xml',
+        'MLS': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-mls.xml',
         'NBA': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nba.xml',
         'LaLiga': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-laliga.xml',
         'UFC': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-ufc.xml',
