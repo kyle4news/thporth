@@ -6243,6 +6243,16 @@ document.addEventListener('DOMContentLoaded', function () {
             return "Formula 1";
         }
         
+        // Special handling for UEFA Europa League - any league name containing "Europa League" becomes "UEFA Europa League"
+        if (name && (name.includes("Europa League") || name === "Europa League")) {
+            return "UEFA Europa League";
+        }
+        
+        // Special handling for UEFA Conference League - any league name containing "Conference League" becomes "UEFA Conference League"
+        if (name && (name.includes("Conference League") || name === "Conference League")) {
+            return "UEFA Conference League";
+        }
+        
         // Fuzzy logic matching for ATP Finals - check if name contains "Finals" AND "ATP" AND "(Singles)" or "(Doubles)"
         if (name && name.includes("Finals") && name.includes("ATP")) {
             if (name.includes("(Singles)")) {
@@ -7573,8 +7583,24 @@ document.addEventListener('DOMContentLoaded', function () {
             "Crvena zvezda": "Red Star",
             "Maccabi Tel Aviv": "M. Tel Aviv"
         },
+        "UEFA Europa League": {
+            "Din. Zagreb": "D. Zagreb",
+            "Crvena zvezda": "Red Star",
+            "Maccabi Tel Aviv": "M. Tel Aviv"
+        },
         // UEFA Conference League
         UEFAConferenceLeague: {
+            "Shakhtar Donetsk": "Shaktar D.",
+            "Sigma Olomouc": "S. Olomouc",
+            "Slovan Bratislava": "S. Bratislava",
+            "AEK Athens FC": "AEK Athens",
+            "Shamrock Rovers": "Shamrock",
+            "Rayo Vallecano": "R. Vallecano",
+            "Lincoln Red Imps": "L. Red Imps",
+            "Lausanne Sport": "Lausanne",
+            "Omonia": "Omonoia"
+        },
+        "UEFA Conference League": {
             "Shakhtar Donetsk": "Shaktar D.",
             "Sigma Olomouc": "S. Olomouc",
             "Slovan Bratislava": "S. Bratislava",
