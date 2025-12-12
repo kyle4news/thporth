@@ -5659,7 +5659,12 @@ document.addEventListener('DOMContentLoaded', function () {
         "Boxing": "https://box.live/fight-results",
         "USMNT": "https://www.fotmob.com/teams/6713/fixtures/usa",
         "AFC Asian Cup Qualifiers": "https://www.fotmob.com/leagues/10609/fixtures/asian-cup-qualification-playoff?group=by-round",
-        "NCAA Men's Hockey": "https://www.ncaa.com/scoreboard/icehockey-men/d1"
+        "NCAA Men's Hockey": "https://www.ncaa.com/scoreboard/icehockey-men/d1",
+        "EFL Championship": "https://www.fotmob.com/leagues/48/fixtures/championship",
+        "Belgian Pro League": "https://www.fotmob.com/leagues/40/fixtures/first-division",
+        "Super Lig": "https://www.fotmob.com/leagues/71/fixtures/super-lig",
+        "PGA Tour": "https://www.pgatour.com/leaderboard",
+        "LPGA Tour": "https://www.golflive24.com/lpga-tour/"
     };
 
     function normalizeNcaaTeamName(name) {
@@ -7102,7 +7107,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Caldwell College": "Caldwell",
             "Georgia Southern": "GA Southern",
             "EWU Phantoms": "East West U",
-            "SIU Edwardsville": "SIU-Edwardsv",
+            "SIU Edwardsville": "SIU-Edwardsville",
             "Siu Edwardsville": "SIU-E",
             "Mount St. Mary's": "Mt St Mary's",
             "St. Joseph's (Brooklyn)": "St. Joseph's",
@@ -7220,6 +7225,11 @@ document.addEventListener('DOMContentLoaded', function () {
             "Trinity College of Jacksonville": "Trinity (Jax)",
             "Saint John's (MN)": "St John's MN",
             "Alaska Anchorage": "AK-Anch",
+            "Queens University": "Queens",
+            "Gardner-Webb": "Gard-Webb",
+            "Dallas Christian": "Dallas Christ",
+            "Texas A&M-Corpus Christi": "TX A&M-CC",
+            "Dakota Wesleyan": "Dak Wesley",
             "Western Kentucky": "W Kentucky",
             "Morehead State": "Morehead St",
             "Kennesaw State": "Ken'saw St",
@@ -7235,7 +7245,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Alabama State": "Ala St",
             "CSU Bakersfield": "CSU-B'field",
             "Eastern Oregon": "E Oregon",
-            "Stephen F. Austin": "SF Austin",
+            "Stephen F. Austin": "S.F. Austin",
             "UCF Knights": "UCF",
             "Illinois (Chi.)": "UIC",
             "Illinois State": "Illinois St",
@@ -7259,6 +7269,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Northern Illinois": "N Illinois",
             "SMU Mustangs": "SMU",
             "SMU": "SMU",
+            "Vermont State - Johnson": "VT St-Johnson",
             "VTSU Johnson": "VTSU-Johns.",
             "University of Puget Sound": "Puget Sound",
             "Puget Sound": "Puget Sound",
@@ -7375,7 +7386,19 @@ document.addEventListener('DOMContentLoaded', function () {
             "St. Mary's (TX)": "St Mary's TX",
             "Trinity College of Jacksonville": "Trinity (Jax)",
             "Saint John's (MN)": "St John's MN",
-            "Alaska Anchorage": "AK-Anch"
+            "Alaska Anchorage": "AK-Anch",
+            "Stephen F. Austin": "S.F. Austin",
+            "Montana State": "Montana St",
+            "Florida Gulf Coast": "FGCU",
+            "Coastal Georgia": "Coastal GA",
+            "Georgia Southern": "GA Southern",
+            "Vermont State - Johnson": "VT St-Johnson",
+            "Queens University": "Queens",
+            "Gardner-Webb": "Gard-Webb",
+            "Dallas Christian": "Dallas Christ",
+            "Texas A&M-Corpus Christi": "TX A&M-CC",
+            "Dakota Wesleyan": "Dak Wesley",
+            "SIU Edwardsville": "SIU-Edwardsville"
         },
         // NCAAW
         NCAAW: {
@@ -7556,7 +7579,18 @@ document.addEventListener('DOMContentLoaded', function () {
             "Southern Wesleyan": "S Wesleyan",
             "Texas Southern": "TX Southern",
             "Southern Indiana": "So Indiana",
-            "Stephen F. Austin": "SF Austin",
+            "Stephen F. Austin": "S.F. Austin",
+            "Montana State": "Montana St",
+            "Florida Gulf Coast": "FGCU",
+            "Coastal Georgia": "Coastal GA",
+            "Georgia Southern": "GA Southern",
+            "Vermont State - Johnson": "VT St-Johnson",
+            "Queens University": "Queens",
+            "Gardner-Webb": "Gard-Webb",
+            "Dallas Christian": "Dallas Christ",
+            "Texas A&M-Corpus Christi": "TX A&M-CC",
+            "Dakota Wesleyan": "Dak Wesley",
+            "SIU Edwardsville": "SIU-Edwardsville",
             "Stonehill Skyhawks": "Stonehill",
             "Texas State Bobcats": "TX State",
             "Tulane Green Wave": "Tulane",
@@ -8308,7 +8342,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         titleContent.appendChild(logo);
                 } else if (leagueNameKey === "Super Lig") {
                     const logo = document.createElement("img");
-                    logo.src = "Super lig.png";
+                    logo.src = "https://thporth.com/Super%20lig.png";
                     logo.alt = "Super Lig Logo";
                         logo.width = 14;
                         logo.height = 14;
@@ -9178,7 +9212,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     titleContent.appendChild(logo);
                 } else if (leagueNameKey === "EFL Championship") {
                     const logo = document.createElement("img");
-                    logo.src = "EFL Championship.png";
+                    logo.src = "https://thporth.com/EFL%20Championship.png";
                     logo.alt = "EFL Championship Logo";
                         logo.width = 14;
                         logo.height = 14;
