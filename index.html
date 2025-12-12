@@ -4280,19 +4280,18 @@ function loadCustomRSSFeed(feedUrl, container) {
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-        // --- GRAB ELEMENTS FOR COLUMN SWITCHING ---
-        const gamesColumn = document.getElementById('games-column');
-        const leagueSpecificColumn = document.getElementById('league-specific-column');
-        const f1Content = document.getElementById('f1-column-content');
-        const gamesContent = document.getElementById('tv-listings-container');
-        
-
         // --- NEW: FALLBACK URLs FOR THE HOME PAGE ---
         const HOME_PAGE_FEEDS = {
             breaking: "https://rss-feed-service-124291936014.us-central1.run.app/feeds/home-breaking.xml",
             fantasy: "https://fantasynews.cbssports.com/rss/headlines/",
             transactions: "https://www.espn.com/espn/rss/mlb/news"
         };
+
+        // --- GRAB ELEMENTS FOR COLUMN SWITCHING ---
+        const gamesColumn = document.getElementById('games-column');
+        const leagueSpecificColumn = document.getElementById('league-specific-column');
+        const f1Content = document.getElementById('f1-column-content');
+        const gamesContent = document.getElementById('tv-listings-container');
 
         // Helper function to fetch and render an XML feed
         function fetchFeed(containerSelector, feedUrl) {
@@ -4338,6 +4337,13 @@ function loadCustomRSSFeed(feedUrl, container) {
                     console.error("Error loading feed:", error);
                     container.innerHTML = "<p style='padding: 10px; color: #ef4444;'>Error loading feed.</p>";
                 });
+        }
+
+        // --- Load Breaking feed IMMEDIATELY (before other initialization) ---
+        const breakingFeedContainer = document.getElementById('breaking-feed');
+        const breakingFeedUrl = HOME_PAGE_FEEDS.breaking;
+        if (breakingFeedContainer && breakingFeedUrl) {
+            fetchFeed('#breaking-feed', breakingFeedUrl);
         }
 
         // --- Initial Feed Loads for Home Page (Headlines) ---
@@ -4574,8 +4580,8 @@ function loadCustomRSSFeed(feedUrl, container) {
             section.style.display = expanded ? "none" : "block";
             toggle.textContent = expanded ? "More…" : "Less…";
         };
-
-        // --- Initial Load on Page Start ---
+        
+        // Also click the tab to ensure UI state is correct
         const homeBreakingTab = document.querySelector('#news-Home .news-tab[data-tab="breaking"]');
         if (homeBreakingTab) {
             homeBreakingTab.click();
@@ -4751,70 +4757,6 @@ function loadCustomRSSFeed(feedUrl, container) {
   });
 </script>
 
-	  <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const breakingContainer = document.getElementById("breaking-feed");
-    if (!breakingContainer) return;
-
-    breakingContainer.addEventListener("click", async (evt) => {
-      // Only proceed if a link (<a>) was clicked inside #breaking-feed
-      const anchor = evt.target.closest("a");
-      if (!anchor || !breakingContainer.contains(anchor)) return;
-      evt.preventDefault();
-
-      const newsNowUrl = anchor.href;
-      try {
-        // 1) Fetch the NewsNow page HTML
-        const resp = await fetch(newsNowUrl, { redirect: "follow" });
-        const html = await resp.text();
-        const doc = new DOMParser().parseFromString(html, "text/html");
-
-        // 2) Look for a <meta http-equiv="refresh"> redirect
-        const metaRefresh = doc.querySelector('meta[http-equiv="refresh"]');
-        if (metaRefresh) {
-          const content = metaRefresh.getAttribute("content") || "";
-          // "content" is often like "0; URL=https://…"
-          const match = content.match(/URL=(.*)/i);
-          if (match && match[1]) {
-            window.open(match[1], "_blank");
-            return;
-          }
-        }
-
-        // 3) Fallback: check for <link rel="canonical">
-        const linkCanonical = doc.querySelector('link[rel="canonical"]');
-        if (linkCanonical && linkCanonical.href) {
-          window.open(linkCanonical.href, "_blank");
-          return;
-        }
-
-        // 4) Fallback: inspect any <script> blocks for a JS redirect
-        const scripts = Array.from(doc.querySelectorAll("script"));
-        for (const s of scripts) {
-          const txt = s.textContent || "";
-          // look for window.location.href = "…";
-          let m = txt.match(/window\.location\.href\s*=\s*['"](.*?)['"]/);
-          if (m && m[1]) {
-            window.open(m[1], "_blank");
-            return;
-          }
-          // look for location.replace("…");
-          m = txt.match(/location\.replace\s*\(\s*['"](.*?)['"]/);
-          if (m && m[1]) {
-            window.open(m[1], "_blank");
-            return;
-          }
-        }
-
-        // 5) If none of the above, just open the NewsNow URL as a last resort
-        window.open(newsNowUrl, "_blank");
-      } catch (err) {
-        // On fetch/parse error, open the original link
-        window.open(newsNowUrl, "_blank");
-      }
-    });
-  });
-</script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     
@@ -6667,9 +6609,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "Sheffield Utd": "Sheffield Utd",
             "Birmingham City": "B'ham City",
             "B'ham City": "B'ham City",
-            "West Bromwich Albion": "WBA",
-            "WBA": "WBA",
-            "West Brom": "WBA"
+            "West Bromwich Albion": "West Brom",
         },
         // Bundesliga
         Bundesliga: {
