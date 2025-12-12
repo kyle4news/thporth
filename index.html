@@ -3583,7 +3583,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             font-size: 10px; display: flex; align-items: center;
             padding-left: 1px; z-index: 11; border-bottom: 1px solid #1f1f1f;
           ">
-          <strong>Videos</strong>
+          <strong>Media</strong>
         </div>
 
             <!-- Videos tabs (only shown for pages with two tabs) -->
@@ -3625,7 +3625,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <button class="mobile-toolbar-btn active" id="mobile-news-btn">News</button>
         <button class="mobile-toolbar-btn" id="mobile-social-btn">Social</button>
         <button class="mobile-toolbar-btn" id="mobile-games-btn">Games</button>
-        <button class="mobile-toolbar-btn" id="mobile-videos-btn">Videos</button>
+        <button class="mobile-toolbar-btn" id="mobile-videos-btn">Media</button>
     </div>
 
     <!-- Mobile Menu Overlay (hidden on desktop) -->
@@ -5617,7 +5617,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'LPGA Tour', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "LPGA Tour", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership","Scottish Cup", "Eredivisie", "AFC Elite", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Super Lig", "Scottish Premiership", "Eredivisie", "AFC Elite", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         NFL: "https://www.nfl.com/scores",
@@ -8580,10 +8580,40 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     titleContent.appendChild(logo);
+                } else if (leagueNameKey === "DP World Tour") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/IJIc07kD-dGGneQe0.png";
+                    logo.alt = "DP World Tour Logo";
+                        logo.width = 14;
+                        logo.height = 14;
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
                 } else if (leagueNameKey === "LPGA Tour") {
                     const logo = document.createElement("img");
                     logo.src = "https://thporth.com/LPGATour.png";
                     logo.alt = "LPGA Tour Logo";
+                        logo.width = 14;
+                        logo.height = 14;
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
+                } else if (leagueNameKey === "PGA Champions") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/f/fe/PGA_Tour_Champions_logo.svg/500px-PGA_Tour_Champions_logo.svg.png";
+                    logo.alt = "PGA Champions Logo";
                         logo.width = 14;
                         logo.height = 14;
                     logo.style.width = "14px";
@@ -9287,7 +9317,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     titleContent.appendChild(logo);
                 } else if (leagueNameKey === "Scottish Cup") {
                     const logo = document.createElement("img");
-                    logo.src = "png-ScottishCup.png";
+                    logo.src = "https://static.flashscore.com/res/image/data/zwdJzFld-dCI2lleA.png";
                     logo.alt = "Scottish Cup Logo";
                         logo.width = 14;
                         logo.height = 14;
@@ -11019,7 +11049,9 @@ document.addEventListener('DOMContentLoaded', function () {
             'FormulaOne': 'Formula One',
             'FACup': 'FA Cup',
             'PGATour': 'PGA Tour',
+            'DPWorldTour': 'DP World Tour',
             'LPGATour': 'LPGA Tour',
+            'PGATourChampions': 'PGA Champions',
             'UFC': 'UFC',
             'Boxing': 'Boxing',
             'NASCARCupSeries': 'NASCAR Cup Series',
