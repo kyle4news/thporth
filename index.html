@@ -1053,11 +1053,13 @@ table.game-table td:nth-child(1) {
 .ligamx-headlines-section,
 .uefaeuropaleague-headlines-section,
 .uefaconferenceleague-headlines-section,
+.uefachampionsleague-headlines-section,
 .livgolf-headlines-section,
 .indycar-headlines-section,
 .lpgatour-headlines-section,
 .trackandfield-headlines-section,
-#news-MotoGP .headlines-section {
+#news-MotoGP .headlines-section,
+#news-UEFAChampionsLeague .headlines-section {
     flex: 1 1 auto !important;
     max-height: 100% !important;
     border-bottom: none !important;
@@ -1068,11 +1070,13 @@ table.game-table td:nth-child(1) {
 .ligamx-headlines-section .news-feed-content,
 .uefaeuropaleague-headlines-section .news-feed-content,
 .uefaconferenceleague-headlines-section .news-feed-content,
+.uefachampionsleague-headlines-section .news-feed-content,
 .livgolf-headlines-section .news-feed-content,
 .indycar-headlines-section .news-feed-content,
 .lpgatour-headlines-section .news-feed-content,
 .trackandfield-headlines-section .news-feed-content,
-#news-MotoGP .headlines-section .news-feed-content {
+#news-MotoGP .headlines-section .news-feed-content,
+#news-UEFAChampionsLeague .headlines-section .news-feed-content {
     flex: 1 1 auto !important;
     overflow-y: auto !important;
     padding: 0 !important;
@@ -2851,7 +2855,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/espn-nba-rss.xml">ESPN</div>
                     <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/cbs-nba-rss.xml">CBS Sports</div>
                     <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/yahoo-nba-rss.xml">Yahoo</div>
-                    <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/nba-com-news.xml">NBA.com</div>
+                    <div class="headlines-tab" data-url="https://rss.app/feeds/pXNlalfRqrlyVml6.xml">NBA.com</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/foxsports-nba-api.xml">FOX Sports</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/reddit-nba.xml">Reddit</div>
 					<!-- <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/si-nba.xml">SI</div> -->
@@ -2959,27 +2963,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 </div>
 
-<div id="news-UEFAChampionsLeague" class="content-section" style="display: none; height: calc(100% - 18px);">
-    <div class="news-main-container" style="display: flex; flex-direction: column; height: 100%;">
-        <div class="news-section headlines-section" style="flex: 1 1 auto; min-height: 0;">
-            <div class="news-section-header">Headlines</div>
-            <div style="display: flex; height: calc(100% - 18px);">
-                <div id="headlines-tabs-UEFAChampionsLeague" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/yB1knLblnebjjIez.xml">Google News</div>
-					<div class="headlines-tab active" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/si-championsleague.xml">SI</div>
-                    <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/athletic-championsleague.xml">The Athletic</div>
-					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/reddit-championsleague.xml">Reddit</div>
-                </div>
-                <div id="headlines-content-UEFAChampionsLeague" class="news-feed-content" style="width: 80%; overflow-y: auto;"></div>
-            </div>
-        </div>
-        <div class="news-section breaking-section" style="flex: 1 1 40%; min-height: 0;">
-            <div class="news-section-header breaking-tabs-header">
-                <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-championsleague.xml">Breaking</span>
-            </div>
-            <div class="news-content-pane" id="breaking-content-UEFAChampionsLeague" style="display: block;"></div>
-        </div>
+<div id="news-UEFAChampionsLeague" class="content-section" style="display:none; height:100%; overflow:hidden;">
+  <div class="news-main-container" style="display:flex; flex-direction:column; height:100%; min-height:0;">
+    <div class="news-section uefachampionsleague-headlines-section" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0;">
+      <div class="news-feed-content" id="headlines-feed-UEFAChampionsLeague" style="display:block; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
     </div>
+  </div>
 </div>
 
 <div id="news-PremierLeague" class="content-section" style="display: none; height: calc(100% - 18px);">
@@ -2994,7 +2983,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/skysports-premierleague.xml">Sky</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/bbc-premierleague.xml">BBC</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/footballtalk-premierleague.xml">Football Talk</div>
-					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/sportingnews-premierleague.xml">Sporting News</div>
+					<!-- <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/sportingnews-premierleague.xml">Sporting News</div> -->
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/daily-mail-premierleague.xml">Daily Mail</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/talksport-premierleague.xml">talkSPORT</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/sportbible-premierleague.xml">SPORTbible</div>
@@ -3019,8 +3008,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-MLS" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
                     <div class="headlines-tab active" data-url="https://rss.app/feeds/XgOB7BUJbxy6FsjC.xml">MLSSoccer.com</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/rAadgaUcXJa3grIV.xml">Google News</div>
-                    <div class="headlines-tab" data-url="https://rss.app/feeds/liWpcUXYMINvUeWS.xml">FLM</div>
+                    <div class="headlines-tab" data-url="https://rss.app/feeds/Vm7I9MyjMh4OSzGQ.xml">Google News</div>
+                    <div class="headlines-tab" data-url="https://rss.app/feeds/oBHEA0YkjVDtsGqd.xml">FLM</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/reddit-mls.xml">Reddit</div>
                     
                 </div>
@@ -3130,7 +3119,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="news-section" style="flex: 1 1 auto; min-height: 0;">
             <div id="news-content-FACup" class="news-feed-content" style="overflow-y: auto; height: 100%;">
                 <div class="news-section-header">
-                    <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-facup.xml">Breaking</span>
+                    <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/bundle/facup-news.xml">News</span>
                 </div>
                 <div class="news-content-pane" id="breaking-content-FACup" style="display: block;"></div>
                 </div>
@@ -3143,12 +3132,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="news-section nwsl-headlines-section" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0;">
       <div id="nwsltabs-NWSL" class="headlines-tabs" style="display:flex; border-bottom:1px solid #374151; flex:0 0 auto;">
         <div class="headlines-tab active" data-source="headlines" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-nwsl.xml">Headlines</div>
-        <div class="headlines-tab" data-source="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-nwsl.xml">Breaking</div>
         <div class="headlines-tab" data-source="reddit" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/reddit-nwsl.xml">Reddit</div>
       </div>
 
       <div class="news-feed-content" id="headlines-feed-NWSL" style="display:block; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
-      <div class="news-feed-content" id="breaking-feed-NWSL" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
       <div class="news-feed-content" id="reddit-feed-NWSL" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
     </div>
   </div>
@@ -3455,7 +3442,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-NCAAM" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab active" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-ncaabasketball.xml">Headlines</div>
+                    <div class="headlines-tab active" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/ncaa-com-ncaam.xml">NCAA</div>
                     <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/espn-ncb-rss.xml">ESPN</div>
                     <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/cbs-ncaam-rss.xml">CBS Sports</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/reddit-collegebasketball.xml">Reddit</div>
@@ -3477,7 +3464,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="news-section" style="flex: 1 1 auto; min-height: 0;"> 
             <div id="news-content-NCAAW" class="news-feed-content" style="overflow-y: auto; height: 100%;"> 
                 <div class="news-section-header"> 
-                    <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-ncaaw.xml">Headlines</span>
+                    <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/ncaa-com-ncaaw.xml">News</span>
                     <span class="news-tab" data-tab="reddit" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/reddit-ncaaw.xml">Reddit</span>
                 </div> 
                 <div class="news-content-pane" id="breaking-content-NCAAW" style="display: block;"></div>
@@ -3534,12 +3521,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="news-LPGATour" class="content-section" style="display:none; height:100%; overflow:hidden;">
   <div class="news-main-container" style="display:flex; flex-direction:column; height:100%; min-height:0;">
     <div class="news-section lpgatour-headlines-section" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0;">
-      <div id="lpgatourtabs-LPGATour" class="headlines-tabs" style="display:flex; border-bottom:1px solid #374151; flex:0 0 auto;">
+      <!-- <div id="lpgatourtabs-LPGATour" class="headlines-tabs" style="display:flex; border-bottom:1px solid #374151; flex:0 0 auto;">
         <div class="headlines-tab active" data-source="headlines" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-lpga.xml">Headlines</div>
         <div class="headlines-tab" data-source="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-lpga.xml">Breaking</div>
-      </div>
+      </div> -->
       <div class="news-feed-content" id="headlines-feed-LPGATour" style="display:block; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
-      <div class="news-feed-content" id="breaking-feed-LPGATour" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
+      <!-- <div class="news-feed-content" id="breaking-feed-LPGATour" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div> -->
     </div>
   </div>
 </div>
@@ -16773,8 +16760,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const nwsltabs = document.getElementById('nwsltabs-NWSL');
 
   const feedMapNWSL = {
-    headlines: "https://rss.app/feeds/tnA7WHOi3hNDP2Wr.xml",
-	breaking: "https://rss.app/feeds/PE7NGL6ftSREkzv9.xml",
+    headlines: "https://rss.app/feeds/zL71BDnU9LO5QpOP.xml",
     reddit: "https://rss.app/feeds/HL9rA42ELIkqWXJg.xml"
   };
 
@@ -17141,6 +17127,74 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // UEFA Champions League - Direct bundle feed load (no tabs)
+  let uefaChampionsLeagueFeedLoaded = false;
+  
+  function fetchFeedUEFAChampionsLeague(url, contentPaneId) {
+    const contentPane = document.getElementById(contentPaneId);
+    if (!contentPane) return;
+    if (uefaChampionsLeagueFeedLoaded && contentPane.innerHTML && !contentPane.innerHTML.includes('Loading')) return;
+    
+    contentPane.innerHTML = '<p>Loading...</p>';
+
+    fetch(url)
+      .then(r => r.text())
+      .then(str => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(str, "text/xml");
+        const items = xmlDoc.querySelectorAll("item");
+        let html = '<ul>';
+        items.forEach(el => {
+          const title = el.querySelector("title")?.textContent || 'No title';
+          const link = el.querySelector("link")?.textContent || '#';
+          html += `
+            <li>
+              <a href="${link}" target="_blank">
+                ${title}
+              </a>
+            </li>`;
+        });
+        html += '</ul>';
+        contentPane.innerHTML = html;
+        uefaChampionsLeagueFeedLoaded = true;
+      })
+      .catch(err => {
+        console.error("Error fetching RSS feed:", err);
+        contentPane.innerHTML = `<p>Failed to load news. Please try again later.</p>`;
+      });
+  }
+
+  // Load feed when section is shown
+  const uefaChampionsLeagueSection = document.getElementById('news-UEFAChampionsLeague');
+  if (uefaChampionsLeagueSection) {
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          if (uefaChampionsLeagueSection.style.display !== 'none' && !uefaChampionsLeagueFeedLoaded) {
+            const feedUrl = 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/bundle/uefa-championsleague-news.xml';
+            fetchFeedUEFAChampionsLeague(feedUrl, 'headlines-feed-UEFAChampionsLeague');
+          }
+        }
+      });
+    });
+    observer.observe(uefaChampionsLeagueSection, { attributes: true, attributeFilter: ['style'] });
+    
+    // Also check on section click events
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-section="UEFAChampionsLeague"]')) {
+        setTimeout(() => {
+          if (uefaChampionsLeagueSection.style.display !== 'none' && !uefaChampionsLeagueFeedLoaded) {
+            const feedUrl = 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/bundle/uefa-championsleague-news.xml';
+            fetchFeedUEFAChampionsLeague(feedUrl, 'headlines-feed-UEFAChampionsLeague');
+          }
+        }, 100);
+      }
+    });
+  }
+});
+</script>
 
 		<script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -17297,22 +17351,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		<script>
 document.addEventListener('DOMContentLoaded', function() {
-  const lpgatourtabs = document.getElementById('lpgatourtabs-LPGATour');
-
-  const feedMapLPGATour = {
-    headlines: "https://rss.app/feeds/tqz9SwQPuclR1mSF.xml",
-    breaking: "https://rss.app/feeds/0afVGov5MVxxBF7B.xml"
-  };
+  let lpgatourFeedLoaded = false;
 
   function fetchFeedLPGATour(url, contentPaneId) {
     const contentPane = document.getElementById(contentPaneId);
     if (!contentPane) return;
+    if (lpgatourFeedLoaded && contentPane.innerHTML && !contentPane.innerHTML.includes('Loading')) return;
+    
     contentPane.innerHTML = '<p>Loading...</p>';
 
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const finalUrl = proxyUrl + encodeURIComponent(url);
-
-    fetch(finalUrl)
+    fetch(url)
       .then(r => r.text())
       .then(str => {
         const parser = new DOMParser();
@@ -17331,6 +17379,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         html += '</ul>';
         contentPane.innerHTML = html;
+        lpgatourFeedLoaded = true;
       })
       .catch(err => {
         console.error("Error fetching RSS feed:", err);
@@ -17338,35 +17387,31 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
 
-  if (lpgatourtabs) {
-    lpgatourtabs.addEventListener('click', function(e) {
-      if (e.target.classList.contains('headlines-tab')) {
-        document.querySelectorAll('#news-LPGATour .news-feed-content')
-          .forEach(p => p.style.display = 'none');
-        document.querySelectorAll('#lpgatourtabs-LPGATour .headlines-tab')
-          .forEach(t => t.classList.remove('active'));
-
-        const source = e.target.dataset.source;
-        const targetPaneId = `${source}-feed-LPGATour`;
-        const targetPane = document.getElementById(targetPaneId);
-        if (targetPane) {
-          targetPane.style.display = 'block';
-          e.target.classList.add('active');
+  const lpgatourSection = document.getElementById('news-LPGATour');
+  if (lpgatourSection) {
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          if (lpgatourSection.style.display !== 'none' && !lpgatourFeedLoaded) {
+            const feedUrl = 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-lpga.xml';
+            fetchFeedLPGATour(feedUrl, 'headlines-feed-LPGATour');
+          }
         }
-        const url = e.target.dataset.url;
-        if (url) {
-          fetchFeedLPGATour(url, targetPaneId);
-        }
+      });
+    });
+    observer.observe(lpgatourSection, { attributes: true, attributeFilter: ['style'] });
+    
+    // Also check on section click events
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-section="LPGATour"]')) {
+        setTimeout(() => {
+          if (lpgatourSection.style.display !== 'none' && !lpgatourFeedLoaded) {
+            const feedUrl = 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-lpga.xml';
+            fetchFeedLPGATour(feedUrl, 'headlines-feed-LPGATour');
+          }
+        }, 100);
       }
     });
-
-    const initialActiveTab = document.querySelector('#lpgatourtabs-LPGATour .headlines-tab.active');
-    if (initialActiveTab) {
-      const source = initialActiveTab.dataset.source;
-      const targetPaneId = `${source}-feed-LPGATour`;
-      const url = initialActiveTab.dataset.url;
-      fetchFeedLPGATour(url, targetPaneId);
-    }
   }
 });
 </script>
