@@ -2577,12 +2577,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       
       <!-- Main Tabs: Schedule | Standings -->
       <div id="f1-main-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0; gap: 2px; margin-top: 2px;">
-          <div class="f1-main-tab active" data-f1-main-tab="schedule" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #fff; color: #000; font-weight: bold;">SCHEDULE</div>
-          <div class="f1-main-tab" data-f1-main-tab="standings" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">STANDINGS</div>
+          <div class="f1-main-tab" data-f1-main-tab="schedule" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">SCHEDULE</div>
+          <div class="f1-main-tab active" data-f1-main-tab="standings" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #fff; color: #000; font-weight: bold;">STANDINGS</div>
       </div>
   
-      <!-- Schedule Tab Content (active by default) -->
-      <div id="f1-schedule-tab-content" class="f1-main-tab-content" style="display: block; height: calc(100% - 36px); flex-direction: column;">
+      <!-- Schedule Tab Content -->
+      <div id="f1-schedule-tab-content" class="f1-main-tab-content" style="display: none; height: calc(100% - 36px); flex-direction: column;">
           <!-- Schedule Sub-Tabs (Yesterday, Today, Upcoming) -->
           <div id="f1-schedule-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-top: 2px; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%; gap: 2px;">
               <!-- <div class="f1-schedule-tab" data-f1-schedule-tab="yesterday" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Yesterday</div> -->
@@ -2606,8 +2606,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
       </div>
   
-      <!-- Standings Tab Content -->
-      <div id="f1-standings-tab-content" class="f1-main-tab-content" style="display: none; height: calc(100% - 36px); flex-direction: column;">
+      <!-- Standings Tab Content (active by default) -->
+      <div id="f1-standings-tab-content" class="f1-main-tab-content" style="display: block; height: calc(100% - 36px); flex-direction: column;">
           <!-- Standings Sub-Tabs (Driver, Constructor) -->
           <div id="f1-standings-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-top: 2px; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%; gap: 2px;">
               <div class="f1-standings-tab active" data-f1-standings-tab="driver" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Driver</div>
@@ -2967,8 +2967,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="news-main-container" style="display:flex; flex-direction:column; height:100%; min-height:0;">
     <div class="news-section uefachampionsleague-headlines-section" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0;">
       <div class="news-feed-content" id="headlines-feed-UEFAChampionsLeague" style="display:block; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
+        </div>
     </div>
-  </div>
 </div>
 
 <div id="news-PremierLeague" class="content-section" style="display: none; height: calc(100% - 18px);">
@@ -3144,15 +3144,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="news-Ligue1" class="content-section" style="display:none; height:100%; overflow:hidden;">
   <div class="news-main-container" style="display:flex; flex-direction:column; height:100%; min-height:0;">
     <div class="news-section ligue1-headlines-section" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0;">
-      <div id="ligue1tabs-Ligue1" class="headlines-tabs" style="display:flex; border-bottom:1px solid #374151; flex:0 0 auto;">
-        <div class="headlines-tab active" data-source="headlines" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-ligue1.xml">Headlines</div>
-        <div class="headlines-tab" data-source="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-ligue1.xml">Breaking</div>
-        <div class="headlines-tab" data-source="reddit" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/reddit-ligue1.xml">Reddit</div>
-      </div>
-
       <div class="news-feed-content" id="headlines-feed-Ligue1" style="display:block; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
-      <div class="news-feed-content" id="breaking-feed-Ligue1" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
-      <div class="news-feed-content" id="reddit-feed-Ligue1" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
     </div>
   </div>
 </div>
@@ -3411,11 +3403,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="news-section livgolf-headlines-section" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0;">
       <div id="livgolftabs-LIVGolf" class="headlines-tabs" style="display:flex; border-bottom:1px solid #374151; flex:0 0 auto;">
         <div class="headlines-tab active" data-source="headlines" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-livgolf.xml">Headlines</div>
-        <div class="headlines-tab" data-source="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-livgolf.xml">Breaking</div>
         <div class="headlines-tab" data-source="reddit" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/reddit-livgolf.xml">Reddit</div>
       </div>
       <div class="news-feed-content" id="headlines-feed-LIVGolf" style="display:block; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
-      <div class="news-feed-content" id="breaking-feed-LIVGolf" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
       <div class="news-feed-content" id="reddit-feed-LIVGolf" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
     </div>
   </div>
@@ -3426,11 +3416,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="news-section indycar-headlines-section" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0;">
       <div id="indycarrtabs-IndyCar" class="headlines-tabs" style="display:flex; border-bottom:1px solid #374151; flex:0 0 auto;">
         <div class="headlines-tab active" data-source="headlines" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-indycar.xml">Headlines</div>
-        <div class="headlines-tab" data-source="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-indycar.xml">Breaking</div>
         <div class="headlines-tab" data-source="reddit" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/reddit-indycar.xml">Reddit</div>
       </div>
       <div class="news-feed-content" id="headlines-feed-IndyCar" style="display:block; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
-      <div class="news-feed-content" id="breaking-feed-IndyCar" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
       <div class="news-feed-content" id="reddit-feed-IndyCar" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
     </div>
   </div>
@@ -4582,7 +4570,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             section.style.display = expanded ? "none" : "block";
             toggle.textContent = expanded ? "More…" : "Less…";
         };
-        
+
         // Also click the tab to ensure UI state is correct
         const homeBreakingTab = document.querySelector('#news-Home .news-tab[data-tab="breaking"]');
         if (homeBreakingTab) {
@@ -9908,13 +9896,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         // Main item: white text (normal), shows time
                         // Only apply gray if no channel (old behavior for backward compatibility)
-                        if (!channelDisplay || channelDisplay.trim() === '') {
-                            // Only apply gray color if there's no existing color set (not a final game with losing team color)
-                            if (!homeColor) {
-                                homeColor = 'color: #C0C0C0;';
-                            }
-                            if (!awayColor) {
-                                awayColor = 'color: #C0C0C0;';
+                    if (!channelDisplay || channelDisplay.trim() === '') {
+                        // Only apply gray color if there's no existing color set (not a final game with losing team color)
+                        if (!homeColor) {
+                            homeColor = 'color: #C0C0C0;';
+                        }
+                        if (!awayColor) {
+                            awayColor = 'color: #C0C0C0;';
                             }
                         }
                     }
@@ -11604,11 +11592,8 @@ document.addEventListener('DOMContentLoaded', function () {
         return html;
     }
 
-    // WNBA Standings: Conference headers (no tabs)
+    // WNBA Standings: Hardcoded data
     function createWNBAStandings(teams) {
-        const eastTeams = teams.filter(team => team.Conference === 'Eastern Conference');
-        const westTeams = teams.filter(team => team.Conference === 'Western Conference');
-        
         let html = '<div class="wnba-standings">';
         html += '<div class="conference-section">';
         html += '<h3 class="conference-header">Eastern Conference</h3>';
@@ -11623,10 +11608,19 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '</thead>';
         html += '<tbody>';
         
+        const eastTeams = [
+            { Rank: 3, Team: 'Dream', Wins: 30, Losses: 14 },
+            { Rank: 5, Team: 'Liberty', Wins: 27, Losses: 17 },
+            { Rank: 6, Team: 'Fever', Wins: 24, Losses: 20 },
+            { Rank: 10, Team: 'Mystics', Wins: 16, Losses: 28 },
+            { Rank: 11, Team: 'Sun', Wins: 11, Losses: 33 },
+            { Rank: 12, Team: 'Sky', Wins: 10, Losses: 34 }
+        ];
+        
         eastTeams.forEach((team, index) => {
             const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
             html += '<tr style="' + rowStyle + '">';
-            html += '<td style="padding: 8px; text-align: left; font-size: 12px;">' + (team.Rank || '') + '</td>';
+            html += '<td style="padding: 8px; text-align: left; font-size: 12px;">' + team.Rank + '</td>';
             html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
             html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
             html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
@@ -11649,10 +11643,20 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '</thead>';
         html += '<tbody>';
         
+        const westTeams = [
+            { Rank: 1, Team: 'Lynx', Wins: 34, Losses: 10 },
+            { Rank: 2, Team: 'Aces', Wins: 30, Losses: 14 },
+            { Rank: 4, Team: 'Mercury', Wins: 27, Losses: 17 },
+            { Rank: 7, Team: 'Storm', Wins: 23, Losses: 21 },
+            { Rank: 8, Team: 'Valkyries', Wins: 23, Losses: 21 },
+            { Rank: 9, Team: 'Sparks', Wins: 21, Losses: 23 },
+            { Rank: 13, Team: 'Wings', Wins: 10, Losses: 34 }
+        ];
+        
         westTeams.forEach((team, index) => {
             const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
             html += '<tr style="' + rowStyle + '">';
-            html += '<td style="padding: 8px; text-align: left; font-size: 12px;">' + (team.Rank || '') + '</td>';
+            html += '<td style="padding: 8px; text-align: left; font-size: 12px;">' + team.Rank + '</td>';
             html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">' + team.Team + '</td>';
             html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Wins + '</td>';
             html += '<td style="padding: 8px; text-align: center; font-size: 12px;">' + team.Losses + '</td>';
@@ -16832,23 +16836,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const ligue1tabs = document.getElementById('ligue1tabs-Ligue1');
-
-  const feedMapLigue1 = {
-    headlines: "https://rss.app/feeds/tbxA99undrBg8j4I.xml",
-    breaking: "https://rss.app/feeds/AdN94t2aMmFNKpiW.xml",
-    reddit: "https://rss.app/feeds/UNtqy55sZPAGDxWp.xml"
-  };
-
+  // Ligue 1 - Direct feed load (no tabs)
+  let ligue1FeedLoaded = false;
+  
   function fetchFeedLigue1(url, contentPaneId) {
     const contentPane = document.getElementById(contentPaneId);
     if (!contentPane) return;
+    if (ligue1FeedLoaded && contentPane.innerHTML && !contentPane.innerHTML.includes('Loading')) return;
+    
     contentPane.innerHTML = '<p>Loading...</p>';
 
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const finalUrl = proxyUrl + encodeURIComponent(url);
-
-    fetch(finalUrl)
+    fetch(url)
       .then(r => r.text())
       .then(str => {
         const parser = new DOMParser();
@@ -16867,6 +16865,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         html += '</ul>';
         contentPane.innerHTML = html;
+        ligue1FeedLoaded = true;
       })
       .catch(err => {
         console.error("Error fetching RSS feed:", err);
@@ -16874,35 +16873,32 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
 
-  if (ligue1tabs) {
-    ligue1tabs.addEventListener('click', function(e) {
-      if (e.target.classList.contains('headlines-tab')) {
-        document.querySelectorAll('#news-Ligue1 .news-feed-content')
-          .forEach(p => p.style.display = 'none');
-        document.querySelectorAll('#ligue1tabs-Ligue1 .headlines-tab')
-          .forEach(t => t.classList.remove('active'));
-
-        const source = e.target.dataset.source;
-        const targetPaneId = `${source}-feed-Ligue1`;
-        const targetPane = document.getElementById(targetPaneId);
-        if (targetPane) {
-          targetPane.style.display = 'block';
-          e.target.classList.add('active');
+  // Load feed when section is shown
+  const ligue1Section = document.getElementById('news-Ligue1');
+  if (ligue1Section) {
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          if (ligue1Section.style.display !== 'none' && !ligue1FeedLoaded) {
+            const feedUrl = 'https://rss.app/feeds/tct5GyDJwZIxACdb.xml';
+            fetchFeedLigue1(feedUrl, 'headlines-feed-Ligue1');
+          }
         }
-        const url = e.target.dataset.url;
-        if (url) {
-          fetchFeedLigue1(url, targetPaneId);
-        }
+      });
+    });
+    observer.observe(ligue1Section, { attributes: true, attributeFilter: ['style'] });
+    
+    // Also check on section click events
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-section="Ligue1"]')) {
+        setTimeout(() => {
+          if (ligue1Section.style.display !== 'none' && !ligue1FeedLoaded) {
+            const feedUrl = 'https://rss.app/feeds/tct5GyDJwZIxACdb.xml';
+            fetchFeedLigue1(feedUrl, 'headlines-feed-Ligue1');
+          }
+        }, 100);
       }
     });
-
-    const initialActiveTab = document.querySelector('#ligue1tabs-Ligue1 .headlines-tab.active');
-    if (initialActiveTab) {
-      const source = initialActiveTab.dataset.source;
-      const targetPaneId = `${source}-feed-Ligue1`;
-      const url = initialActiveTab.dataset.url;
-      fetchFeedLigue1(url, targetPaneId);
-    }
   }
 });
 </script>
@@ -17063,7 +17059,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
   // UEFA Conference League - Direct feed load (no tabs)
   let uefaConferenceLeagueFeedLoaded = false;
-  
+
   function fetchFeedUEFAConferenceLeague(url, contentPaneId) {
     const contentPane = document.getElementById(contentPaneId);
     if (!contentPane) return;
@@ -17395,9 +17391,9 @@ document.addEventListener('DOMContentLoaded', function() {
           if (lpgatourSection.style.display !== 'none' && !lpgatourFeedLoaded) {
             const feedUrl = 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-lpga.xml';
             fetchFeedLPGATour(feedUrl, 'headlines-feed-LPGATour');
-          }
         }
-      });
+      }
+    });
     });
     observer.observe(lpgatourSection, { attributes: true, attributeFilter: ['style'] });
     
@@ -17734,7 +17730,7 @@ const VIDEOS_CONFIG = {
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
         'NFL': {
-            highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gngxLmdCouF4seR20NDrviF.xml',
+            highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gn04EX1BXBk8TgY82oOIWVl.xml',
             allVideos: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-nfl.xml'
         },
         'MLB': {
