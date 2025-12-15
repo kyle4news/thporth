@@ -4781,15 +4781,70 @@ document.addEventListener('DOMContentLoaded', function () {
     const f1MenuItem = document.querySelector('li[data-section="FormulaOne"]');
     if (f1MenuItem) {
         f1MenuItem.addEventListener('click', () => {
-            // Schedule tab is active by default with Upcoming sub-tab active
-            // Load the schedule after a short delay to ensure the function is available
+            // Check which tab is active by default
+            const activeMainTab = document.querySelector('.f1-main-tab.active');
+            const activeTabType = activeMainTab ? activeMainTab.dataset.f1MainTab : 'standings';
+            
             setTimeout(() => {
-                window.f1ScheduleLastUserSelection = null;
-                if (window.updateF1Schedule) {
-                    window.updateF1Schedule();
+                if (activeTabType === 'standings') {
+                    // Standings tab is active by default - load driver standings
+                    if (!driverStandingsLoaded && typeof loadDriverStandings === 'function') {
+                        loadDriverStandings();
+                        driverStandingsLoaded = true;
+                    }
+                } else {
+                    // Schedule tab - load schedule
+                    window.f1ScheduleLastUserSelection = null;
+                    if (window.updateF1Schedule) {
+                        window.updateF1Schedule();
+                    }
                 }
             }, 100);
         }, { once: true });
+    }
+    
+    // Also check on initial page load if FormulaOne section is already visible
+    setTimeout(() => {
+        const formulaOneSection = document.getElementById('league-specific-column');
+        const leagueHeader = document.getElementById('league-specific-header');
+        if (formulaOneSection && leagueHeader && leagueHeader.innerText === 'Formula One') {
+            const activeMainTab = document.querySelector('.f1-main-tab.active');
+            const activeTabType = activeMainTab ? activeMainTab.dataset.f1MainTab : 'standings';
+            
+            if (activeTabType === 'standings' && !driverStandingsLoaded && typeof loadDriverStandings === 'function') {
+                loadDriverStandings();
+                driverStandingsLoaded = true;
+            }
+        }
+    }, 500);
+    
+    // Watch for when FormulaOne section becomes visible and load standings if Standings tab is active
+    const leagueSpecificColumn = document.getElementById('league-specific-column');
+    const leagueHeader = document.getElementById('league-specific-header');
+    if (leagueSpecificColumn && leagueHeader) {
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    const isVisible = leagueSpecificColumn.style.display !== 'none';
+                    const isFormulaOne = leagueHeader.innerText === 'Formula One';
+                    
+                    if (isVisible && isFormulaOne) {
+                        const activeMainTab = document.querySelector('.f1-main-tab.active');
+                        const activeTabType = activeMainTab ? activeMainTab.dataset.f1MainTab : 'standings';
+                        
+                        if (activeTabType === 'standings' && !driverStandingsLoaded && typeof loadDriverStandings === 'function') {
+                            setTimeout(() => {
+                                loadDriverStandings();
+                                driverStandingsLoaded = true;
+                            }, 100);
+                        }
+                    }
+                }
+            });
+        });
+        
+        observer.observe(leagueSpecificColumn, { attributes: true, attributeFilter: ['style'] });
+        observer.observe(leagueHeader, { childList: true, characterData: true, subtree: true });
     }
 
     if (f1MainTabsContainer) {
