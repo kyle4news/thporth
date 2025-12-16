@@ -3213,10 +3213,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-NCAAF" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
                     <div class="headlines-tab active" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/espn-ncf-rss.xml">ESPN</div>
+					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/on3-cfb.xml">On3</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/foxsports-cfb-api.xml">FOX Sports</div>
                     <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/cbs-collegefootball-rss.xml">CBS Sports</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/yahoo-collegefootball-rss.xml">Yahoo</div>
-					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/on3-cfb.xml">On3</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/saturdaydownsouth.xml">SDS</div>
 					<!-- <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/bleacherreport-cfb.xml">B/R</div> -->
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/si-cfb.xml">SI</div>
@@ -3711,38 +3711,60 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
  }
 
 function loadSocialFeed(section) {
-  const container = document.getElementById("social-feed-container");
-  if (!container) return;
-  if (currentFeedSection === section) return;
-  container.innerHTML = "";
-  const feedId = getNextFeedId(section);
-  if (feedId) {
-    // Check if feedId is a URL (custom RSS feed) or an ID (RSS.app widget)
-    if (feedId.startsWith('http://') || feedId.startsWith('https://')) {
-      // Custom RSS feed URL - load directly
-      loadCustomRSSFeed(feedId, container);
-    } else {
-      // RSS.app widget ID - use RSS.app widget
-      const feedTag = document.createElement("rssapp-feed");
-      feedTag.setAttribute("id", feedId);
-      container.appendChild(feedTag);
-
-      // Remove any previous RSS.app script
-      const oldScript = container.querySelector('script[data-rssapp]');
-      if (oldScript) oldScript.remove();
-
-      // Add the RSS.app script dynamically
-      const script = document.createElement("script");
-      script.src = "https://widget.rss.app/v1/feed.js";
-      script.async = true;
-      script.setAttribute('data-rssapp', 'true');
-      container.appendChild(script);
+  try {
+    const container = document.getElementById("social-feed-container");
+    if (!container) {
+      console.warn('Social feed container not found');
+      return;
     }
-  } else {
-    container.innerHTML =
-      "<div style='padding: 10px; font-size: 12px;'>No social feed available for this section.</div>";
+    if (currentFeedSection === section) return;
+    container.innerHTML = "";
+    const feedId = getNextFeedId(section);
+    if (feedId) {
+      // Check if feedId is a URL (custom RSS feed) or an ID (RSS.app widget)
+      if (feedId.startsWith('http://') || feedId.startsWith('https://')) {
+        // Custom RSS feed URL - load directly
+        loadCustomRSSFeed(feedId, container);
+      } else {
+        // RSS.app widget ID - use RSS.app widget
+        try {
+          const feedTag = document.createElement("rssapp-feed");
+          feedTag.setAttribute("id", feedId);
+          container.appendChild(feedTag);
+
+          // Remove any previous RSS.app script from container
+          const oldScript = container.querySelector('script[data-rssapp]');
+          if (oldScript) oldScript.remove();
+
+          // Only add the RSS.app script once to document head (not container)
+          if (!document.querySelector('script[src="https://widget.rss.app/v1/feed.js"]')) {
+            const script = document.createElement("script");
+            script.src = "https://widget.rss.app/v1/feed.js";
+            script.async = true;
+            script.setAttribute('data-rssapp', 'true');
+            script.onerror = function() {
+              console.error('Failed to load RSS.app widget script');
+              container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading social feed.</div>';
+            };
+            document.head.appendChild(script);
+          }
+        } catch (error) {
+          console.error('Error creating RSS.app widget:', error);
+          container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading social feed.</div>';
+        }
+      }
+    } else {
+      container.innerHTML =
+        "<div style='padding: 10px; font-size: 12px;'>No social feed available for this section.</div>";
+    }
+    currentFeedSection = section;
+  } catch (error) {
+    console.error('Error in loadSocialFeed:', error);
+    const container = document.getElementById("social-feed-container");
+    if (container) {
+      container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading social feed.</div>';
+    }
   }
-  currentFeedSection = section;
 }
 
 // Load custom RSS feed from our RSS service
