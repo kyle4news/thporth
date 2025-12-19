@@ -9315,7 +9315,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     titleContent.appendChild(logo);
                 } else if (leagueNameKey === "Saudi Pro League") {
                     const logo = document.createElement("img");
-                    logo.src = "RSL.png";
+                    logo.src = "https://static.flashscore.com/res/image/data/Y9o3ZAV1-dbVv7fPJ.png";
                     logo.alt = "Saudi Pro League Logo";
                         logo.width = 14;
                         logo.height = 14;
@@ -12603,6 +12603,7 @@ async function fetchFeaturedGames() {
         loadTop25RankingsCache('NCAAF');
         loadTop25RankingsCache('NCAAM');
         loadTop25RankingsCache('NCAAW');
+        loadCFPRankingsCache();
         
         const todayContainer = document.getElementById('games');
         const errorDiv = document.getElementById('error');
@@ -12951,6 +12952,9 @@ async function fetchFeaturedGames() {
         if (isNCALeague) {
             // Load Top 25 rankings cache for this league
             loadTop25RankingsCache(leagueKey);
+            if (leagueKey === 'NCAAF') {
+                loadCFPRankingsCache();
+            }
             
             // Set CFP tab as active by default for NCAAF, Top 25 for others
             const top25Tab = ncaaStandingsTabs.querySelector('.ncaa-standings-tab[data-ncaa-standings-tab="top25"]');
@@ -16488,6 +16492,7 @@ if (ncaaStandingsTabsContainer) {
 // --- TOP 25 RANKINGS CACHE ---
 // Cache for Top 25 rankings by league key: { 'NCAAF': { 'Ohio State': 1, ... }, ... }
 let top25RankingsCache = {};
+let cfpRankingsCache = {};
 
 // Top 25-specific team name mappings (Firestore name -> Display name for ranking matching)
 // This maps the team name as it appears in Firestore to the display name as it appears on the site
@@ -16597,6 +16602,45 @@ function getTop25Rank(displayName, leagueKey) {
     return rankings[displayName] || null;
 }
 
+// Load CFP rankings into cache (keyed by display name)
+async function loadCFPRankingsCache() {
+    try {
+        const snapshot = await db.collection('CFP').get();
+        
+        if (snapshot.empty) {
+            cfpRankingsCache = {};
+            return;
+        }
+        
+        // Build cache: display name -> rank
+        const rankingsMap = {};
+        snapshot.docs.forEach(doc => {
+            const teamData = doc.data();
+            if (teamData.Rk !== null && teamData.Rk !== undefined && teamData.Team) {
+                const teamName = teamData.Team;
+                // Get display name for the ranking team name (using Top 25-specific mapping)
+                const displayName = getTop25DisplayName(teamName, 'NCAAF');
+                rankingsMap[displayName] = parseInt(teamData.Rk) || null;
+            }
+        });
+        
+        cfpRankingsCache = rankingsMap;
+        console.log(`✅ Loaded ${Object.keys(rankingsMap).length} CFP rankings into cache`);
+    } catch (error) {
+        console.error(`Error loading CFP rankings cache:`, error);
+        cfpRankingsCache = {};
+    }
+}
+
+// Get CFP rank for a team display name
+function getCFPRank(displayName) {
+    if (!displayName) return null;
+    
+    if (!cfpRankingsCache || Object.keys(cfpRankingsCache).length === 0) return null;
+    
+    return cfpRankingsCache[displayName] || null;
+}
+
 // Get league key from game data (for Top 25 matching)
 function getLeagueKeyFromGame(game) {
     if (!game) return null;
@@ -16625,7 +16669,15 @@ function formatTeamNameWithRanking(displayName, leagueKey) {
     if (!leagueKey || !['NCAAF', 'NCAAM', 'NCAAW'].includes(leagueKey)) {
         return displayName;
     }
-    const rank = getTop25Rank(displayName, leagueKey);
+    
+    // For NCAAF, use CFP rankings instead of Top 25
+    let rank = null;
+    if (leagueKey === 'NCAAF') {
+        rank = getCFPRank(displayName);
+    } else {
+        rank = getTop25Rank(displayName, leagueKey);
+    }
+    
     if (rank !== null && rank !== undefined) {
         return `<span style="font-size: 0.75em;">${rank}</span> ${displayName}`;
     }
