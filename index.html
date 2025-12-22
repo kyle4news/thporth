@@ -266,8 +266,14 @@ table.game-table td:nth-child(1) {
 .game-row {
     /* Remove block styling - back to simple rows */
 }
+.game-row.live-filter-hidden {
+    display: none !important;
+}
 .game-separator {
     /* Add line break after each game */
+}
+.game-separator.live-filter-hidden {
+    display: none !important;
 }
 .game-separator::after {
     content: "\A";
@@ -2545,7 +2551,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="games-tabs" style="display: flex; height: 18px; background-color: #2a2a2a;">
       <!-- <div class="games-tab" data-tab="scores">SCORES</div> -->
       <div class="games-tab active" data-tab="today">TODAY</div>
-      <!-- <div id="live-filter-toggle" class="games-tab"><span style="display: inline-block; width: 3px; height: 3px; background-color: #ff0000; border-radius: 50%; margin-right: 4px; margin-left: 2px; vertical-align: middle; transform: translateY(-2px);"></span>LIVE</div> -->
+      <div id="live-filter-toggle" class="games-tab"><span style="display: inline-block; width: 3px; height: 3px; background-color: #ff0000; border-radius: 50%; margin-right: 4px; margin-left: 2px; vertical-align: middle; transform: translateY(-2px);"></span>LIVE</div>
     </div>
     <div id="tv-listings-scores" class="games-content" style="display: none;">
       <div id="scoresWrapper">
@@ -8463,6 +8469,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderGames(container, gamesData, isGroupedByLeague, isYesterdayScores = false) {
         container.innerHTML = "";
+        // Note: gamesData is already filtered at the data level in updateDisplay() - no need to filter here
+        
         // Check if this is for Tennis ATP/WTA section
         const isTennisSection = container && (container.id === 'tennis-today-atp-content' || container.id === 'tennis-today-wta-content' || container.id === 'tennis-upcoming-atp-content' || container.id === 'tennis-upcoming-wta-content');
         
@@ -9955,20 +9963,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Check if timeString field exists and is empty (manual games with blank time)
                         if (data.timeString === '') {
                             currentTimeLabel = ""; // Display as empty for blank times
-                        // TEMPORARILY DISABLED: Live data display - only show start time, not live status
-                        // } else if (isLive) {
-                        //     // Use EXACT same logic as individual league sections
-                        //     let parsedStatus = '';
-                        //     const displayLeague = getLeagueDisplayName(data.League, data.Sport);
-                        //     if (displayLeague === "MLB") {
-                        //         const inningHalf = data.inningHalf || "";
-                        //         const currentInning = data.currentInning || "";
-                        //         if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
-                        //     } else {
-                        //         // Use granular live status for ALL sports (including NFL, MLS, etc.)
-                        //         parsedStatus = getGranularLiveStatus(data);
-                        //     }
-                        //     currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
+                        } else if (isLive) {
+                            // Use EXACT same logic as individual league sections
+                            let parsedStatus = '';
+                            const displayLeague = getLeagueDisplayName(data.League, data.Sport);
+                            if (displayLeague === "MLB") {
+                                const inningHalf = data.inningHalf || "";
+                                const currentInning = data.currentInning || "";
+                                if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
+                            } else {
+                                // Use granular live status for ALL sports (including NFL, MLS, etc.)
+                                parsedStatus = getGranularLiveStatus(data);
+                            }
+                            currentTimeLabel = parsedStatus ? `<span style="color: red;">${parsedStatus}</span>` : '<span style="color: red;">Live</span>';
                         } else if (isPostponed) {
                             currentTimeLabel = '<span style="color: #545353;">PPD</span>';
                         } else if (isCanceled) {
@@ -9989,6 +9996,124 @@ document.addEventListener('DOMContentLoaded', function () {
                             displayTimeLabel = "";
                         } else {
                             lastDisplayedTimeLabel = normalizedTimeLabel;
+                        }
+                    }
+                    
+                    // Get displayLeagueForCheck early for use in granular time logic
+                    const displayLeagueForCheck = getLeagueDisplayName(data.League, data.Sport);
+                    const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Elite', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly', 'AFCON'].includes(displayLeagueForCheck);
+                    
+                    // Apply granular time logic for featured games (same as regular games)
+                    let timeColumnTop = displayTimeLabel; // Default: keep as-is
+                    let timeColumnBottom = ''; // Default: empty
+                    
+                    if (!isSoccerLeague && isLive) {
+                        // RULE: For live games with quarters/halves/periods that have time remaining:
+                        // Top line: ONLY "1st", "2nd", "3rd", "4th", or "OT" (period/quarter only)
+                        // Bottom line: ONLY time format like "9:59", "0:40" (numbers with colon)
+                        
+                        let periodQuarter = '';
+                        let timeRemaining = '';
+                        
+                        // ALWAYS try to parse from displayTimeLabel first (which may have "1st<br>9:53" format)
+                        if (displayTimeLabel) {
+                            // Remove span tags and get inner content
+                            const innerContent = displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '');
+                            
+                            // Check if it contains <br> (line break)
+                            if (innerContent.includes('<br>')) {
+                                const parts = innerContent.split('<br>');
+                                if (parts.length >= 2) {
+                                    const topPart = parts[0].trim();
+                                    const bottomPart = parts[1].trim();
+                                    
+                                    // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
+                                    if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
+                                        periodQuarter = topPart.toLowerCase();
+                                    }
+                                    
+                                    // Validate bottom part is ONLY time format (digits:digits)
+                                    if (bottomPart.match(/^\d+:\d+$/)) {
+                                        timeRemaining = bottomPart;
+                                    }
+                                }
+                            } else {
+                                // No <br> - might be space-separated like "1st 9:53" or just period
+                                // Try to extract period and time from space-separated format
+                                const spaceMatch = innerContent.match(/^(1st|2nd|3rd|4th|OT)\s+(\d+:\d+)$/i);
+                                if (spaceMatch) {
+                                    periodQuarter = spaceMatch[1].toLowerCase();
+                                    timeRemaining = spaceMatch[2];
+                                } else if (innerContent.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
+                                    // Just period, no time
+                                    periodQuarter = innerContent.toLowerCase();
+                                }
+                            }
+                        }
+                        
+                        // If parsing from displayTimeLabel didn't work, try direct data fields
+                        if (!periodQuarter || !timeRemaining) {
+                            const currentPeriod = data['Current Period'] || data.currentPeriod || data.Stage || '';
+                            const gameTime = data.GameTime || data.gameTime || data.displayClock || '';
+                            
+                            // Check if we have a period/quarter with time remaining (not "Half" or "Int")
+                            const hasTimeRemaining = gameTime && gameTime !== "" && gameTime !== "-1";
+                            const isHalftimeOrIntermission = currentPeriod && (
+                                currentPeriod.includes("HALF") || 
+                                currentPeriod.includes("INTERMISSION") ||
+                                currentPeriod === "HALF" ||
+                                currentPeriod === "HALFTIME" ||
+                                currentPeriod === "HALF_TIME"
+                            );
+                            
+                            if (hasTimeRemaining && !isHalftimeOrIntermission && currentPeriod) {
+                                // Extract period/quarter - ONLY allow "1st", "2nd", "3rd", "4th", or "OT"
+                                if (!periodQuarter) {
+                                    let period = currentPeriod;
+                                    if (period === "1ST_QUARTER" || period === "FIRST_QUARTER") periodQuarter = "1st";
+                                    else if (period === "2ND_QUARTER" || period === "SECOND_QUARTER") periodQuarter = "2nd";
+                                    else if (period === "3RD_QUARTER" || period === "THIRD_QUARTER") periodQuarter = "3rd";
+                                    else if (period === "4TH_QUARTER" || period === "FOURTH_QUARTER") periodQuarter = "4th";
+                                    else if (period === "OVERTIME" || period === "OT") periodQuarter = "OT";
+                                    else if (period === "1ST_PERIOD" || period === "FIRST_PERIOD") periodQuarter = "1st";
+                                    else if (period === "2ND_PERIOD" || period === "SECOND_PERIOD") periodQuarter = "2nd";
+                                    else if (period === "3RD_PERIOD" || period === "THIRD_PERIOD") periodQuarter = "3rd";
+                                    else {
+                                        // Handle any other quarter format
+                                        period = period.replace('_QUARTER', '').replace('_PERIOD', '').replace('_', '');
+                                        if (period === "FIRST" || period === "1ST") periodQuarter = "1st";
+                                        else if (period === "SECOND" || period === "2ND") periodQuarter = "2nd";
+                                        else if (period === "THIRD" || period === "3RD") periodQuarter = "3rd";
+                                        else if (period === "FOURTH" || period === "4TH") periodQuarter = "4th";
+                                        else if (period === "OVERTIME" || period === "OT") periodQuarter = "OT";
+                                    }
+                                }
+                                
+                                // Extract time - ONLY format like "9:59", "0:40" (numbers with colon)
+                                if (!timeRemaining && gameTime) {
+                                    let timeStr = gameTime;
+                                    // Ensure it has colon format
+                                    if (!timeStr.includes(':')) {
+                                        timeStr = timeStr + ':00';
+                                    }
+                                    // Validate it matches time format (digits:digits)
+                                    if (timeStr.match(/^\d+:\d+$/)) {
+                                        timeRemaining = timeStr;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Set time column values - STRICT: only period on top, only time on bottom
+                        if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT")) {
+                            timeColumnTop = `<span style="color: red;">${periodQuarter}</span>`;
+                        } else {
+                            // If we don't have a valid period/quarter, use displayTimeLabel as fallback
+                            timeColumnTop = displayTimeLabel;
+                        }
+                        
+                        if (timeRemaining && timeRemaining.match(/^\d+:\d+$/)) {
+                            timeColumnBottom = `<span style="color: red;">${timeRemaining}</span>`;
                         }
                     }
                         
@@ -10034,13 +10159,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     const row2 = currentTable.insertRow();
                     row2.className = "game-row game-separator";
                     
-                    const displayLeagueForCheck = getLeagueDisplayName(data.League, data.Sport);
                     // Add special class for ATP Finals (Doubles) to add extra spacing
                     const isAtpDoubles = displayLeagueForCheck === "ATP Finals (Doubles)";
                     if (isAtpDoubles) {
                         row2.classList.add("atp-doubles-match");
                     }
-                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Elite', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly', 'AFCON'].includes(displayLeagueForCheck);
                     
                     // Set channel display - use Tennis Channel for ATP leagues, otherwise use data.channel
                     let featuredChannelToDisplay = data.channel || '';
@@ -10065,12 +10188,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     if (isSoccerLeague) {
                         // Soccer: home team on top, away team on bottom (opposite of non-soccer)
-                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td>`;
+                        // For soccer, displayTimeLabel stays in time column (centered, rowspan="2")
+                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: middle; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td>`;
                         row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                     } else {
                         // All other leagues: away team on top, home team on bottom
-                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td>`;
-                        row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
+                        // Period/quarter goes in time column top row (same line as top team), time remaining goes in time column bottom row (same line as bottom team)
+                        // Remove rowspan="2" from time column to allow separate content in each row
+                        row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td>`;
+                        row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                     }
 
                     let gameStatusClass = 'scheduled-game';
@@ -10078,6 +10204,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (isFinal) gameStatusClass = 'final-game';
                     row1.classList.add(gameStatusClass);
                     row2.classList.add(gameStatusClass);
+                    
+                    // Store match status in data attribute for filtering
+                    // Check multiple possible field names for match status
+                    // For ESPN API games, also check StageType if Match Status is empty
+                    let matchStatusValue = (data["Match Status"] || data.matchStatus || data["matchStatus"] || "").toUpperCase().trim();
+                    if (!matchStatusValue && (data["StageType"] || data.StageType)) {
+                        matchStatusValue = (data["StageType"] || data.StageType || "").toUpperCase().trim();
+                    }
+                    if (row1) {
+                        row1.dataset.matchStatus = matchStatusValue;
+                    }
+                    if (row2) {
+                        row2.dataset.matchStatus = matchStatusValue;
+                    }
                     
                 // Add separator line between games (but not after the last game in the same table)
                 if (i < sortedFeaturedGames.length - 1) {
@@ -10515,6 +10655,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (isFinal) gameStatusClass = 'final-game';
                 row1.classList.add(gameStatusClass);
                 row2.classList.add(gameStatusClass);
+                
+                // Store match status in data attribute for filtering
+                // Check multiple possible field names for match status
+                // For ESPN API games, also check StageType if Match Status is empty
+                let matchStatusValue = (data["Match Status"] || data.matchStatus || data["matchStatus"] || "").toUpperCase().trim();
+                if (!matchStatusValue && (data["StageType"] || data.StageType)) {
+                    matchStatusValue = (data["StageType"] || data.StageType || "").toUpperCase().trim();
+                }
+                if (row1) {
+                    row1.dataset.matchStatus = matchStatusValue;
+                }
+                if (row2) {
+                    row2.dataset.matchStatus = matchStatusValue;
+                }
                 
                 // Add separator line between games (but not after the last game)
                 if (i < games.length - 1) {
@@ -12950,6 +13104,9 @@ async function fetchFeaturedGames() {
     }
 
     
+    // Track active tab globally - 'ALL' or 'LIVE'
+    let activeTab = 'ALL';
+    
     function fetchTodayGames(callback) {
         // Load Top 25 rankings cache for all NCAA leagues (for home page games display)
         loadTop25RankingsCache('NCAAF');
@@ -12967,6 +13124,7 @@ async function fetchFeaturedGames() {
 
         let regularGames = [];
         let featuredGames = [];
+        let updateDisplayRef = null; // Store reference to updateDisplay so it can be called from outside
         
         // Set up real-time listener for regular games
         const regularGamesUnsubscribe = gamesCollectionRef.where('gameDate', '==', todayStr)
@@ -13158,20 +13316,49 @@ async function fetchFeaturedGames() {
             });
 
         function updateDisplay() {
-            const allGames = [...featuredGames, ...regularGames];
-            renderGames(todayContainer, allGames, true);
+            let gamesToRender = [];
+            
+            // In Live tab, exclude featured games entirely
+            if (activeTab === 'LIVE') {
+                // Only show regular games (no featured section)
+                gamesToRender = [...regularGames];
+            } else {
+                // In ALL tab, show both featured and regular games
+                gamesToRender = [...featuredGames, ...regularGames];
+            }
+            
+            // Filter at DATA level BEFORE rendering - this is the key fix
+            if (activeTab === 'LIVE') {
+                gamesToRender = gamesToRender.filter(game => {
+                    const matchStatus = (game["Match Status"] || game.matchStatus || game["matchStatus"] || "").toUpperCase().trim();
+                    // Only include live/in-progress games
+                    return matchStatus.includes("IN PROGRESS") || 
+                           matchStatus.includes("IN_PROGRESS") ||
+                           matchStatus.includes("LIVE");
+                });
+            }
+            
+            renderGames(todayContainer, gamesToRender, true);
             
             if (callback) {
                 callback();
             }
         }
+        
+        // Store reference so it can be called when Live filter is toggled
+        updateDisplayRef = updateDisplay;
 
-        // Return cleanup function
-        return () => {
+        // Return cleanup function and updateDisplay reference
+        const cleanup = () => {
             regularGamesUnsubscribe();
             featuredGamesUnsubscribe();
             liveGamesUnsubscribe();
         };
+        
+        // Attach updateDisplay to window so Live filter can call it
+        window.triggerGamesUpdate = updateDisplay;
+        
+        return cleanup;
     }
 
     // Cache for yesterday's scores to improve performance (valid until next prep-yesterday run at 3:55 AM ET)
@@ -15454,27 +15641,97 @@ if (gamesTabsContainer) {
     let activeListenerUnsubscribe = null;
 
     const applyLiveFilter = () => {
-        if (!liveFilter) return;
+        if (!liveFilter) {
+            console.warn('Live filter: liveFilter element not found');
+            return;
+        }
         const isFilterActive = liveFilter.classList.contains('active');
+        console.log('Live filter: isFilterActive =', isFilterActive);
         const todayContent = document.getElementById('games');
-        if (!todayContent) return;
+        if (!todayContent) {
+            console.warn('Live filter: games container not found');
+            return;
+        }
         const allGameRows = todayContent.querySelectorAll('.game-row');
+        console.log('Live filter: Found', allGameRows.length, 'game rows');
         const leagueSections = todayContent.querySelectorAll('.league-section');
         const gameTables = todayContent.querySelectorAll('.game-table');
         const tablesWithImportance = new Set();
 
+        // Counters for debugging
+        let hiddenCount = 0;
+        let shownCount = 0;
+        let noMatchStatusCount = 0;
+
+        // When Live filter is active, ONLY show games that are in progress (live)
+        // Hide games with "F" (final), start times, or any non-live status
         allGameRows.forEach(row => {
             const parentTable = row.closest('table');
             if (parentTable && parentTable.dataset.hasImportanceToggle === 'true') {
                 tablesWithImportance.add(parentTable);
                 return;
             }
-            let showRow = true;
-            if (isFilterActive && !row.classList.contains('live-game')) {
-                showRow = false;
+            
+            // Skip separator rows - they'll be handled with their paired row
+            if (row.classList.contains('game-separator')) {
+                return;
             }
-            row.style.display = showRow ? '' : 'none';
+            
+            let showRow = true;
+            if (isFilterActive) {
+                // Check the match status from data attribute - ONLY show live/in-progress games
+                const matchStatus = (row.dataset.matchStatus || "").toUpperCase().trim();
+                
+                // If no match status found, hide the game (shouldn't happen, but be safe)
+                if (!matchStatus) {
+                    noMatchStatusCount++;
+                    showRow = false;
+                } else {
+                    // Explicitly exclude SCHEDULED and FINAL games
+                    if (matchStatus === "SCHEDULED" || matchStatus === "FINAL" || matchStatus.includes("FINAL")) {
+                        hiddenCount++;
+                        showRow = false;
+                    } else {
+                        // Only show games that are explicitly live/in-progress
+                        const isLive = matchStatus.includes("IN PROGRESS") || 
+                                       matchStatus.includes("IN_PROGRESS") ||
+                                       matchStatus.includes("LIVE");
+                        
+                        if (!isLive) {
+                            // Hide any game that's not explicitly live
+                            hiddenCount++;
+                            showRow = false;
+                        } else {
+                            shownCount++;
+                        }
+                    }
+                }
+            }
+            
+            // Hide/show both row1 and row2 together using CSS class
+            if (showRow) {
+                row.classList.remove('live-filter-hidden');
+                row.style.display = '';
+            } else {
+                row.classList.add('live-filter-hidden');
+                row.style.display = 'none';
+            }
+            const nextRow = row.nextElementSibling;
+            if (nextRow && nextRow.classList.contains('game-separator')) {
+                if (showRow) {
+                    nextRow.classList.remove('live-filter-hidden');
+                    nextRow.style.display = '';
+                } else {
+                    nextRow.classList.add('live-filter-hidden');
+                    nextRow.style.display = 'none';
+                }
+            }
         });
+        
+        // Log filter results
+        if (isFilterActive) {
+            console.log('Live filter results: Shown =', shownCount, ', Hidden =', hiddenCount, ', No matchStatus =', noMatchStatusCount);
+        }
 
         tablesWithImportance.forEach(table => {
             if (typeof table.updateImportanceVisibility === 'function') {
@@ -15483,6 +15740,24 @@ if (gamesTabsContainer) {
         });
 
         gameTables.forEach(table => {
+            // Check if this table is in the FEATURED section
+            const leagueSection = table.closest('.league-section');
+            const isFeaturedSection = leagueSection && (
+                leagueSection.querySelector('.league-title')?.textContent?.trim() === 'FEATURED' ||
+                leagueSection.getAttribute('data-league') === 'FEATURED'
+            );
+            
+            // Hide entire FEATURED section when Live filter is active
+            if (isFilterActive && isFeaturedSection) {
+                table.style.display = 'none';
+                // Also hide the featured subheader
+                const header = table.previousElementSibling;
+                if (header && header.classList && header.classList.contains('featured-subheader')) {
+                    header.style.display = 'none';
+                }
+                return;
+            }
+            
             const rows = table.querySelectorAll('.game-row');
             const hasVisible = !isFilterActive || Array.from(rows).some(row => row.style.display !== 'none');
             const isDefaultCollapsed = table.dataset.collapsible === 'true' && table.dataset.isCollapsed === 'true';
@@ -15505,6 +15780,21 @@ if (gamesTabsContainer) {
         });
 
         leagueSections.forEach(section => {
+            // Hide FEATURED section when Live filter is active
+            const sectionTitle = section.querySelector('.league-title');
+            const isFeaturedSection = sectionTitle && (
+                sectionTitle.textContent?.trim() === 'FEATURED' ||
+                section.getAttribute('data-league') === 'FEATURED'
+            );
+            
+            if (isFilterActive && isFeaturedSection) {
+                section.style.display = 'none';
+                if (sectionTitle) {
+                    sectionTitle.style.display = 'none';
+                }
+                return;
+            }
+            
             const visibleRows = section.querySelectorAll('.game-row:not([style*="display: none"])');
             const shouldShowSection = visibleRows.length > 0;
             section.style.display = shouldShowSection ? 'block' : 'none';
@@ -15551,15 +15841,20 @@ if (gamesTabsContainer) {
         }
         todayTab.classList.add('active');
         
+        // Set active tab to ALL when Today tab is clicked
+        activeTab = 'ALL';
+        
         document.getElementById('tv-listings-today').style.display = 'block';
         document.getElementById('tv-listings-scores').style.display = 'none';
         
-        activeListenerUnsubscribe = fetchTodayGames(applyLiveFilter);
+        activeListenerUnsubscribe = fetchTodayGames(() => {
+            // updateDisplay will be called by Firestore listeners
+        });
     });
 
     if (liveFilter) {
     liveFilter.addEventListener('click', () => {
-        // Always switch to TODAY tab first, then apply LIVE filter
+        // Always switch to TODAY tab first, then toggle LIVE filter
         if (!todayTab.classList.contains('active')) {
             // Switch to TODAY tab
             if (activeListenerUnsubscribe) {
@@ -15575,15 +15870,25 @@ if (gamesTabsContainer) {
             document.getElementById('tv-listings-today').style.display = 'block';
             document.getElementById('tv-listings-scores').style.display = 'none';
             
-            // Load today's games and then apply LIVE filter
+            // Load today's games
             activeListenerUnsubscribe = fetchTodayGames(() => {
-                liveFilter.classList.add('active');
-                applyLiveFilter();
+                // updateDisplay will be called by Firestore listeners
             });
+        }
+        
+        // Toggle LIVE filter state
+        liveFilter.classList.toggle('active');
+        
+        // Update active tab based on filter state
+        if (liveFilter.classList.contains('active')) {
+            activeTab = 'LIVE';
         } else {
-            // Already on TODAY tab, just toggle LIVE filter
-            liveFilter.classList.toggle('active');
-            applyLiveFilter();
+            activeTab = 'ALL';
+        }
+        
+        // Trigger updateDisplay immediately to re-render with filtered data
+        if (typeof window.triggerGamesUpdate === 'function') {
+            window.triggerGamesUpdate();
         }
     });
     }
