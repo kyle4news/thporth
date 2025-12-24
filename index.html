@@ -2549,7 +2549,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div id="games-tabs" style="display: flex; height: 18px; background-color: #2a2a2a;">
-      <!-- <div class="games-tab" data-tab="scores">SCORES</div> -->
+      <div class="games-tab" data-tab="scores">SCORES</div>
       <div class="games-tab active" data-tab="today">TODAY</div>
       <div id="live-filter-toggle" class="games-tab"><span style="display: inline-block; width: 3px; height: 3px; background-color: #ff0000; border-radius: 50%; margin-right: 4px; margin-left: 2px; vertical-align: middle; transform: translateY(-2px);"></span>LIVE</div>
     </div>
@@ -5632,7 +5632,7 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'LPGA Tour', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "EFL Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "AFCON", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: National League", "2. Bundesliga", "Serie B", "Greek Super League", "LaLiga 2"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "AFCON", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: National League", "2. Bundesliga", "Serie B", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         // NFL: "https://www.nfl.com/scores",
@@ -6339,7 +6339,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return "CONCACAF Qualifiers";
         }
         
-        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: NBA": "NBA", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: MLS - Play Offs": "MLS", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "USA: NWSL Women - Play Offs": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "France: Coupe de France": "Coupe de France", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Spain: Copa del Rey": "Copa del Rey", "Mexico: Liga MX": "Liga MX", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "Mexico: Liga MX - Apertura - Play In": "Liga MX", "Mexico: Liga MX - Apertura - Play Offs": "Liga MX", "England: EFL Cup": "EFL Cup", "England: FA Cup": "FA Cup", "England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "Belgium: Jupiler Pro League": "Belgian Pro League", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "Asia: AFC Asian Cup - Qualification - Third round": "AFC Asian Cup Qualifiers", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "CopaSudamericana": "Copa Sudamericana", "South America: Copa Sudamericana": "Copa Sudamericana", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "Women's UCL", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Europe: Conference League - League phase": "UEFA Conference League", "Europe: Champions League Women - League phase": "Women's UCL", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera", "Argentina: Torneo Betano - Apertura": "Argentine Primera", "Argentina: Torneo Betano - Clausura - Play Offs": "LPF Playoffs", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership", "World: World Cup U20": "FIFA U-20 World Cup", "North & Central America: Campeones Cup": "Campeones Cup", "World: ICC World Cup Women": "Women's Cricket World Cup", "World: Test Series": "ICC Test Series", "World: One Day International": "ODI", "World: Twenty20 International": "T20 International", "USA: NBA - Pre-season": "NBA Preseason", "USA: USL Championship": "USL Championship", "World: World Cup U20 - Play Offs": "FIFA U-20 World Cup", "USA: MLB - Play Offs": "MLB", "Canada: OHL": "OHL", "USA: NCAA Hockey": "NCAA Men's Hockey", "World: Friendly International": "International Friendly", "World: World Cup U17": "FIFA U-17 World Cup", "World: World Cup U17 - Play Offs": "FIFA U-17 World Cup", "World: Finals - Turin ATP - Play Offs, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles - Play Offs, hard (indoor)": "ATP Finals (Doubles)", "World: Finals - Turin ATP, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles, hard (indoor)": "ATP Finals (Doubles)", "Asia: AFC Elite": "AFC Champions League", "AFC Champions League": "AFC Champions League", "Germany: 2. Bundesliga": "2. Bundesliga", "Africa: CAF Nations League": "AFCON", "Greece: Super League": "Greek Super League", "Spain: LaLiga 2": "LaLiga 2", "Italy: Serie B": "Serie B", "England: National League": "England: National League" };
+        const map = { "USA: WNBA": "WNBA", "USA: MLB": "MLB", "USA: NFL": "NFL", "Europe: Champions League - League phase": "UEFA Champions League", "USA: NBA": "NBA", "USA: MLS": "MLS", "USA: NHL": "NHL", "USA: NHL - Pre-season": "NHL Preseason", "USA: NCAA": "NCAAF", "USA: MLS - Play Offs": "MLS", "USA: US Open ATP, hard": "U.S. Open - Men's", "USA: US Open WTA, hard": "U.S. Open - Women's", "ENGLAND: PREMIER LEAGUE": "Premier League", "USA: NWSL Women": "NWSL", "USA: NWSL Women - Play Offs": "NWSL", "World: Club Friendly": "Club Friendly", "USA: Cleveland WTA, hard": "WTA", "Germany: DFB Pokal": "DFB-Pokal", "Italy: Coppa Italia": "Coppa Italia", "France: Coupe de France": "Coupe de France", "Italy: Serie A": "Serie A", "Turkey: Super Lig": "Super Lig", "Spain: LaLiga": "LaLiga", "Spain: Copa del Rey": "Copa del Rey", "Mexico: Liga MX": "Liga MX", "Mexico: Liga MX - Apertura": "Liga MX", "Mexico: Liga MX - Clausura": "Liga MX", "Mexico: Liga MX - Apertura - Play In": "Liga MX", "Mexico: Liga MX - Apertura - Play Offs": "Liga MX", "England: EFL Cup": "Carabao Cup", "EFL Cup": "Carabao Cup", "England: FA Cup": "FA Cup", "England: Premier League": "Premier League", "Europe: Champions League - Qualification": "UEFA Champions League", "Brazil: Serie A Betano": "Brasileirão", "Belgium: Jupiler Pro League": "Belgian Pro League", "South America: Copa Libertadores - Play Offs": "Copa Libertadores", "Asia: AFC Asian Cup - Qualification - Third round": "AFC Asian Cup Qualifiers", "North & Central America: Leagues Cup - Play Offs": "Leagues Cup", "CopaSudamericana": "Copa Sudamericana", "South America: Copa Sudamericana": "Copa Sudamericana", "South America: Copa Sudamericana - Play Offs": "Copa Sudamericana", "World: AmeriCup": "FIBA AmeriCup", "Europe: Champions League Women - Qualification - Second stage": "Women's UCL", "Europe: Europa League - Qualification": "UEFA Europa League", "Europe: Europa League - League phase": "UEFA Europa League", "Europe: Conference League - Qualification": "UEFA Conference League", "Europe: Conference League - League phase": "UEFA Conference League", "Europe: Champions League Women - League phase": "Women's UCL", "Germany: Bundesliga": "Bundesliga", "Saudi Arabia: Saudi Professional League": "Saudi Pro League", "France: Ligue 1": "Ligue 1", "Canada: CFL": "CFL", "USA: WNBA - Play Offs": "WNBA", "England: Championship": "EFL Championship", "World: Ryder Cup": "Ryder Cup", "Netherlands: Eredivisie": "Eredivisie", "England: WSL": "Women's Super League", "Argentina: Torneo Betano - Clausura": "Argentine Primera", "Argentina: Torneo Betano - Apertura": "Argentine Primera", "Argentina: Torneo Betano - Clausura - Play Offs": "LPF Playoffs", "Scotland: Scottish Cup": "Scottish Cup", "Portugal: Liga Portugal": "Liga Portugal", "Scotland: Premiership": "Scottish Premiership", "World: World Cup U20": "FIFA U-20 World Cup", "North & Central America: Campeones Cup": "Campeones Cup", "World: ICC World Cup Women": "Women's Cricket World Cup", "World: Test Series": "ICC Test Series", "World: One Day International": "ODI", "World: Twenty20 International": "T20 International", "USA: NBA - Pre-season": "NBA Preseason", "USA: USL Championship": "USL Championship", "World: World Cup U20 - Play Offs": "FIFA U-20 World Cup", "USA: MLB - Play Offs": "MLB", "Canada: OHL": "OHL", "USA: NCAA Hockey": "NCAA Men's Hockey", "World: Friendly International": "International Friendly", "World: World Cup U17": "FIFA U-17 World Cup", "World: World Cup U17 - Play Offs": "FIFA U-17 World Cup", "World: Finals - Turin ATP - Play Offs, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles - Play Offs, hard (indoor)": "ATP Finals (Doubles)", "World: Finals - Turin ATP, hard (indoor)": "ATP Finals (Singles)", "World: Finals - Turin ATP Doubles, hard (indoor)": "ATP Finals (Doubles)", "Asia: AFC Elite": "AFC Champions League", "AFC Champions League": "AFC Champions League", "Germany: 2. Bundesliga": "2. Bundesliga", "Africa: CAF Nations League": "AFCON", "Greece: Super League": "Greek Super League", "Spain: LaLiga 2": "LaLiga 2", "Italy: Serie B": "Serie B", "England: National League": "England: National League", "Australia: A-League Men": "A-League" };
         return map[name] || name;
     }
 
@@ -6399,8 +6399,8 @@ document.addEventListener('DOMContentLoaded', function () {
             'CoppaItalia': ['Italy: Coppa Italia', 'Coppa Italia'],
             // Coupe de France variations
             'CoupeDeFrance': ['France: Coupe de France', 'Coupe de France'],
-            // EFL Cup variations
-            'EFLCup': ['England: EFL Cup', 'EFL Cup'],
+            // Carabao Cup variations (formerly EFL Cup)
+            'CarabaoCup': ['England: EFL Cup', 'EFL Cup', 'Carabao Cup'],
             // Super Lig variations
             'SuperLig': ['Turkey: Super Lig', 'Super Lig'],
             // Eredivisie variations
@@ -8083,7 +8083,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Handle halftime/intermission for all sports
         if (game.Stage === "HALF_TIME" || game.Stage === "HALF") {
-            return "Half";
+            return "HALF";
         }
         if (game.Stage === "1ST_INTERMISSION" || game.Stage === "2ND_INTERMISSION") {
             return "Int";
@@ -8209,7 +8209,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 else if (quarter === "2ND_QUARTER" || quarter === "SECOND_QUARTER") quarter = "2nd";
                 else if (quarter === "3RD_QUARTER" || quarter === "THIRD_QUARTER") quarter = "3rd";
                 else if (quarter === "4TH_QUARTER" || quarter === "FOURTH_QUARTER") quarter = "4th";
-                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "Half";
+                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "HALF";
                 else if (quarter === "OVERTIME" || quarter === "OT") quarter = "OT";
                 else {
                     // Handle any other quarter format
@@ -8219,6 +8219,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     else if (quarter === "THIRD") quarter = "3rd";
                     else if (quarter === "FOURTH") quarter = "4th";
                     else quarter = quarter.toLowerCase();
+                }
+                
+                // For halftime, don't show time - just return "HALF"
+                if (quarter === "HALF") {
+                    return "HALF";
                 }
                 
                 // Format time to include seconds if not present
@@ -8235,7 +8240,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 else if (quarter === "2ND_QUARTER" || quarter === "SECOND_QUARTER") quarter = "2nd";
                 else if (quarter === "3RD_QUARTER" || quarter === "THIRD_QUARTER") quarter = "3rd";
                 else if (quarter === "4TH_QUARTER" || quarter === "FOURTH_QUARTER") quarter = "4th";
-                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "Half";
+                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "HALF";
                 else if (quarter === "OVERTIME" || quarter === "OT") quarter = "OT";
                 return quarter;
             }
@@ -8258,7 +8263,7 @@ document.addEventListener('DOMContentLoaded', function () {
             );
             
             if (isFirstPeriod && isZeroClock) {
-                return "Half";
+                return "HALF";
             }
             
             if (gameTime && gameTime !== "" && gameTime !== "-1" && currentPeriod) {
@@ -8268,7 +8273,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 else if (quarter === "2ND_QUARTER" || quarter === "SECOND_QUARTER") quarter = "2nd";
                 else if (quarter === "3RD_QUARTER" || quarter === "THIRD_QUARTER") quarter = "3rd";
                 else if (quarter === "4TH_QUARTER" || quarter === "FOURTH_QUARTER") quarter = "4th";
-                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "Half";
+                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "HALF";
                 else if (quarter === "OVERTIME" || quarter === "OT") quarter = "OT";
                 else {
                     // Handle any other quarter format
@@ -8278,6 +8283,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     else if (quarter === "THIRD") quarter = "3rd";
                     else if (quarter === "FOURTH") quarter = "4th";
                     else quarter = quarter.toLowerCase();
+                }
+                
+                // For halftime, don't show time - just return "HALF"
+                if (quarter === "HALF") {
+                    return "HALF";
                 }
                 
                 // Format time to include seconds if not present
@@ -8294,7 +8304,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 else if (quarter === "2ND_QUARTER" || quarter === "SECOND_QUARTER") quarter = "2nd";
                 else if (quarter === "3RD_QUARTER" || quarter === "THIRD_QUARTER") quarter = "3rd";
                 else if (quarter === "4TH_QUARTER" || quarter === "FOURTH_QUARTER") quarter = "4th";
-                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "Half";
+                else if (quarter === "HALFTIME" || quarter === "HALF_TIME") quarter = "HALF";
                 else if (quarter === "OVERTIME" || quarter === "OT") quarter = "OT";
                 return quarter;
             }
@@ -8685,13 +8695,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     titleContent.appendChild(logo);
-                } else if (leagueNameKey === "EFL Cup") {
+                } else if (leagueNameKey === "Carabao Cup") {
                     const logo = document.createElement("img");
-                    logo.src = "https://static.flashscore.com/res/image/data/EqLxVbkd-QwJbqIgc.png";
-                    logo.alt = "EFL Cup Logo";
-                        logo.width = 14;
-                        logo.height = 14;
-                        logo.style.width = "14px";
+                    logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/EFL_%28Carabao%29_Cup_Logo.svg/250px-EFL_%28Carabao%29_Cup_Logo.svg.png";
+                    logo.alt = "Carabao Cup Logo";
+                    logo.width = 14;
+                    logo.height = 14;
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8767,6 +8777,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         logo.width = 14;
                         logo.height = 14;
                         logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
+                } else if (leagueNameKey === "A-League") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/4Uw9VtU1-I5crYno3.png";
+                    logo.alt = "A-League Logo";
+                    logo.width = 14;
+                    logo.height = 14;
+                    logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -10016,7 +10041,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // Get displayLeagueForCheck early for use in granular time logic
                     const displayLeagueForCheck = getLeagueDisplayName(data.League, data.Sport);
-                    const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly', 'AFCON'].includes(displayLeagueForCheck);
+                    const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly', 'AFCON'].includes(displayLeagueForCheck);
                     
                     // Apply granular time logic for featured games (same as regular games)
                     let timeColumnTop = displayTimeLabel; // Default: keep as-is
@@ -10035,21 +10060,32 @@ document.addEventListener('DOMContentLoaded', function () {
                             // Remove span tags and get inner content
                             const innerContent = displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '');
                             
-                            // Check if it contains <br> (line break)
-                            if (innerContent.includes('<br>')) {
+                            // Check if it's halftime - show "HALF" without time
+                            if (innerContent.toUpperCase() === "HALF" || innerContent.toUpperCase() === "HALFTIME") {
+                                timeColumnTop = `<span style="color: red;">HALF</span>`;
+                                timeColumnBottom = '';
+                                periodQuarter = 'HALF'; // Set flag to skip further processing
+                            } else if (innerContent.includes('<br>')) {
                                 const parts = innerContent.split('<br>');
                                 if (parts.length >= 2) {
                                     const topPart = parts[0].trim();
                                     const bottomPart = parts[1].trim();
                                     
-                                    // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
-                                    if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
-                                        periodQuarter = topPart.toLowerCase();
-                                    }
-                                    
-                                    // Validate bottom part is ONLY time format (digits:digits)
-                                    if (bottomPart.match(/^\d+:\d+$/)) {
-                                        timeRemaining = bottomPart;
+                                    // Check if top part is "Half" or "HALF" - show "HALF" without time
+                                    if (topPart.toUpperCase() === "HALF" || topPart.toUpperCase() === "HALFTIME") {
+                                        timeColumnTop = `<span style="color: red;">HALF</span>`;
+                                        timeColumnBottom = '';
+                                        periodQuarter = 'HALF'; // Set flag to skip further processing
+                                    } else {
+                                        // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
+                                        if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
+                                            periodQuarter = topPart.toLowerCase();
+                                        }
+                                        
+                                        // Validate bottom part is ONLY time format (digits:digits)
+                                        if (bottomPart.match(/^\d+:\d+$/)) {
+                                            timeRemaining = bottomPart;
+                                        }
                                     }
                                 }
                             } else {
@@ -10081,7 +10117,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 currentPeriod === "HALF_TIME"
                             );
                             
-                            if (hasTimeRemaining && !isHalftimeOrIntermission && currentPeriod) {
+                            // If halftime, show "HALF" without time
+                            if (isHalftimeOrIntermission && !periodQuarter) {
+                                timeColumnTop = `<span style="color: red;">HALF</span>`;
+                                timeColumnBottom = '';
+                                periodQuarter = 'HALF'; // Set flag to skip further processing
+                            } else if (hasTimeRemaining && !isHalftimeOrIntermission && currentPeriod) {
                                 // Extract period/quarter - ONLY allow "1st", "2nd", "3rd", "4th", or "OT"
                                 if (!periodQuarter) {
                                     let period = currentPeriod;
@@ -10120,11 +10161,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         
                         // Set time column values - STRICT: only period on top, only time on bottom
-                        if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT")) {
+                        if (periodQuarter === 'HALF') {
+                            // Already set above, do nothing
+                        } else if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT")) {
                             timeColumnTop = `<span style="color: red;">${periodQuarter}</span>`;
                         } else {
-                            // If we don't have a valid period/quarter, use displayTimeLabel as fallback
-                            timeColumnTop = displayTimeLabel;
+                            // If we don't have a valid period/quarter, check if displayTimeLabel is "Half" and convert to "HALF"
+                            const innerContent = displayTimeLabel ? displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '') : '';
+                            if (innerContent.toUpperCase() === "HALF" || innerContent.toUpperCase() === "HALFTIME") {
+                                timeColumnTop = `<span style="color: red;">HALF</span>`;
+                                timeColumnBottom = '';
+                            } else {
+                                timeColumnTop = displayTimeLabel;
+                            }
                         }
                         
                         if (timeRemaining && timeRemaining.match(/^\d+:\d+$/)) {
@@ -10203,9 +10252,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     if (isSoccerLeague) {
                         // Soccer: home team on top, away team on bottom (opposite of non-soccer)
-                        // For soccer, displayTimeLabel stays in time column (centered, rowspan="2")
-                        row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: middle; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td>`;
-                        row2.innerHTML = `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
+                        // Time on top line (same as other leagues)
+                        row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td>`;
+                        row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                     } else {
                         // All other leagues: away team on top, home team on bottom
                         // Period/quarter goes in time column top row (same line as top team), time remaining goes in time column bottom row (same line as bottom team)
@@ -10398,7 +10447,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (isFinal) {
                     currentTimeLabel = "F";
                 } else if (rawStart && rawStart.toDate) {
-                    currentTimeLabel = luxon.DateTime.fromJSDate(rawStart.toDate()).toFormat('h:mm a');
+                    currentTimeLabel = luxon.DateTime.fromJSDate(rawStart.toDate(), { zone: 'utc' }).setZone('local').toFormat('h:mm a');
                 } else {
                     currentTimeLabel = "TBD";
                 }
@@ -10513,7 +10562,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Check if this is a soccer league - soccer leagues show home on top, away on bottom
                 // displayLeague already declared above
-                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'Copa Libertadores', 'Copa Sudamericana', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'AFCON'].includes(displayLeague);
+                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'Copa Libertadores', 'Copa Sudamericana', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'AFCON'].includes(displayLeague);
                 
                 // Check if we're rendering in the league-specific column (for font size adjustment)
                 const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
@@ -10540,21 +10589,32 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Remove span tags and get inner content
                         const innerContent = displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '');
                         
-                        // Check if it contains <br> (line break)
-                        if (innerContent.includes('<br>')) {
+                        // Check if it's halftime - show "HALF" without time
+                        if (innerContent.toUpperCase() === "HALF" || innerContent.toUpperCase() === "HALFTIME") {
+                            timeColumnTop = `<span style="color: red;">HALF</span>`;
+                            timeColumnBottom = '';
+                            periodQuarter = 'HALF'; // Set flag to skip further processing
+                        } else if (innerContent.includes('<br>')) {
                             const parts = innerContent.split('<br>');
                             if (parts.length >= 2) {
                                 const topPart = parts[0].trim();
                                 const bottomPart = parts[1].trim();
                                 
-                                // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
-                                if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
-                                    periodQuarter = topPart.toLowerCase();
-                                }
-                                
-                                // Validate bottom part is ONLY time format (digits:digits)
-                                if (bottomPart.match(/^\d+:\d+$/)) {
-                                    timeRemaining = bottomPart;
+                                // Check if top part is "Half" or "HALF" - show "HALF" without time
+                                if (topPart.toUpperCase() === "HALF" || topPart.toUpperCase() === "HALFTIME") {
+                                    timeColumnTop = `<span style="color: red;">HALF</span>`;
+                                    timeColumnBottom = '';
+                                    periodQuarter = 'HALF'; // Set flag to skip further processing
+                                } else {
+                                    // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
+                                    if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
+                                        periodQuarter = topPart.toLowerCase();
+                                    }
+                                    
+                                    // Validate bottom part is ONLY time format (digits:digits)
+                                    if (bottomPart.match(/^\d+:\d+$/)) {
+                                        timeRemaining = bottomPart;
+                                    }
                                 }
                             }
                         } else {
@@ -10586,7 +10646,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             currentPeriod === "HALF_TIME"
                         );
                         
-                        if (hasTimeRemaining && !isHalftimeOrIntermission && currentPeriod) {
+                        // If halftime, show "HALF" without time
+                        if (isHalftimeOrIntermission && !periodQuarter) {
+                            timeColumnTop = `<span style="color: red;">HALF</span>`;
+                            timeColumnBottom = '';
+                            periodQuarter = 'HALF'; // Set flag to skip further processing
+                        } else if (hasTimeRemaining && !isHalftimeOrIntermission && currentPeriod) {
                             // Extract period/quarter - ONLY allow "1st", "2nd", "3rd", "4th", or "OT"
                             if (!periodQuarter) {
                                 let period = currentPeriod;
@@ -10625,11 +10690,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     
                     // Set time column values - STRICT: only period on top, only time on bottom
-                    if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT")) {
+                    if (periodQuarter === 'HALF') {
+                        // Already set above, do nothing
+                    } else if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT")) {
                         timeColumnTop = `<span style="color: red;">${periodQuarter}</span>`;
                     } else {
-                        // If we don't have a valid period/quarter, use displayTimeLabel as fallback
-                        timeColumnTop = displayTimeLabel;
+                        // If we don't have a valid period/quarter, check if displayTimeLabel is "Half" and convert to "HALF"
+                        const innerContent = displayTimeLabel ? displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '') : '';
+                        if (innerContent.toUpperCase() === "HALF" || innerContent.toUpperCase() === "HALFTIME") {
+                            timeColumnTop = `<span style="color: red;">HALF</span>`;
+                            timeColumnBottom = '';
+                        } else {
+                            timeColumnTop = displayTimeLabel;
+                        }
                     }
                     
                     if (timeRemaining && timeRemaining.match(/^\d+:\d+$/)) {
@@ -10639,9 +10712,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom (opposite of non-soccer)
-                    // For soccer, displayTimeLabel stays in time column (centered, rowspan="2")
-                    row1.innerHTML = `<td rowspan="2" style="text-align: center; font-size: ${timeFontSize}; vertical-align: middle; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td>`;
-                    row2.innerHTML = `<td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
+                    // Time on top line (same as other leagues)
+                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td>`;
+                    row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
                     // Period/quarter goes in time column top row (same line as top team), time remaining goes in time column bottom row (same line as bottom team)
@@ -13343,10 +13416,49 @@ async function fetchFeaturedGames() {
             });
 
         function updateDisplay() {
+            // CRITICAL: Check LIVE filter state directly AND activeTab variable
+            // Use the most authoritative source - LIVE filter DOM state takes precedence
+            const liveFilterElement = document.getElementById('live-filter-toggle');
+            const isLiveFilterActive = liveFilterElement && liveFilterElement.classList.contains('active');
+            // If LIVE filter is active in DOM, use 'LIVE', otherwise use activeTab variable (defaults to 'ALL')
+            const currentActiveTab = isLiveFilterActive ? 'LIVE' : (activeTab || 'ALL');
+            
+            // Ensure activeTab variable stays in sync with DOM state
+            if (isLiveFilterActive && activeTab !== 'LIVE') {
+                activeTab = 'LIVE';
+            } else if (!isLiveFilterActive && activeTab === 'LIVE') {
+                activeTab = 'ALL';
+            }
+            
+            // Diagnostic logging to confirm data state
+            const nonLiveRegular = regularGames.filter(g => {
+                const s = (g["Match Status"] || "").toUpperCase();
+                return !s.includes("IN PROGRESS") && !s.includes("LIVE");
+            }).length;
+            const nonLiveFeatured = featuredGames.filter(g => {
+                const s = (g["Match Status"] || "").toUpperCase();
+                return !s.includes("IN PROGRESS") && !s.includes("LIVE");
+            }).length;
+            
+            console.log(
+                '[updateDisplay] TAB:', currentActiveTab,
+                '| activeTab var:', activeTab,
+                '| LIVE filter active:', isLiveFilterActive,
+                '| regular:', regularGames.length,
+                '| featured:', featuredGames.length,
+                '| non-live regular:', nonLiveRegular,
+                '| non-live featured:', nonLiveFeatured
+            );
+            
+            // Prevent rendering when data arrays are empty (prevents empty wipe)
+            if (!regularGames.length && !featuredGames.length) {
+                return;
+            }
+            
             let gamesToRender = [];
             
             // In Live tab, exclude featured games entirely
-            if (activeTab === 'LIVE') {
+            if (currentActiveTab === 'LIVE') {
                 // Only show regular games (no featured section)
                 gamesToRender = [...regularGames];
             } else {
@@ -13368,7 +13480,7 @@ async function fetchFeaturedGames() {
             });
             
             // Filter at DATA level BEFORE rendering - this is the key fix
-            if (activeTab === 'LIVE') {
+            if (currentActiveTab === 'LIVE') {
                 gamesToRender = gamesToRender.filter(game => {
                     const matchStatus = (game["Match Status"] || game.matchStatus || game["matchStatus"] || "").toUpperCase().trim();
                     // Only include live/in-progress games
@@ -13440,26 +13552,58 @@ async function fetchFeaturedGames() {
         scoresError.style.display = 'none';
         scoresContainer.innerHTML = '';
 
-        // Read from yesterdayScores collection (completed games from all leagues)
-        const yesterdayScoresRef = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
+        // Read from sportsGames collection - filter for yesterday's FINAL games
+        const sportsGamesRef = db.collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
 
-        yesterdayScoresRef.get()
+        // Get yesterday's date
+        const { DateTime } = luxon;
+        const now = DateTime.now().setZone('America/Denver');
+        const yesterdayStr = now.minus({ days: 1 }).toISODate();
+
+        // Query for yesterday's games that are FINAL
+        console.log('[SCORES] Querying for yesterday\'s games. Date:', yesterdayStr);
+        sportsGamesRef.where('gameDate', '==', yesterdayStr).get()
             .then(async snapshot => {
             scoresLoading.style.display = 'none';
                 
+                console.log('[SCORES] Query result: found', snapshot.size, 'games for', yesterdayStr);
+                
                 if (snapshot.empty) {
+                    console.log('[SCORES] No games found for yesterday\'s date');
                     scoresContainer.innerHTML = '<p style="padding: 10px;">No completed games found. Check back after games finish.</p>';
                     return;
                 }
                 
-                // Get yesterday's games - filter by gameDate
-                const { DateTime } = luxon;
-                const now = DateTime.now().setZone('America/Denver');
-                const yesterdayStr = now.minus({ days: 1 }).toISODate();
-                
                 const allGamesData = snapshot.docs.map(doc => doc.data());
+                console.log('[SCORES] Total games found:', allGamesData.length);
+                
+                // Log match statuses for debugging
+                const statusCounts = {};
+                allGamesData.forEach(game => {
+                    const status = game['Match Status'] || 'NO STATUS';
+                    statusCounts[status] = (statusCounts[status] || 0) + 1;
+                });
+                console.log('[SCORES] Match status breakdown:', statusCounts);
+                
+                // Filter to only FINAL games (yesterday's completed games)
+                // Also include games with scores (indicating they've been played) even if status isn't exactly FINAL
+                const matchStatusFilter = (status, homeScore, awayScore) => {
+                    const upperStatus = (status || '').toUpperCase();
+                    const hasScores = (homeScore !== undefined && homeScore !== null && homeScore !== '') || 
+                                     (awayScore !== undefined && awayScore !== null && awayScore !== '');
+                    return upperStatus.includes('FINAL') || 
+                           upperStatus.includes('FINISHED') || 
+                           upperStatus.includes('GAME OVER') ||
+                           (hasScores && !upperStatus.includes('IN PROGRESS') && !upperStatus.includes('LIVE') && !upperStatus.includes('SCHEDULED'));
+                };
+                
+                const finalGamesData = allGamesData.filter(game => 
+                    matchStatusFilter(game['Match Status'], game['Home Score'], game['Away Score'])
+                );
+                console.log('[SCORES] FINAL games after filtering:', finalGamesData.length);
+                
                 // Exclude old "Asia: AFC Elite" games from Google Sheets (source is not ESPN_LIVE) and any unmapped "AFC Champions League" games
-                const filteredAllGamesData = allGamesData.filter(game => {
+                const filteredAllGamesData = finalGamesData.filter(game => {
                     // Only exclude if it's an old Google Sheets game (no source or source is not ESPN_LIVE)
                     if (game.League === "Asia: AFC Elite" && game.source !== "ESPN_LIVE") {
                         return false;
@@ -13470,25 +13614,19 @@ async function fetchFeaturedGames() {
                     }
                     return true;
                 });
+                console.log('[SCORES] FINAL games after league filtering:', filteredAllGamesData.length);
+                
                 // Keep a raw cache for league Yesterday tabs (filtered)
                 yesterdayScoresRawCache = filteredAllGamesData;
                 
-                // Try to get games from yesterday first
-                let gamesData = allGamesData.filter(game => game.gameDate === yesterdayStr).sort(sortGames);
+                // Use the filtered FINAL games from yesterday
+                let gamesData = filteredAllGamesData.sort(sortGames);
                 
-                // If no games found for yesterday, try to get the most recent games available
+                // If no FINAL games found for yesterday, show message
                 if (gamesData.length === 0) {
-                    // Get all unique dates and sort them
-                    const availableDates = [...new Set(filteredAllGamesData.map(g => g.gameDate))].sort();
-                    
-                    // If we have dates, get the most recent one
-                    if (availableDates.length > 0) {
-                        const mostRecentDate = availableDates[availableDates.length - 1];
-                        gamesData = filteredAllGamesData.filter(game => game.gameDate === mostRecentDate).sort(sortGames);
-                    } else {
-                        scoresContainer.innerHTML = '<p style="padding: 10px; color: #9ca3af;">No completed games found.</p>';
-                        return;
-                    }
+                    console.log('[SCORES] No FINAL games found after all filtering');
+                    scoresContainer.innerHTML = '<p style="padding: 10px; color: #9ca3af;">No completed games found for yesterday.</p>';
+                    return;
                 }
                 
                 // Try to get featured games for the date we're using, but don't fail if it doesn't work
@@ -14156,7 +14294,7 @@ async function fetchFeaturedGames() {
                 const soccerGames = allGames.filter(game => {
                     const displayLeague = getLeagueDisplayName(game.League, game.Sport);
                     // Check if it's a soccer league
-                    return ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'EFL Cup', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers'].includes(displayLeague);
+                    return ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers'].includes(displayLeague);
                 });
                 
                 if (soccerGames.length === 0) {
@@ -15867,9 +16005,9 @@ if (gamesTabsContainer) {
         }
         
         todayTab.classList.remove('active');
-            if (liveFilter) {
-        liveFilter.classList.remove('active');
-            }
+        if (liveFilter) {
+            liveFilter.classList.remove('active');
+        }
         scoresTab.classList.add('active');
 
         document.getElementById('tv-listings-scores').style.display = 'block';
@@ -15886,19 +16024,26 @@ if (gamesTabsContainer) {
         }
 
         if (scoresTab) {
-        scoresTab.classList.remove('active');
+            scoresTab.classList.remove('active');
         }
         if (liveFilter) {
-        liveFilter.classList.remove('active');
+            liveFilter.classList.remove('active');
         }
         todayTab.classList.add('active');
         
-        // Set active tab to ALL when Today tab is clicked
+        // CRITICAL: Force activeTab to ALL and ensure LIVE filter is off
+        // This must happen BEFORE fetchTodayGames creates the closure
         activeTab = 'ALL';
+        
+        // Double-check LIVE filter is not active
+        if (liveFilter && liveFilter.classList.contains('active')) {
+            liveFilter.classList.remove('active');
+        }
         
         document.getElementById('tv-listings-today').style.display = 'block';
         document.getElementById('tv-listings-scores').style.display = 'none';
         
+        // Let Firestore listeners call updateDisplay() - don't force it
         activeListenerUnsubscribe = fetchTodayGames(() => {
             // updateDisplay will be called by Firestore listeners
         });
@@ -15906,17 +16051,17 @@ if (gamesTabsContainer) {
 
     if (liveFilter) {
     liveFilter.addEventListener('click', () => {
-        // Always switch to TODAY tab first, then toggle LIVE filter
-        if (!todayTab.classList.contains('active')) {
-            // Switch to TODAY tab
+        // Ensure we're on TODAY tab content first
+        if (!todayTab.classList.contains('active') && !liveFilter.classList.contains('active')) {
+            // Switch to TODAY tab only if LIVE filter is not already active
             if (activeListenerUnsubscribe) {
                 activeListenerUnsubscribe();
                 activeListenerUnsubscribe = null;
             }
             
-                if (scoresTab) {
-            scoresTab.classList.remove('active');
-                }
+            if (scoresTab) {
+                scoresTab.classList.remove('active');
+            }
             todayTab.classList.add('active');
             
             document.getElementById('tv-listings-today').style.display = 'block';
@@ -15928,17 +16073,35 @@ if (gamesTabsContainer) {
             });
         }
         
-        // Toggle LIVE filter state
+        // Toggle LIVE filter state FIRST
+        const willBeActive = !liveFilter.classList.contains('active');
         liveFilter.classList.toggle('active');
         
-        // Update active tab based on filter state
+        // CRITICAL: Set activeTab IMMEDIATELY after toggling, before any renders
         if (liveFilter.classList.contains('active')) {
             activeTab = 'LIVE';
         } else {
             activeTab = 'ALL';
         }
         
-        // Trigger updateDisplay immediately to re-render with filtered data
+        // Update active tab styling based on LIVE filter state
+        if (willBeActive) {
+            // LIVE is becoming active - remove active from other tabs, add to LIVE
+            if (scoresTab) {
+                scoresTab.classList.remove('active');
+            }
+            todayTab.classList.remove('active');
+            // LIVE filter already has 'active' from toggle above
+        } else {
+            // LIVE is becoming inactive - restore active to TODAY tab
+            if (scoresTab) {
+                scoresTab.classList.remove('active');
+            }
+            todayTab.classList.add('active');
+        }
+        
+        // Force updateDisplay to run immediately with new filter state
+        // This ensures the filter is applied right away
         if (typeof window.triggerGamesUpdate === 'function') {
             window.triggerGamesUpdate();
         }
@@ -18726,7 +18889,7 @@ const VIDEOS_CONFIG = {
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
         'NFL': {
-            highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gmpnkQT2kGX3czPL-8tYKzx.xml',
+            highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gmO5mZRxR3YNII5qHYs_3RY.xml',
             allVideos: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-nfl.xml'
         },
         'MLB': {
@@ -18811,7 +18974,7 @@ function loadVideosWithTabs(section) {
         }
     } else if (section === 'NFL') {
         if (highlightsTab) {
-            highlightsTab.textContent = 'PREVIEWS';
+            highlightsTab.textContent = 'HIGHLIGHTS';
         }
         if (allVideosTab) {
             allVideosTab.textContent = 'ALL VIDEOS';
