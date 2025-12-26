@@ -96,7 +96,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     font-family: Arial, sans-serif;
     background-color: #151515;
     color: white;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+    overflow: hidden; /* Prevent all page-level scrolling - only columns scroll */
     zoom: 1;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
@@ -334,8 +334,10 @@ table.game-table td:nth-child(1) {
             flex: 1;
             padding: 0;
             margin: 0;
-            overflow-y: auto;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
             background-color: #000000;
+            display: block;
         }
 
         /* Ensure all video thumbnails are the same size and spacing - target all possible selectors including universal */
@@ -721,8 +723,10 @@ table.game-table td:nth-child(1) {
   }
 
   .column {
-    overflow: auto;
+    overflow: hidden;
     padding: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .column.tv-listings {
@@ -733,6 +737,23 @@ table.game-table td:nth-child(1) {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  #tv-listings-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .games-content {
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 150px;
   }
 
   .column.tv-listings * {
@@ -758,6 +779,16 @@ table.game-table td:nth-child(1) {
     min-width: 130px;
     font-size: 11px;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  #menuList {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 150px;
   }
 
   .divider {
@@ -770,17 +801,70 @@ table.game-table td:nth-child(1) {
     min-width: 220px;
     background-color: #fafaf9;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .news .content-section {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .social {
     flex: 0 1 317px;
     min-width: 220px;
     background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  #social-feed-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .videos-column {
     flex: 1 1 0;
     min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  #videos-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .videos-content {
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  
+  #league-specific-column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  
+  #f1-column-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden !important;
+  }
+  
+  #f1-column-content > div[style*="overflow-y"] {
+    overflow-y: auto !important;
   }
 
   /* ────────────────────────────────────────────────────────── */
@@ -1543,6 +1627,10 @@ div[id^="breaking-content-"] a:hover {
   #tv-listings-today,
   #tv-listings-live {
     padding: 5px;
+    padding-bottom: 150px;
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
 	   
 	   .winner {
@@ -2214,7 +2302,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div id="menuTopBox">
           <div class="menu-logo-section">
           <img
-            src="THPORTH logo.png"
+            src="https://thporth.com/THPORTH%20logo.png"
             alt="Logo"
               width="54"
               height="18"
@@ -2537,8 +2625,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="divider"></div>
 
 <!-- ─── TV-LISTINGS COLUMN (Default View) ──────────────────────────────────────── -->
-<div class="column tv-listings" id="games-column" style="background-color: #1f1f1f; overflow-x: hidden; padding-bottom: 40px;">
-  <div id="tv-listings-container" style="display: block;">
+<div class="column tv-listings" id="games-column" style="background-color: #1f1f1f;">
+  <div id="tv-listings-container" style="display: flex; flex-direction: column; height: 100%;">
     <div id="games-header" style="
         position: sticky; top: 0; width: 100%; height: 18px;
         background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif;
@@ -2983,7 +3071,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-PremierLeague" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/si-premierleague.xml">SI</div>
+					<!-- <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/si-premierleague.xml">SI</div> -->
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/yahoo-premierleague.xml">OneFootball</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/sportsmole-premierleague.xml">Sports Mole</div>
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/skysports-premierleague.xml">Sky</div>
@@ -3125,7 +3213,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="news-section" style="flex: 1 1 auto; min-height: 0;">
             <div id="news-content-FACup" class="news-feed-content" style="overflow-y: auto; height: 100%;">
                 <div class="news-section-header">
-                    <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/bundle/facup-news.xml">News</span>
+                    <span class="news-tab active" data-tab="breaking" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/newsnow-facup.xml">News</span>
                 </div>
                 <div class="news-content-pane" id="breaking-content-FACup" style="display: block;"></div>
                 </div>
@@ -3558,7 +3646,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <!-- VIDEOS COLUMN -->
         <div class="column videos-column" id="videos-column" style="background-color: #000000;">
-      <div id="videos-container" style="display: block;">
+      <div id="videos-container" style="display: flex; flex-direction: column; height: 100%;">
         <div id="videos-header" style="
             position: sticky; top: 0; width: 100%; height: 18px;
             background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif;
@@ -3575,7 +3663,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
 
         <!-- Videos content -->
-        <div id="videos-content" class="videos-content" style="display: block;">
+        <div id="videos-content" class="videos-content">
           <div id="videosWrapper">
             <div id="videosLoading" class="loading-indicator hidden">
               <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -5632,7 +5720,220 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'LPGA Tour', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "AFCON", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: National League", "2. Bundesliga", "Serie B", "Greek Super League", "LaLiga 2"]; 
+    // Hardcoded upcoming schedules (manually maintained)
+    const HARDCODED_UPCOMING_SCHEDULES = {
+        'Ligue1': [
+            { date: '2026-01-02', time: '2:45 PM', home: 'Toulouse', away: 'Lens', channel: 'beIN' },
+            { date: '2026-01-03', time: '11:00 AM', home: 'Monaco', away: 'Olympique Lyonnais', channel: 'beIN' },
+            { date: '2026-01-03', time: '1:00 PM', home: 'Nice', away: 'Strasbourg', channel: 'beIN' },
+            { date: '2026-01-03', time: '3:05 PM', home: 'Lille', away: 'Rennes', channel: 'beIN' },
+            { date: '2026-01-04', time: '11:15 AM', home: 'Brest', away: 'Auxerre', channel: 'beIN' },
+            { date: '2026-01-04', time: '11:15 AM', home: 'Le Havre', away: 'Angers SCO', channel: 'beIN' },
+            { date: '2026-01-04', time: '11:15 AM', home: 'Lorient', away: 'Metz', channel: 'beIN' },
+            { date: '2026-01-16', time: '1:00 PM', home: 'Monaco', away: 'Lorient', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-16', time: '3:00 PM', home: 'PSG', away: 'Lille', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-17', time: '11:00 AM', home: 'Lens', away: 'Auxerre', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-17', time: '1:00 PM', home: 'Toulouse', away: 'Nice', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-17', time: '3:05 PM', home: 'Angers SCO', away: 'Olympique Marseille', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-18', time: '9:00 AM', home: 'Strasbourg', away: 'Metz', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-18', time: '11:15 AM', home: 'Nantes', away: 'Paris', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-18', time: '11:15 AM', home: 'Rennes', away: 'Le Havre', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-18', time: '2:45 PM', home: 'Olympique Lyonnais', away: 'Brest', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-23', time: '2:00 PM', home: 'Auxerre', away: 'PSG', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-24', time: '11:00 AM', home: 'Rennes', away: 'Lorient', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-24', time: '1:00 PM', home: 'Le Havre', away: 'Monaco', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-24', time: '3:05 PM', home: 'Olympique Marseille', away: 'Lens', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-25', time: '9:00 AM', home: 'Nantes', away: 'Nice', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-25', time: '11:15 AM', home: 'Brest', away: 'Toulouse', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-25', time: '11:15 AM', home: 'Metz', away: 'Olympique Lyonnais', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-25', time: '11:15 AM', home: 'Paris', away: 'Angers SCO', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-25', time: '2:45 PM', home: 'Lille', away: 'Strasbourg', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-30', time: '2:45 PM', home: 'Lens', away: 'Le Havre', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-31', time: '11:00 AM', home: 'Paris', away: 'Olympique Marseille', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-31', time: '1:00 PM', home: 'Lorient', away: 'Nantes', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-01-31', time: '3:05 PM', home: 'Monaco', away: 'Rennes', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-02-01', time: '9:00 AM', home: 'Olympique Lyonnais', away: 'Lille', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-02-01', time: '11:15 AM', home: 'Angers SCO', away: 'Metz', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-02-01', time: '11:15 AM', home: 'Nice', away: 'Brest', channel: 'Disney+ Premium Caribbean' },
+            { date: '2026-02-01', time: '11:15 AM', home: 'Toulouse', away: 'Auxerre', channel: 'Disney+ Premium Caribbean' }
+        ],
+        'LigaMX': [
+            { date: '2026-01-09', time: '10:00 PM', home: 'Atlas', away: 'Puebla', channel: 'ViX' },
+            { date: '2026-01-09', time: '10:00 PM', home: 'Mazatlán', away: 'Juárez', channel: 'ViX' },
+            { date: '2026-01-09', time: '10:00 PM', home: 'Tijuana', away: 'América', channel: 'ViX' },
+            { date: '2026-01-10', time: '6:00 PM', home: 'Guadalajara', away: 'Pachuca', channel: '' },
+            { date: '2026-01-10', time: '8:00 PM', home: 'León', away: 'Cruz Azul', channel: '' },
+            { date: '2026-01-10', time: '8:00 PM', home: 'Santos Laguna', away: 'Necaxa', channel: 'ViX' },
+            { date: '2026-01-10', time: '10:00 PM', home: 'Monterrey', away: 'Toluca', channel: 'ViX' },
+            { date: '2026-01-11', time: '1:00 PM', home: 'Pumas UNAM', away: 'Querétaro', channel: '' },
+            { date: '2026-01-11', time: '8:00 PM', home: 'Atlético San Luis', away: 'Tigres UANL', channel: '' },
+            { date: '2026-01-13', time: '8:00 PM', home: 'Necaxa', away: 'Monterrey', channel: 'ViX' },
+            { date: '2026-01-13', time: '8:00 PM', home: 'Pachuca', away: 'León', channel: '' },
+            { date: '2026-01-13', time: '8:00 PM', home: 'Puebla', away: 'Mazatlán', channel: 'ViX' },
+            { date: '2026-01-13', time: '10:00 PM', home: 'Cruz Azul', away: 'Atlas', channel: '' },
+            { date: '2026-01-13', time: '10:00 PM', home: 'Juárez', away: 'Guadalajara', channel: '' },
+            { date: '2026-01-14', time: '8:00 PM', home: 'América', away: 'Atlético San Luis', channel: '' },
+            { date: '2026-01-14', time: '8:00 PM', home: 'Querétaro', away: 'Tijuana', channel: 'ViX' },
+            { date: '2026-01-14', time: '10:00 PM', home: 'Tigres UANL', away: 'Pumas UNAM', channel: '' },
+            { date: '2026-01-14', time: '10:00 PM', home: 'Toluca', away: 'Santos Laguna', channel: '' },
+            { date: '2026-01-16', time: '10:00 PM', home: 'Mazatlán', away: 'Monterrey', channel: 'ViX' },
+            { date: '2026-01-17', time: '6:00 PM', home: 'Guadalajara', away: 'Querétaro', channel: '' },
+            { date: '2026-01-17', time: '6:00 PM', home: 'Necaxa', away: 'Atlas', channel: 'ViX' },
+            { date: '2026-01-17', time: '8:00 PM', home: 'Tigres UANL', away: 'Toluca', channel: '' },
+            { date: '2026-01-17', time: '10:00 PM', home: 'Cruz Azul', away: 'Puebla', channel: '' },
+            { date: '2026-01-17', time: '10:00 PM', home: 'Tijuana', away: 'Atlético San Luis', channel: 'ViX' },
+            { date: '2026-01-18', time: '1:00 PM', home: 'Pumas UNAM', away: 'León', channel: '' },
+            { date: '2026-01-18', time: '6:00 PM', home: 'Santos Laguna', away: 'Juárez', channel: 'ViX' },
+            { date: '2026-01-18', time: '8:00 PM', home: 'Pachuca', away: 'América', channel: '' },
+            { date: '2026-01-30', time: '8:00 PM', home: 'Puebla', away: 'Toluca', channel: 'ViX' },
+            { date: '2026-01-30', time: '10:00 PM', home: 'Juárez', away: 'Cruz Azul', channel: '' },
+            { date: '2026-01-30', time: '10:00 PM', home: 'Pumas UNAM', away: 'Santos Laguna', channel: '' },
+            { date: '2026-01-31', time: '6:00 PM', home: 'Atlas', away: 'Mazatlán', channel: 'ViX' },
+            { date: '2026-01-31', time: '8:00 PM', home: 'León', away: 'Tigres UANL', channel: '' },
+            { date: '2026-01-31', time: '8:00 PM', home: 'Monterrey', away: 'Tijuana', channel: 'ViX' },
+            { date: '2026-01-31', time: '10:00 PM', home: 'América', away: 'Necaxa', channel: '' },
+            { date: '2026-02-01', time: '6:00 PM', home: 'Querétaro', away: 'Pachuca', channel: 'ViX' },
+            { date: '2026-02-01', time: '8:00 PM', home: 'Atlético San Luis', away: 'Guadalajara', channel: '' },
+            { date: '2026-02-06', time: '8:00 PM', home: 'Necaxa', away: 'Atlético San Luis', channel: 'ViX' },
+            { date: '2026-02-06', time: '8:00 PM', home: 'Tigres UANL', away: 'Santos Laguna', channel: '' },
+            { date: '2026-02-06', time: '10:00 PM', home: 'Mazatlán', away: 'Guadalajara', channel: 'ViX' },
+            { date: '2026-02-06', time: '10:00 PM', home: 'Tijuana', away: 'Puebla', channel: 'ViX' }
+        ],
+        'FACup': [
+            { date: '2026-01-09', time: '2:30 PM', home: 'Milton Keynes Dons', away: 'Oxford United', channel: 'ESPN Select' },
+            { date: '2026-01-09', time: '2:30 PM', home: 'Port Vale', away: 'Fleetwood Town', channel: 'ESPN Select' },
+            { date: '2026-01-09', time: '2:30 PM', home: 'Preston North End', away: 'Wigan Athletic', channel: 'ESPN Select' },
+            { date: '2026-01-09', time: '2:30 PM', home: 'Wrexham', away: 'Nottingham Forest', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '7:15 AM', home: 'Cheltenham Town', away: 'Leicester City', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '7:15 AM', home: 'Everton', away: 'Sunderland', channel: 'ESPN2' },
+            { date: '2026-01-10', time: '7:15 AM', home: 'Macclesfield', away: 'Crystal Palace', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '7:15 AM', home: 'Wolverhampton Wanderers', away: 'Shrewsbury Town', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '10:00 AM', home: 'Boreham Wood', away: 'Burton Albion', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '10:00 AM', home: 'Burnley', away: 'Millwall', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '10:00 AM', home: 'Doncaster Rovers', away: 'Southampton', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '10:00 AM', home: 'Fulham', away: 'Middlesbrough', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '10:00 AM', home: 'Ipswich Town', away: 'Blackpool', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '10:00 AM', home: 'Manchester City', away: 'Exeter City', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '10:00 AM', home: 'Newcastle United', away: 'AFC Bournemouth', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '10:00 AM', home: 'Salford City', away: 'Swindon Town', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '10:00 AM', home: 'Sheffield Wednesday', away: 'Brentford', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '10:00 AM', home: 'Stoke City', away: 'Coventry City', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '12:45 PM', home: 'Bristol City', away: 'Watford', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '12:45 PM', home: 'Cambridge United', away: 'Birmingham City', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '12:45 PM', home: 'Grimsby Town', away: 'Weston-super-Mare', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '12:45 PM', home: 'Tottenham Hotspur', away: 'Aston Villa', channel: 'ESPN Select' },
+            { date: '2026-01-10', time: '3:00 PM', home: 'Charlton Athletic', away: 'Chelsea', channel: 'ESPN Select' },
+            { date: '2026-01-11', time: '7:00 AM', home: 'Derby County', away: 'Leeds United', channel: 'ESPN Select' },
+            { date: '2026-01-11', time: '9:00 AM', home: 'Portsmouth', away: 'Arsenal', channel: 'ESPN2' },
+            { date: '2026-01-11', time: '9:30 AM', home: 'Hull City', away: 'Blackburn Rovers', channel: 'ESPN Select' },
+            { date: '2026-01-11', time: '9:30 AM', home: 'Norwich City', away: 'Walsall', channel: 'ESPN Select' },
+            { date: '2026-01-11', time: '9:30 AM', home: 'Sheffield United', away: 'Mansfield Town', channel: 'ESPN Select' },
+            { date: '2026-01-11', time: '9:30 AM', home: 'Swansea City', away: 'West Bromwich Albion', channel: 'ESPN Select' },
+            { date: '2026-01-11', time: '9:30 AM', home: 'West Ham United', away: 'Queens Park Rangers', channel: 'ESPN Select' },
+            { date: '2026-01-11', time: '11:30 AM', home: 'Manchester United', away: 'Brighton & Hove Albion', channel: 'ESPN Select' },
+            { date: '2026-01-12', time: '2:45 PM', home: 'Liverpool', away: 'Barnsley', channel: 'ESPN Select' }
+        ],
+        'Bundesliga': [
+            { date: '2026-01-09', time: '2:30 PM', home: 'Eintracht Frankfurt', away: 'Borussia Dortmund', channel: 'ESPN2' },
+            { date: '2026-01-10', time: '9:30 AM', home: '1. FC Heidenheim 1846', away: 'FC Cologne', channel: 'ESPN+' },
+            { date: '2026-01-10', time: '9:30 AM', home: '1. FC Union Berlin', away: 'Mainz', channel: 'ESPN+' },
+            { date: '2026-01-10', time: '9:30 AM', home: 'SC Freiburg', away: 'Hamburg SV', channel: 'ESPN+' },
+            { date: '2026-01-10', time: '9:30 AM', home: 'St. Pauli', away: 'RB Leipzig', channel: 'ESPN+' },
+            { date: '2026-01-10', time: '9:30 AM', home: 'Werder Bremen', away: 'TSG Hoffenheim', channel: 'ESPN+' },
+            { date: '2026-01-10', time: '12:30 PM', home: 'Bayer Leverkusen', away: 'VfB Stuttgart', channel: 'ESPN+' },
+            { date: '2026-01-11', time: '9:30 AM', home: 'Borussia Mönchengladbach', away: 'FC Augsburg', channel: 'ESPN+' },
+            { date: '2026-01-11', time: '11:30 AM', home: 'Bayern Munich', away: 'VfL Wolfsburg', channel: 'ESPN+' },
+            { date: '2026-01-14', time: '12:30 PM', home: 'VfL Wolfsburg', away: 'St. Pauli', channel: 'ESPN+' },
+            { date: '2026-01-14', time: '2:30 PM', home: 'FC Cologne', away: 'Bayern Munich', channel: 'ESPN+' },
+            { date: '2026-01-14', time: '2:30 PM', home: 'RB Leipzig', away: 'SC Freiburg', channel: 'ESPN+' },
+            { date: '2026-01-14', time: '2:30 PM', home: 'TSG Hoffenheim', away: 'Borussia Mönchengladbach', channel: 'ESPN+' },
+            { date: '2026-01-15', time: '2:30 PM', home: 'FC Augsburg', away: '1. FC Union Berlin', channel: 'ESPN+' },
+            { date: '2026-01-16', time: '2:30 PM', home: 'Werder Bremen', away: 'Eintracht Frankfurt', channel: 'ESPN+' },
+            { date: '2026-01-17', time: '9:30 AM', home: 'Borussia Dortmund', away: 'St. Pauli', channel: 'ESPN+' },
+            { date: '2026-01-17', time: '9:30 AM', home: 'FC Cologne', away: 'Mainz', channel: 'ESPN+' },
+            { date: '2026-01-17', time: '9:30 AM', home: 'Hamburg SV', away: 'Borussia Mönchengladbach', channel: 'ESPN+' },
+            { date: '2026-01-17', time: '9:30 AM', home: 'TSG Hoffenheim', away: 'Bayer Leverkusen', channel: 'ESPN+' },
+            { date: '2026-01-17', time: '9:30 AM', home: 'VfL Wolfsburg', away: '1. FC Heidenheim 1846', channel: 'ESPN+' },
+            { date: '2026-01-17', time: '12:30 PM', home: 'RB Leipzig', away: 'Bayern Munich', channel: 'ESPN+' },
+            { date: '2026-01-18', time: '9:30 AM', home: 'VfB Stuttgart', away: '1. FC Union Berlin', channel: 'ESPN+' },
+            { date: '2026-01-18', time: '11:30 AM', home: 'FC Augsburg', away: 'SC Freiburg', channel: 'ESPN+' },
+            { date: '2026-01-23', time: '2:30 PM', home: 'St. Pauli', away: 'Hamburg SV', channel: 'ESPN+' },
+            { date: '2026-01-24', time: '9:30 AM', home: '1. FC Heidenheim 1846', away: 'RB Leipzig', channel: 'ESPN+' },
+            { date: '2026-01-24', time: '9:30 AM', home: 'Bayer Leverkusen', away: 'Werder Bremen', channel: 'ESPN+' },
+            { date: '2026-01-24', time: '9:30 AM', home: 'Bayern Munich', away: 'FC Augsburg', channel: 'ESPN+' },
+            { date: '2026-01-24', time: '9:30 AM', home: 'Eintracht Frankfurt', away: 'TSG Hoffenheim', channel: 'ESPN+' },
+            { date: '2026-01-24', time: '9:30 AM', home: 'Mainz', away: 'VfL Wolfsburg', channel: 'ESPN+' },
+            { date: '2026-01-24', time: '12:30 PM', home: '1. FC Union Berlin', away: 'Borussia Dortmund', channel: 'ESPN+' }
+        ],
+        'LaLiga': [
+            { date: '2026-01-02', time: '3:00 PM', home: 'Rayo Vallecano', away: 'Getafe', channel: 'ESPN+' },
+            { date: '2026-01-03', time: '8:00 AM', home: 'Celta Vigo', away: 'Valencia', channel: 'ESPN+' },
+            { date: '2026-01-03', time: '10:15 AM', home: 'Osasuna', away: 'Athletic Club', channel: 'ESPN+' },
+            { date: '2026-01-03', time: '12:30 PM', home: 'Elche', away: 'Villarreal', channel: 'ESPN+' },
+            { date: '2026-01-03', time: '3:00 PM', home: 'Espanyol', away: 'Barcelona', channel: 'ESPN+' },
+            { date: '2026-01-09', time: '3:00 PM', home: 'Getafe', away: 'Real Sociedad', channel: 'ESPN+' },
+            { date: '2026-01-10', time: '8:00 AM', home: 'Real Oviedo', away: 'Real Betis', channel: 'ESPN+' },
+            { date: '2026-01-10', time: '10:15 AM', home: 'Villarreal', away: 'Alavés', channel: 'ESPN+' },
+            { date: '2026-01-10', time: '12:30 PM', home: 'Girona', away: 'Osasuna', channel: 'ESPN+' },
+            { date: '2026-01-10', time: '3:00 PM', home: 'Valencia', away: 'Elche', channel: 'ESPN+' },
+            { date: '2026-01-11', time: '8:00 AM', home: 'Rayo Vallecano', away: 'Mallorca', channel: 'ESPN+' },
+            { date: '2026-01-11', time: '10:15 AM', home: 'Levante', away: 'Espanyol', channel: 'ESPN+' },
+            { date: '2026-01-12', time: '3:00 PM', home: 'Sevilla', away: 'Celta Vigo', channel: 'ESPN+' },
+            { date: '2026-01-16', time: '3:00 PM', home: 'Espanyol', away: 'Girona', channel: 'ESPN+' },
+            { date: '2026-01-17', time: '8:00 AM', home: 'Real Madrid', away: 'Levante', channel: 'ESPN+' },
+            { date: '2026-01-17', time: '10:15 AM', home: 'Mallorca', away: 'Athletic Club', channel: 'ESPN+' },
+            { date: '2026-01-17', time: '12:30 PM', home: 'Osasuna', away: 'Real Oviedo', channel: 'ESPN+' },
+            { date: '2026-01-17', time: '3:00 PM', home: 'Real Betis', away: 'Villarreal', channel: 'ESPN+' },
+            { date: '2026-01-18', time: '8:00 AM', home: 'Getafe', away: 'Valencia', channel: 'ESPN+' },
+            { date: '2026-01-18', time: '10:15 AM', home: 'Atlético Madrid', away: 'Alavés', channel: 'ESPN+' },
+            { date: '2026-01-18', time: '12:30 PM', home: 'Celta Vigo', away: 'Rayo Vallecano', channel: 'ESPN+' },
+            { date: '2026-01-18', time: '3:00 PM', home: 'Real Sociedad', away: 'Barcelona', channel: 'ESPN+' },
+            { date: '2026-01-19', time: '3:00 PM', home: 'Elche', away: 'Sevilla', channel: 'ESPN+' },
+            { date: '2026-01-25', time: 'TBD', home: 'Alavés', away: 'Real Betis', channel: 'ESPN+' },
+            { date: '2026-01-25', time: 'TBD', home: 'Atlético Madrid', away: 'Mallorca', channel: 'ESPN+' },
+            { date: '2026-01-25', time: 'TBD', home: 'Barcelona', away: 'Real Oviedo', channel: 'ESPN+' },
+            { date: '2026-01-25', time: 'TBD', home: 'Girona', away: 'Getafe', channel: 'ESPN+' },
+            { date: '2026-01-25', time: 'TBD', home: 'Levante', away: 'Elche', channel: 'ESPN+' },
+            { date: '2026-01-25', time: 'TBD', home: 'Rayo Vallecano', away: 'Osasuna', channel: 'ESPN+' },
+            { date: '2026-01-25', time: 'TBD', home: 'Real Sociedad', away: 'Celta Vigo', channel: 'ESPN+' },
+            { date: '2026-01-25', time: 'TBD', home: 'Sevilla', away: 'Athletic Club', channel: 'ESPN+' },
+            { date: '2026-01-25', time: 'TBD', home: 'Valencia', away: 'Espanyol', channel: 'ESPN+' },
+            { date: '2026-01-25', time: 'TBD', home: 'Villarreal', away: 'Real Madrid', channel: 'ESPN+' }
+        ],
+        'NFL': [
+            { date: '2025-12-27', time: '4:30 PM', away: 'Houston Texans', home: 'Los Angeles Chargers', channel: 'NFL Net' },
+            { date: '2025-12-27', time: '8:00 PM', away: 'Baltimore Ravens', home: 'Green Bay Packers', channel: 'Peacock' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Pittsburgh Steelers', home: 'Cleveland Browns', channel: 'CBS' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'New England Patriots', home: 'New York Jets', channel: 'FOX' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'New Orleans Saints', home: 'Tennessee Titans', channel: 'CBS' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Jacksonville Jaguars', home: 'Indianapolis Colts', channel: 'FOX' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Tampa Bay Buccaneers', home: 'Miami Dolphins', channel: 'FOX' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Seattle Seahawks', home: 'Carolina Panthers', channel: 'CBS' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Arizona Cardinals', home: 'Cincinnati Bengals', channel: 'FOX' },
+            { date: '2025-12-28', time: '4:05 PM', away: 'New York Giants', home: 'Las Vegas Raiders', channel: 'CBS' },
+            { date: '2025-12-28', time: '4:25 PM', away: 'Philadelphia Eagles', home: 'Buffalo Bills', channel: 'FOX' },
+            { date: '2025-12-28', time: '8:20 PM', away: 'Chicago Bears', home: 'San Francisco 49ers', channel: 'NBC' },
+            { date: '2025-12-29', time: '8:15 PM', away: 'Los Angeles Rams', home: 'Atlanta Falcons', channel: 'ESPN' },
+            { date: '2026-01-04', time: 'TBD', away: 'New Orleans Saints', home: 'Atlanta Falcons', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'New York Jets', home: 'Buffalo Bills', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Detroit Lions', home: 'Chicago Bears', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Cleveland Browns', home: 'Cincinnati Bengals', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Los Angeles Chargers', home: 'Denver Broncos', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Kansas City Chiefs', home: 'Las Vegas Raiders', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Arizona Cardinals', home: 'Los Angeles Rams', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Green Bay Packers', home: 'Minnesota Vikings', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Miami Dolphins', home: 'New England Patriots', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Dallas Cowboys', home: 'New York Giants', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Washington Commanders', home: 'Philadelphia Eagles', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Baltimore Ravens', home: 'Pittsburgh Steelers', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Seattle Seahawks', home: 'San Francisco 49ers', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Carolina Panthers', home: 'Tampa Bay Buccaneers', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Tennessee Titans', home: 'Jacksonville Jaguars', channel: '' },
+            { date: '2026-01-04', time: 'TBD', away: 'Indianapolis Colts', home: 'Houston Texans', channel: '' }
+        ]
+    };
+
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "AFCON", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         // NFL: "https://www.nfl.com/scores",
@@ -6057,8 +6358,11 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Leagues that should be collapsed by default on the home page
     const COLLAPSED_LEAGUES = [
+    "A-League",
     "AFC Asian Cup Qualifiers",
     "CAF Qualifiers", 
+    "England: League One",
+    "England: League Two",
     "NHL Preseason", 
     "Women's Super League", 
     "ICC Test Series", 
@@ -8639,8 +8943,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/YPeMC9Tp-jsOA0PE1.png";
                     logo.alt = "Italian Super Cup Logo";
-                    logo.width = 14;
-                    logo.height = 14;
+                        logo.width = 14;
+                        logo.height = 14;
                     logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
@@ -8649,7 +8953,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.verticalAlign = "middle";
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
-                    titleContent.appendChild(logo);
+                        titleContent.appendChild(logo);
                 } else if (leagueNameKey === "UEFA Europa League") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/lxUusmmd-nyYh4pi6.png";
@@ -8699,9 +9003,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/EFL_%28Carabao%29_Cup_Logo.svg/250px-EFL_%28Carabao%29_Cup_Logo.svg.png";
                     logo.alt = "Carabao Cup Logo";
-                    logo.width = 14;
-                    logo.height = 14;
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -8789,9 +9093,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/4Uw9VtU1-I5crYno3.png";
                     logo.alt = "A-League Logo";
-                    logo.width = 14;
-                    logo.height = 14;
-                    logo.style.width = "14px";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
                     logo.style.height = "14px";
                     logo.style.objectFit = "contain";
                     logo.style.marginLeft = "5px";
@@ -9700,6 +10004,36 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     titleContent.appendChild(logo);
+                } else if (leagueNameKey === "England: League One") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/M77QzXA7-fP33jgO5.png";
+                    logo.alt = "England: League One Logo";
+                    logo.width = 14;
+                    logo.height = 14;
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
+                } else if (leagueNameKey === "England: League Two") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://static.flashscore.com/res/image/data/xQAcEyAj-IHi3niLP.png";
+                    logo.alt = "England: League Two Logo";
+                    logo.width = 14;
+                    logo.height = 14;
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
                 } else if (leagueNameKey === "England: National League") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/EsxLCiW1-fo7cPihD.png";
@@ -10077,14 +10411,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                         timeColumnBottom = '';
                                         periodQuarter = 'HALF'; // Set flag to skip further processing
                                     } else {
-                                        // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
-                                        if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
-                                            periodQuarter = topPart.toLowerCase();
-                                        }
-                                        
-                                        // Validate bottom part is ONLY time format (digits:digits)
-                                        if (bottomPart.match(/^\d+:\d+$/)) {
-                                            timeRemaining = bottomPart;
+                                    // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
+                                    if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
+                                        periodQuarter = topPart.toLowerCase();
+                                    }
+                                    
+                                    // Validate bottom part is ONLY time format (digits:digits)
+                                    if (bottomPart.match(/^\d+:\d+$/)) {
+                                        timeRemaining = bottomPart;
                                         }
                                     }
                                 }
@@ -10172,7 +10506,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 timeColumnTop = `<span style="color: red;">HALF</span>`;
                                 timeColumnBottom = '';
                             } else {
-                                timeColumnTop = displayTimeLabel;
+                            timeColumnTop = displayTimeLabel;
                             }
                         }
                         
@@ -10606,14 +10940,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                     timeColumnBottom = '';
                                     periodQuarter = 'HALF'; // Set flag to skip further processing
                                 } else {
-                                    // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
-                                    if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
-                                        periodQuarter = topPart.toLowerCase();
-                                    }
-                                    
-                                    // Validate bottom part is ONLY time format (digits:digits)
-                                    if (bottomPart.match(/^\d+:\d+$/)) {
-                                        timeRemaining = bottomPart;
+                                // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
+                                if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
+                                    periodQuarter = topPart.toLowerCase();
+                                }
+                                
+                                // Validate bottom part is ONLY time format (digits:digits)
+                                if (bottomPart.match(/^\d+:\d+$/)) {
+                                    timeRemaining = bottomPart;
                                     }
                                 }
                             }
@@ -10701,7 +11035,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             timeColumnTop = `<span style="color: red;">HALF</span>`;
                             timeColumnBottom = '';
                         } else {
-                            timeColumnTop = displayTimeLabel;
+                        timeColumnTop = displayTimeLabel;
                         }
                     }
                     
@@ -15184,6 +15518,111 @@ async function fetchFeaturedGames() {
             defaultContent.innerHTML = '<p style="color: #9ca3af;">Loading upcoming schedule...</p>';
         }
 
+        // Check for hardcoded schedule first
+        if (HARDCODED_UPCOMING_SCHEDULES[leagueKey]) {
+            const todayStr = luxon.DateTime.now().setZone('America/New_York').toISODate();
+            const allGames = HARDCODED_UPCOMING_SCHEDULES[leagueKey];
+            
+            // Filter to only future games
+            const futureGames = allGames.filter(game => game.date > todayStr);
+            
+            if (futureGames.length === 0) {
+                if (defaultContent) {
+                    defaultContent.innerHTML = '<p style="color: #9ca3af;">No upcoming games scheduled.</p>';
+                }
+                return;
+            }
+            
+            // Helper function to extract mascot name only
+            function getMascotName(fullTeamName) {
+                // List of city/state prefixes to remove
+                const prefixes = [
+                    'New York', 'Los Angeles', 'San Francisco', 'San Diego', 'San Antonio', 'San Jose',
+                    'Las Vegas', 'New England', 'New Orleans', 'Tampa Bay', 'Green Bay',
+                    'Kansas City', 'Oklahoma City', 'Golden State', 'Portland Trail',
+                    'Minnesota', 'Indiana', 'Tennessee', 'Carolina', 'Arizona', 'Jacksonville',
+                    'Philadelphia', 'Pittsburgh', 'Baltimore', 'Cleveland', 'Cincinnati',
+                    'Houston', 'Dallas', 'Washington', 'Chicago', 'Detroit', 'Milwaukee',
+                    'Denver', 'Seattle', 'Atlanta', 'Miami', 'Charlotte', 'Orlando',
+                    'Brooklyn', 'Toronto', 'Boston', 'Buffalo', 'Memphis'
+                ];
+                
+                let mascot = fullTeamName.trim();
+                
+                // Remove prefix if found
+                for (const prefix of prefixes) {
+                    if (mascot.startsWith(prefix + ' ')) {
+                        mascot = mascot.substring(prefix.length + 1);
+                        break;
+                    }
+                }
+                
+                return mascot;
+            }
+            
+            // Group games by date
+            const gamesByDate = {};
+            futureGames.forEach(game => {
+                if (!gamesByDate[game.date]) {
+                    gamesByDate[game.date] = [];
+                }
+                gamesByDate[game.date].push(game);
+            });
+            
+            // Build HTML
+            let html = '';
+            const sortedDates = Object.keys(gamesByDate).sort();
+            
+            sortedDates.forEach(dateStr => {
+                const dateObj = luxon.DateTime.fromISO(dateStr);
+                const dateHeader = dateObj.toFormat('EEEE, MMMM d, yyyy');
+                
+                html += `<div style="background-color: #2a2a2a; padding: 6px 10px; font-weight: bold; font-size: 11px; border-bottom: 1px solid #3a3a3a; margin-top: 10px;">${dateHeader}</div>`;
+                
+                gamesByDate[dateStr].forEach(game => {
+                    // Parse time as EST and convert to user's local time (or keep TBD)
+                    let displayTime = game.time;
+                    if (game.time && game.time.toUpperCase() !== 'TBD') {
+                        const estTime = luxon.DateTime.fromFormat(game.time, 'h:mm a', { zone: 'America/New_York' });
+                        if (estTime.isValid) {
+                            const localTime = estTime.setZone('local');
+                            displayTime = localTime.toFormat('h:mm a');
+                        }
+                    }
+                    
+                    // Determine display order based on league type
+                    const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia'].includes(leagueKey);
+                    
+                    let topTeam, bottomTeam;
+                    if (isSoccerLeague) {
+                        // Soccer: Home team on top, away team on bottom
+                        topTeam = game.home;
+                        bottomTeam = game.away;
+                    } else {
+                        // Other sports (NFL, etc.): Away team on top, home team on bottom
+                        topTeam = getMascotName(game.away);
+                        bottomTeam = getMascotName(game.home);
+                    }
+                    
+                    html += `
+                        <div style="display: flex; align-items: center; padding: 8px 10px; border-bottom: 1px solid #2a2a2a; font-size: 11px;">
+                            <div style="width: 80px; flex-shrink: 0; color: #9ca3af;">${displayTime}</div>
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                <div>${topTeam}</div>
+                                <div>${bottomTeam}</div>
+                            </div>
+                            ${game.channel ? `<div style="width: 80px; text-align: right; color: #9ca3af; flex-shrink: 0;">${game.channel}</div>` : ''}
+                        </div>
+                    `;
+                });
+            });
+            
+            if (defaultContent) {
+                defaultContent.innerHTML = html;
+            }
+            return;
+        }
+
         const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
         if (!leagueInfo || !leagueInfo.upcomingCollectionName) {
             if (defaultContent) {
@@ -16038,9 +16477,9 @@ if (gamesTabsContainer) {
         }
         
         todayTab.classList.remove('active');
-        if (liveFilter) {
-            liveFilter.classList.remove('active');
-        }
+            if (liveFilter) {
+        liveFilter.classList.remove('active');
+            }
         scoresTab.classList.add('active');
 
         document.getElementById('tv-listings-scores').style.display = 'block';
@@ -16057,10 +16496,10 @@ if (gamesTabsContainer) {
         }
 
         if (scoresTab) {
-            scoresTab.classList.remove('active');
+        scoresTab.classList.remove('active');
         }
         if (liveFilter) {
-            liveFilter.classList.remove('active');
+        liveFilter.classList.remove('active');
         }
         todayTab.classList.add('active');
         
@@ -16092,9 +16531,9 @@ if (gamesTabsContainer) {
                 activeListenerUnsubscribe = null;
             }
             
-            if (scoresTab) {
-                scoresTab.classList.remove('active');
-            }
+                if (scoresTab) {
+            scoresTab.classList.remove('active');
+                }
             todayTab.classList.add('active');
             
             document.getElementById('tv-listings-today').style.display = 'block';
