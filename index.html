@@ -6140,7 +6140,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const leagueInfo = LEAGUE_DATA_CONFIG[currentLeague];
                     if (leagueInfo) {
                         const { DateTime } = luxon;
-                        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
+                        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
                         getCachedGames(leagueInfo.leagueId, todayStr); // Pre-cache fresh data
                     }
                 }
@@ -11116,10 +11116,23 @@ document.addEventListener('DOMContentLoaded', function () {
         
         const statusA = (a["Match Status"] || "").toUpperCase();
         const statusB = (b["Match Status"] || "").toUpperCase();
-        const isFinalA = statusA.includes("FINISHED") || statusA.includes("FINAL");
-        const isFinalB = statusB.includes("FINISHED") || statusB.includes("FINAL");
-        if (isFinalA && !isFinalB) return 1;
-        if (!isFinalA && isFinalB) return -1;
+        
+        // Determine game state: LIVE > SCHEDULED > FINAL
+        const isLiveA = statusA.includes("IN PROGRESS") || statusA.includes("IN_PROGRESS") || statusA.includes("LIVE");
+        const isLiveB = statusB.includes("IN PROGRESS") || statusB.includes("IN_PROGRESS") || statusB.includes("LIVE");
+        const isFinalA = statusA.includes("FINISHED") || statusA.includes("FINAL") || statusA.includes("GAME OVER");
+        const isFinalB = statusB.includes("FINISHED") || statusB.includes("FINAL") || statusB.includes("GAME OVER");
+        const isScheduledA = !isLiveA && !isFinalA;
+        const isScheduledB = !isLiveB && !isFinalB;
+        
+        // Priority order: LIVE games first, then SCHEDULED, then FINAL
+        if (isLiveA && !isLiveB) return -1; // A is live, B is not - A comes first
+        if (!isLiveA && isLiveB) return 1;  // B is live, A is not - B comes first
+        
+        if (isScheduledA && isFinalB) return -1; // A is scheduled, B is final - A comes first
+        if (isFinalA && isScheduledB) return 1;  // A is final, B is scheduled - B comes first
+        
+        // If both are same state (both live, both scheduled, or both final), sort by time
         
         // Check if both are manual games (Game ID starts with "manual-" or "sheet-")
         const isManualA = a["Game ID"] && (a["Game ID"].startsWith("manual-") || a["Game ID"].startsWith("sheet-"));
@@ -11154,7 +11167,7 @@ document.addEventListener('DOMContentLoaded', function () {
         scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
         const { DateTime } = luxon;
          // Match home column logic (Denver) for gameDate equality
-         const todayStr = DateTime.now().setZone('America/Denver').toISODate();
+         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
          
          // League config is not required for today's games; read from sportsGames
          // 1) Exact League + gameDate (primary)
@@ -11258,8 +11271,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Calculate yesterday in both Denver and New York to handle edge timezone mismatches
         const { DateTime } = luxon;
-        const yesterdayDenver = DateTime.now().setZone('America/Denver').minus({ days: 1 }).toISODate();
-        const yesterdayNY = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
+        // Use Eastern Time for gameDate queries (matches backend storage)
+        const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
 
         // Ensure Home SCORES cache is available (single source of truth)
         const nowCheck = Date.now();
@@ -11283,7 +11296,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const nowAfterWait = Date.now();
         if (yesterdayScoresCache && yesterdayScoresCacheExpiry && nowAfterWait < yesterdayScoresCacheExpiry) {
             const allGames = yesterdayScoresCache;
-            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayDenver || game.gameDate === yesterdayNY);
+            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayStr);
             let leagueGames = yesterdayGames.filter(game => {
                 if (game.League === leagueId) return true;
                 const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
@@ -11315,8 +11328,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Fast path: query by date only, then client-filter by league (mirrors home SCORES logic)
         const col = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
         Promise.all([
-            col.where('gameDate', '==', yesterdayDenver).get(),
-            col.where('gameDate', '==', yesterdayNY).get()
+            col.where('gameDate', '==', yesterdayStr).get()
         ]).then(([snapA, snapB]) => {
             if (!snapA.empty || !snapB.empty) {
                 let allGames = [...snapA.docs, ...snapB.docs].map(d => d.data());
@@ -11358,7 +11370,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const nowMs = Date.now();
         if (yesterdayScoresCache && yesterdayScoresCacheExpiry && nowMs < yesterdayScoresCacheExpiry) {
             const allGames = yesterdayScoresCache; // includes featured merges; we'll filter by league
-            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayDenver || game.gameDate === yesterdayNY);
+            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayStr);
             const leagueGames = yesterdayGames.filter(game => {
                 // Exact match first
                 if (game.League === leagueId) return true;
@@ -11411,7 +11423,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // If we have a valid raw cache, use it to avoid refetching
         if (yesterdayScoresRawCache && yesterdayScoresCacheExpiry && nowMs < yesterdayScoresCacheExpiry) {
             const allGames = yesterdayScoresRawCache;
-            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayDenver || game.gameDate === yesterdayNY);
+            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayStr);
             const leagueGames = yesterdayGames.filter(game => {
                 // Exact match first
                 if (game.League === leagueId) return true;
@@ -13028,7 +13040,7 @@ let featuredGamesCache = {
 async function fetchFeaturedGames() {
     try {
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
+        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
         
         // fetchFeaturedGamesForDate already handles MLB matching and live data merging
         return await fetchFeaturedGamesForDate(todayStr);
@@ -13053,7 +13065,7 @@ async function fetchFeaturedGames() {
             
             // Now fetch the LIVE data for these game IDs from sportsGames or yesterdayScores
             const { DateTime } = luxon;
-            const todayStr = DateTime.now().setZone('America/Denver').toISODate();
+            const todayStr = DateTime.now().setZone('America/New_York').toISODate();
             const isToday = dateStr === todayStr;
             
             const collectionName = isToday 
@@ -13220,7 +13232,7 @@ async function fetchFeaturedGames() {
 
         errorDiv.textContent = "";
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
+        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
 
         let regularGames = [];
         let featuredGames = [];
@@ -13555,13 +13567,15 @@ async function fetchFeaturedGames() {
         // Read from sportsGames collection - filter for yesterday's FINAL games
         const sportsGamesRef = db.collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
 
-        // Get yesterday's date
+        // Get yesterday's date (in Eastern Time to match gameDate storage)
         const { DateTime } = luxon;
-        const now = DateTime.now().setZone('America/Denver');
+        const now = DateTime.now().setZone('America/New_York');
         const yesterdayStr = now.minus({ days: 1 }).toISODate();
 
         // Query for yesterday's games that are FINAL
         console.log('[SCORES] Querying for yesterday\'s games. Date:', yesterdayStr);
+        console.log('[SCORES] Current time (Mountain):', now.toISO());
+        console.log('[SCORES] Yesterday date string:', yesterdayStr);
         sportsGamesRef.where('gameDate', '==', yesterdayStr).get()
             .then(async snapshot => {
             scoresLoading.style.display = 'none';
@@ -13570,6 +13584,16 @@ async function fetchFeaturedGames() {
                 
                 if (snapshot.empty) {
                     console.log('[SCORES] No games found for yesterday\'s date');
+                    console.log('[SCORES] DEBUG: Checking if games exist with different dates...');
+                    // Debug: Check what dates actually exist in the collection
+                    const allGamesSnapshot = await sportsGamesRef.limit(100).get();
+                    const dateCounts = {};
+                    allGamesSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const gd = data.gameDate || 'NO_DATE';
+                        dateCounts[gd] = (dateCounts[gd] || 0) + 1;
+                    });
+                    console.log('[SCORES] DEBUG: Sample of gameDate values in collection:', dateCounts);
                     scoresContainer.innerHTML = '<p style="padding: 10px;">No completed games found. Check back after games finish.</p>';
                     return;
                 }
@@ -13586,15 +13610,24 @@ async function fetchFeaturedGames() {
                 console.log('[SCORES] Match status breakdown:', statusCounts);
                 
                 // Filter to only FINAL games (yesterday's completed games)
-                // Also include games with scores (indicating they've been played) even if status isn't exactly FINAL
+                // Explicitly exclude SCHEDULED, IN PROGRESS, and LIVE games
                 const matchStatusFilter = (status, homeScore, awayScore) => {
                     const upperStatus = (status || '').toUpperCase();
+                    
+                    // Explicitly exclude SCHEDULED, IN PROGRESS, and LIVE games
+                    if (upperStatus.includes('SCHEDULED') || upperStatus.includes('IN PROGRESS') || upperStatus.includes('LIVE')) {
+                        return false;
+                    }
+                    
+                    // Include FINAL, FINISHED, or GAME OVER games
+                    if (upperStatus.includes('FINAL') || upperStatus.includes('FINISHED') || upperStatus.includes('GAME OVER')) {
+                        return true;
+                    }
+                    
+                    // Include games with scores (indicating they've been played) if not explicitly excluded above
                     const hasScores = (homeScore !== undefined && homeScore !== null && homeScore !== '') || 
                                      (awayScore !== undefined && awayScore !== null && awayScore !== '');
-                    return upperStatus.includes('FINAL') || 
-                           upperStatus.includes('FINISHED') || 
-                           upperStatus.includes('GAME OVER') ||
-                           (hasScores && !upperStatus.includes('IN PROGRESS') && !upperStatus.includes('LIVE') && !upperStatus.includes('SCHEDULED'));
+                    return hasScores;
                 };
                 
                 const finalGamesData = allGamesData.filter(game => 
@@ -13957,7 +13990,7 @@ async function fetchFeaturedGames() {
         todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
         }
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/Denver').toISODate();
+        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
         
         // Set up real-time listener for today's games (similar to home page)
         const todayGamesQuery = gamesCollectionRef.where('gameDate', '==', todayStr);
