@@ -16038,11 +16038,8 @@ async function fetchFeaturedGames() {
                         
                         // Apply Top 25 rankings for NCAA leagues
                         if (isNcaaLeague) {
-                            console.log(`🎯 Upcoming schedule: "${game.away}" @ "${game.home}"`);
-                            console.log(`   Before ranking - Top: "${topTeam}", Bottom: "${bottomTeam}"`);
                             topTeam = formatTeamNameWithRanking(topTeam, leagueKey);
                             bottomTeam = formatTeamNameWithRanking(bottomTeam, leagueKey);
-                            console.log(`   After ranking - Top: "${topTeam}", Bottom: "${bottomTeam}"`);
                         }
                         
                         html += `
@@ -16503,15 +16500,6 @@ async function fetchFeaturedGames() {
                     }
                     const awayDisplay = getTeamDisplayName(game.away || '', displayLeague);
                     const homeDisplay = getTeamDisplayName(game.home || '', displayLeague);
-                    
-                    // Debug logging for NCAAM/NCAAW
-                    if (gameLeagueKey === 'NCAAM' || gameLeagueKey === 'NCAAW') {
-                        console.log(`🎯 Upcoming schedule game: ${game.away} @ ${game.home}`);
-                        console.log(`   gameLeagueKey: ${gameLeagueKey}`);
-                        console.log(`   awayDisplay: "${awayDisplay}"`);
-                        console.log(`   homeDisplay: "${homeDisplay}"`);
-                    }
-                    
                     let awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey);
                     let homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey);
                     
@@ -18774,38 +18762,14 @@ async function loadTop25RankingsCache(leagueKey) {
             ncaaToEspnMap[ncaaName] = espnName;
         }
         
-        // Debug: Show Alabama mapping
-        if (leagueKey === 'NCAAM') {
-            console.log(`📋 Reverse map for Alabama: "${ncaaToEspnMap['Alabama'] || 'NOT FOUND'}"`);
-        }
-        
-        // Log first few docs from Firestore for debugging
-        if (leagueKey === 'NCAAM' && snapshot.docs.length > 0) {
-            console.log(`📄 First 3 Firestore docs for ${leagueKey}:`);
-            snapshot.docs.slice(0, 3).forEach(doc => {
-                const data = doc.data();
-                console.log(`  Doc ID: ${doc.id}, Team: "${data.Team}", Rank: ${data.Top25Rank}`);
-            });
-        }
-        
         snapshot.docs.forEach(doc => {
             const teamData = doc.data();
             if (teamData.Top25Rank !== null && teamData.Top25Rank !== undefined && teamData.Team) {
                 const ncaaTeamName = teamData.Team; // e.g., "Duke"
                 const rank = parseInt(teamData.Top25Rank) || null;
                 
-                // Debug specific team
-                if (leagueKey === 'NCAAM' && ncaaTeamName.includes('Alabama')) {
-                    console.log(`🔍 Processing Alabama from Firestore: "${ncaaTeamName}", Rank: ${rank}`);
-                }
-                
                 // Find the ESPN name for this NCAA name
                 const espnName = ncaaToEspnMap[ncaaTeamName];
-                
-                // Debug Alabama specifically
-                if (leagueKey === 'NCAAM' && ncaaTeamName.includes('Alabama')) {
-                    console.log(`  🔄 Reverse map lookup: "${ncaaTeamName}" → "${espnName || 'NOT FOUND'}"`);
-                }
                 
                 if (espnName) {
                     // Store with all 3 variants:
@@ -18835,49 +18799,15 @@ async function loadTop25RankingsCache(leagueKey) {
                         }
                     }
                     rankingsMap[schoolName] = rank;
-                    
-                    // Debug Alabama specifically
-                    if (leagueKey === 'NCAAM' && ncaaTeamName.includes('Alabama')) {
-                        console.log(`  ✅ Stored 3 variants: "${ncaaTeamName}", "${espnName}", "${schoolName}"`);
-                    }
                 } else {
                     // If no ESPN mapping found, store NCAA name
                     rankingsMap[ncaaTeamName] = rank;
-                    
-                    if (leagueKey === 'NCAAM' && ncaaTeamName.includes('Alabama')) {
-                        console.log(`  ⚠️ No ESPN mapping, stored only: "${ncaaTeamName}"`);
-                    }
                 }
             }
         });
         
         top25RankingsCache[leagueKey] = rankingsMap;
-        
-        // Count unique ranks to show actual number of ranked teams (not total variants)
-        const uniqueRanks = new Set(Object.values(rankingsMap));
-        console.log(`✅ Loaded ${uniqueRanks.size} ranked teams for ${leagueKey} (${Object.keys(rankingsMap).length} name variants in cache)`);
-        
-        // Show ALL teams and their variants for debugging
-        if (leagueKey === 'NCAAM' || leagueKey === 'NCAAW') {
-            const teamsByRank = {};
-            Object.entries(rankingsMap).forEach(([name, rank]) => {
-                if (!teamsByRank[rank]) teamsByRank[rank] = [];
-                teamsByRank[rank].push(name);
-            });
-            
-            console.log(`🔍 ${leagueKey} ALL RANKED TEAMS with ALL variants:`);
-            const allRanks = Object.keys(teamsByRank).sort((a, b) => parseInt(a) - parseInt(b));
-            allRanks.forEach(rank => {
-                console.log(`  #${rank}: ${teamsByRank[rank].join(' | ')}`);
-            });
-            
-            // Test lookup for Alabama specifically
-            if (leagueKey === 'NCAAM') {
-                console.log(`🔎 Testing Alabama lookup in NCAAM cache:`);
-                console.log(`  - "Alabama": ${rankingsMap['Alabama'] || 'NOT FOUND'}`);
-                console.log(`  - "Alabama Crimson Tide": ${rankingsMap['Alabama Crimson Tide'] || 'NOT FOUND'}`);
-            }
-        }
+        console.log(`✅ Loaded Top 25 rankings for ${leagueKey}`);
     } catch (error) {
         console.error(`Error loading Top 25 rankings cache for ${leagueKey}:`, error);
         top25RankingsCache[leagueKey] = {};
@@ -18889,29 +18819,10 @@ function getTop25Rank(displayName, leagueKey) {
     if (!displayName || !leagueKey) return null;
     
     const rankings = top25RankingsCache[leagueKey];
-    if (!rankings) {
-        console.log(`⚠️ No rankings cache loaded for ${leagueKey}`);
-        return null;
-    }
+    if (!rankings) return null;
     
     // Cache now stores with ESPN names as keys, so direct lookup
-    const rank = rankings[displayName];
-    
-    // Debug: Log ALL lookups for NCAA basketball temporarily
-    if (leagueKey === 'NCAAM' || leagueKey === 'NCAAW') {
-        if (rank) {
-            console.log(`✅ Found rank: "${displayName}" = #${rank} in ${leagueKey}`);
-        } else {
-            console.log(`❌ No rank: "${displayName}" in ${leagueKey}`);
-            // Show what names ARE in the cache (sample)
-            if (Math.random() < 0.02) {
-                const sampleNames = Object.keys(rankings).slice(0, 10);
-                console.log(`   Sample names in ${leagueKey} cache:`, sampleNames);
-            }
-        }
-    }
-    
-    return rank;
+    return rankings[displayName] || null;
 }
 
 // Load CFP rankings into cache (keyed by ESPN display name)
@@ -18974,10 +18885,7 @@ async function loadCFPRankingsCache() {
         });
         
         cfpRankingsCache = rankingsMap;
-        
-        // Count unique ranks
-        const uniqueRanks = new Set(Object.values(rankingsMap));
-        console.log(`✅ Loaded ${uniqueRanks.size} CFP ranked teams (${Object.keys(rankingsMap).length} name variants in cache)`);
+        console.log(`✅ Loaded CFP rankings`);
     } catch (error) {
         console.error(`Error loading CFP rankings cache:`, error);
         cfpRankingsCache = {};
