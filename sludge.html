@@ -174,20 +174,29 @@ enter.addEventListener("click", async () => {
 
   /* Begin fade immediately */
   exterior.classList.add("hidden");
+  console.log("Fade started");
 
   /* Wait for metadata */
   await Promise.all([
     new Promise(r => video.onloadedmetadata = r),
     new Promise(r => audio.onloadedmetadata = r)
   ]);
+  console.log("Metadata loaded");
 
   /* Seek to live positions */
   video.currentTime = getLiveOffset(video.duration);
   audio.currentTime = getLiveOffset(audio.duration);
+  console.log("Seeked to live position");
 
   /* Start playback */
-  await video.play();
-  await audio.play();
+  try {
+    await video.play();
+    console.log("Video playing");
+    await audio.play();
+    console.log("Audio playing");
+  } catch (err) {
+    console.error("Playback error:", err);
+  }
 
   /* Ongoing drift correction */
   setInterval(() => {
