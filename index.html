@@ -4011,12 +4011,78 @@ async function loadMultipleRSSFeeds(feedUrls, container) {
             description = descRSS.textContent || '';
           }
           
+          // Get channel/author information
+          let channelName = '';
+          let channelUrl = '';
+          let channelId = '';
+          const authorEl = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'author')[0] || item.getElementsByTagName('author')[0];
+          if (authorEl) {
+            const nameEl = authorEl.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'name')[0] || authorEl.getElementsByTagName('name')[0];
+            const uriEl = authorEl.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'uri')[0] || authorEl.getElementsByTagName('uri')[0];
+            if (nameEl) channelName = nameEl.textContent || '';
+            if (uriEl) channelUrl = uriEl.textContent || '';
+          }
+          
+          // Get YouTube-specific metadata
+          const ytNS = 'http://www.youtube.com/xml/schemas/2015';
+          const channelIdEl = item.getElementsByTagNameNS(ytNS, 'channelId')[0] || item.getElementsByTagName('yt:channelId')[0];
+          if (channelIdEl) {
+            channelId = channelIdEl.textContent || '';
+          }
+          
+          // Get video ID
+          let videoId = '';
+          const videoIdEl = item.getElementsByTagNameNS(ytNS, 'videoId')[0] || item.getElementsByTagName('yt:videoId')[0];
+          if (videoIdEl) {
+            videoId = videoIdEl.textContent || '';
+          } else {
+            // Extract from link as fallback
+            const videoIdMatch = link.match(/[?&]v=([^&]+)/);
+            if (videoIdMatch) {
+              videoId = videoIdMatch[1];
+            } else {
+              // Try extracting from id tag (format: yt:video:VIDEO_ID)
+              const idEl = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'id')[0] || item.getElementsByTagName('id')[0];
+              if (idEl) {
+                const idText = idEl.textContent || '';
+                const idMatch = idText.match(/yt:video:(.+)/);
+                if (idMatch) videoId = idMatch[1];
+              }
+            }
+          }
+          
+          // Get view count from media:community
+          let viewCount = '';
+          if (mediaGroupNS) {
+            const communityEl = mediaGroupNS.getElementsByTagNameNS(mediaNS, 'community')[0];
+            if (communityEl) {
+              const statsEl = communityEl.getElementsByTagNameNS(mediaNS, 'statistics')[0];
+              if (statsEl) {
+                viewCount = statsEl.getAttribute('views') || '';
+              }
+            }
+          }
+          
+          // Get updated date (separate from published date)
+          let updatedDate = '';
+          if (updatedNS) {
+            updatedDate = updatedNS.textContent || '';
+          } else if (updatedRSS) {
+            updatedDate = updatedRSS.textContent || '';
+          }
+          
           allItems.push({
             title,
             link,
             pubDate,
             thumbnail,
-            description
+            description,
+            channelName,
+            channelUrl,
+            channelId,
+            videoId,
+            viewCount,
+            updatedDate
           });
         });
       } catch (error) {
@@ -4063,12 +4129,22 @@ async function loadMultipleRSSFeeds(feedUrls, container) {
       }
       
       html += `
-        <div style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #333;">
+        <div class="video-item" style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #333;" 
+             data-video-id="${item.videoId || ''}" 
+             data-channel-name="${item.channelName || ''}" 
+             data-channel-id="${item.channelId || ''}" 
+             data-view-count="${item.viewCount || ''}" 
+             data-pub-date="${item.pubDate || ''}" 
+             data-updated-date="${item.updatedDate || ''}">
           <h3 style="margin: 0 0 8px 0; padding: 0; font-size: 14px; font-weight: normal; line-height: 1.2;">
             <a href="${item.link}" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: none; display: block;">${item.title}</a>
           </h3>
           ${videoContent}
-          ${formattedDate ? `<div style="font-size: 11px; color: #9ca3af; margin: 0; padding: 0; line-height: 1;">${formattedDate}</div>` : ''}
+          <div style="font-size: 11px; color: #9ca3af; margin: 0; padding: 0; line-height: 1.4;">
+            ${formattedDate ? `<div>${formattedDate}</div>` : ''}
+            ${item.channelName ? `<div>${item.channelName}</div>` : ''}
+            ${item.viewCount ? `<div>${parseInt(item.viewCount).toLocaleString()} views</div>` : ''}
+          </div>
         </div>
       `;
     });
@@ -4287,6 +4363,66 @@ function loadCustomRSSFeed(feedUrl, container) {
           }
         }
         
+        // Get channel/author information
+        let channelName = '';
+        let channelUrl = '';
+        let channelId = '';
+        const authorEl = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'author')[0] || item.getElementsByTagName('author')[0];
+        if (authorEl) {
+          const nameEl = authorEl.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'name')[0] || authorEl.getElementsByTagName('name')[0];
+          const uriEl = authorEl.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'uri')[0] || authorEl.getElementsByTagName('uri')[0];
+          if (nameEl) channelName = nameEl.textContent || '';
+          if (uriEl) channelUrl = uriEl.textContent || '';
+        }
+        
+        // Get YouTube-specific metadata
+        const ytNS = 'http://www.youtube.com/xml/schemas/2015';
+        const channelIdEl = item.getElementsByTagNameNS(ytNS, 'channelId')[0] || item.getElementsByTagName('yt:channelId')[0];
+        if (channelIdEl) {
+          channelId = channelIdEl.textContent || '';
+        }
+        
+        // Get video ID
+        let videoId = '';
+        const videoIdEl = item.getElementsByTagNameNS(ytNS, 'videoId')[0] || item.getElementsByTagName('yt:videoId')[0];
+        if (videoIdEl) {
+          videoId = videoIdEl.textContent || '';
+        } else {
+          // Extract from link as fallback
+          const videoIdMatch = link.match(/[?&]v=([^&]+)/);
+          if (videoIdMatch) {
+            videoId = videoIdMatch[1];
+          } else {
+            // Try extracting from id tag (format: yt:video:VIDEO_ID)
+            const idEl = item.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'id')[0] || item.getElementsByTagName('id')[0];
+            if (idEl) {
+              const idText = idEl.textContent || '';
+              const idMatch = idText.match(/yt:video:(.+)/);
+              if (idMatch) videoId = idMatch[1];
+            }
+          }
+        }
+        
+        // Get view count and engagement metrics from media:community
+        let viewCount = '';
+        if (mediaGroupNS) {
+          const communityEl = mediaGroupNS.getElementsByTagNameNS(mediaNS, 'community')[0];
+          if (communityEl) {
+            const statsEl = communityEl.getElementsByTagNameNS(mediaNS, 'statistics')[0];
+            if (statsEl) {
+              viewCount = statsEl.getAttribute('views') || '';
+            }
+          }
+        }
+        
+        // Get updated date (separate from published date)
+        let updatedDate = '';
+        if (updatedNS) {
+          updatedDate = updatedNS.textContent || '';
+        } else if (updatedRSS) {
+          updatedDate = updatedRSS.textContent || '';
+        }
+        
         // Format date
         let formattedDate = '';
         if (pubDate) {
@@ -4322,12 +4458,22 @@ function loadCustomRSSFeed(feedUrl, container) {
         }
         
         html += `
-          <div style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #333;">
+          <div class="video-item" style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #333;" 
+               data-video-id="${videoId}" 
+               data-channel-name="${channelName}" 
+               data-channel-id="${channelId}" 
+               data-view-count="${viewCount}" 
+               data-pub-date="${pubDate}" 
+               data-updated-date="${updatedDate}">
             <h3 style="margin: 0 0 8px 0; padding: 0; font-size: 14px; font-weight: normal; line-height: 1.2;">
               <a href="${link}" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: none; display: block;">${title}</a>
             </h3>
             ${videoContent}
-            ${formattedDate ? `<div style="font-size: 11px; color: #9ca3af; margin: 0; padding: 0; line-height: 1;">${formattedDate}</div>` : ''}
+            <div style="font-size: 11px; color: #9ca3af; margin: 0; padding: 0; line-height: 1.4;">
+              ${formattedDate ? `<div>${formattedDate}</div>` : ''}
+              ${channelName ? `<div>${channelName}</div>` : ''}
+              ${viewCount ? `<div>${parseInt(viewCount).toLocaleString()} views</div>` : ''}
+            </div>
           </div>
         `;
       });
@@ -7978,7 +8124,8 @@ document.addEventListener('DOMContentLoaded', function () {
             "Washington State": "Wash St",
             "Manhattan Christian": "Manhatt Chr",
             "Abilene Christian": "Abilene Chr",
-            "Columbia College (SC)": "Columbia (SC)",
+            "Columbia College (SC)": "Columbia SC",
+            "Columbia (SC)": "Columbia SC",
             "Evergreen State": "Evergreen St",
             "UT Rio Grande Valley": "UTRGV",
             "Warren Wilson": "Warr Wilson",
@@ -8043,149 +8190,264 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         // NCAAF
         NCAAF: {
-            "Massachusetts": "UMass",
-            "Northern Illinois": "No. Illinois",
-            "Georgia Southern": "GA Southern",
-            "Appalachian State": "App State",
-            "Central Michigan": "C Michigan",
-            "Brigham Young": "BYU",
-            "Boise State": "Boise St",
-            "San Diego State": "San Diego St",
-            "IU Indianapolis": "IU Indy",
-            "South Dakota State": "S Dakota St",
-            "Crown College": "Crown Coll.",
-            "St. Thomas-Minnesota": "St Thomas",
-            "Eastern Washington": "EWU",
-            "College Of Biblical Studies": "CBS",
-            "Arkansas-Pine Bluff": "AR-Pine Bluff",
-            "Salish Kootenai": "S Kootenai",
-            "Bethesda University": "Bethesda",
-            "Washington State": "Wash St",
-            "Louisiana Tech": "LA Tech",
-            "Jacksonville State": "Jax State",
-            "Kennesaw State": "Kennesaw",
-            "Mississippi State": "MS State",
-            "Mississippi St.": "MS State",
-            "Mississippi St": "MS State",
-            "Washington Huskies": "Washington",
-            "Sam Houston State": "Sam Houston",
-            "Delaware Fightin": "Delaware",
-            "Florida International": "FIU",
-            "Coastal Carolina": "Coastal Car",
-            "New Mexico State": "NM State",
-            "Florida Atlantic": "FAU",
-            "Boston College": "Boston Coll",
-            "Georgia Tech": "GA Tech",
-            "San Jose State": "San Jose St",
-            "Texas State Bobcats": "TX State",
-            "James Madison": "JMU",
-            "Western Kentucky": "W Kentucky",
-            "Middle Tennessee St": "Mid TN St",
-            "North Carolina State": "NC State",
-            "Michigan State": "Mich St",
-            "Western Michigan": "W Michigan",
-            "Louisiana-Monroe": "UL-Monroe",
-            "South Alabama": "S Alabama",
-            "Colorado State": "Colorado St",
-            "Colorado State Rams": "Colorado St",
-            "Georgia State Panthers": "GA State",
-            "Tennessee Tech": "TN Tech",
-            "South Florida": "USF",
+            // FBS Teams - Remove all mascots
+            "Air Force Falcons": "Air Force",
+            "Akron Zips": "Akron",
+            "Alabama Crimson Tide": "Alabama",
+            "Appalachian State Mountaineers": "App State",
+            "Arizona State Sun Devils": "Arizona St",
+            "Arizona Wildcats": "Arizona",
+            "Arkansas Razorbacks": "Arkansas",
+            "Arkansas State Red Wolves": "Arkansas St",
+            "Army Black Knights": "Army",
+            "Auburn Tigers": "Auburn",
+            "Ball State Cardinals": "Ball State",
+            "Baylor Bears": "Baylor",
+            "Boise State Broncos": "Boise State",
+            "Boston College Eagles": "Boston College",
+            "Bowling Green Falcons": "Bowling Green",
+            "Buffalo Bulls": "Buffalo",
+            "BYU Cougars": "BYU",
+            "California Golden Bears": "California",
+            "Central Michigan Chippewas": "Central Michigan",
+            "Charlotte 49ers": "Charlotte",
             "Cincinnati Bearcats": "Cincinnati",
-            "South Carolina": "S Carolina",
-            "Southeast Missouri State": "SE MO St",
-            "Northern Arizona": "N Arizona",
-            "Penn State Hazleton": "PS Hazleton",
-            "Montana-Western": "MT-Western",
-            "SIU-Edwardsville": "SIU-E",
-            "Eastern Michigan": "E Michigan",
-            "Oklahoma State": "OK State",
-            "Penn State": "Penn St",
-            "Bowling Green": "Bowl Green",
-            "Warren Wilson": "Warr Wilson",
-            "Cal State Northridge": "CS-Northridge",
-            "Cal State Fullerton": "Fullerton",
-            "North Texas": "N Texas",
-            "San José State": "San José St",
-            "Northwestern State": "NW State",
-            "Cleary University": "Cleary",
-            "Central Connecticut": "Central CT",
-            "West Virginia": "W Virginia",
-            "Southern Wesleyan": "S Wesleyan",
-            "South Carolina State": "So Car St",
-            "Texas Southern": "TX Southern",
-            "North Dakota St": "N Dakota St",
-            "North Dakota State": "N Dakota St",
-            "Northern Kentucky": "N Kentucky",
-            "Incarnate Word": "Inc. Word",
-            "Tennessee State": "TN State",
-            "CS Monterey Bay": "CS Monterrey",
-            "St. Mary's (TX)": "St Mary's TX",
-            "Trinity College of Jacksonville": "Trinity (Jax)",
-            "Saint John's (MN)": "St John's MN",
-            "Alaska Anchorage": "AK-Anch",
-            "Stephen F. Austin": "S.F. Austin",
-            "Montana State": "Montana St",
-            "Florida Gulf Coast": "FGCU",
-            "Coastal Georgia": "Coastal GA",
-            "Georgia Southern": "GA Southern",
-            "Vermont State - Johnson": "VT St-Johnson",
-            "Queens University": "Queens",
-            "Gardner-Webb": "Gard-Webb",
-            "Dallas Christian": "Dallas Christ",
-            "Texas A&M-Corpus Christi": "TX A&M-CC",
-            "Dakota Wesleyan": "Dak Wesley",
-            "SIU Edwardsville": "SIU-Edwardsville",
-            "Miami (OH)-Middletown": "MIA (OH)-Middletown",
-            "Bowling Green": "Bowl Green",
-            "Ohio Wesleyan": "OH Wesleyan",
-            "Mississippi State": "MS State",
-            "Northern Colorado": "N Colorado",
-            "East-West University": "East-West",
-            "York College Nebraska": "York (NE)",
-            "Colorado-Colorado Springs": "CO-Col Springs",
-            "Cal State East Bay": "CS East Bay",
-            "Cal State Bakersfield": "CS Bakersfield",
-            "Middle Tennessee": "Middle TN",
-            "Southwestern Christian": "SW Christian",
-            "Kansas Christian": "KS Christian",
-            "New Hampshire": "New Hamp",
-            "Youngstown State": "Youngstown St",
-            "Brewton-Parker": "Brewt-Parker",
-            "South Carolina Upstate": "SC Upstate",
-            "Mid-Atlantic Christian": "Mid-Atl Christian",
-            "Georgian Court University": "Georgian Ct",
-            "Agnes Scott College": "Agnes Scott",
-            "Wesleyan College (GA)": "Wesleyan (GA)",
-            "Jacksonville State": "Jax State",
-            "Mississippi Valley State": "MS Valley St",
-            "Simmons College (KY)": "Simmons (KY)",
-            "Sacramento State": "Sac State",
-            "Wayne State (MI)": "Wayne St (MI)",
-            "Alabama State": "AL State",
-            "Colorado Christian": "CO Christian",
+            "Clemson Tigers": "Clemson",
+            "Coastal Carolina Chanticleers": "Coastal Carolina",
+            "Colorado Buffaloes": "Colorado",
+            "Colorado State Rams": "Colorado State",
+            "Duke Blue Devils": "Duke",
+            "East Carolina Pirates": "East Carolina",
+            "Eastern Michigan Eagles": "Eastern Michigan",
+            "FIU Panthers": "FIU",
+            "Florida Atlantic Owls": "Florida Atlantic",
+            "Florida Gators": "Florida",
+            "Florida State Seminoles": "Florida State",
+            "Fresno State Bulldogs": "Fresno State",
+            "Georgia Bulldogs": "Georgia",
+            "Georgia Southern Eagles": "Georgia Southern",
+            "Georgia State Panthers": "Georgia State",
+            "Georgia Tech Yellow Jackets": "GA Tech",
+            "Hawai'i Rainbow Warriors": "Hawai'i",
+            "Houston Cougars": "Houston",
+            "Illinois Fighting Illini": "Illinois",
+            "Indiana Hoosiers": "Indiana",
+            "Iowa Hawkeyes": "Iowa",
+            "Iowa State Cyclones": "Iowa State",
+            "Jacksonville State Gamecocks": "Jacksonville State",
+            "James Madison Dukes": "James Madison",
+            "Kansas Jayhawks": "Kansas",
+            "Kansas State Wildcats": "Kansas State",
+            "Kent State Golden Flashes": "Kent State",
+            "Kennesaw State Owls": "Kennesaw State",
+            "Kentucky Wildcats": "Kentucky",
+            "Liberty Flames": "Liberty",
+            "Louisiana Ragin' Cajuns": "Louisiana",
+            "Louisiana Tech Bulldogs": "Louisiana Tech",
+            "Louisiana-Monroe Warhawks": "Louisiana-Monroe",
+            "Louisville Cardinals": "Louisville",
+            "LSU Tigers": "LSU",
+            "Marshall Thundering Herd": "Marshall",
+            "Maryland Terrapins": "Maryland",
+            "Memphis Tigers": "Memphis",
+            "Miami Hurricanes": "Miami",
+            "Miami (OH) RedHawks": "Miami (OH)",
+            "Michigan State Spartans": "Michigan State",
+            "Michigan Wolverines": "Michigan",
+            "Middle Tennessee Blue Raiders": "Middle Tennessee",
+            "Minnesota Golden Gophers": "Minnesota",
+            "Mississippi State Bulldogs": "Mississippi State",
+            "Missouri Tigers": "Missouri",
+            "Navy Midshipmen": "Navy",
+            "NC State Wolfpack": "NC State",
+            "Nebraska Cornhuskers": "Nebraska",
+            "Nevada Wolf Pack": "Nevada",
+            "New Mexico Lobos": "New Mexico",
+            "New Mexico State Aggies": "New Mexico State",
+            "North Carolina Tar Heels": "North Carolina",
+            "North Texas Mean Green": "North Texas",
+            "Northern Illinois Huskies": "Northern Illinois",
+            "Northwestern Wildcats": "Northwestern",
+            "Notre Dame Fighting Irish": "Notre Dame",
+            "Ohio Bobcats": "Ohio",
+            "Ohio State Buckeyes": "Ohio State",
+            "Oklahoma Sooners": "Oklahoma",
+            "Oklahoma State Cowboys": "Oklahoma State",
+            "Old Dominion Monarchs": "Old Dominion",
+            "Ole Miss Rebels": "Ole Miss",
+            "Oregon Ducks": "Oregon",
+            "Oregon State Beavers": "Oregon State",
+            "Penn State Nittany Lions": "Penn State",
+            "Pittsburgh Panthers": "Pittsburgh",
+            "Purdue Boilermakers": "Purdue",
+            "Rice Owls": "Rice",
+            "Rutgers Scarlet Knights": "Rutgers",
+            "Sam Houston Bearkats": "Sam Houston",
+            "San Diego State Aztecs": "San Diego St",
+            "San José State Spartans": "San José State",
+            "SMU Mustangs": "SMU",
+            "South Alabama Jaguars": "South Alabama",
+            "South Carolina Gamecocks": "South Carolina",
+            "South Florida Bulls": "South Florida",
+            "Southern Miss Golden Eagles": "Southern Miss",
+            "Stanford Cardinal": "Stanford",
+            "Syracuse Orange": "Syracuse",
+            "TCU Horned Frogs": "TCU",
+            "Temple Owls": "Temple",
+            "Tennessee Volunteers": "Tennessee",
+            "Texas A&M Aggies": "Texas A&M",
+            "Texas Longhorns": "Texas",
+            "Texas State Bobcats": "Texas State",
+            "Texas Tech Red Raiders": "Texas Tech",
+            "Toledo Rockets": "Toledo",
+            "Troy Trojans": "Troy",
+            "Tulane Green Wave": "Tulane",
+            "Tulsa Golden Hurricane": "Tulsa",
+            "UAB Blazers": "UAB",
+            "UCF Knights": "UCF",
+            "UCLA Bruins": "UCLA",
+            "UConn Huskies": "UConn",
+            "UL Monroe Warhawks": "UL Monroe",
+            "UMass Minutemen": "UMass",
+            "UNLV Rebels": "UNLV",
+            "USC Trojans": "USC",
+            "Utah State Aggies": "Utah State",
+            "Utah Utes": "Utah",
+            "UTEP Miners": "UTEP",
+            "UTSA Roadrunners": "UTSA",
             "Vanderbilt Commodores": "Vanderbilt",
-            "Lehman College": "Lehman",
-            "Notre Dame (MD)": "N Dame (MD)",
-            "Youngstown St": "Youngstown",
-            "Purdue Fort Wayne": "Purdue FW",
-            "Simpson University (CA)": "Simpson",
-            "Coastal Carolina": "Coastal Car",
-            "Lourdes University": "Lourdes",
-            "Harris-Stowe State": "Harris-Stowe",
-            "UNC Wilmington": "UNC-Wilm",
-            "Southern-New Orleans": "Southern (NO)",
-            "Mid-Atl Christian": "Mid-Atl Christ.",
-            "Southwestern Adventist": "SW Adventist",
-            "Maine-Fort Kent": "Maine-Ft Kent",
-            "Judson University": "Judson",
-            "Wisconsin-Lutheran": "WI-Luthern",
-            "Dickinson State (ND)": "Dickinson St",
-            "Gwynedd-Mercy": "Gwynn-Mercy",
-            "Central Baptist College": "Cent Baptist",
-            "Lindsey Wilson": "Lind Wilson",
-            "CS Bakersfield": "CS-Bakersf",
-            "Western Oregon": "W Oregon"
+            "Virginia Cavaliers": "Virginia",
+            "Virginia Tech Hokies": "Virginia Tech",
+            "Wake Forest Demon Deacons": "Wake Forest",
+            "Washington Huskies": "Washington",
+            "Washington State Cougars": "Washington State",
+            "West Virginia Mountaineers": "West Virginia",
+            "Western Kentucky Hilltoppers": "Western Kentucky",
+            "Western Michigan Broncos": "Western Michigan",
+            "Wisconsin Badgers": "Wisconsin",
+            "Wyoming Cowboys": "Wyoming",
+            
+            // FCS and Other Division Teams - Remove all mascots
+            "Abilene Christian Wildcats": "Abilene Christian",
+            "Albany Great Danes": "Albany",
+            "Alcorn State Braves": "Alcorn State",
+            "Austin Peay Governors": "Austin Peay",
+            "Bethune-Cookman Wildcats": "Bethune-Cookman",
+            "Brown Bears": "Brown",
+            "Bryant Bulldogs": "Bryant",
+            "Bucknell Bison": "Bucknell",
+            "Butler Bulldogs": "Butler",
+            "Cal Poly Mustangs": "Cal Poly",
+            "Campbell Fighting Camels": "Campbell",
+            "Central Arkansas Bears": "Central Arkansas",
+            "Central Connecticut Blue Devils": "Central Connecticut",
+            "Charleston Southern Buccaneers": "Charleston Southern",
+            "Chattanooga Mocs": "Chattanooga",
+            "Colgate Raiders": "Colgate",
+            "Columbia Lions": "Columbia",
+            "Cornell Big Red": "Cornell",
+            "Dartmouth Big Green": "Dartmouth",
+            "Davidson Wildcats": "Davidson",
+            "Delaware Fightin' Blue Hens": "Delaware",
+            "Delaware State Hornets": "Delaware State",
+            "Drake Bulldogs": "Drake",
+            "Duquesne Dukes": "Duquesne",
+            "East Tennessee State Buccaneers": "East Tennessee State",
+            "Eastern Illinois Panthers": "Eastern Illinois",
+            "Eastern Kentucky Colonels": "Eastern Kentucky",
+            "Eastern Washington Eagles": "Eastern Washington",
+            "Elon Phoenix": "Elon",
+            "Fordham Rams": "Fordham",
+            "Furman Paladins": "Furman",
+            "Gardner-Webb Runnin' Bulldogs": "Gardner-Webb",
+            "Georgetown Hoyas": "Georgetown",
+            "Grambling Tigers": "Grambling",
+            "Hampton Pirates": "Hampton",
+            "Harvard Crimson": "Harvard",
+            "Holy Cross Crusaders": "Holy Cross",
+            "Howard Bison": "Howard",
+            "Idaho State Bengals": "Idaho State",
+            "Idaho Vandals": "Idaho",
+            "Illinois State Redbirds": "Illinois State",
+            "Incarnate Word Cardinals": "Incarnate Word",
+            "Indiana State Sycamores": "Indiana State",
+            "Jackson State Tigers": "Jackson State",
+            "Lafayette Leopards": "Lafayette",
+            "Lamar Cardinals": "Lamar",
+            "Lehigh Mountain Hawks": "Lehigh",
+            "Lindenwood Lions": "Lindenwood",
+            "Maine Black Bears": "Maine",
+            "Marist Red Foxes": "Marist",
+            "McNeese Cowboys": "McNeese",
+            "Mercer Bears": "Mercer",
+            "Missouri State Bears": "Missouri State",
+            "Monmouth Hawks": "Monmouth",
+            "Montana Grizzlies": "Montana",
+            "Montana State Bobcats": "Montana State",
+            "Morehead State Eagles": "Morehead State",
+            "Morgan State Bears": "Morgan State",
+            "Murray State Racers": "Murray State",
+            "New Hampshire Wildcats": "New Hampshire",
+            "Nicholls Colonels": "Nicholls",
+            "Norfolk State Spartans": "Norfolk State",
+            "North Alabama Lions": "North Alabama",
+            "North Carolina A&T Aggies": "North Carolina A&T",
+            "North Carolina Central Eagles": "North Carolina Central",
+            "North Dakota Fighting Hawks": "North Dakota",
+            "North Dakota State Bison": "North Dakota State",
+            "Northeastern Huskies": "Northeastern",
+            "Northern Arizona Lumberjacks": "Northern Arizona",
+            "Northern Colorado Bears": "Northern Colorado",
+            "Northern Iowa Panthers": "Northern Iowa",
+            "Northwestern State Demons": "Northwestern State",
+            "Penn Quakers": "Penn",
+            "Portland State Vikings": "Portland State",
+            "Prairie View A&M Panthers": "Prairie View A&M",
+            "Presbyterian Blue Hose": "Presbyterian",
+            "Princeton Tigers": "Princeton",
+            "Rhode Island Rams": "Rhode Island",
+            "Richmond Spiders": "Richmond",
+            "Robert Morris Colonials": "Robert Morris",
+            "Sacramento State Hornets": "Sacramento State",
+            "Sacred Heart Pioneers": "Sacred Heart",
+            "Samford Bulldogs": "Samford",
+            "San Diego Toreros": "San Diego",
+            "SE Louisiana Lions": "SE Louisiana",
+            "South Carolina State Bulldogs": "South Carolina State",
+            "South Dakota Coyotes": "South Dakota",
+            "South Dakota State Jackrabbits": "South Dakota State",
+            "Southeast Missouri State Redhawks": "Southeast Missouri State",
+            "Southern Illinois Salukis": "Southern Illinois",
+            "Southern Jaguars": "Southern",
+            "Southern Utah Thunderbirds": "Southern Utah",
+            "St. Thomas Tommies": "St. Thomas",
+            "Stephen F. Austin Lumberjacks": "Stephen F. Austin",
+            "Stetson Hatters": "Stetson",
+            "Stony Brook Seawolves": "Stony Brook",
+            "Tarleton State Texans": "Tarleton State",
+            "Tennessee State Tigers": "Tennessee State",
+            "Tennessee Tech Golden Eagles": "Tennessee Tech",
+            "Texas Southern Tigers": "Texas Southern",
+            "The Citadel Bulldogs": "The Citadel",
+            "Towson Tigers": "Towson",
+            "UC Davis Aggies": "UC Davis",
+            "UT Martin Skyhawks": "UT Martin",
+            "Valparaiso Beacons": "Valparaiso",
+            "Villanova Wildcats": "Villanova",
+            "VMI Keydets": "VMI",
+            "Wagner Seahawks": "Wagner",
+            "Weber State Wildcats": "Weber State",
+            "Western Carolina Catamounts": "Western Carolina",
+            "Western Illinois Leathernecks": "Western Illinois",
+            "William & Mary Tribe": "William & Mary",
+            "Wofford Terriers": "Wofford",
+            "Yale Bulldogs": "Yale",
+            "Youngstown State Penguins": "Youngstown State",
+            
+            // Short name variants without mascots (for data that comes without mascots)
+            "Massachusetts": "UMass",
+            "Brigham Young": "BYU",
+            "IU Indianapolis": "IU Indy"
         },
         // NCAAW
         NCAAW: {
@@ -8424,7 +8686,8 @@ document.addEventListener('DOMContentLoaded', function () {
             "Washington State": "Wash St",
             "Manhattan Christian": "Manhatt Chr",
             "Abilene Christian": "Abilene Chr",
-            "Columbia College (SC)": "Columbia (SC)",
+            "Columbia College (SC)": "Columbia SC",
+            "Columbia (SC)": "Columbia SC",
             "Evergreen State": "Evergreen St",
             "North Carolina Central": "NC Central",
             "UT Rio Grande Valley": "UTRGV",
@@ -8646,6 +8909,25 @@ document.addEventListener('DOMContentLoaded', function () {
             "1. FC Nürnberg": "Nürnberg",
             "SV 07 Elversberg": "Elversberg",
             "Preußen Münster": "Preu Münster"
+        },
+        // A-League (Australia)
+        "A-League": {
+            "Adelaide United": "Adelaide",
+            "Brisbane Roar": "Brisbane",
+            "Central Coast Mariners": "Central Coast",
+            "Macarthur FC": "Macarthur",
+            "Melbourne City": "Melbourne City",
+            "Melbourne City FC": "Melbourne City",
+            "Melbourne Victory": "Melbourne Victory",
+            "Melbourne Victory FC": "Melbourne Victory",
+            "Newcastle Jets": "Newcastle",
+            "Newcastle United Jets": "Newcastle",
+            "Perth Glory": "Perth",
+            "Sydney FC": "Sydney",
+            "Wellington Phoenix": "Wellington",
+            "Western Sydney Wanderers": "Wanderers",
+            "Western United": "Western United",
+            "Western United FC": "Western United"
         }
     };
     
