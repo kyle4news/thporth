@@ -130,22 +130,23 @@ html, body {
 
 <!-- INTERIOR -->
 <div id="video-bg">
-  <!-- Self-hosted video -->
+  <!-- Self-hosted video (with audio track) -->
   <video
     id="bgVideo"
     src="ssludge/sludge.mp4"
-    muted
     loop
     playsinline
     preload="auto">
   </video>
 </div>
 
+<!-- Audio commented out until file is ready
 <audio
   id="bgAudio"
   src="ssludge/audio.mp3"
   preload="auto">
 </audio>
+-->
 
 <div id="overlay"></div>
 
@@ -161,7 +162,7 @@ const PERFORMANCE_START_UTC = "2025-01-01T00:00:00Z";
 const exterior = document.getElementById("exterior");
 const enter = document.getElementById("enter");
 const video = document.getElementById("bgVideo");
-const audio = document.getElementById("bgAudio");
+// const audio = document.getElementById("bgAudio"); // Commented out until audio file is ready
 const liveText = document.querySelector(".live-text");
 
 function getLiveOffset(duration) {
@@ -175,39 +176,41 @@ enter.addEventListener("click", async () => {
   /* Begin fade immediately */
   exterior.classList.add("hidden");
   console.log("Fade started");
+  console.log("Video src:", video.src);
 
-  /* Wait for metadata */
-  await Promise.all([
-    new Promise(r => video.onloadedmetadata = r),
-    new Promise(r => audio.onloadedmetadata = r)
-  ]);
-  console.log("Metadata loaded");
+  /* Wait for video metadata with timeout */
+  try {
+    await Promise.race([
+      new Promise((resolve, reject) => {
+        video.onloadedmetadata = resolve;
+        video.onerror = (e) => reject("Video error: " + e);
+      }),
+      new Promise((_, reject) => setTimeout(() => reject("Timeout loading video"), 10000))
+    ]);
+    console.log("Video metadata loaded");
+  } catch (err) {
+    console.error("Video loading failed:", err);
+    alert("Failed to load video: " + err);
+    return;
+  }
 
-  /* Seek to live positions */
-  video.currentTime = getLiveOffset(video.duration);
-  audio.currentTime = getLiveOffset(audio.duration);
-  console.log("Seeked to live position");
-
-  /* Start playback */
+  /* Start video playback FIRST */
   try {
     await video.play();
-    console.log("Video playing");
-    await audio.play();
-    console.log("Audio playing");
+    console.log("Video playback started");
+    
+    /* THEN seek to live position after playing has started */
+    video.currentTime = getLiveOffset(video.duration);
+    console.log("Seeked to live position");
   } catch (err) {
     console.error("Playback error:", err);
   }
 
-  /* Ongoing drift correction */
+  /* Ongoing drift correction (video only) */
   setInterval(() => {
     const vt = getLiveOffset(video.duration);
-    const at = getLiveOffset(audio.duration);
-
     if (Math.abs(video.currentTime - vt) > 0.5) {
       video.currentTime = vt;
-    }
-    if (Math.abs(audio.currentTime - at) > 0.5) {
-      audio.currentTime = at;
     }
   }, 60000);
   
