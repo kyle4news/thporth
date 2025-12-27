@@ -2769,26 +2769,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         
         <!-- Schedule Content with padding -->
         <div style="padding: 0 0 1rem 0; flex: 1; display: flex; flex-direction: column;">
-            <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto; flex-direction: column;">
+            <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto; flex-direction: column; padding-bottom: 150px;">
                 <!-- Tennis ATP/WTA sub-tabs for Today (only shown for Tennis) -->
                 <div id="tennis-today-tabs" style="display: none; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0; gap: 2px; margin-bottom: 2px;">
                     <div class="tennis-today-subtab active" data-tennis-today-tab="atp" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">ATP</div>
                     <div class="tennis-today-subtab" data-tennis-today-tab="wta" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">WTA</div>
                 </div>
-                <div id="tennis-today-atp-content" class="tennis-today-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading ATP schedule...</p></div>
-                <div id="tennis-today-wta-content" class="tennis-today-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading WTA schedule...</p></div>
-                <div id="league-schedule-today-default-content" style="flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
+                <div id="tennis-today-atp-content" class="tennis-today-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading ATP schedule...</p></div>
+                <div id="tennis-today-wta-content" class="tennis-today-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading WTA schedule...</p></div>
+                <div id="league-schedule-today-default-content" style="flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
             </div>
-            <div id="league-schedule-yesterday-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading yesterday's scores...</p></div>
-            <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto; flex-direction: column;">
+            <div id="league-schedule-yesterday-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading yesterday's scores...</p></div>
+            <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto; flex-direction: column; padding-bottom: 150px;">
                 <!-- Tennis ATP/WTA sub-tabs (only shown for Tennis) -->
                 <div id="tennis-upcoming-tabs" style="display: none; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0; gap: 2px; margin-bottom: 2px;">
                     <div class="tennis-upcoming-subtab active" data-tennis-tab="atp" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">ATP</div>
                     <div class="tennis-upcoming-subtab" data-tennis-tab="wta" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">WTA</div>
                 </div>
-                <div id="tennis-upcoming-atp-content" class="tennis-upcoming-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading ATP schedule...</p></div>
-                <div id="tennis-upcoming-wta-content" class="tennis-upcoming-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading WTA schedule...</p></div>
-                <div id="league-schedule-upcoming-default-content" style="flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
+                <div id="tennis-upcoming-atp-content" class="tennis-upcoming-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading ATP schedule...</p></div>
+                <div id="tennis-upcoming-wta-content" class="tennis-upcoming-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading WTA schedule...</p></div>
+                <div id="league-schedule-upcoming-default-content" style="flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
             </div>
         </div>
     </div>
@@ -2803,13 +2803,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         
         <!-- CFP Content (only for NCAAF) -->
-        <div id="league-cfp-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">CFP rankings coming soon...</p></div>
+        <div id="league-cfp-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">CFP rankings coming soon...</p></div>
         
         <!-- Top 25 Content (active by default for NCAA leagues) -->
-        <div id="league-top25-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading Top 25...</p></div>
+        <div id="league-top25-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading Top 25...</p></div>
         
         <!-- Standings Content (for conference standings) -->
-        <div id="league-standings-content" style="flex: 1;"><p style="color: #9ca3af;">Loading standings...</p></div>
+        <div id="league-standings-content" style="flex: 1; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading standings...</p></div>
     </div>
 
     <!-- Stats Tab Content (hidden by default) -->
@@ -2823,7 +2823,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- Player Stats Content (active by default) -->
         <div id="player-stats-content" class="stats-sub-content" style="display: flex; flex: 1; height: calc(100% - 18px); overflow: hidden;">
             <!-- Left Column: Category Menu (20% width) -->
-            <div id="player-category-menu" class="stats-category-menu" style="width: 20%; background-color: #1f1f1f; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
+            <div id="player-category-menu" class="stats-category-menu" style="width: 20%; background-color: #1f1f1f; border-right: 1px solid #1f1f1f; overflow-y: auto; padding-bottom: 150px; flex-shrink: 0;">
                 <div class="stats-category-item active" data-category="batting" style="padding: 8px 2px; cursor: pointer; border-bottom: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 9px; margin-bottom: 1px;">Batting</div>
                 <div class="stats-category-item" data-category="pitching" style="padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;">Pitching</div>
                 <div class="stats-category-item" data-category="fielding" style="padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;">Fielding</div>
@@ -2831,7 +2831,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             
             <!-- Right Column: Stats Display (80% width) -->
-            <div id="player-stats-display" class="stats-display" style="width: 80%; background-color: #000; overflow-y: auto; padding: 1rem;">
+            <div id="player-stats-display" class="stats-display" style="width: 80%; background-color: #000; overflow-y: auto; padding: 1rem; padding-bottom: 150px;">
                 <div id="player-stats-content-area" style="color: #9ca3af;">Player statistics will be loaded here...</div>
             </div>
         </div>
@@ -2839,7 +2839,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- Team Stats Content (hidden by default) -->
         <div id="team-stats-content" class="stats-sub-content" style="display: none; flex: 1; height: calc(100% - 18px); overflow: hidden;">
             <!-- Left Column: Category Menu (20% width) -->
-            <div id="team-category-menu" class="stats-category-menu" style="width: 20%; background-color: #1f1f1f; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
+            <div id="team-category-menu" class="stats-category-menu" style="width: 20%; background-color: #1f1f1f; border-right: 1px solid #1f1f1f; overflow-y: auto; padding-bottom: 150px; flex-shrink: 0;">
                 <div class="stats-category-item active" data-category="standings" style="padding: 8px 2px; cursor: pointer; border-bottom: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 9px; margin-bottom: 1px;">Standings</div>
                 <div class="stats-category-item" data-category="offense" style="padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;">Offense</div>
                 <div class="stats-category-item" data-category="defense" style="padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;">Defense</div>
@@ -2847,7 +2847,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             
             <!-- Right Column: Stats Display (80% width) -->
-            <div id="team-stats-display" class="stats-display" style="width: 80%; background-color: #000; overflow-y: auto; padding: 1rem;">
+            <div id="team-stats-display" class="stats-display" style="width: 80%; background-color: #000; overflow-y: auto; padding: 1rem; padding-bottom: 150px;">
                 <div id="team-stats-content-area" style="color: #9ca3af;">Team statistics will be loaded here...</div>
             </div>
         </div>
@@ -15958,13 +15958,24 @@ async function fetchFeaturedGames() {
             const featuredGamesCount = futureGames.filter(g => g.isImportant).length;
             const nonFeaturedGamesCount = futureGames.filter(g => !g.isImportant).length;
             
+            // Object to track expand/collapse state for each date
+            const dateExpandStates = {};
+            
+            // Initialize all dates to collapsed (false = show featured only)
+            const sortedDates = Object.keys(futureGames.reduce((acc, game) => {
+                acc[game.date] = true;
+                return acc;
+            }, {})).sort();
+            
+            sortedDates.forEach(date => {
+                dateExpandStates[date] = false;
+            });
+            
             // Function to render the schedule
-            function renderSchedule(showAllGames) {
-                // Group games by date
+            function renderSchedule() {
+                // Group all games by date (not filtered yet)
                 const gamesByDate = {};
-                const gamesToShow = showAllGames ? futureGames : futureGames.filter(g => g.isImportant);
-                
-                gamesToShow.forEach(game => {
+                futureGames.forEach(game => {
                     if (!gamesByDate[game.date]) {
                         gamesByDate[game.date] = [];
                     }
@@ -15979,19 +15990,23 @@ async function fetchFeaturedGames() {
                 sortedDates.forEach(dateStr => {
                     const dateObj = luxon.DateTime.fromISO(dateStr);
                     const dateHeader = dateObj.toFormat('EEEE, MMMM d, yyyy');
+                    const isExpanded = dateExpandStates[dateStr];
                     
                     html += `<div style="background-color: #2a2a2a; padding: 6px 10px; font-weight: bold; font-size: 11px; border-bottom: 1px solid #3a3a3a; margin-top: 10px;">${dateHeader}</div>`;
                     
                     // Add toggle button under each date header if there are non-featured games
                     if (isNcaaLeague && nonFeaturedGamesCount > 0) {
                         html += `
-                            <div class="upcoming-schedule-toggle" style="font-size: 10px; padding: 6px 10px; cursor: pointer; color: #9ca3af; border-bottom: 1px solid #2a2a2a;">
-                                <span style="text-decoration: underline;">${showAllGames ? 'Featured only' : 'Expand all'}</span>
+                            <div class="upcoming-schedule-toggle" data-date="${dateStr}" style="font-size: 10px; padding: 6px 10px; cursor: pointer; color: #9ca3af; border-bottom: 1px solid #2a2a2a;">
+                                <span style="text-decoration: underline;">${isExpanded ? 'Featured only' : 'Expand all'}</span>
                             </div>
                         `;
                     }
                     
-                    gamesByDate[dateStr].forEach(game => {
+                    // Filter games for this date based on its expand state
+                    const datesToShow = isExpanded ? gamesByDate[dateStr] : gamesByDate[dateStr].filter(g => g.isImportant);
+                    
+                    datesToShow.forEach(game => {
                         // Parse time as EST and convert to user's local time (or keep TBD)
                         let displayTime = game.time;
                         if (game.time && game.time.toUpperCase() !== 'TBD') {
@@ -16035,19 +16050,34 @@ async function fetchFeaturedGames() {
             // Function to attach toggle handlers
             function attachToggleHandlers() {
                 const toggleButtons = defaultContent.querySelectorAll('.upcoming-schedule-toggle');
-                toggleButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        showAllGames = !showAllGames;
-                        defaultContent.innerHTML = renderSchedule(showAllGames);
+                toggleButtons.forEach((button) => {
+                    button.addEventListener('click', (e) => {
+                        const dateStr = button.getAttribute('data-date');
+                        
+                        // Get the clicked button's offset from the top of the container
+                        const buttonOffsetFromTop = button.offsetTop - defaultContent.scrollTop;
+                        
+                        // Toggle the state for this specific date
+                        dateExpandStates[dateStr] = !dateExpandStates[dateStr];
+                        
+                        defaultContent.innerHTML = renderSchedule();
+                        
+                        // Find the corresponding toggle button for this date after re-render
+                        const newToggleButton = defaultContent.querySelector(`.upcoming-schedule-toggle[data-date="${dateStr}"]`);
+                        if (newToggleButton) {
+                            // Calculate the new scroll position to maintain the visual position of the clicked toggle
+                            const targetScrollTop = newToggleButton.offsetTop - buttonOffsetFromTop;
+                            defaultContent.scrollTop = targetScrollTop;
+                        }
+                        
                         attachToggleHandlers(); // Re-attach handlers after re-render
                     });
                 });
             }
             
-            // Initial render - start with Featured only (false means show featured only)
-            let showAllGames = false;
+            // Initial render
             if (defaultContent) {
-                defaultContent.innerHTML = renderSchedule(showAllGames);
+                defaultContent.innerHTML = renderSchedule();
                 
                 // Add click handlers for all toggle buttons
                 if (isNcaaLeague && nonFeaturedGamesCount > 0) {
