@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Live Performance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: black;
+}
+
+/* ===============================
+   EXTERIOR (LANDING)
+================================ */
+#exterior {
+  position: fixed;
+  inset: 0;
+  background: url("ssludge/warehouse-entrance.png") center / cover no-repeat;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  transition: opacity 1.8s ease;
+}
+
+#exterior.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#enter {
+  color: white;
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 48px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  user-select: none;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+#enter:hover {
+  transform: scale(1.1);
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+}
+
+/* ===============================
+   INTERIOR (VIDEO)
+================================ */
+#video-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+#video-bg video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* ===============================
+   LIVE INDICATOR
+================================ */
+.live-text {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 10px;
+  color: white;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 1s ease 1.8s;
+}
+
+.live-text.visible {
+  opacity: 1;
+}
+
+.live-text::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ===============================
+   INTERACTION BLOCKER
+================================ */
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: transparent;
+}
+</style>
+</head>
+
+<body>
+
+<!-- EXTERIOR -->
+<div id="exterior">
+  <div id="enter">Enter</div>
+</div>
+
+<!-- INTERIOR -->
+<div id="video-bg">
+  <!-- Self-hosted video -->
+  <video
+    id="bgVideo"
+    src="ssludge/sludge.mp4"
+    muted
+    loop
+    playsinline
+    preload="auto">
+  </video>
+</div>
+
+<audio
+  id="bgAudio"
+  src="ssludge/audio.mp3"
+  preload="auto">
+</audio>
+
+<div id="overlay"></div>
+
+<!-- Live indicator -->
+<div class="live-text">Live</div>
+
+<script>
+/* ===============================
+   GLOBAL CLOCK
+================================ */
+const PERFORMANCE_START_UTC = "2025-01-01T00:00:00Z";
+
+const exterior = document.getElementById("exterior");
+const enter = document.getElementById("enter");
+const video = document.getElementById("bgVideo");
+const audio = document.getElementById("bgAudio");
+const liveText = document.querySelector(".live-text");
+
+function getLiveOffset(duration) {
+  const start = new Date(PERFORMANCE_START_UTC).getTime();
+  const now = Date.now();
+  return ((now - start) / 1000) % duration;
+}
+
+enter.addEventListener("click", async () => {
+
+  /* Begin fade immediately */
+  exterior.classList.add("hidden");
+
+  /* Wait for metadata */
+  await Promise.all([
+    new Promise(r => video.onloadedmetadata = r),
+    new Promise(r => audio.onloadedmetadata = r)
+  ]);
+
+  /* Seek to live positions */
+  video.currentTime = getLiveOffset(video.duration);
+  audio.currentTime = getLiveOffset(audio.duration);
+
+  /* Start playback */
+  await video.play();
+  await audio.play();
+
+  /* Ongoing drift correction */
+  setInterval(() => {
+    const vt = getLiveOffset(video.duration);
+    const at = getLiveOffset(audio.duration);
+
+    if (Math.abs(video.currentTime - vt) > 0.5) {
+      video.currentTime = vt;
+    }
+    if (Math.abs(audio.currentTime - at) > 0.5) {
+      audio.currentTime = at;
+    }
+  }, 60000);
+  
+  /* Show Live indicator after fade completes */
+  setTimeout(() => {
+    liveText.classList.add("visible");
+  }, 1800);
+});
+</script>
+
+</body>
+</html>
