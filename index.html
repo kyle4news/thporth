@@ -21005,6 +21005,86 @@ function showMLSTab(conference) {
     document.getElementById('mls-' + conference + '-tab').classList.add('active');
 }
 
+// ============================================================
+// AUTO-REFRESH: Smart Background Data Updates Every 2 Minutes
+// ============================================================
+let autoRefreshInterval = null;
+let lastRefreshTime = Date.now();
+
+async function smartBackgroundRefresh() {
+    try {
+        console.log('🔄 Auto-refresh: Fetching latest game data...');
+        const startTime = Date.now();
+        
+        // Check which tab is currently active
+        const todayTab = document.getElementById('today-filter');
+        const scoresTab = document.getElementById('scores-filter');
+        const isTodayTabActive = todayTab && todayTab.classList.contains('active');
+        const isScoresTabActive = scoresTab && scoresTab.classList.contains('active');
+        
+        // Check if we're on the home page
+        const homeMenuItem = document.querySelector('#menuList li[data-section="Home"]');
+        const isOnHomePage = homeMenuItem && homeMenuItem.classList.contains('selected');
+        
+        // Only refresh if on home page and today/scores tab is active
+        if (isOnHomePage && (isTodayTabActive || isScoresTabActive)) {
+            // Preserve scroll position
+            const gamesContent = document.getElementById('tv-listings-content');
+            const scrollPosition = gamesContent ? gamesContent.scrollTop : 0;
+            
+            // Fetch updated data without unsubscribing/resubscribing
+            // This will update games in place via Firestore listeners
+            if (isTodayTabActive && typeof fetchTodayGames === 'function') {
+                await fetchTodayGames(() => {});
+            }
+            
+            // Restore scroll position
+            if (gamesContent && scrollPosition > 0) {
+                gamesContent.scrollTop = scrollPosition;
+            }
+            
+            const duration = Date.now() - startTime;
+            console.log(`✅ Auto-refresh complete (${duration}ms)`);
+            lastRefreshTime = Date.now();
+        } else {
+            console.log('⏭️  Auto-refresh skipped (not on home page or not on today/scores tab)');
+        }
+    } catch (error) {
+        console.error('❌ Auto-refresh error:', error);
+    }
+}
+
+// Start auto-refresh when page loads
+function initializeAutoRefresh() {
+    // Clear any existing interval
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+    
+    // Start auto-refresh every 2 minutes (120000ms)
+    autoRefreshInterval = setInterval(smartBackgroundRefresh, 120000);
+    console.log('✅ Auto-refresh initialized: Will update every 2 minutes');
+    
+    // Show indicator in console when next refresh will occur
+    const nextRefreshTime = new Date(Date.now() + 120000);
+    console.log(`⏰ Next auto-refresh at: ${nextRefreshTime.toLocaleTimeString()}`);
+}
+
+// Initialize auto-refresh when page is fully loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAutoRefresh);
+} else {
+    // DOM already loaded
+    initializeAutoRefresh();
+}
+
+// Log refresh status every 30 seconds (optional - for debugging)
+setInterval(() => {
+    const timeSinceLastRefresh = Math.floor((Date.now() - lastRefreshTime) / 1000);
+    const timeUntilNextRefresh = 120 - (timeSinceLastRefresh % 120);
+    console.log(`🕐 Auto-refresh status: Last refresh ${timeSinceLastRefresh}s ago, next in ${timeUntilNextRefresh}s`);
+}, 30000);
+
 </script>
  
     <script>
