@@ -2769,26 +2769,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         
         <!-- Schedule Content with padding -->
         <div style="padding: 0 0 1rem 0; flex: 1; display: flex; flex-direction: column;">
-            <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto; flex-direction: column;">
+            <div id="league-schedule-today-content" class="schedule-content" style="display: block; flex: 1; overflow-y: auto; flex-direction: column; padding-bottom: 150px;">
                 <!-- Tennis ATP/WTA sub-tabs for Today (only shown for Tennis) -->
                 <div id="tennis-today-tabs" style="display: none; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0; gap: 2px; margin-bottom: 2px;">
                     <div class="tennis-today-subtab active" data-tennis-today-tab="atp" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">ATP</div>
                     <div class="tennis-today-subtab" data-tennis-today-tab="wta" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">WTA</div>
                 </div>
-                <div id="tennis-today-atp-content" class="tennis-today-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading ATP schedule...</p></div>
-                <div id="tennis-today-wta-content" class="tennis-today-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading WTA schedule...</p></div>
-                <div id="league-schedule-today-default-content" style="flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
+                <div id="tennis-today-atp-content" class="tennis-today-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading ATP schedule...</p></div>
+                <div id="tennis-today-wta-content" class="tennis-today-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading WTA schedule...</p></div>
+                <div id="league-schedule-today-default-content" style="flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading today's schedule...</p></div>
             </div>
-            <div id="league-schedule-yesterday-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading yesterday's scores...</p></div>
-            <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto; flex-direction: column;">
+            <div id="league-schedule-yesterday-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading yesterday's scores...</p></div>
+            <div id="league-schedule-upcoming-content" class="schedule-content" style="display: none; flex: 1; overflow-y: auto; flex-direction: column; padding-bottom: 150px;">
                 <!-- Tennis ATP/WTA sub-tabs (only shown for Tennis) -->
                 <div id="tennis-upcoming-tabs" style="display: none; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0; gap: 2px; margin-bottom: 2px;">
                     <div class="tennis-upcoming-subtab active" data-tennis-tab="atp" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">ATP</div>
                     <div class="tennis-upcoming-subtab" data-tennis-tab="wta" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">WTA</div>
                 </div>
-                <div id="tennis-upcoming-atp-content" class="tennis-upcoming-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading ATP schedule...</p></div>
-                <div id="tennis-upcoming-wta-content" class="tennis-upcoming-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading WTA schedule...</p></div>
-                <div id="league-schedule-upcoming-default-content" style="flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
+                <div id="tennis-upcoming-atp-content" class="tennis-upcoming-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading ATP schedule...</p></div>
+                <div id="tennis-upcoming-wta-content" class="tennis-upcoming-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading WTA schedule...</p></div>
+                <div id="league-schedule-upcoming-default-content" style="flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading upcoming schedule...</p></div>
             </div>
         </div>
     </div>
@@ -2803,13 +2803,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         
         <!-- CFP Content (only for NCAAF) -->
-        <div id="league-cfp-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">CFP rankings coming soon...</p></div>
+        <div id="league-cfp-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">CFP rankings coming soon...</p></div>
         
         <!-- Top 25 Content (active by default for NCAA leagues) -->
-        <div id="league-top25-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto;"><p style="color: #9ca3af;">Loading Top 25...</p></div>
+        <div id="league-top25-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading Top 25...</p></div>
         
         <!-- Standings Content (for conference standings) -->
-        <div id="league-standings-content" style="flex: 1;"><p style="color: #9ca3af;">Loading standings...</p></div>
+        <div id="league-standings-content" style="flex: 1; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading standings...</p></div>
     </div>
 
     <!-- Stats Tab Content (hidden by default) -->
@@ -2823,7 +2823,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- Player Stats Content (active by default) -->
         <div id="player-stats-content" class="stats-sub-content" style="display: flex; flex: 1; height: calc(100% - 18px); overflow: hidden;">
             <!-- Left Column: Category Menu (20% width) -->
-            <div id="player-category-menu" class="stats-category-menu" style="width: 20%; background-color: #1f1f1f; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
+            <div id="player-category-menu" class="stats-category-menu" style="width: 20%; background-color: #1f1f1f; border-right: 1px solid #1f1f1f; overflow-y: auto; padding-bottom: 150px; flex-shrink: 0;">
                 <div class="stats-category-item active" data-category="batting" style="padding: 8px 2px; cursor: pointer; border-bottom: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 9px; margin-bottom: 1px;">Batting</div>
                 <div class="stats-category-item" data-category="pitching" style="padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;">Pitching</div>
                 <div class="stats-category-item" data-category="fielding" style="padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;">Fielding</div>
@@ -2831,7 +2831,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             
             <!-- Right Column: Stats Display (80% width) -->
-            <div id="player-stats-display" class="stats-display" style="width: 80%; background-color: #000; overflow-y: auto; padding: 1rem;">
+            <div id="player-stats-display" class="stats-display" style="width: 80%; background-color: #000; overflow-y: auto; padding: 1rem; padding-bottom: 150px;">
                 <div id="player-stats-content-area" style="color: #9ca3af;">Player statistics will be loaded here...</div>
             </div>
         </div>
@@ -2839,7 +2839,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- Team Stats Content (hidden by default) -->
         <div id="team-stats-content" class="stats-sub-content" style="display: none; flex: 1; height: calc(100% - 18px); overflow: hidden;">
             <!-- Left Column: Category Menu (20% width) -->
-            <div id="team-category-menu" class="stats-category-menu" style="width: 20%; background-color: #1f1f1f; border-right: 1px solid #1f1f1f; overflow-y: auto; flex-shrink: 0;">
+            <div id="team-category-menu" class="stats-category-menu" style="width: 20%; background-color: #1f1f1f; border-right: 1px solid #1f1f1f; overflow-y: auto; padding-bottom: 150px; flex-shrink: 0;">
                 <div class="stats-category-item active" data-category="standings" style="padding: 8px 2px; cursor: pointer; border-bottom: 1px solid #fff; background-color: #000; color: #fff; font-weight: bold; font-size: 9px; margin-bottom: 1px;">Standings</div>
                 <div class="stats-category-item" data-category="offense" style="padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;">Offense</div>
                 <div class="stats-category-item" data-category="defense" style="padding: 8px 2px; cursor: pointer; background-color: #141414; color: #BFBFBF; font-size: 9px; margin-bottom: 1px;">Defense</div>
@@ -2847,7 +2847,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             
             <!-- Right Column: Stats Display (80% width) -->
-            <div id="team-stats-display" class="stats-display" style="width: 80%; background-color: #000; overflow-y: auto; padding: 1rem;">
+            <div id="team-stats-display" class="stats-display" style="width: 80%; background-color: #000; overflow-y: auto; padding: 1rem; padding-bottom: 150px;">
                 <div id="team-stats-content-area" style="color: #9ca3af;">Team statistics will be loaded here...</div>
             </div>
         </div>
@@ -4496,7 +4496,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (section === 'Home') {
                     gamesColumn.style.display = 'block';
                     leagueSpecificColumn.style.display = 'none';
-                    gamesContent.style.display = 'block';
+                    gamesContent.style.display = 'flex';
                     f1Content.style.display = 'none';
 
                     // Ensure TODAY tab reloads (and resets Live filter) when returning to Home
@@ -4513,7 +4513,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                     // Formula One has its own special column structure
                     gamesColumn.style.display = 'block';
                     leagueSpecificColumn.style.display = 'none';
-                    f1Content.style.display = 'block';
+                    f1Content.style.display = 'flex';
                     gamesContent.style.display = 'none';
                 } else {
                     gamesColumn.style.display = 'none';
@@ -4878,7 +4878,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const section = clickedItem.dataset.section;
 
-                gamesContent.style.display = 'block';
+                gamesContent.style.display = 'flex';
                 f1Content.style.display = 'none';
         });
     }
@@ -5930,6 +5930,368 @@ document.addEventListener('DOMContentLoaded', function () {
             { date: '2026-01-04', time: 'TBD', away: 'Carolina Panthers', home: 'Tampa Bay Buccaneers', channel: '' },
             { date: '2026-01-04', time: 'TBD', away: 'Tennessee Titans', home: 'Jacksonville Jaguars', channel: '' },
             { date: '2026-01-04', time: 'TBD', away: 'Indianapolis Colts', home: 'Houston Texans', channel: '' }
+        ],
+        'NCAAW': [
+            { date: '2025-12-28', time: '12:00 PM', away: 'Providence', home: 'South Carolina', channel: 'SEC Network' },
+            { date: '2025-12-28', time: '12:00 PM', away: 'Wofford', home: 'Georgia Tech', channel: 'ACC Network' },
+            { date: '2025-12-28', time: '12:00 PM', away: 'Illinois', home: 'Purdue', channel: 'BTN' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'New Haven', home: 'New Hampshire', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Xavier', home: 'Seton Hall', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Dallas', home: 'Sam Houston', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Wilberforce', home: 'Ohio', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'SE Louisiana', home: 'Texas', channel: 'SEC Network' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Furman', home: 'Florida', channel: 'SECN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Hofstra', home: 'Kentucky', channel: 'SECN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Stetson', home: 'Miami', channel: 'ACC Network' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Coppin State', home: 'George Washington', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Arcadia University', home: 'Saint Joseph\'s', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Dartmouth', home: 'Vermont', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Brewton-Parker', home: 'West Georgia', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Rutgers', home: 'Michigan State', channel: 'B1G+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'UCLA', home: 'Ohio State', channel: 'BTN' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'LaGrange', home: 'Georgia State', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Stonehill', home: 'Vanderbilt', channel: 'SECN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Kansas City', home: 'Missouri', channel: 'SECN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Samford', home: 'Mississippi State', channel: 'SECN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Rust College', home: 'Memphis', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Arkansas State', home: 'Arkansas', channel: 'SECN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Alcorn State', home: 'Ole Miss', channel: 'SECN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Pepperdine', home: 'Washington State', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Berry', home: 'Austin Peay', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '4:00 PM', away: 'Alabama State', home: 'LSU', channel: 'SEC Network' },
+            { date: '2025-12-28', time: '4:00 PM', away: 'Cornell', home: 'Stanford', channel: 'ACC Extra' },
+            { date: '2025-12-28', time: '4:00 PM', away: 'Duke', home: 'Syracuse', channel: 'ACC Network' },
+            { date: '2025-12-28', time: '4:00 PM', away: 'Penn State', home: 'Iowa', channel: 'BTN' },
+            { date: '2025-12-28', time: '4:00 PM', away: 'UConn', home: 'Butler', channel: 'TNT' },
+            { date: '2025-12-28', time: '4:00 PM', away: 'Seattle U', home: 'Pacific', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '4:00 PM', away: 'San Diego', home: 'Santa Clara', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '4:30 PM', away: 'Kentucky Christian', home: 'Morehead State', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'Cal Poly', home: 'California', channel: 'ACC Extra' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'Creighton', home: 'Georgetown', channel: 'truTV' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'La Sierra', home: 'Cal State Fullerton', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'Loyola Marymount', home: 'Gonzaga', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'Portland', home: 'Saint Mary\'s', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'Oregon State', home: 'San Francisco', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'Grand Canyon', home: 'San José State', channel: 'MWN' },
+            { date: '2025-12-29', time: '12:00 PM', away: 'Charleston Southern', home: 'Georgia', channel: 'SECN+' },
+            { date: '2025-12-29', time: '12:00 PM', away: 'Wheaton College (MA)', home: 'Brown', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '12:00 PM', away: 'Howard', home: 'Army', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '1:00 PM', away: 'Delaware', home: 'Harvard', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '1:00 PM', away: 'Rochester University (MI)', home: 'Detroit Mercy', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '1:00 PM', away: 'Hampton', home: 'Eastern Kentucky', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '1:00 PM', away: 'Drake', home: 'UIC', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '2:00 PM', away: 'Sacred Heart', home: 'Marist', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '2:00 PM', away: 'Mount St. Mary\'s', home: 'Merrimack', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '2:00 PM', away: 'Columbia', home: 'Florida Gulf Coast', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '2:00 PM', away: 'NJIT', home: 'Delaware State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '2:00 PM', away: 'Jackson State', home: 'Auburn', channel: 'SECN+' },
+            { date: '2025-12-29', time: '2:00 PM', away: 'Nelson', home: 'Abilene Christian', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '2:00 PM', away: 'Northern Iowa', home: 'Valparaiso', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '3:00 PM', away: 'Quinnipiac', home: 'Saint Peter\'s', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '3:00 PM', away: 'USC', home: 'Nebraska', channel: 'B1G+' },
+            { date: '2025-12-29', time: '3:00 PM', away: 'Northern Illinois', home: 'St. Thomas-Minnesota', channel: 'Midco Sports Plus' },
+            { date: '2025-12-29', time: '4:00 PM', away: 'Oakland', home: 'Robert Morris', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '4:00 PM', away: 'Youngstown State', home: 'Cleveland State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '4:00 PM', away: 'Wisconsin', home: 'Maryland', channel: 'B1G+' },
+            { date: '2025-12-29', time: '4:00 PM', away: 'Rider', home: 'Iona', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '4:00 PM', away: 'Ottawa (KS)', home: 'Lindenwood', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '5:00 PM', away: 'Stephen F. Austin', home: 'East Texas A&M', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '5:00 PM', away: 'New Orleans', home: 'UT Rio Grande Valley', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '6:00 PM', away: 'Nicholls', home: 'Texas A&M-Corpus Christi', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '6:00 PM', away: 'Pittsburgh', home: 'Notre Dame', channel: 'ACC Network' },
+            { date: '2025-12-29', time: '6:00 PM', away: 'Brevard', home: 'UNC Asheville', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '6:00 PM', away: 'Minnesota', home: 'Indiana', channel: 'B1G+' },
+            { date: '2025-12-29', time: '6:00 PM', away: 'Columbia College (SC)', home: 'Coastal Carolina', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '6:00 PM', away: 'St. Joseph\'S Brookyn', home: 'UMass Lowell', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '6:30 PM', away: 'Milwaukee', home: 'IU Indianapolis', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '6:30 PM', away: 'Carolina University', home: 'App State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'McNeese', home: 'Incarnate Word', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Fairfield', home: 'Manhattan', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Northern Kentucky', home: 'Purdue Fort Wayne', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Life University', home: 'Kennesaw State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'SMU', home: 'Virginia', channel: 'ACC Extra' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Villanova', home: 'DePaul', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Dillard', home: 'Louisiana', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Saint Mary\'S (Mn)', home: 'North Dakota State', channel: 'Midco Sports Plus' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Columbia International', home: 'UNC Wilmington', channel: 'FloSports' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'E. New Mexico', home: 'New Mexico State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Murray State', home: 'Evansville', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Belmont', home: 'Southern Illinois', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:30 PM', away: 'St. John\'s', home: 'Marquette', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:30 PM', away: 'Indiana State', home: 'Illinois State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'UT Arlington', home: 'Tarleton State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'North Carolina', home: 'Boston College', channel: 'ACC Network' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Huston-Tillotson', home: 'Texas State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:30 PM', away: 'Utah Tech', home: 'Southern Utah', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '9:00 PM', away: 'Utah Valley', home: 'California Baptist', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '9:00 PM', away: 'Bushnell', home: 'Eastern Washington', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '9:00 PM', away: 'Hope International', home: 'Long Beach State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '9:00 PM', away: 'Michigan', home: 'Oregon', channel: 'FS1' },
+            { date: '2025-12-29', time: '9:00 PM', away: 'University of The Southwest', home: 'UTEP', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '12:00 PM', away: 'William Woods', home: 'Southeast Missouri State', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '1:00 PM', away: 'Florida National', home: 'Florida International', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '1:00 PM', away: 'St. Joseph\'S Brookyn', home: 'Dartmouth', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '2:00 PM', away: 'Montreat', home: 'Western Carolina', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '2:00 PM', away: 'Tulane', home: 'UTSA', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '3:00 PM', away: 'College Of St Mary', home: 'South Dakota', channel: 'Summit League Network' },
+            { date: '2025-12-30', time: '3:00 PM', away: 'Morgan State', home: 'Towson', channel: 'FloSports' },
+            { date: '2025-12-30', time: '4:00 PM', away: 'Bowling Green', home: 'Eastern Michigan', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '4:00 PM', away: 'Newberry', home: 'North Carolina A&T', channel: 'FloSports' },
+            { date: '2025-12-30', time: '4:00 PM', away: 'UC Merced', home: 'UC Riverside', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '4:00 PM', away: 'San Diego', home: 'Pacific', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '6:00 PM', away: 'Southern Wesleyan', home: 'Chattanooga', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '6:00 PM', away: 'SUNY Geneseo', home: 'Le Moyne', channel: 'NEC Front Row' },
+            { date: '2025-12-30', time: '6:00 PM', away: 'UAB', home: 'East Carolina', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '6:00 PM', away: 'Richmond', home: 'Rhode Island', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '6:30 PM', away: 'Tennessee State', home: 'Tennessee Tech', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '6:30 PM', away: 'Bethune-Cookman', home: 'Jacksonville', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '6:30 PM', away: 'Notre Dame Of Maryland University', home: 'UMBC', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'Green Bay', home: 'Wright State', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'Brevard', home: 'Furman', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'North Texas', home: 'Florida Atlantic', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'Rice', home: 'South Florida', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'NC Wesleyan', home: 'Elon', channel: 'FloSports' },
+            { date: '2025-12-30', time: '7:30 PM', away: 'Wichita State', home: 'Tulsa', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '8:00 PM', away: 'Oregon State', home: 'Saint Mary\'s', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '9:00 PM', away: 'Pepperdine', home: 'Gonzaga', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '9:00 PM', away: 'Loyola Marymount', home: 'Washington State', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '9:00 PM', away: 'Portland', home: 'San Francisco', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '9:00 PM', away: 'Seattle U', home: 'Santa Clara', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Ball State', home: 'Akron', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Miami (OH)', home: 'Kent State', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Radford', home: 'Presbyterian', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Ohio State', home: 'Purdue', channel: 'BTN' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Dayton', home: 'George Mason', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Ohio', home: 'Central Michigan', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Western Michigan', home: 'Massachusetts', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'American University', home: 'Loyola Maryland', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Holy Cross', home: 'Bucknell', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Georgetown', home: 'Seton Hall', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Lehigh', home: 'Army', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'George Washington', home: 'St. Bonaventure', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'La Salle', home: 'Fordham', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Saint Louis', home: 'Duquesne', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Salem University', home: 'Youngstown State', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Colorado State', home: 'Grand Canyon', channel: 'MWN' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Northern Iowa', home: 'UIC', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'New Orleans', home: 'Texas A&M-Corpus Christi', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'SE Louisiana', home: 'Incarnate Word', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Stephen F. Austin', home: 'Northwestern State', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Buffalo', home: 'Toledo', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'UNC Asheville', home: 'High Point', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Navy', home: 'Boston University', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Gardner-Webb', home: 'Winthrop', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'UCLA', home: 'Penn State', channel: 'Peacock' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Iowa State', home: 'Houston', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Cincinnati', home: 'Kansas State', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'VCU', home: 'Saint Joseph\'s', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'McNeese', home: 'Houston Christian', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'Nicholls', home: 'UT Rio Grande Valley', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'South Carolina Upstate', home: 'Charleston Southern', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'UConn', home: 'Providence', channel: 'Peacock' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'Baylor', home: 'Oklahoma State', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'Memphis', home: 'Charlotte', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'Davidson', home: 'Loyola Chicago', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'San José State', home: 'Utah State', channel: 'MWN' },
+            { date: '2025-12-31', time: '3:30 PM', away: 'Lamar', home: 'East Texas A&M', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '4:00 PM', away: 'Arizona State', home: 'Utah', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '4:00 PM', away: 'Air Force', home: 'San Diego State', channel: 'MWN' },
+            { date: '2025-12-31', time: '4:00 PM', away: 'Nevada', home: 'Boise State', channel: 'MWN' },
+            { date: '2025-12-31', time: '6:00 PM', away: 'Omaha', home: 'Kansas City', channel: 'Midco Sports Plus' },
+            { date: '2025-12-31', time: '6:00 PM', away: 'Lafayette', home: 'Colgate', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '7:00 PM', away: 'UCF', home: 'Texas Tech', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '9:00 PM', away: 'TCU', home: 'BYU', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '9:00 PM', away: 'Arizona', home: 'Colorado', channel: 'ESPN+' }
+        ],
+        'NCAAM': [
+            { date: '2025-12-28', time: '12:00 PM', away: 'Arcadia', home: 'Saint Joseph\'s', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Worcester State', home: 'Bryant', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Liberty', home: 'Florida International', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Mount Marty College', home: 'South Dakota', channel: 'Midco Sports Plus' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Harvard', home: 'Colgate', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Le Moyne', home: 'Boston College', channel: 'ACC Extra' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Columbia', home: 'North Florida', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'UL Monroe', home: 'Kansas State', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Winthrop', home: 'Texas Tech', channel: 'TNT' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Fort Lauderdale', home: 'Florida Gulf Coast', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Pfeiffer', home: 'High Point', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Union (KY)', home: 'Wofford', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Dakota State', home: 'North Dakota', channel: 'Summit League Network' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'North Central (MN)', home: 'St. Thomas-Minnesota', channel: 'Midco Sports Plus' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Alice Lloyd College', home: 'Morehead State', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:00 PM', away: 'Baptist (Fl)', home: 'Mercer', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '2:30 PM', away: 'Shenandoah', home: 'Radford', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Principia College', home: 'Saint Louis', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Cal State Fullerton', home: 'SMU', channel: 'ACC Extra' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Northern Colorado', home: 'Colorado', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Averett', home: 'Longwood', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '3:00 PM', away: 'Norfolk State', home: 'Louisiana', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '4:00 PM', away: 'Charleston Southern', home: 'Richmond', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '4:00 PM', away: 'Truett-McConnell', home: 'Presbyterian', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '4:00 PM', away: 'University of The Southwest', home: 'New Mexico State', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'Pennsylvania', home: 'George Mason', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'Pacific Union', home: 'UC Davis', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'Washington State', home: 'Portland', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '5:00 PM', away: 'Columbia College (SC)', home: 'Georgia State', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '5:30 PM', away: 'Fisk', home: 'Austin Peay', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '6:00 PM', away: 'Old Dominion', home: 'Maryland', channel: 'BTN' },
+            { date: '2025-12-28', time: '6:00 PM', away: 'Pacific', home: 'San Diego', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '6:00 PM', away: 'Santa Clara', home: 'Oregon State', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '6:00 PM', away: 'McPherson', home: 'Kansas City', channel: 'Midco Sports Plus' },
+            { date: '2025-12-28', time: '7:00 PM', away: 'Florida A&M', home: 'Georgia Tech', channel: 'ACC Extra' },
+            { date: '2025-12-28', time: '7:00 PM', away: 'Stanton', home: 'UC San Diego', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '7:00 PM', away: 'Saint Mary\'s', home: 'Loyola Marymount', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '8:00 PM', away: 'Omaha', home: 'Oregon', channel: 'BTN' },
+            { date: '2025-12-28', time: '8:00 PM', away: 'Gonzaga', home: 'Pepperdine', channel: 'ESPN+' },
+            { date: '2025-12-28', time: '8:00 PM', away: 'San Francisco', home: 'Seattle U', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '1:00 PM', away: 'North Carolina Central', home: 'Penn State', channel: 'BTN' },
+            { date: '2025-12-29', time: '2:00 PM', away: 'Missouri State', home: 'Delaware', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '2:00 PM', away: 'Merrimack', home: 'Sacred Heart', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '3:00 PM', away: 'Southern', home: 'Illinois', channel: 'BTN' },
+            { date: '2025-12-29', time: '4:00 PM', away: 'Marist', home: 'Quinnipiac', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '4:00 PM', away: 'Arlington Baptist', home: 'Baylor', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '4:00 PM', away: 'Elmira', home: 'Binghamton', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '4:00 PM', away: 'Illinois Tech', home: 'UIC', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '4:00 PM', away: 'SUNY-Canton', home: 'NJIT', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '4:30 PM', away: 'Georgia College', home: 'South Florida', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '5:00 PM', away: 'Towson', home: 'William & Mary', channel: 'FloSports' },
+            { date: '2025-12-29', time: '5:00 PM', away: 'UMass Lowell', home: 'Iowa', channel: 'BTN' },
+            { date: '2025-12-29', time: '6:00 PM', away: 'UMBC', home: 'Coppin State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '6:00 PM', away: 'Dartmouth', home: 'Florida', channel: 'SEC Network' },
+            { date: '2025-12-29', time: '6:30 PM', away: 'Detroit Mercy', home: 'Youngstown State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Western Kentucky', home: 'Jacksonville State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Northeastern', home: 'Elon', channel: 'FloSports' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Stony Brook', home: 'Hampton', channel: 'FloSports' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Campbell', home: 'Hofstra', channel: 'FloSports' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Drexel', home: 'Charleston', channel: 'FloSports' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'UNC Wilmington', home: 'North Carolina A&T', channel: 'CBSSN' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Long Island University', home: 'Georgia', channel: 'SECN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Manhattan', home: 'Rider', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Iona', home: 'Mount St. Mary\'s', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'IU Indianapolis', home: 'Cleveland State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Northern Kentucky', home: 'Robert Morris', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Oakland', home: 'Wright State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Lipscomb', home: 'Cincinnati', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Earlham College', home: 'Ball State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Kent State', home: 'Purdue', channel: 'B1G+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Saint Peter\'s', home: 'Fairfield', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'McNeese', home: 'Michigan', channel: 'B1G+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Cornell', home: 'Michigan State', channel: 'FS1' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Delaware State', home: 'Rutgers', channel: 'BTN' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Belmont', home: 'Indiana State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:00 PM', away: 'Southern Illinois', home: 'Murray State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:30 PM', away: 'UTEP', home: 'Louisiana Tech', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:30 PM', away: 'Stephen F. Austin', home: 'East Texas A&M', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:30 PM', away: 'New Orleans', home: 'UT Rio Grande Valley', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:30 PM', away: 'Lamar', home: 'Northwestern State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '7:30 PM', away: 'Alabama State', home: 'Mississippi State', channel: 'SECN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Tarleton State', home: 'UT Arlington', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'California Baptist', home: 'Utah Valley', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Jackson State', home: 'TCU', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Yale', home: 'Alabama', channel: 'SECN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Bethune-Cookman', home: 'Oklahoma State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Purdue Fort Wayne', home: 'Milwaukee', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Houston Christian', home: 'Iowa State', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Middle Tennessee', home: 'Houston', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Benedictine (AZ)', home: 'Northern Arizona', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Mississippi Valley State', home: 'Oklahoma', channel: 'SECN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'James Madison', home: 'Arkansas', channel: 'SECN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Prairie View A&M', home: 'Texas A&M', channel: 'SECN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Southern Miss', home: 'LSU', channel: 'SECN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Alcorn State', home: 'Ole Miss', channel: 'SEC Network' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Evansville', home: 'Bradley', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Valparaiso', home: 'Northern Iowa', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:00 PM', away: 'Mobile', home: 'South Alabama', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '8:30 PM', away: 'Nicholls', home: 'Texas A&M-Corpus Christi', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '9:00 PM', away: 'Southern Utah', home: 'Utah Tech', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '9:00 PM', away: 'Fairleigh Dickinson', home: 'Minnesota', channel: 'BTN' },
+            { date: '2025-12-29', time: '9:00 PM', away: 'South Dakota State', home: 'Arizona', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '9:00 PM', away: 'Illinois State', home: 'Drake', channel: 'ESPN+' },
+            { date: '2025-12-29', time: '10:00 PM', away: 'La Sierra', home: 'UNLV', channel: 'MWN' },
+            { date: '2025-12-29', time: '10:00 PM', away: 'Queens University', home: 'Auburn', channel: 'SEC Network' },
+            { date: '2025-12-29', time: '11:00 PM', away: 'Utah', home: 'Washington', channel: 'FS1' },
+            { date: '2025-12-30', time: '1:00 PM', away: 'Wofford', home: 'Western Carolina', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '1:00 PM', away: 'Vermont', home: 'Princeton', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '2:00 PM', away: 'Maine-Fort Kent', home: 'Maine', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '3:00 PM', away: 'Ohio', home: 'Central Michigan', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '4:00 PM', away: 'Howard', home: 'Northwestern', channel: 'BTN' },
+            { date: '2025-12-30', time: '6:00 PM', away: 'East Tennessee State', home: 'The Citadel', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '6:00 PM', away: 'SE Louisiana', home: 'Incarnate Word', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '6:00 PM', away: 'UAlbany', home: 'South Carolina', channel: 'SEC Network' },
+            { date: '2025-12-30', time: '6:30 PM', away: 'Western Michigan', home: 'Toledo', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'Miami (OH)', home: 'Bowling Green', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'Pittsburgh', home: 'Miami', channel: 'ACC Network' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'Florida State', home: 'North Carolina', channel: 'ESPN2' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'Milwaukee', home: 'Wisconsin', channel: 'BTN' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'Seton Hall', home: 'Marquette', channel: 'FS1' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'Temple', home: 'Charlotte', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '7:00 PM', away: 'Duquesne', home: 'Davidson', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '7:30 PM', away: 'Massachusetts', home: 'Eastern Michigan', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '8:00 PM', away: 'Buffalo', home: 'Northern Illinois', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '8:00 PM', away: 'South Carolina State', home: 'Tennessee', channel: 'SEC Network' },
+            { date: '2025-12-30', time: '8:00 PM', away: 'Arkansas Tech', home: 'Arkansas State', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '8:30 PM', away: 'Tennessee State', home: 'Tennessee Tech', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '9:00 PM', away: 'Louisville', home: 'California', channel: 'ACC Network' },
+            { date: '2025-12-30', time: '9:00 PM', away: 'Notre Dame', home: 'Stanford', channel: 'ESPN2' },
+            { date: '2025-12-30', time: '9:00 PM', away: 'Butler', home: 'Creighton', channel: 'FS1' },
+            { date: '2025-12-30', time: '9:00 PM', away: 'New Hampshire', home: 'Nebraska', channel: 'BTN' },
+            { date: '2025-12-30', time: '9:00 PM', away: 'Utah State', home: 'Fresno State', channel: 'MWN' },
+            { date: '2025-12-30', time: '9:00 PM', away: 'Saint Mary\'s', home: 'Pepperdine', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '9:30 PM', away: 'Gonzaga', home: 'San Diego', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '10:00 PM', away: 'Lincoln University (CA)', home: 'Long Beach State', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '10:00 PM', away: 'San Diego State', home: 'San José State', channel: 'CBSSN' },
+            { date: '2025-12-30', time: '10:00 PM', away: 'Pacific', home: 'Loyola Marymount', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '10:00 PM', away: 'San Francisco', home: 'Oregon State', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '10:00 PM', away: 'Santa Clara', home: 'Portland', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '10:00 PM', away: 'Washington State', home: 'Seattle U', channel: 'ESPN+' },
+            { date: '2025-12-30', time: '11:00 PM', away: 'New Mexico', home: 'Boise State', channel: 'FS1' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Lamar', home: 'East Texas A&M', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Mercer', home: 'Furman', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Johnson & Wales (RI)', home: 'Brown', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Wake Forest', home: 'NC State', channel: 'ESPN2' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Army', home: 'Lehigh', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Tulane', home: 'East Carolina', channel: 'ESPNU' },
+            { date: '2025-12-31', time: '12:00 PM', away: 'Loyola Chicago', home: 'Rhode Island', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'South Alabama', home: 'Louisiana', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Boston University', home: 'Navy', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'Loyola Maryland', home: 'American University', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '1:00 PM', away: 'UTSA', home: 'Florida Atlantic', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'App State', home: 'Old Dominion', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Texas State', home: 'Troy', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Stony Brook', home: 'William & Mary', channel: 'CBSSN' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Campbell', home: 'Monmouth', channel: 'FloSports' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Charleston', home: 'Elon', channel: 'FloSports' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'NJIT', home: 'Pennsylvania', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Penn St Abington', home: 'Columbia', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Clemson', home: 'Syracuse', channel: 'ESPN2' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Virginia', home: 'Virginia Tech', channel: 'ACC Network' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Charleston Southern', home: 'Gardner-Webb', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'High Point', home: 'UNC Asheville', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Radford', home: 'South Carolina Upstate', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Bucknell', home: 'Holy Cross', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Rice', home: 'Tulsa', channel: 'ESPNU' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'Fordham', home: 'Dayton', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'George Mason', home: 'La Salle', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:00 PM', away: 'St. Bonaventure', home: 'VCU', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '2:30 PM', away: 'Towson', home: 'Hampton', channel: 'FloSports' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'Northeastern', home: 'North Carolina A&T', channel: 'FloSports' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'Winthrop', home: 'Longwood', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '3:00 PM', away: 'Colgate', home: 'Lafayette', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '4:00 PM', away: 'Georgia State', home: 'Marshall', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '4:00 PM', away: 'Kansas City', home: 'Denver', channel: 'Midco Sports Plus' },
+            { date: '2025-12-31', time: '4:00 PM', away: 'Georgia Tech', home: 'Duke', channel: 'ACC Network' },
+            { date: '2025-12-31', time: '4:00 PM', away: 'Wichita State', home: 'UAB', channel: 'ESPNU' },
+            { date: '2025-12-31', time: '4:00 PM', away: 'North Texas', home: 'Memphis', channel: 'ESPN2' },
+            { date: '2025-12-31', time: '4:00 PM', away: 'George Washington', home: 'Richmond', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '4:00 PM', away: 'Saint Joseph\'s', home: 'Saint Louis', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '4:30 PM', away: 'New Orleans', home: 'Texas A&M-Corpus Christi', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '4:30 PM', away: 'Stephen F. Austin', home: 'Northwestern State', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '5:00 PM', away: 'South Dakota', home: 'North Dakota State', channel: 'Midco Sports Plus' },
+            { date: '2025-12-31', time: '5:00 PM', away: 'UConn', home: 'Xavier', channel: 'Peacock' },
+            { date: '2025-12-31', time: '5:30 PM', away: 'Nicholls', home: 'UT Rio Grande Valley', channel: 'ESPN+' },
+            { date: '2025-12-31', time: '6:00 PM', away: 'DePaul', home: 'Villanova', channel: 'FS1' },
+            { date: '2025-12-31', time: '7:00 PM', away: 'Drexel', home: 'UNC Wilmington', channel: 'CBSSN' },
+            { date: '2025-12-31', time: '8:00 PM', away: 'St. John\'s', home: 'Georgetown', channel: 'FS1' }
         ]
     };
 
@@ -14077,6 +14439,11 @@ async function fetchFeaturedGames() {
             }
         }
         
+        // Clear old Top 25 content when switching leagues
+        if (top25Content) {
+            top25Content.innerHTML = '<p style="color: #9ca3af;">Loading Top 25...</p>';
+        }
+        
         if (isNCALeague) {
             // Load Top 25 rankings cache for this league
             loadTop25RankingsCache(leagueKey);
@@ -14120,8 +14487,11 @@ async function fetchFeaturedGames() {
                     standingsTab.style.color = '#ccc';
                     standingsTab.style.borderBottom = 'none';
                 }
-                // Show Top 25 content, hide other content
-                if (top25Content) top25Content.style.display = 'block';
+                // Show Top 25 content, hide other content, and LOAD the data
+                if (top25Content) {
+                    top25Content.style.display = 'block';
+                    loadTop25Data(leagueKey); // LOAD THE DATA!
+                }
                 if (standingsContentOnly) standingsContentOnly.style.display = 'none';
                 if (cfpContent) cfpContent.style.display = 'none';
             }
@@ -14199,6 +14569,13 @@ async function fetchFeaturedGames() {
             if (todayScheduleContent) todayScheduleContent.style.display = 'none';
             if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'block';
             activateMainTab('standings');
+            
+            // For NCAA leagues, load Top 25 data when switching to Standings tab
+            const isNCALeague = ['NCAAF', 'NCAAM', 'NCAAW'].includes(leagueKey);
+            if (isNCALeague && (leagueKey === 'NCAAM' || leagueKey === 'NCAAW')) {
+                // Top 25 tab is already active by default for NCAAM/NCAAW, so load the data
+                loadTop25Data(leagueKey);
+            }
         }
 
         if (scheduleTabsContainer) {
@@ -15560,65 +15937,152 @@ async function fetchFeaturedGames() {
                 return mascot;
             }
             
-            // Group games by date
-            const gamesByDate = {};
+            // Check if this league uses the Featured Only / Expand All toggle
+            const isNcaaLeague = (leagueKey === 'NCAAM' || leagueKey === 'NCAAW');
+            const importantTeamsSet = leagueKey === 'NCAAM' ? IMPORTANT_NCAAM_TEAMS : (leagueKey === 'NCAAW' ? IMPORTANT_NCAAW_TEAMS : null);
+            
+            // Function to check if a game involves important teams
+            function isImportantGame(game) {
+                if (!importantTeamsSet) return true; // Show all games if no important teams filter
+                const awayNormalized = normalizeNcaaTeamName(game.away);
+                const homeNormalized = normalizeNcaaTeamName(game.home);
+                return importantTeamsSet.has(awayNormalized) || importantTeamsSet.has(homeNormalized);
+            }
+            
+            // Mark games as important or not
             futureGames.forEach(game => {
-                if (!gamesByDate[game.date]) {
-                    gamesByDate[game.date] = [];
-                }
-                gamesByDate[game.date].push(game);
+                game.isImportant = isImportantGame(game);
             });
             
-            // Build HTML
-            let html = '';
-            const sortedDates = Object.keys(gamesByDate).sort();
+            // Count featured vs non-featured games
+            const featuredGamesCount = futureGames.filter(g => g.isImportant).length;
+            const nonFeaturedGamesCount = futureGames.filter(g => !g.isImportant).length;
             
-            sortedDates.forEach(dateStr => {
-                const dateObj = luxon.DateTime.fromISO(dateStr);
-                const dateHeader = dateObj.toFormat('EEEE, MMMM d, yyyy');
-                
-                html += `<div style="background-color: #2a2a2a; padding: 6px 10px; font-weight: bold; font-size: 11px; border-bottom: 1px solid #3a3a3a; margin-top: 10px;">${dateHeader}</div>`;
-                
-                gamesByDate[dateStr].forEach(game => {
-                    // Parse time as EST and convert to user's local time (or keep TBD)
-                    let displayTime = game.time;
-                    if (game.time && game.time.toUpperCase() !== 'TBD') {
-                        const estTime = luxon.DateTime.fromFormat(game.time, 'h:mm a', { zone: 'America/New_York' });
-                        if (estTime.isValid) {
-                            const localTime = estTime.setZone('local');
-                            displayTime = localTime.toFormat('h:mm a');
-                        }
+            // Object to track expand/collapse state for each date
+            const dateExpandStates = {};
+            
+            // Initialize all dates to collapsed (false = show featured only)
+            const sortedDates = Object.keys(futureGames.reduce((acc, game) => {
+                acc[game.date] = true;
+                return acc;
+            }, {})).sort();
+            
+            sortedDates.forEach(date => {
+                dateExpandStates[date] = false;
+            });
+            
+            // Function to render the schedule
+            function renderSchedule() {
+                // Group all games by date (not filtered yet)
+                const gamesByDate = {};
+                futureGames.forEach(game => {
+                    if (!gamesByDate[game.date]) {
+                        gamesByDate[game.date] = [];
                     }
-                    
-                    // Determine display order based on league type
-                    const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia'].includes(leagueKey);
-                    
-                    let topTeam, bottomTeam;
-                    if (isSoccerLeague) {
-                        // Soccer: Home team on top, away team on bottom
-                        topTeam = game.home;
-                        bottomTeam = game.away;
-                    } else {
-                        // Other sports (NFL, etc.): Away team on top, home team on bottom
-                        topTeam = getMascotName(game.away);
-                        bottomTeam = getMascotName(game.home);
-                    }
-                    
-                    html += `
-                        <div style="display: flex; align-items: center; padding: 8px 10px; border-bottom: 1px solid #2a2a2a; font-size: 11px;">
-                            <div style="width: 80px; flex-shrink: 0; color: #9ca3af;">${displayTime}</div>
-                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
-                                <div>${topTeam}</div>
-                                <div>${bottomTeam}</div>
-                            </div>
-                            ${game.channel ? `<div style="width: 80px; text-align: right; color: #9ca3af; flex-shrink: 0;">${game.channel}</div>` : ''}
-                        </div>
-                    `;
+                    gamesByDate[game.date].push(game);
                 });
-            });
+                
+                // Build HTML
+                let html = '';
+                
+                const sortedDates = Object.keys(gamesByDate).sort();
+                
+                sortedDates.forEach(dateStr => {
+                    const dateObj = luxon.DateTime.fromISO(dateStr);
+                    const dateHeader = dateObj.toFormat('EEEE, MMMM d, yyyy');
+                    const isExpanded = dateExpandStates[dateStr];
+                    
+                    html += `<div style="background-color: #2a2a2a; padding: 6px 10px; font-weight: bold; font-size: 11px; border-bottom: 1px solid #3a3a3a; margin-top: 10px;">${dateHeader}</div>`;
+                    
+                    // Add toggle button under each date header if there are non-featured games
+                    if (isNcaaLeague && nonFeaturedGamesCount > 0) {
+                        html += `
+                            <div class="upcoming-schedule-toggle" data-date="${dateStr}" style="font-size: 10px; padding: 6px 10px; cursor: pointer; color: #9ca3af; border-bottom: 1px solid #2a2a2a;">
+                                <span style="text-decoration: underline;">${isExpanded ? 'Featured only' : 'Expand all'}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    // Filter games for this date based on its expand state
+                    const datesToShow = isExpanded ? gamesByDate[dateStr] : gamesByDate[dateStr].filter(g => g.isImportant);
+                    
+                    datesToShow.forEach(game => {
+                        // Parse time as EST and convert to user's local time (or keep TBD)
+                        let displayTime = game.time;
+                        if (game.time && game.time.toUpperCase() !== 'TBD') {
+                            const estTime = luxon.DateTime.fromFormat(game.time, 'h:mm a', { zone: 'America/New_York' });
+                            if (estTime.isValid) {
+                                const localTime = estTime.setZone('local');
+                                displayTime = localTime.toFormat('h:mm a');
+                            }
+                        }
+                        
+                        // Determine display order based on league type
+                        const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia'].includes(leagueKey);
+                        
+                        let topTeam, bottomTeam;
+                        if (isSoccerLeague) {
+                            // Soccer: Home team on top, away team on bottom
+                            topTeam = game.home;
+                            bottomTeam = game.away;
+                        } else {
+                            // Other sports (NFL, etc.): Away team on top, home team on bottom
+                            topTeam = getMascotName(game.away);
+                            bottomTeam = getMascotName(game.home);
+                        }
+                        
+                        html += `
+                            <div style="display: flex; align-items: center; padding: 8px 10px; border-bottom: 1px solid #2a2a2a; font-size: 11px;">
+                                <div style="width: 80px; flex-shrink: 0; color: #9ca3af;">${displayTime}</div>
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                    <div>${topTeam}</div>
+                                    <div>${bottomTeam}</div>
+                                </div>
+                                ${game.channel ? `<div style="width: 80px; text-align: right; color: #9ca3af; flex-shrink: 0;">${game.channel}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                });
+                
+                return html;
+            }
             
+            // Function to attach toggle handlers
+            function attachToggleHandlers() {
+                const toggleButtons = defaultContent.querySelectorAll('.upcoming-schedule-toggle');
+                toggleButtons.forEach((button) => {
+                    button.addEventListener('click', (e) => {
+                        const dateStr = button.getAttribute('data-date');
+                        
+                        // Get the clicked button's offset from the top of the container
+                        const buttonOffsetFromTop = button.offsetTop - defaultContent.scrollTop;
+                        
+                        // Toggle the state for this specific date
+                        dateExpandStates[dateStr] = !dateExpandStates[dateStr];
+                        
+                        defaultContent.innerHTML = renderSchedule();
+                        
+                        // Find the corresponding toggle button for this date after re-render
+                        const newToggleButton = defaultContent.querySelector(`.upcoming-schedule-toggle[data-date="${dateStr}"]`);
+                        if (newToggleButton) {
+                            // Calculate the new scroll position to maintain the visual position of the clicked toggle
+                            const targetScrollTop = newToggleButton.offsetTop - buttonOffsetFromTop;
+                            defaultContent.scrollTop = targetScrollTop;
+                        }
+                        
+                        attachToggleHandlers(); // Re-attach handlers after re-render
+                    });
+                });
+            }
+            
+            // Initial render
             if (defaultContent) {
-                defaultContent.innerHTML = html;
+                defaultContent.innerHTML = renderSchedule();
+                
+                // Add click handlers for all toggle buttons
+                if (isNcaaLeague && nonFeaturedGamesCount > 0) {
+                    attachToggleHandlers();
+                }
             }
             return;
         }
@@ -18177,20 +18641,28 @@ function createTop25Table(teams, leagueKey) {
     let html = '<div class="top25-standings" style="color: #ffffff;">';
     html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; table-layout: fixed;">';
     html += '<colgroup>';
-    html += '<col style="width: 60px;">';
-    html += '<col style="width: auto;">';
-    html += '<col style="width: 100px;">';
-    if (leagueKey !== 'NCAAF') {
-        html += '<col style="width: 80px;">';
+    // NCAAM and NCAAW get tight layout: narrower Rank and Record columns
+    if (leagueKey === 'NCAAM' || leagueKey === 'NCAAW') {
+        html += '<col style="width: 45px;">';
+        html += '<col style="width: auto;">';
+        html += '<col style="width: 85px;">';
+    } else {
+        html += '<col style="width: 60px;">';
+        html += '<col style="width: auto;">';
+        html += '<col style="width: 100px;">';
     }
     html += '</colgroup>';
     html += '<thead>';
     html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
-    html += '<th style="padding: 8px; text-align: center; border-bottom: 1px solid #666;">Rank</th>';
-    html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
-    html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Record</th>';
-    if (leagueKey !== 'NCAAF') {
-        html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Points</th>';
+    // NCAAM and NCAAW: push Rank to left edge with 5px padding
+    if (leagueKey === 'NCAAM' || leagueKey === 'NCAAW') {
+        html += '<th style="padding: 8px 8px 8px 5px; text-align: left; border-bottom: 1px solid #666;">Rank</th>';
+        html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
+        html += '<th style="padding: 8px 8px 8px 5px; text-align: right; border-bottom: 1px solid #666;">Record</th>';
+    } else {
+        html += '<th style="padding: 8px; text-align: center; border-bottom: 1px solid #666;">Rank</th>';
+        html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
+        html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Record</th>';
     }
     html += '</tr>';
     html += '</thead>';
@@ -18205,15 +18677,22 @@ function createTop25Table(teams, leagueKey) {
             // Keep the "T" prefix for display but ensure it's sorted correctly
             displayRank = displayRank;
         }
-        html += '<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff;">' + (displayRank || '') + '</td>';
+        // NCAAM and NCAAW: push Rank to left with 5px padding, left-align
+        if (leagueKey === 'NCAAM' || leagueKey === 'NCAAW') {
+            html += '<td style="padding: 8px 8px 8px 5px; text-align: left; font-size: 12px; font-weight: 600; color: #ffffff;">' + (displayRank || '') + '</td>';
+        } else {
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff;">' + (displayRank || '') + '</td>';
+        }
         // Get display name for team (e.g., "Southern California" -> "USC")
         const displayTeamName = getTop25DisplayName(team.Team, leagueKey) || team.Team || '';
         html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + displayTeamName + '</td>';
         // Use OverallRecord for Top 25 display (ensure it's overall, not conference)
         const displayRecord = team.OverallRecord || team.Record || '';
-        html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + displayRecord + '</td>';
-        if (leagueKey !== 'NCAAF') {
-            html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + (team.Top25Points || '') + '</td>';
+        // NCAAM and NCAAW: tighter padding before Record
+        if (leagueKey === 'NCAAM' || leagueKey === 'NCAAW') {
+            html += '<td style="padding: 8px 8px 8px 5px; text-align: right; font-size: 12px; color: #ffffff;">' + displayRecord + '</td>';
+        } else {
+            html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + displayRecord + '</td>';
         }
         html += '</tr>';
     });
