@@ -29,7 +29,7 @@ html, body {
   align-items: center;
   justify-content: center;
   z-index: 20;
-  transition: opacity 1.8s ease;
+  transition: opacity 1s ease;
 }
 
 #exterior.hidden {
@@ -94,7 +94,7 @@ html, body {
   align-items: center;
   gap: 6px;
   opacity: 0;
-  transition: opacity 1s ease 1.8s;
+  transition: opacity 1s ease 1s;
 }
 
 .live-text.visible {
@@ -133,7 +133,7 @@ html, body {
 <div id="video-bg">
   <iframe
     id="bgVideo"
-    src="https://www.youtube.com/embed/W4M_9CXXWXw?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&playsinline=1&loop=1&playlist=W4M_9CXXWXw"
+    src="https://www.youtube.com/embed/r8LPAu4z2ts?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&playsinline=1&loop=1&playlist=r8LPAu4z2ts"
     frameborder="0"
     allow="autoplay; fullscreen"
     allowfullscreen>
@@ -161,7 +161,7 @@ enter.addEventListener("click", () => {
   /* Show Live indicator after fade completes */
   setTimeout(() => {
     liveText.classList.add("visible");
-  }, 1800);
+  }, 1000);
 });
 </script>
 
