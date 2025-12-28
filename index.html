@@ -739,21 +739,26 @@ table.game-table td:nth-child(1) {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    height: 100vh;
+    max-height: 100vh;
     overflow: hidden;
   }
   
   #tv-listings-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
     overflow: hidden;
   }
   
   .games-content {
-    flex: 1;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding-bottom: 150px;
+    min-height: 0;
   }
 
   .column.tv-listings * {
@@ -1634,11 +1639,18 @@ div[id^="breaking-content-"] a:hover {
   #tv-listings-scores,
   #tv-listings-today,
   #tv-listings-live {
-    padding: 5px;
-    padding-bottom: 150px;
-    flex: 1;
+    padding: 5px !important;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    min-height: 0;
+  }
+  
+  #games {
+    width: 100%;
+    padding-bottom: 150px;
   }
 	   
 	   .winner {
@@ -2634,7 +2646,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ─── TV-LISTINGS COLUMN (Default View) ──────────────────────────────────────── -->
 <div class="column tv-listings" id="games-column" style="background-color: #1f1f1f;">
-  <div id="tv-listings-container" style="display: flex; flex-direction: column; height: 100%;">
+  <div id="tv-listings-container" style="display: flex; flex-direction: column;">
     <div id="games-header" style="
         position: sticky; top: 0; width: 100%; height: 18px;
         background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif;
