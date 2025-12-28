@@ -14244,6 +14244,120 @@ async function fetchFeaturedGames() {
     // Track active tab globally - 'ALL' or 'LIVE'
     let activeTab = 'ALL';
     
+    // TODAY tab lifecycle state (FSM-based, prevents midnight flip until games finish + 2 hours)
+    let activeTodayDate = null; // The date currently shown in TODAY tab (YYYY-MM-DD)
+    let holdTimer = null; // setTimeout reference for 2-hour hold
+    let holdUntil = null; // Timestamp when hold expires (ms since epoch)
+    
+    // Initialize TODAY latch state (IIFE pattern - runs once on page load)
+    (function initTodayLatch() {
+        const { DateTime } = luxon;
+        
+        activeTodayDate = localStorage.getItem('activeTodayDate');
+        holdUntil = Number(localStorage.getItem('holdUntil')) || null;
+        
+        if (!activeTodayDate) {
+            activeTodayDate = DateTime
+                .now()
+                .setZone('America/New_York')
+                .toISODate();
+        }
+        
+        // If hold expired while page was closed, advance immediately
+        if (holdUntil && Date.now() >= holdUntil) {
+            advanceTodayDate();
+        } else if (holdUntil) {
+            // Restore timer if still in hold period
+            const delay = holdUntil - Date.now();
+            if (delay > 0) {
+                holdTimer = setTimeout(() => {
+                    advanceTodayDate();
+                }, delay);
+                console.log(`🔒 TODAY tab held until ${new Date(holdUntil).toLocaleString()}`);
+            }
+        }
+    })();
+    
+    // Persist TODAY latch state to localStorage
+    function persistTodayLatch() {
+        localStorage.setItem('activeTodayDate', activeTodayDate);
+        if (holdUntil) {
+            localStorage.setItem('holdUntil', holdUntil);
+        } else {
+            localStorage.removeItem('holdUntil');
+        }
+    }
+    
+    // Advance TODAY date by 1 day (FSM transition: ROTATE)
+    function advanceTodayDate() {
+        console.log('🔄 Advancing TODAY tab to next day...');
+        
+        const { DateTime } = luxon;
+        
+        // Advance activeTodayDate by 1 day (don't use current date!)
+        activeTodayDate = DateTime
+            .fromISO(activeTodayDate, { zone: 'America/New_York' })
+            .plus({ days: 1 })
+            .toISODate();
+        
+        console.log('📅 TODAY tab now showing:', activeTodayDate);
+        
+        // Clear hold state
+        holdUntil = null;
+        if (holdTimer) {
+            clearTimeout(holdTimer);
+            holdTimer = null;
+        }
+        
+        persistTodayLatch();
+        
+        // Reload TODAY games with new date
+        if (typeof fetchTodayGames === 'function') {
+            fetchTodayGames(() => {
+                // updateDisplay will be called by Firestore listeners
+            });
+        }
+    }
+    
+    // FSM logic: Handle TODAY tab state transitions based on game status
+    function handleTodayFSM(games) {
+        if (!games || games.length === 0) return;
+        
+        // Check if all games are FINAL
+        const allFinal = games.every(game => {
+            const status = (game['Match Status'] || '').toUpperCase();
+            return status.includes('FINAL') ||
+                   status.includes('FINISHED') ||
+                   status.includes('GAME OVER');
+        });
+        
+        // ─── STATE: TODAY_ACTIVE ─────────────────────────
+        // At least one game is not FINAL - clear any hold timer
+        if (!allFinal) {
+            if (holdTimer) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+                holdUntil = null;
+                persistTodayLatch();
+                console.log('🔄 Active games detected, clearing hold');
+            }
+            return;
+        }
+        
+        // ─── STATE: TODAY_HOLDING ───────────────────────
+        // All games are FINAL - start 2-hour hold timer if not already started
+        if (!holdTimer) {
+            holdUntil = Date.now() + (2 * 60 * 60 * 1000); // 2 hours from now
+            
+            holdTimer = setTimeout(() => {
+                advanceTodayDate();
+            }, holdUntil - Date.now());
+            
+            persistTodayLatch();
+            console.log(`✅ All games finished! Starting 2-hour hold until ${new Date(holdUntil).toLocaleString()}`);
+        }
+    }
+    
     async function fetchTodayGames(callback) {
         // Load Top 25 rankings cache for all NCAA leagues (for home page games display)
         // Wait for all caches to load before rendering games
@@ -14260,7 +14374,9 @@ async function fetchFeaturedGames() {
 
         errorDiv.textContent = "";
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+        
+        // Use activeTodayDate (which may be held from previous day) instead of current calendar date
+        const todayStr = activeTodayDate; // Use the active date (may be held from yesterday)
 
         let regularGames = [];
         let featuredGames = [];
@@ -14549,6 +14665,12 @@ async function fetchFeaturedGames() {
             }
             
             renderGames(todayContainer, gamesToRender, true);
+            
+            // ─────────────────────────────────────────────
+            // 🧠 FSM LOGIC — Handle TODAY tab state transitions
+            // ─────────────────────────────────────────────
+            const allGames = [...regularGames, ...featuredGames];
+            handleTodayFSM(allGames);
             
             if (callback) {
                 callback();
