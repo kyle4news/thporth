@@ -14248,48 +14248,141 @@ async function fetchFeaturedGames() {
     let activeTodayDate = null; // The date currently shown in TODAY tab (YYYY-MM-DD)
     let holdTimer = null; // setTimeout reference for 2-hour hold
     let holdUntil = null; // Timestamp when hold expires (ms since epoch)
+    let todaySlateUnsubscribe = null; // Firestore listener unsubscribe function
     
-    // Initialize TODAY latch state (IIFE pattern - runs once on page load)
-    (function initTodayLatch() {
+    // Get Firestore reference for TODAY latch state (lazy initialization)
+    function getTodaySlateRef() {
+        if (typeof db === 'undefined' || !db) {
+            throw new Error('Firestore db not initialized');
+        }
+        return db.collection('system').doc('todaySlate');
+    }
+    
+    // Initialize TODAY latch state from Firestore (shared state)
+    async function initTodayLatch() {
         const { DateTime } = luxon;
         
-        activeTodayDate = localStorage.getItem('activeTodayDate');
-        holdUntil = Number(localStorage.getItem('holdUntil')) || null;
-        
-        if (!activeTodayDate) {
-            activeTodayDate = DateTime
-                .now()
-                .setZone('America/New_York')
-                .toISODate();
-        }
-        
-        // If hold expired while page was closed, advance immediately
-        if (holdUntil && Date.now() >= holdUntil) {
-            advanceTodayDate();
-        } else if (holdUntil) {
-            // Restore timer if still in hold period
-            const delay = holdUntil - Date.now();
-            if (delay > 0) {
-                holdTimer = setTimeout(() => {
-                    advanceTodayDate();
-                }, delay);
-                console.log(`🔒 TODAY tab held until ${new Date(holdUntil).toLocaleString()}`);
+        try {
+            // Try to read from Firestore first (shared state)
+            const todaySlateRef = getTodaySlateRef();
+            const doc = await todaySlateRef.get();
+            
+            if (doc.exists) {
+                const data = doc.data();
+                activeTodayDate = data.activeTodayDate;
+                holdUntil = data.holdUntil || null;
+                
+                console.log('📡 Loaded TODAY latch state from Firestore:', activeTodayDate);
+                
+                // If hold expired while page was closed, advance immediately
+                if (holdUntil && Date.now() >= holdUntil) {
+                    await advanceTodayDate();
+                } else if (holdUntil) {
+                    // Restore timer if still in hold period
+                    const delay = holdUntil - Date.now();
+                    if (delay > 0) {
+                        holdTimer = setTimeout(() => {
+                            advanceTodayDate();
+                        }, delay);
+                        console.log(`🔒 TODAY tab held until ${new Date(holdUntil).toLocaleString()}`);
+                    }
+                }
+            } else {
+                // No Firestore state - initialize with current date
+                activeTodayDate = DateTime
+                    .now()
+                    .setZone('America/New_York')
+                    .toISODate();
+                
+                // Write initial state to Firestore
+                await persistTodayLatch();
+                console.log('✨ Initialized TODAY latch state:', activeTodayDate);
             }
-        }
-    })();
-    
-    // Persist TODAY latch state to localStorage
-    function persistTodayLatch() {
-        localStorage.setItem('activeTodayDate', activeTodayDate);
-        if (holdUntil) {
-            localStorage.setItem('holdUntil', holdUntil);
-        } else {
-            localStorage.removeItem('holdUntil');
+            
+            // Set up real-time listener for TODAY latch state (syncs across all users/devices)
+            todaySlateUnsubscribe = todaySlateRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    const newActiveDate = data.activeTodayDate;
+                    const newHoldUntil = data.holdUntil || null;
+                    
+                    // Only update if state changed (avoid infinite loops)
+                    if (newActiveDate !== activeTodayDate || newHoldUntil !== holdUntil) {
+                        console.log('🔄 TODAY latch state updated from Firestore:', newActiveDate);
+                        
+                        activeTodayDate = newActiveDate;
+                        holdUntil = newHoldUntil;
+                        
+                        // Clear existing timer
+                        if (holdTimer) {
+                            clearTimeout(holdTimer);
+                            holdTimer = null;
+                        }
+                        
+                        // Restore timer if hold is active
+                        if (holdUntil && Date.now() < holdUntil) {
+                            const delay = holdUntil - Date.now();
+                            holdTimer = setTimeout(() => {
+                                advanceTodayDate();
+                            }, delay);
+                        } else if (holdUntil && Date.now() >= holdUntil) {
+                            // Hold expired, advance immediately
+                            advanceTodayDate();
+                        }
+                        
+                        // Reload games if date changed
+                        if (typeof fetchTodayGames === 'function') {
+                            fetchTodayGames(() => {});
+                        }
+                    }
+                }
+            }, (error) => {
+                console.error('❌ Error listening to TODAY latch state:', error);
+            });
+            
+        } catch (error) {
+            console.error('❌ Error initializing TODAY latch state:', error);
+            // Fallback to localStorage if Firestore fails
+            activeTodayDate = localStorage.getItem('activeTodayDate') || 
+                DateTime.now().setZone('America/New_York').toISODate();
+            holdUntil = Number(localStorage.getItem('holdUntil')) || null;
         }
     }
     
+    // Persist TODAY latch state to Firestore (shared state)
+    async function persistTodayLatch() {
+        try {
+            const todaySlateRef = getTodaySlateRef();
+            await todaySlateRef.set({
+                activeTodayDate: activeTodayDate,
+                holdUntil: holdUntil || null,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            
+            // Also backup to localStorage as fallback
+            localStorage.setItem('activeTodayDate', activeTodayDate);
+            if (holdUntil) {
+                localStorage.setItem('holdUntil', holdUntil);
+            } else {
+                localStorage.removeItem('holdUntil');
+            }
+        } catch (error) {
+            console.error('❌ Error persisting TODAY latch state:', error);
+            // Fallback to localStorage only
+            localStorage.setItem('activeTodayDate', activeTodayDate);
+            if (holdUntil) {
+                localStorage.setItem('holdUntil', holdUntil);
+            } else {
+                localStorage.removeItem('holdUntil');
+            }
+        }
+    }
+    
+    // Initialize on page load
+    initTodayLatch();
+    
     // Advance TODAY date by 1 day (FSM transition: ROTATE)
-    function advanceTodayDate() {
+    async function advanceTodayDate() {
         console.log('🔄 Advancing TODAY tab to next day...');
         
         const { DateTime } = luxon;
@@ -14309,7 +14402,7 @@ async function fetchFeaturedGames() {
             holdTimer = null;
         }
         
-        persistTodayLatch();
+        await persistTodayLatch();
         
         // Reload TODAY games with new date
         if (typeof fetchTodayGames === 'function') {
@@ -14320,7 +14413,7 @@ async function fetchFeaturedGames() {
     }
     
     // FSM logic: Handle TODAY tab state transitions based on game status
-    function handleTodayFSM(games) {
+    async function handleTodayFSM(games) {
         if (!games || games.length === 0) return;
         
         // Check if all games are FINAL
@@ -14338,7 +14431,7 @@ async function fetchFeaturedGames() {
                 clearTimeout(holdTimer);
                 holdTimer = null;
                 holdUntil = null;
-                persistTodayLatch();
+                await persistTodayLatch();
                 console.log('🔄 Active games detected, clearing hold');
             }
             return;
@@ -14353,7 +14446,7 @@ async function fetchFeaturedGames() {
                 advanceTodayDate();
             }, holdUntil - Date.now());
             
-            persistTodayLatch();
+            await persistTodayLatch();
             console.log(`✅ All games finished! Starting 2-hour hold until ${new Date(holdUntil).toLocaleString()}`);
         }
     }
@@ -14670,7 +14763,10 @@ async function fetchFeaturedGames() {
             // 🧠 FSM LOGIC — Handle TODAY tab state transitions
             // ─────────────────────────────────────────────
             const allGames = [...regularGames, ...featuredGames];
-            handleTodayFSM(allGames);
+            // Fire-and-forget: FSM updates state asynchronously
+            handleTodayFSM(allGames).catch(err => {
+                console.error('Error in FSM logic:', err);
+            });
             
             if (callback) {
                 callback();
