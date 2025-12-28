@@ -1586,6 +1586,10 @@ div[id^="breaking-content-"] a:hover {
     cursor: pointer;
     background-color: #2a2a2a;
     border-right: 1px solid #1f1f1f;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+    user-select: none;
   }
 
   .games-tab.active {
@@ -1621,6 +1625,10 @@ div[id^="breaking-content-"] a:hover {
 
   .games-content {
     display: none;
+  }
+
+  .games-content.active {
+    display: flex;
   }
 
   #tv-listings-scores,
@@ -2641,7 +2649,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="games-tab active" data-tab="today">TODAY</div>
       <div id="live-filter-toggle" class="games-tab"><span style="display: inline-block; width: 3px; height: 3px; background-color: #ff0000; border-radius: 50%; margin-right: 4px; margin-left: 2px; vertical-align: middle; transform: translateY(-2px);"></span>LIVE</div>
     </div>
-    <div id="tv-listings-scores" class="games-content" style="display: none;">
+    <div id="tv-listings-scores" class="games-content">
       <div id="scoresWrapper">
         <div id="scoresLoading" class="loading-indicator hidden">
           <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -2657,7 +2665,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div id="dynamicScoresContent"></div>
       </div>
     </div>
-    <div id="tv-listings-today" class="games-content" style="display: block;">
+    <div id="tv-listings-today" class="games-content active">
       <div id="games"></div>
       <div id="error" class="error"></div>
     </div>
@@ -4143,7 +4151,6 @@ async function loadMultipleRSSFeeds(feedUrls, container) {
           <div style="font-size: 11px; color: #9ca3af; margin: 0; padding: 0; line-height: 1.4;">
             ${formattedDate ? `<div>${formattedDate}</div>` : ''}
             ${item.channelName ? `<div>${item.channelName}</div>` : ''}
-            ${item.viewCount ? `<div>${parseInt(item.viewCount).toLocaleString()} views</div>` : ''}
           </div>
         </div>
       `;
@@ -4472,7 +4479,6 @@ function loadCustomRSSFeed(feedUrl, container) {
             <div style="font-size: 11px; color: #9ca3af; margin: 0; padding: 0; line-height: 1.4;">
               ${formattedDate ? `<div>${formattedDate}</div>` : ''}
               ${channelName ? `<div>${channelName}</div>` : ''}
-              ${viewCount ? `<div>${parseInt(viewCount).toLocaleString()} views</div>` : ''}
             </div>
           </div>
         `;
@@ -9082,7 +9088,20 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // NFL, NCAAF, NBA, WNBA - Quarter-based sports (NCAAW handled separately above)
         if (['NFL', 'NCAAF', 'NBA', 'WNBA'].includes(displayLeague)) {
-        if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
+            // Check for halftime FIRST (before processing GameTime)
+            const stage = (game.Stage || '').toUpperCase();
+            const stageType = (game.StageType || '').toUpperCase();
+            const matchStatus = (game['Match Status'] || '').toUpperCase();
+            
+            if (stage.includes('HALF') || stageType.includes('HALF') || matchStatus.includes('HALF') ||
+                stage === 'HALFTIME' || stage === 'HALF_TIME' || stage === 'HALF') {
+                return 'HALF';
+            }
+            
+            // For American Football (NFL, NCAAF), validate GameTime is within 0-15 minutes
+            const isAmericanFootball = displayLeague === 'NFL' || displayLeague === 'NCAAF';
+            
+            if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
                 // Format quarter and time remaining with proper quarter names
                 let quarter = game.Stage;
                 if (quarter === "1ST_QUARTER") quarter = "1st";
@@ -9099,15 +9118,43 @@ document.addEventListener('DOMContentLoaded', function () {
                     else if (quarter === "FOURTH") quarter = "4th";
                     else quarter = quarter.toLowerCase();
                 }
+                
                 // Format time to include seconds if not present
                 let timeStr = game.GameTime;
                 if (timeStr && !timeStr.includes(':')) {
                     // If time is just a number (like "11"), add ":00" to make it "11:00"
                     timeStr = timeStr + ':00';
                 }
+                
+                // For American Football, validate and clamp time to 0-15 minutes
+                if (isAmericanFootball && timeStr.includes(':')) {
+                    const [minutes, seconds] = timeStr.split(':').map(Number);
+                    // If minutes > 15, it's likely halftime or invalid data
+                    if (minutes > 15 || (minutes === 15 && seconds > 0)) {
+                        // Check if we're actually in halftime based on quarter
+                        if (quarter === "2nd" || stage.includes('HALF')) {
+                            return 'HALF';
+                        }
+                        // Otherwise, clamp to 15:00 max
+                        timeStr = '15:00';
+                    } else if (minutes < 0) {
+                        timeStr = '0:00';
+                    } else {
+                        // Ensure seconds are 0-59
+                        const validSeconds = Math.max(0, Math.min(59, seconds || 0));
+                        timeStr = `${minutes}:${String(validSeconds).padStart(2, '0')}`;
+                    }
+                }
+                
                 return `${quarter}<br>${timeStr}`;
             }
-            return game.Stage;
+            
+            // If no GameTime but Stage indicates halftime, return HALF
+            if (stage.includes('HALF') || stageType.includes('HALF')) {
+                return 'HALF';
+            }
+            
+            return game.Stage || '';
         }
         
         // Hockey - Period-based sport (NHL, OHL, and all hockey leagues)
@@ -14222,10 +14269,19 @@ async function fetchFeaturedGames() {
         // Set up real-time listener for regular games
         const regularGamesUnsubscribe = gamesCollectionRef.where('gameDate', '==', todayStr)
             .onSnapshot(snapshot => {
+                const previousCount = regularGames.length;
                 regularGames = snapshot.empty ? [] : snapshot.docs.map(doc => doc.data()).sort(sortGames);
+                const newCount = regularGames.length;
+                console.log(`🔄 [Firestore Listener] Regular games updated: ${previousCount} → ${newCount} games`);
+                if (snapshot.docChanges && snapshot.docChanges().length > 0) {
+                    snapshot.docChanges().forEach(change => {
+                        const game = change.doc.data();
+                        console.log(`  📝 ${change.type}: ${game['Away Team']} vs ${game['Home Team']} (${game['Match Status'] || 'No status'})`);
+                    });
+                }
                 updateDisplay();
             }, err => {
-                console.error("Error fetching regular games: ", err);
+                console.error("❌ Error fetching regular games: ", err);
                 errorDiv.textContent = "Failed to load real-time data.";
             });
 
@@ -14402,10 +14458,19 @@ async function fetchFeaturedGames() {
         const gamesRef = firebase.firestore().collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
         const liveGamesUnsubscribe = gamesRef.where('gameDate', '==', todayStr)
             .onSnapshot(snapshot => {
+                const previousCount = liveGamesData.length;
                 liveGamesData = snapshot.empty ? [] : snapshot.docs.map(doc => doc.data());
+                const newCount = liveGamesData.length;
+                console.log(`🔄 [Firestore Listener] Live games updated: ${previousCount} → ${newCount} games`);
+                if (snapshot.docChanges && snapshot.docChanges().length > 0) {
+                    snapshot.docChanges().forEach(change => {
+                        const game = change.doc.data();
+                        console.log(`  📝 ${change.type}: ${game['Away Team']} vs ${game['Home Team']} (${game['Match Status'] || 'No status'})`);
+                    });
+                }
                 mergeFeaturedWithLive();
             }, err => {
-                console.error("Error fetching live games for featured: ", err);
+                console.error("❌ Error fetching live games for featured: ", err);
             });
 
         function updateDisplay() {
@@ -14502,6 +14567,31 @@ async function fetchFeaturedGames() {
         
         // Attach updateDisplay to window so Live filter can call it
         window.triggerGamesUpdate = updateDisplay;
+        
+        // Attach manual refresh function for debugging
+        window.manualRefreshGames = async () => {
+            console.log('🔄 Manual refresh triggered...');
+            const { DateTime } = luxon;
+            const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+            console.log(`📅 Today's date string: ${todayStr}`);
+            
+            // Force re-fetch from Firestore
+            try {
+                const snapshot = await gamesCollectionRef.where('gameDate', '==', todayStr).get();
+                console.log(`📊 Found ${snapshot.size} games in Firestore for today`);
+                if (snapshot.size > 0) {
+                    const sampleGame = snapshot.docs[0].data();
+                    console.log(`📝 Sample game: ${sampleGame['Away Team']} vs ${sampleGame['Home Team']} - Status: ${sampleGame['Match Status']}`);
+                }
+            } catch (err) {
+                console.error('❌ Error during manual refresh:', err);
+            }
+            
+            // Trigger updateDisplay
+            if (updateDisplayRef) {
+                updateDisplayRef();
+            }
+        };
         
         return cleanup;
     }
@@ -17051,11 +17141,275 @@ async function fetchFeaturedGames() {
 
 
     // --- 7. TABS AND FILTER INITIALIZATION ---
-const gamesTabsContainer = document.getElementById('games-tabs');
-if (gamesTabsContainer) {
-    const todayTab = gamesTabsContainer.querySelector('.games-tab[data-tab="today"]');
-    const scoresTab = gamesTabsContainer.querySelector('.games-tab[data-tab="scores"]');
-    const liveFilter = document.getElementById('live-filter-toggle');
+function initializeTabsAndFilters() {
+    const gamesTabsContainer = document.getElementById('games-tabs');
+    if (!gamesTabsContainer) {
+        console.warn('⚠️ games-tabs container not found, retrying in 100ms...');
+        setTimeout(initializeTabsAndFilters, 100);
+        return;
+    }
+    
+    // Use event delegation - attach ONE listener to container that handles all tab clicks
+    // This survives DOM replacement, re-renders, and async loads
+    gamesTabsContainer.addEventListener('click', (e) => {
+        const clickedTab = e.target.closest('.games-tab');
+        if (!clickedTab) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const tabId = clickedTab.dataset.tab || clickedTab.id;
+        console.log('🎯 Tab clicked:', tabId);
+        
+        const todayTab = gamesTabsContainer.querySelector('.games-tab[data-tab="today"]');
+        const scoresTab = gamesTabsContainer.querySelector('.games-tab[data-tab="scores"]');
+        const liveFilter = document.getElementById('live-filter-toggle');
+        
+        const todayContainer = document.getElementById('tv-listings-today');
+        const scoresContainer = document.getElementById('tv-listings-scores');
+        
+        let activeListenerUnsubscribe = window.activeListenerUnsubscribe || null;
+        
+        // Handle TODAY tab - BULLETPROOF VERSION
+        if (clickedTab.dataset.tab === 'today') {
+            console.log('📅 Switching to TODAY tab...');
+            
+            // Step 1: Update tab styling
+            if (scoresTab) scoresTab.classList.remove('active');
+            if (liveFilter) liveFilter.classList.remove('active');
+            clickedTab.classList.add('active');
+            
+            // Step 2: Unsubscribe from previous listener (CRASH-PROOF: check if it's a function)
+            if (activeListenerUnsubscribe && typeof activeListenerUnsubscribe === 'function') {
+                activeListenerUnsubscribe();
+                activeListenerUnsubscribe = null;
+                window.activeListenerUnsubscribe = null;
+            } else if (activeListenerUnsubscribe) {
+                // It's a Promise or something else, just clear it
+                activeListenerUnsubscribe = null;
+                window.activeListenerUnsubscribe = null;
+            }
+            
+            // Step 3: FORCE hide scores container (multiple methods)
+            if (scoresContainer) {
+                scoresContainer.classList.remove('active');
+                scoresContainer.style.setProperty('display', 'none', 'important');
+                scoresContainer.style.visibility = 'hidden';
+                scoresContainer.style.opacity = '0';
+                scoresContainer.style.height = '0';
+                scoresContainer.style.overflow = 'hidden';
+            }
+            
+            // Step 4: FORCE show today container (multiple methods + parent check)
+            if (todayContainer) {
+                // Remove from scores
+                todayContainer.classList.remove('active');
+                
+                // Add active class
+                todayContainer.classList.add('active');
+                
+                // Force inline styles with !important
+                todayContainer.style.setProperty('display', 'flex', 'important');
+                todayContainer.style.setProperty('visibility', 'visible', 'important');
+                todayContainer.style.setProperty('opacity', '1', 'important');
+                todayContainer.style.setProperty('height', 'auto', 'important');
+                // Don't override overflow - CSS already has overflow-y: auto !important for scrolling
+                
+                // Check parent visibility
+                let parent = todayContainer.parentElement;
+                while (parent && parent !== document.body) {
+                    const parentDisplay = getComputedStyle(parent).display;
+                    const parentVisibility = getComputedStyle(parent).visibility;
+                    if (parentDisplay === 'none' || parentVisibility === 'hidden') {
+                        console.warn('⚠️ Parent is hidden:', parent.id || parent.className);
+                        parent.style.setProperty('display', 'flex', 'important');
+                        parent.style.setProperty('visibility', 'visible', 'important');
+                    }
+                    parent = parent.parentElement;
+                }
+                
+                // Verify it's actually visible
+                setTimeout(() => {
+                    const finalDisplay = getComputedStyle(todayContainer).display;
+                    if (finalDisplay === 'none') {
+                        console.error('🔴 TODAY container still hidden! Forcing again...');
+                        todayContainer.style.setProperty('display', 'flex', 'important');
+                    } else {
+                        console.log('✅ TODAY container is visible:', finalDisplay);
+                    }
+                }, 10);
+            } else {
+                console.error('❌ todayContainer not found!');
+            }
+            
+            // Step 5: Set activeTab
+            activeTab = 'ALL';
+            
+            // Step 6: Load today's games (fetchTodayGames is async, so it returns a Promise)
+            if (typeof fetchTodayGames === 'function') {
+                fetchTodayGames(() => {
+                    // updateDisplay will be called by Firestore listeners
+                }).then(cleanup => {
+                    // Store the cleanup function (not the Promise)
+                    window.activeListenerUnsubscribe = cleanup;
+                }).catch(err => {
+                    console.error('❌ Error loading today games:', err);
+                    window.activeListenerUnsubscribe = null;
+                });
+            } else {
+                console.error('❌ fetchTodayGames function not found');
+            }
+            return;
+        }
+        
+        // Handle SCORES tab - BULLETPROOF VERSION
+        if (clickedTab.dataset.tab === 'scores') {
+            console.log('📊 Switching to SCORES tab...');
+            
+            // Step 1: Update tab styling
+            if (todayTab) todayTab.classList.remove('active');
+            if (liveFilter) liveFilter.classList.remove('active');
+            clickedTab.classList.add('active');
+            
+            // Step 2: Unsubscribe from previous listener (CRASH-PROOF: check if it's a function)
+            if (activeListenerUnsubscribe && typeof activeListenerUnsubscribe === 'function') {
+                activeListenerUnsubscribe();
+                activeListenerUnsubscribe = null;
+                window.activeListenerUnsubscribe = null;
+            } else if (activeListenerUnsubscribe) {
+                // It's a Promise or something else, just clear it
+                activeListenerUnsubscribe = null;
+                window.activeListenerUnsubscribe = null;
+            }
+            
+            // Step 3: FORCE hide today container (multiple methods)
+            if (todayContainer) {
+                todayContainer.classList.remove('active');
+                todayContainer.style.setProperty('display', 'none', 'important');
+                todayContainer.style.visibility = 'hidden';
+                todayContainer.style.opacity = '0';
+                todayContainer.style.height = '0';
+                todayContainer.style.overflow = 'hidden';
+            }
+            
+            // Step 4: FORCE show scores container (multiple methods + parent check)
+            if (scoresContainer) {
+                // Remove from today
+                scoresContainer.classList.remove('active');
+                
+                // Add active class
+                scoresContainer.classList.add('active');
+                
+                // Force inline styles with !important
+                scoresContainer.style.setProperty('display', 'flex', 'important');
+                scoresContainer.style.setProperty('visibility', 'visible', 'important');
+                scoresContainer.style.setProperty('opacity', '1', 'important');
+                scoresContainer.style.setProperty('height', 'auto', 'important');
+                // Don't override overflow - CSS already has overflow-y: auto !important for scrolling
+                
+                // Check parent visibility
+                let parent = scoresContainer.parentElement;
+                while (parent && parent !== document.body) {
+                    const parentDisplay = getComputedStyle(parent).display;
+                    const parentVisibility = getComputedStyle(parent).visibility;
+                    if (parentDisplay === 'none' || parentVisibility === 'hidden') {
+                        console.warn('⚠️ Parent is hidden:', parent.id || parent.className);
+                        parent.style.setProperty('display', 'flex', 'important');
+                        parent.style.setProperty('visibility', 'visible', 'important');
+                    }
+                    parent = parent.parentElement;
+                }
+                
+                // Verify it's actually visible
+                setTimeout(() => {
+                    const finalDisplay = getComputedStyle(scoresContainer).display;
+                    if (finalDisplay === 'none') {
+                        console.error('🔴 SCORES container still hidden! Forcing again...');
+                        scoresContainer.style.setProperty('display', 'flex', 'important');
+                    } else {
+                        console.log('✅ SCORES container is visible:', finalDisplay);
+                    }
+                }, 10);
+            } else {
+                console.error('❌ scoresContainer not found!');
+            }
+            
+            // Step 5: Load scores
+            if (typeof fetchYesterdayScores === 'function') {
+                fetchYesterdayScores();
+            } else {
+                console.error('❌ fetchYesterdayScores function not found');
+            }
+            return;
+        }
+        
+        // Handle LIVE filter
+        if (clickedTab.id === 'live-filter-toggle') {
+            const todayTab = gamesTabsContainer.querySelector('.games-tab[data-tab="today"]');
+            const scoresTab = gamesTabsContainer.querySelector('.games-tab[data-tab="scores"]');
+            
+            // Ensure we're on TODAY tab content first
+            if (todayTab && !todayTab.classList.contains('active') && !clickedTab.classList.contains('active')) {
+                // Switch to TODAY tab only if LIVE filter is not already active
+                // CRASH-PROOF: check if it's a function before calling
+                if (activeListenerUnsubscribe && typeof activeListenerUnsubscribe === 'function') {
+                    activeListenerUnsubscribe();
+                    activeListenerUnsubscribe = null;
+                    window.activeListenerUnsubscribe = null;
+                } else if (activeListenerUnsubscribe) {
+                    // It's a Promise or something else, just clear it
+                    activeListenerUnsubscribe = null;
+                    window.activeListenerUnsubscribe = null;
+                }
+                
+                if (scoresTab) scoresTab.classList.remove('active');
+                todayTab.classList.add('active');
+                
+                const todayContainer = document.getElementById('tv-listings-today');
+                const scoresContainer = document.getElementById('tv-listings-scores');
+                
+                if (todayContainer) todayContainer.classList.add('active');
+                if (scoresContainer) scoresContainer.classList.remove('active');
+                
+                // Load today's games (fetchTodayGames is async, so it returns a Promise)
+                if (typeof fetchTodayGames === 'function') {
+                    fetchTodayGames(() => {
+                        // updateDisplay will be called by Firestore listeners
+                    }).then(cleanup => {
+                        // Store the cleanup function (not the Promise)
+                        window.activeListenerUnsubscribe = cleanup;
+                    }).catch(err => {
+                        console.error('❌ Error loading today games:', err);
+                        window.activeListenerUnsubscribe = null;
+                    });
+                }
+            }
+            
+            // Toggle LIVE filter state
+            const willBeActive = !clickedTab.classList.contains('active');
+            clickedTab.classList.toggle('active');
+            
+            // Set activeTab
+            activeTab = clickedTab.classList.contains('active') ? 'LIVE' : 'ALL';
+            
+            // Update active tab styling
+            if (willBeActive) {
+                if (scoresTab) scoresTab.classList.remove('active');
+                if (todayTab) todayTab.classList.remove('active');
+            } else {
+                if (scoresTab) scoresTab.classList.remove('active');
+                if (todayTab) todayTab.classList.add('active');
+            }
+            
+            // Force updateDisplay
+            if (typeof window.triggerGamesUpdate === 'function') {
+                window.triggerGamesUpdate();
+            }
+            return;
+        }
+    });
+    
+    console.log('✅ Event delegation listener attached to games-tabs container');
     
     let activeListenerUnsubscribe = null;
 
@@ -17226,119 +17580,86 @@ if (gamesTabsContainer) {
         });
     };
 
-    if (scoresTab) {
-    scoresTab.addEventListener('click', () => {
-        if (activeListenerUnsubscribe) {
-            activeListenerUnsubscribe();
-            activeListenerUnsubscribe = null;
-        }
-        
-        todayTab.classList.remove('active');
-            if (liveFilter) {
-        liveFilter.classList.remove('active');
-            }
-        scoresTab.classList.add('active');
-
-        document.getElementById('tv-listings-scores').style.display = 'block';
-        document.getElementById('tv-listings-today').style.display = 'none';
-
-        fetchYesterdayScores();
-    });
+    // Initial load - trigger TODAY tab
+    const todayTab = gamesTabsContainer.querySelector('.games-tab[data-tab="today"]');
+    if (todayTab) {
+        todayTab.click();
+    } else {
+        console.warn('⚠️ Today tab not found for initial load');
     }
-
-    todayTab.addEventListener('click', () => {
-        if (activeListenerUnsubscribe) {
-            activeListenerUnsubscribe();
-            activeListenerUnsubscribe = null;
-        }
-
-        if (scoresTab) {
-        scoresTab.classList.remove('active');
-        }
-        if (liveFilter) {
-        liveFilter.classList.remove('active');
-        }
-        todayTab.classList.add('active');
-        
-        // CRITICAL: Force activeTab to ALL and ensure LIVE filter is off
-        // This must happen BEFORE fetchTodayGames creates the closure
-        activeTab = 'ALL';
-        
-        // Double-check LIVE filter is not active
-        if (liveFilter && liveFilter.classList.contains('active')) {
-            liveFilter.classList.remove('active');
-        }
-        
-        document.getElementById('tv-listings-today').style.display = 'block';
-        document.getElementById('tv-listings-scores').style.display = 'none';
-        
-        // Let Firestore listeners call updateDisplay() - don't force it
-        activeListenerUnsubscribe = fetchTodayGames(() => {
-            // updateDisplay will be called by Firestore listeners
+    
+    // Debug: Monitor for any code that's overriding display (as suggested by ChatGPT)
+    const todayContainer = document.getElementById('tv-listings-today');
+    const scoresContainer = document.getElementById('tv-listings-scores');
+    
+    if (todayContainer) {
+        new MutationObserver(() => {
+            const computed = getComputedStyle(todayContainer).display;
+            if (computed === 'none' && todayContainer.classList.contains('active')) {
+                console.warn('🔴 WARNING: todayContainer has "active" class but display is "none"!');
+                console.trace('Stack trace:');
+            }
+        }).observe(todayContainer, { 
+            attributes: true, 
+            attributeFilter: ['style', 'class'] 
         });
-    });
-
-    if (liveFilter) {
-    liveFilter.addEventListener('click', () => {
-        // Ensure we're on TODAY tab content first
-        if (!todayTab.classList.contains('active') && !liveFilter.classList.contains('active')) {
-            // Switch to TODAY tab only if LIVE filter is not already active
-            if (activeListenerUnsubscribe) {
-                activeListenerUnsubscribe();
-                activeListenerUnsubscribe = null;
-            }
-            
-                if (scoresTab) {
-            scoresTab.classList.remove('active');
-                }
-            todayTab.classList.add('active');
-            
-            document.getElementById('tv-listings-today').style.display = 'block';
-            document.getElementById('tv-listings-scores').style.display = 'none';
-            
-            // Load today's games
-            activeListenerUnsubscribe = fetchTodayGames(() => {
-                // updateDisplay will be called by Firestore listeners
-            });
-        }
-        
-        // Toggle LIVE filter state FIRST
-        const willBeActive = !liveFilter.classList.contains('active');
-        liveFilter.classList.toggle('active');
-        
-        // CRITICAL: Set activeTab IMMEDIATELY after toggling, before any renders
-        if (liveFilter.classList.contains('active')) {
-            activeTab = 'LIVE';
-        } else {
-            activeTab = 'ALL';
-        }
-        
-        // Update active tab styling based on LIVE filter state
-        if (willBeActive) {
-            // LIVE is becoming active - remove active from other tabs, add to LIVE
-            if (scoresTab) {
-                scoresTab.classList.remove('active');
-            }
-            todayTab.classList.remove('active');
-            // LIVE filter already has 'active' from toggle above
-        } else {
-            // LIVE is becoming inactive - restore active to TODAY tab
-            if (scoresTab) {
-                scoresTab.classList.remove('active');
-            }
-            todayTab.classList.add('active');
-        }
-        
-        // Force updateDisplay to run immediately with new filter state
-        // This ensures the filter is applied right away
-        if (typeof window.triggerGamesUpdate === 'function') {
-            window.triggerGamesUpdate();
-        }
-    });
     }
+    
+    if (scoresContainer) {
+        new MutationObserver(() => {
+            const computed = getComputedStyle(scoresContainer).display;
+            if (computed === 'none' && scoresContainer.classList.contains('active')) {
+                console.warn('🔴 WARNING: scoresContainer has "active" class but display is "none"!');
+                console.trace('Stack trace:');
+            }
+        }).observe(scoresContainer, { 
+            attributes: true, 
+            attributeFilter: ['style', 'class'] 
+        });
+    }
+}
 
-    // Initial load
-    if (todayTab) todayTab.click();
+// Call initialization function
+initializeTabsAndFilters();
+
+// DEBUGGING: MutationObserver to catch what's undoing our changes
+const todayTarget = document.getElementById('tv-listings-today');
+const scoresTarget = document.getElementById('tv-listings-scores');
+
+if (todayTarget) {
+    new MutationObserver(mutations => {
+        mutations.forEach(m => {
+            console.log(
+                '🔴 TODAY MUTATION:',
+                m.attributeName,
+                'display =',
+                getComputedStyle(todayTarget).display,
+                'stack:',
+                new Error().stack
+            );
+        });
+    }).observe(todayTarget, {
+        attributes: true,
+        attributeFilter: ['style', 'class']
+    });
+}
+
+if (scoresTarget) {
+    new MutationObserver(mutations => {
+        mutations.forEach(m => {
+            console.log(
+                '🔴 SCORES MUTATION:',
+                m.attributeName,
+                'display =',
+                getComputedStyle(scoresTarget).display,
+                'stack:',
+                new Error().stack
+            );
+        });
+    }).observe(scoresTarget, {
+        attributes: true,
+        attributeFilter: ['style', 'class']
+    });
 }
 
 // --- STATS SUB-TABS INITIALIZATION ---
@@ -21013,12 +21334,13 @@ let lastRefreshTime = Date.now();
 
 async function smartBackgroundRefresh() {
     try {
-        console.log('🔄 Auto-refresh: Fetching latest game data...');
+        console.log('🔄 Auto-refresh: Checking for updates...');
         const startTime = Date.now();
         
-        // Check which tab is currently active
-        const todayTab = document.getElementById('today-filter');
-        const scoresTab = document.getElementById('scores-filter');
+        // Check which tab is currently active (using correct selectors)
+        const gamesTabsContainer = document.getElementById('games-tabs');
+        const todayTab = gamesTabsContainer?.querySelector('.games-tab[data-tab="today"]');
+        const scoresTab = gamesTabsContainer?.querySelector('.games-tab[data-tab="scores"]');
         const isTodayTabActive = todayTab && todayTab.classList.contains('active');
         const isScoresTabActive = scoresTab && scoresTab.classList.contains('active');
         
@@ -21029,22 +21351,33 @@ async function smartBackgroundRefresh() {
         // Only refresh if on home page and today/scores tab is active
         if (isOnHomePage && (isTodayTabActive || isScoresTabActive)) {
             // Preserve scroll position
-            const gamesContent = document.getElementById('tv-listings-content');
-            const scrollPosition = gamesContent ? gamesContent.scrollTop : 0;
+            const todayContent = document.getElementById('tv-listings-today');
+            const scoresContent = document.getElementById('tv-listings-scores');
+            const activeContent = isTodayTabActive ? todayContent : scoresContent;
+            const scrollPosition = activeContent ? activeContent.scrollTop : 0;
             
-            // Fetch updated data without unsubscribing/resubscribing
-            // This will update games in place via Firestore listeners
-            if (isTodayTabActive && typeof fetchTodayGames === 'function') {
-                await fetchTodayGames(() => {});
+            // Firestore listeners should automatically update when data changes
+            // But we can force a refresh by re-subscribing if needed
+            if (isTodayTabActive) {
+                console.log('🔄 Auto-refresh: Today tab active - Firestore listeners will auto-update');
+                // Firestore listeners are already active and will update automatically
+                // Just log that we're checking
+                const gamesCount = document.querySelectorAll('#games .game-row').length;
+                console.log(`📊 Current games displayed: ${gamesCount}`);
+            } else if (isScoresTabActive && typeof fetchYesterdayScores === 'function') {
+                console.log('🔄 Auto-refresh: Refreshing scores...');
+                fetchYesterdayScores();
             }
             
-            // Restore scroll position
-            if (gamesContent && scrollPosition > 0) {
-                gamesContent.scrollTop = scrollPosition;
-            }
+            // Restore scroll position after a brief delay
+            setTimeout(() => {
+                if (activeContent && scrollPosition > 0) {
+                    activeContent.scrollTop = scrollPosition;
+                }
+            }, 100);
             
             const duration = Date.now() - startTime;
-            console.log(`✅ Auto-refresh complete (${duration}ms)`);
+            console.log(`✅ Auto-refresh check complete (${duration}ms)`);
             lastRefreshTime = Date.now();
         } else {
             console.log('⏭️  Auto-refresh skipped (not on home page or not on today/scores tab)');
