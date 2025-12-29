@@ -9113,7 +9113,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // For American Football (NFL, NCAAF), validate GameTime is within 0-15 minutes
             const isAmericanFootball = displayLeague === 'NFL' || displayLeague === 'NCAAF';
             
-            if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
+        if (game.GameTime && game.GameTime !== "" && game.GameTime !== "-1") {
                 // Format quarter and time remaining with proper quarter names
                 let quarter = game.Stage;
                 if (quarter === "1ST_QUARTER") quarter = "1st";
@@ -16581,26 +16581,26 @@ async function fetchFeaturedGames() {
             // Function to render the schedule
             function renderSchedule() {
                 // Group all games by date (not filtered yet)
-                const gamesByDate = {};
-                futureGames.forEach(game => {
-                    if (!gamesByDate[game.date]) {
-                        gamesByDate[game.date] = [];
-                    }
-                    gamesByDate[game.date].push(game);
-                });
+            const gamesByDate = {};
+            futureGames.forEach(game => {
+                if (!gamesByDate[game.date]) {
+                    gamesByDate[game.date] = [];
+                }
+                gamesByDate[game.date].push(game);
+            });
+            
+            // Build HTML
+            let html = '';
                 
-                // Build HTML
-                let html = '';
-                
-                const sortedDates = Object.keys(gamesByDate).sort();
-                
-                sortedDates.forEach(dateStr => {
-                    const dateObj = luxon.DateTime.fromISO(dateStr);
-                    const dateHeader = dateObj.toFormat('EEEE, MMMM d, yyyy');
+            const sortedDates = Object.keys(gamesByDate).sort();
+            
+            sortedDates.forEach(dateStr => {
+                const dateObj = luxon.DateTime.fromISO(dateStr);
+                const dateHeader = dateObj.toFormat('EEEE, MMMM d, yyyy');
                     const isExpanded = dateExpandStates[dateStr];
-                    
-                    html += `<div style="background-color: #2a2a2a; padding: 6px 10px; font-weight: bold; font-size: 11px; border-bottom: 1px solid #3a3a3a; margin-top: 10px;">${dateHeader}</div>`;
-                    
+                
+                html += `<div style="background-color: #2a2a2a; padding: 6px 10px; font-weight: bold; font-size: 11px; border-bottom: 1px solid #3a3a3a; margin-top: 10px;">${dateHeader}</div>`;
+                
                     // Add toggle button under each date header if there are non-featured games
                     if (isNcaaLeague && nonFeaturedGamesCount > 0) {
                         html += `
@@ -16614,49 +16614,49 @@ async function fetchFeaturedGames() {
                     const datesToShow = isExpanded ? gamesByDate[dateStr] : gamesByDate[dateStr].filter(g => g.isImportant);
                     
                     datesToShow.forEach(game => {
-                        // Parse time as EST and convert to user's local time (or keep TBD)
-                        let displayTime = game.time;
-                        if (game.time && game.time.toUpperCase() !== 'TBD') {
-                            const estTime = luxon.DateTime.fromFormat(game.time, 'h:mm a', { zone: 'America/New_York' });
-                            if (estTime.isValid) {
-                                const localTime = estTime.setZone('local');
-                                displayTime = localTime.toFormat('h:mm a');
-                            }
+                    // Parse time as EST and convert to user's local time (or keep TBD)
+                    let displayTime = game.time;
+                    if (game.time && game.time.toUpperCase() !== 'TBD') {
+                        const estTime = luxon.DateTime.fromFormat(game.time, 'h:mm a', { zone: 'America/New_York' });
+                        if (estTime.isValid) {
+                            const localTime = estTime.setZone('local');
+                            displayTime = localTime.toFormat('h:mm a');
                         }
-                        
-                        // Determine display order based on league type
-                        const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia'].includes(leagueKey);
-                        
-                        let topTeam, bottomTeam;
-                        if (isSoccerLeague) {
-                            // Soccer: Home team on top, away team on bottom
-                            topTeam = game.home;
-                            bottomTeam = game.away;
-                        } else {
-                            // Other sports (NFL, etc.): Away team on top, home team on bottom
-                            topTeam = getMascotName(game.away);
-                            bottomTeam = getMascotName(game.home);
-                        }
+                    }
+                    
+                    // Determine display order based on league type
+                    const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia'].includes(leagueKey);
+                    
+                    let topTeam, bottomTeam;
+                    if (isSoccerLeague) {
+                        // Soccer: Home team on top, away team on bottom
+                        topTeam = game.home;
+                        bottomTeam = game.away;
+                    } else {
+                        // Other sports (NFL, etc.): Away team on top, home team on bottom
+                        topTeam = getMascotName(game.away);
+                        bottomTeam = getMascotName(game.home);
+                    }
                         
                         // Apply Top 25 rankings for NCAA leagues
                         if (isNcaaLeague) {
                             topTeam = formatTeamNameWithRanking(topTeam, leagueKey);
                             bottomTeam = formatTeamNameWithRanking(bottomTeam, leagueKey);
                         }
-                        
-                        html += `
-                            <div style="display: flex; align-items: center; padding: 8px 10px; border-bottom: 1px solid #2a2a2a; font-size: 11px;">
-                                <div style="width: 80px; flex-shrink: 0; color: #9ca3af;">${displayTime}</div>
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
-                                    <div>${topTeam}</div>
-                                    <div>${bottomTeam}</div>
-                                </div>
-                                ${game.channel ? `<div style="width: 80px; text-align: right; color: #9ca3af; flex-shrink: 0;">${game.channel}</div>` : ''}
+                    
+                    html += `
+                        <div style="display: flex; align-items: center; padding: 8px 10px; border-bottom: 1px solid #2a2a2a; font-size: 11px;">
+                            <div style="width: 80px; flex-shrink: 0; color: #9ca3af;">${displayTime}</div>
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                <div>${topTeam}</div>
+                                <div>${bottomTeam}</div>
                             </div>
-                        `;
-                    });
+                            ${game.channel ? `<div style="width: 80px; text-align: right; color: #9ca3af; flex-shrink: 0;">${game.channel}</div>` : ''}
+                        </div>
+                    `;
                 });
-                
+            });
+            
                 return html;
             }
             
@@ -17372,7 +17372,7 @@ async function fetchFeaturedGames() {
 
     // --- 7. TABS AND FILTER INITIALIZATION ---
 function initializeTabsAndFilters() {
-    const gamesTabsContainer = document.getElementById('games-tabs');
+const gamesTabsContainer = document.getElementById('games-tabs');
     if (!gamesTabsContainer) {
         console.warn('⚠️ games-tabs container not found, retrying in 100ms...');
         setTimeout(initializeTabsAndFilters, 100);
@@ -17391,9 +17391,9 @@ function initializeTabsAndFilters() {
         const tabId = clickedTab.dataset.tab || clickedTab.id;
         console.log('🎯 Tab clicked:', tabId);
         
-        const todayTab = gamesTabsContainer.querySelector('.games-tab[data-tab="today"]');
-        const scoresTab = gamesTabsContainer.querySelector('.games-tab[data-tab="scores"]');
-        const liveFilter = document.getElementById('live-filter-toggle');
+    const todayTab = gamesTabsContainer.querySelector('.games-tab[data-tab="today"]');
+    const scoresTab = gamesTabsContainer.querySelector('.games-tab[data-tab="scores"]');
+    const liveFilter = document.getElementById('live-filter-toggle');
         
         const todayContainer = document.getElementById('tv-listings-today');
         const scoresContainer = document.getElementById('tv-listings-scores');
@@ -19902,9 +19902,9 @@ function createTop25Table(teams, leagueKey) {
         html += '<col style="width: auto;">';
         html += '<col style="width: 85px;">';
     } else {
-        html += '<col style="width: 60px;">';
-        html += '<col style="width: auto;">';
-        html += '<col style="width: 100px;">';
+    html += '<col style="width: 60px;">';
+    html += '<col style="width: auto;">';
+    html += '<col style="width: 100px;">';
     }
     html += '</colgroup>';
     html += '<thead>';
@@ -19915,9 +19915,9 @@ function createTop25Table(teams, leagueKey) {
         html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
         html += '<th style="padding: 8px 8px 8px 5px; text-align: right; border-bottom: 1px solid #666;">Record</th>';
     } else {
-        html += '<th style="padding: 8px; text-align: center; border-bottom: 1px solid #666;">Rank</th>';
-        html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
-        html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Record</th>';
+    html += '<th style="padding: 8px; text-align: center; border-bottom: 1px solid #666;">Rank</th>';
+    html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
+    html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Record</th>';
     }
     html += '</tr>';
     html += '</thead>';
@@ -19936,7 +19936,7 @@ function createTop25Table(teams, leagueKey) {
         if (leagueKey === 'NCAAM' || leagueKey === 'NCAAW') {
             html += '<td style="padding: 8px 8px 8px 5px; text-align: left; font-size: 12px; font-weight: 600; color: #ffffff;">' + (displayRank || '') + '</td>';
         } else {
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff;">' + (displayRank || '') + '</td>';
+        html += '<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff;">' + (displayRank || '') + '</td>';
         }
         // Get display name for team (e.g., "Southern California" -> "USC")
         const displayTeamName = getTop25DisplayName(team.Team, leagueKey) || team.Team || '';
@@ -19947,7 +19947,7 @@ function createTop25Table(teams, leagueKey) {
         if (leagueKey === 'NCAAM' || leagueKey === 'NCAAW') {
             html += '<td style="padding: 8px 8px 8px 5px; text-align: right; font-size: 12px; color: #ffffff;">' + displayRecord + '</td>';
         } else {
-            html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + displayRecord + '</td>';
+        html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + displayRecord + '</td>';
         }
         html += '</tr>';
     });
