@@ -4658,24 +4658,69 @@ function loadCustomRSSFeed(feedUrl, container) {
                 const section = item.dataset.section;
 
                 if (section === 'Home') {
-                    gamesColumn.style.display = 'block';
+                    gamesColumn.style.display = 'flex';
                     leagueSpecificColumn.style.display = 'none';
                     gamesContent.style.display = 'flex';
                     f1Content.style.display = 'none';
 
-                    // Ensure TODAY tab reloads (and resets Live filter) when returning to Home
-                    const todayTab = document.querySelector('.games-tab[data-tab="today"]');
-                    if (todayTab) {
-                        todayTab.click();
+                  // Ensure TODAY tab reloads (and resets Live filter) when returning to Home
+                  // Unsubscribe any existing TODAY listeners to avoid stale state
+                  if (window.activeListenerUnsubscribe && typeof window.activeListenerUnsubscribe === 'function') {
+                    try {
+                      window.activeListenerUnsubscribe();
+                    } catch (e) {
+                      console.warn('Error during activeListenerUnsubscribe:', e);
+                    }
+                    window.activeListenerUnsubscribe = null;
+                  }
+
+                  const gamesTabsContainer = document.getElementById('games-tabs');
+                  const todayTab = gamesTabsContainer?.querySelector('.games-tab[data-tab="today"]');
+                  const scoresTab = gamesTabsContainer?.querySelector('.games-tab[data-tab="scores"]');
+                  const liveFilter = document.getElementById('live-filter-toggle');
+
+                  // Determine which tab we should restore: explicit override, activeTab var, or default to TODAY
+                  const desiredTab = window.desiredGamesTab || (typeof activeTab !== 'undefined' ? activeTab : 'ALL');
+                  // Clear any one-off desired tab request
+                  try { delete window.desiredGamesTab; } catch (e) {}
+
+                  // Trigger tab activation after a short delay so layout/display changes settle
+                  setTimeout(() => {
+                    if (desiredTab === 'SCORES' && scoresTab) {
+                      scoresTab.click();
+                    } else if (desiredTab === 'LIVE' && liveFilter) {
+                      // Ensure TODAY content is visible first, then wait for the content to materialize
+                      if (todayTab) todayTab.click();
+                      const start = Date.now();
+                      const maxWait = 2000; // ms
+                      const checkInterval = 80;
+                      const todayContainer = document.getElementById('games');
+                      const waiter = setInterval(() => {
+                        const hasItems = todayContainer && (
+                          todayContainer.querySelector('.game-row') ||
+                          todayContainer.querySelector('.f1-today-list') ||
+                          todayContainer.querySelector('.no-games') ||
+                          todayContainer.querySelector('.info') ||
+                          todayContainer.children.length > 0
+                        );
+                        if (hasItems || (Date.now() - start) > maxWait) {
+                          clearInterval(waiter);
+                          // Use a real click so event flow is identical to user action
+                          if (liveFilter && !liveFilter.classList.contains('active')) {
+                            liveFilter.click();
+                          }
+                        }
+                      }, checkInterval);
+                    } else {
+                      if (todayTab) todayTab.click();
                     }
 
                     const espnTab = document.querySelector('#headlines-tabs .headlines-tab[data-source="espn"]');
-                    if (espnTab) {
-                        espnTab.click();
-                    }
+                    if (espnTab) setTimeout(() => espnTab.click(), 100);
+                  }, 60);
                 } else if (section === 'FormulaOne') {
                     // Formula One has its own special column structure
-                    gamesColumn.style.display = 'block';
+                    gamesColumn.style.display = 'flex';
                     leagueSpecificColumn.style.display = 'none';
                     f1Content.style.display = 'flex';
                     gamesContent.style.display = 'none';
@@ -6459,7 +6504,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
     };
 
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "AFCON", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Greek Super League", "LaLiga 2"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         // NFL: "https://www.nfl.com/scores",
@@ -14477,6 +14522,14 @@ async function fetchFeaturedGames() {
         const errorDiv = document.getElementById('error');
         if (!todayContainer || !errorDiv) return () => {};
 
+        // --- Unsubscribe management: clear any prior TODAY listeners to avoid duplicates ---
+        if (window.activeTodayUnsubscribes && Array.isArray(window.activeTodayUnsubscribes)) {
+          try {
+            window.activeTodayUnsubscribes.forEach(u => { try { u(); } catch(e){} });
+          } catch (e) { console.warn('Error clearing activeTodayUnsubscribes', e); }
+        }
+        window.activeTodayUnsubscribes = [];
+
         errorDiv.textContent = "";
         const { DateTime } = luxon;
         
@@ -14505,6 +14558,8 @@ async function fetchFeaturedGames() {
                 console.error("❌ Error fetching regular games: ", err);
                 errorDiv.textContent = "Failed to load real-time data.";
             });
+            // track unsubscribe
+            window.activeTodayUnsubscribes.push(regularGamesUnsubscribe);
 
         // Store featured games data and live games data separately
         let featuredGamesData = [];
@@ -14674,6 +14729,8 @@ async function fetchFeaturedGames() {
             }, err => { 
                 console.error("Error fetching featured games: ", err);
             });
+              // track unsubscribe
+              window.activeTodayUnsubscribes.push(featuredGamesUnsubscribe);
         
         // Set up real-time listener for live games (sportsGames collection)
         const gamesRef = firebase.firestore().collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
@@ -14693,6 +14750,8 @@ async function fetchFeaturedGames() {
             }, err => {
                 console.error("❌ Error fetching live games for featured: ", err);
             });
+              // track unsubscribe
+              window.activeTodayUnsubscribes.push(liveGamesUnsubscribe);
 
         function updateDisplay() {
             // CRITICAL: Check LIVE filter state directly AND activeTab variable
@@ -14729,9 +14788,15 @@ async function fetchFeaturedGames() {
                 '| non-live featured:', nonLiveFeatured
             );
             
-            // Prevent rendering when data arrays are empty (prevents empty wipe)
+            // If there are no games, show an explicit "No games" message rather than leaving the area blank.
             if (!regularGames.length && !featuredGames.length) {
-                return;
+              try {
+                todayContainer.innerHTML = '<div class="info" style="padding:10px;color:#9ca3af">No games found for today.</div>';
+              } catch (e) { console.warn('Could not render no-games message', e); }
+              // Run FSM with empty data to keep state in sync, then invoke callback
+              try { handleTodayFSM([]).catch(() => {}); } catch (e) {}
+              if (callback) callback();
+              return;
             }
             
             let gamesToRender = [];
