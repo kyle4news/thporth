@@ -2258,6 +2258,13 @@ div[id^="breaking-content-"] a:hover {
 
 <!-- Add this snippet above closing </head> or integrate into your existing <style> section -->
 
+<style>
+/* Center channel text and hide Canada-only services */
+.channel-cell-desktop div { left: 50% !important; transform: translate(-50%, -50%) !important; text-align: center !important; max-width: calc(100% - 4px); word-wrap: break-word; }
+.channel-inline { display: inline-block; text-align: center; }
+.channel-inline:empty { display: none !important; }
+</style>
+
   </head>
   <body>
     <!-- Google Tag Manager (noscript) -->
@@ -5987,41 +5994,41 @@ document.addEventListener('DOMContentLoaded', function () {
             { date: '2026-01-04', time: '10:00 AM', home: 'Newcastle', away: 'Palace', channel: 'Peacock' },
             { date: '2026-01-04', time: '10:00 AM', home: 'Tottenham', away: 'Sunderland', channel: 'Peacock' },
             { date: '2026-01-04', time: '12:30 PM', home: 'Man City', away: 'Chelsea', channel: 'Peacock' },
-            { date: '2026-01-06', time: '3:00 PM', home: 'West Ham', away: 'Forest', channel: 'DAZN Canada' },
-            { date: '2026-01-07', time: '2:30 PM', home: 'Bournemouth', away: 'Tottenham', channel: 'DAZN Canada' },
-            { date: '2026-01-07', time: '2:30 PM', home: 'Brentford', away: 'Sunderland', channel: 'DAZN Canada' },
+            { date: '2026-01-06', time: '3:00 PM', home: 'West Ham', away: 'Forest', channel: '' },
+            { date: '2026-01-07', time: '2:30 PM', home: 'Bournemouth', away: 'Tottenham', channel: '' },
+            { date: '2026-01-07', time: '2:30 PM', home: 'Brentford', away: 'Sunderland', channel: '' },
             { date: '2026-01-07', time: '2:30 PM', home: 'Palace', away: 'Aston Villa', channel: 'Palace TV+' },
-            { date: '2026-01-07', time: '2:30 PM', home: 'Everton', away: 'Wolves', channel: 'DAZN Canada' },
-            { date: '2026-01-07', time: '2:30 PM', home: 'Fulham', away: 'Chelsea', channel: 'DAZN Canada' },
-            { date: '2026-01-07', time: '2:30 PM', home: 'Man City', away: 'Brighton', channel: 'DAZN Canada' },
-            { date: '2026-01-07', time: '3:15 PM', home: 'Burnley', away: 'Man United', channel: 'DAZN Canada' },
-            { date: '2026-01-07', time: '3:15 PM', home: 'Newcastle', away: 'Leeds', channel: 'DAZN Canada' },
-            { date: '2026-01-08', time: '3:00 PM', home: 'Arsenal', away: 'Liverpool', channel: 'DAZN Canada' },
-            { date: '2026-01-17', time: '7:30 AM', home: 'Man United', away: 'Man City', channel: 'fuboTV Canada' },
-            { date: '2026-01-17', time: '10:00 AM', home: 'Chelsea', away: 'Brentford', channel: 'fuboTV Canada' },
-            { date: '2026-01-17', time: '10:00 AM', home: 'Leeds', away: 'Fulham', channel: 'fuboTV Canada' },
-            { date: '2026-01-17', time: '10:00 AM', home: 'Liverpool', away: 'Burnley', channel: 'fuboTV Canada' },
+            { date: '2026-01-07', time: '2:30 PM', home: 'Everton', away: 'Wolves', channel: '' },
+            { date: '2026-01-07', time: '2:30 PM', home: 'Fulham', away: 'Chelsea', channel: '' },
+            { date: '2026-01-07', time: '2:30 PM', home: 'Man City', away: 'Brighton', channel: '' },
+            { date: '2026-01-07', time: '3:15 PM', home: 'Burnley', away: 'Man United', channel: '' },
+            { date: '2026-01-07', time: '3:15 PM', home: 'Newcastle', away: 'Leeds', channel: '' },
+            { date: '2026-01-08', time: '3:00 PM', home: 'Arsenal', away: 'Liverpool', channel: '' },
+            { date: '2026-01-17', time: '7:30 AM', home: 'Man United', away: 'Man City', channel: '' },
+            { date: '2026-01-17', time: '10:00 AM', home: 'Chelsea', away: 'Brentford', channel: '' },
+            { date: '2026-01-17', time: '10:00 AM', home: 'Leeds', away: 'Fulham', channel: '' },
+            { date: '2026-01-17', time: '10:00 AM', home: 'Liverpool', away: 'Burnley', channel: '' },
             { date: '2026-01-17', time: '10:00 AM', home: 'Sunderland', away: 'Palace', channel: 'Palace TV+' },
-            { date: '2026-01-17', time: '10:00 AM', home: 'Tottenham', away: 'West Ham', channel: 'fuboTV Canada' },
-            { date: '2026-01-17', time: '12:30 PM', home: 'Forest', away: 'Arsenal', channel: 'fuboTV Canada' },
-            { date: '2026-01-18', time: '9:00 AM', home: 'Wolves', away: 'Newcastle', channel: 'fuboTV Canada' },
-            { date: '2026-01-18', time: '11:30 AM', home: 'Aston Villa', away: 'Everton', channel: 'fuboTV Canada' },
-            { date: '2026-01-19', time: '3:00 PM', home: 'Brighton', away: 'Bournemouth', channel: 'fuboTV Canada' },
-            { date: '2026-01-24', time: '7:30 AM', home: 'West Ham', away: 'Sunderland', channel: 'fuboTV Canada' },
-            { date: '2026-01-24', time: '10:00 AM', home: 'Burnley', away: 'Tottenham', channel: 'fuboTV Canada' },
-            { date: '2026-01-24', time: '10:00 AM', home: 'Fulham', away: 'Brighton', channel: 'fuboTV Canada' },
-            { date: '2026-01-24', time: '10:00 AM', home: 'Man City', away: 'Wolves', channel: 'fuboTV Canada' },
-            { date: '2026-01-24', time: '12:30 PM', home: 'Bournemouth', away: 'Liverpool', channel: 'fuboTV Canada' },
-            { date: '2026-01-25', time: '9:00 AM', home: 'Brentford', away: 'Forest', channel: 'fuboTV Canada' },
+            { date: '2026-01-17', time: '10:00 AM', home: 'Tottenham', away: 'West Ham', channel: '' },
+            { date: '2026-01-17', time: '12:30 PM', home: 'Forest', away: 'Arsenal', channel: '' },
+            { date: '2026-01-18', time: '9:00 AM', home: 'Wolves', away: 'Newcastle', channel: '' },
+            { date: '2026-01-18', time: '11:30 AM', home: 'Aston Villa', away: 'Everton', channel: '' },
+            { date: '2026-01-19', time: '3:00 PM', home: 'Brighton', away: 'Bournemouth', channel: '' },
+            { date: '2026-01-24', time: '7:30 AM', home: 'West Ham', away: 'Sunderland', channel: '' },
+            { date: '2026-01-24', time: '10:00 AM', home: 'Burnley', away: 'Tottenham', channel: '' },
+            { date: '2026-01-24', time: '10:00 AM', home: 'Fulham', away: 'Brighton', channel: '' },
+            { date: '2026-01-24', time: '10:00 AM', home: 'Man City', away: 'Wolves', channel: '' },
+            { date: '2026-01-24', time: '12:30 PM', home: 'Bournemouth', away: 'Liverpool', channel: '' },
+            { date: '2026-01-25', time: '9:00 AM', home: 'Brentford', away: 'Forest', channel: '' },
             { date: '2026-01-25', time: '9:00 AM', home: 'Palace', away: 'Chelsea', channel: 'Palace TV+' },
-            { date: '2026-01-25', time: '9:00 AM', home: 'Newcastle', away: 'Aston Villa', channel: 'fuboTV Canada' },
-            { date: '2026-01-25', time: '11:30 AM', home: 'Arsenal', away: 'Man United', channel: 'fuboTV Canada' },
-            { date: '2026-01-26', time: '3:00 PM', home: 'Everton', away: 'Leeds', channel: 'fuboTV Canada' },
-            { date: '2026-01-31', time: '10:00 AM', home: 'Brighton', away: 'Everton', channel: 'fuboTV Canada' },
-            { date: '2026-01-31', time: '10:00 AM', home: 'Leeds', away: 'Arsenal', channel: 'fuboTV Canada' },
-            { date: '2026-01-31', time: '10:00 AM', home: 'Wolves', away: 'Bournemouth', channel: 'fuboTV Canada' },
-            { date: '2026-01-31', time: '12:30 PM', home: 'Chelsea', away: 'West Ham', channel: 'fuboTV Canada' },
-            { date: '2026-01-31', time: '3:00 PM', home: 'Liverpool', away: 'Newcastle', channel: 'fuboTV Canada' }
+            { date: '2026-01-25', time: '9:00 AM', home: 'Newcastle', away: 'Aston Villa', channel: '' },
+            { date: '2026-01-25', time: '11:30 AM', home: 'Arsenal', away: 'Man United', channel: '' },
+            { date: '2026-01-26', time: '3:00 PM', home: 'Everton', away: 'Leeds', channel: '' },
+            { date: '2026-01-31', time: '10:00 AM', home: 'Brighton', away: 'Everton', channel: '' },
+            { date: '2026-01-31', time: '10:00 AM', home: 'Leeds', away: 'Arsenal', channel: '' },
+            { date: '2026-01-31', time: '10:00 AM', home: 'Wolves', away: 'Bournemouth', channel: '' },
+            { date: '2026-01-31', time: '12:30 PM', home: 'Chelsea', away: 'West Ham', channel: '' },
+            { date: '2026-01-31', time: '3:00 PM', home: 'Liverpool', away: 'Newcastle', channel: '' }
         ],
           'LigaMX': [
             { date: '2026-01-09', time: '10:00 PM', home: 'Atlas', away: 'Puebla', channel: 'ViX' },
@@ -6065,71 +6072,37 @@ document.addEventListener('DOMContentLoaded', function () {
             { date: '2026-02-06', time: '10:00 PM', home: 'Mazatlán', away: 'Guadalajara', channel: 'ViX' },
             { date: '2026-02-06', time: '10:00 PM', home: 'Tijuana', away: 'Puebla', channel: 'ViX' }
         ],
-        'FACup': [
-            { date: '2026-01-09', time: '2:30 PM', home: 'Milton Keynes Dons', away: 'Oxford United', channel: 'ESPN Select' },
-            { date: '2026-01-09', time: '2:30 PM', home: 'Port Vale', away: 'Fleetwood Town', channel: 'ESPN Select' },
-            { date: '2026-01-09', time: '2:30 PM', home: 'Preston North End', away: 'Wigan Athletic', channel: 'ESPN Select' },
-            { date: '2026-01-09', time: '2:30 PM', home: 'Wrexham', away: 'Nottingham Forest', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '7:15 AM', home: 'Cheltenham Town', away: 'Leicester City', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '7:15 AM', home: 'Everton', away: 'Sunderland', channel: 'ESPN2' },
-            { date: '2026-01-10', time: '7:15 AM', home: 'Macclesfield', away: 'Crystal Palace', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '7:15 AM', home: 'Wolverhampton Wanderers', away: 'Shrewsbury Town', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '10:00 AM', home: 'Boreham Wood', away: 'Burton Albion', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '10:00 AM', home: 'Burnley', away: 'Millwall', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '10:00 AM', home: 'Doncaster Rovers', away: 'Southampton', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '10:00 AM', home: 'Fulham', away: 'Middlesbrough', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '10:00 AM', home: 'Ipswich Town', away: 'Blackpool', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '10:00 AM', home: 'Manchester City', away: 'Exeter City', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '10:00 AM', home: 'Newcastle United', away: 'AFC Bournemouth', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '10:00 AM', home: 'Salford City', away: 'Swindon Town', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '10:00 AM', home: 'Sheffield Wednesday', away: 'Brentford', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '10:00 AM', home: 'Stoke City', away: 'Coventry City', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '12:45 PM', home: 'Bristol City', away: 'Watford', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '12:45 PM', home: 'Cambridge United', away: 'Birmingham City', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '12:45 PM', home: 'Grimsby Town', away: 'Weston-super-Mare', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '12:45 PM', home: 'Tottenham Hotspur', away: 'Aston Villa', channel: 'ESPN Select' },
-            { date: '2026-01-10', time: '3:00 PM', home: 'Charlton Athletic', away: 'Chelsea', channel: 'ESPN Select' },
-            { date: '2026-01-11', time: '7:00 AM', home: 'Derby County', away: 'Leeds United', channel: 'ESPN Select' },
-            { date: '2026-01-11', time: '9:00 AM', home: 'Portsmouth', away: 'Arsenal', channel: 'ESPN2' },
-            { date: '2026-01-11', time: '9:30 AM', home: 'Hull City', away: 'Blackburn Rovers', channel: 'ESPN Select' },
-            { date: '2026-01-11', time: '9:30 AM', home: 'Norwich City', away: 'Walsall', channel: 'ESPN Select' },
-            { date: '2026-01-11', time: '9:30 AM', home: 'Sheffield United', away: 'Mansfield Town', channel: 'ESPN Select' },
-            { date: '2026-01-11', time: '9:30 AM', home: 'Swansea City', away: 'West Bromwich Albion', channel: 'ESPN Select' },
-            { date: '2026-01-11', time: '9:30 AM', home: 'West Ham United', away: 'Queens Park Rangers', channel: 'ESPN Select' },
-            { date: '2026-01-11', time: '11:30 AM', home: 'Manchester United', away: 'Brighton & Hove Albion', channel: 'ESPN Select' },
-            { date: '2026-01-12', time: '2:45 PM', home: 'Liverpool', away: 'Barnsley', channel: 'ESPN Select' }
-        ],
         'Bundesliga': [
-            { date: '2026-01-09', time: '2:30 PM', home: 'Eintracht Frankfurt', away: 'Borussia Dortmund', channel: 'ESPN2' },
-            { date: '2026-01-10', time: '9:30 AM', home: '1. FC Heidenheim 1846', away: 'FC Cologne', channel: 'ESPN+' },
-            { date: '2026-01-10', time: '9:30 AM', home: '1. FC Union Berlin', away: 'Mainz', channel: 'ESPN+' },
-            { date: '2026-01-10', time: '9:30 AM', home: 'SC Freiburg', away: 'Hamburg SV', channel: 'ESPN+' },
-            { date: '2026-01-10', time: '9:30 AM', home: 'St. Pauli', away: 'RB Leipzig', channel: 'ESPN+' },
-            { date: '2026-01-10', time: '9:30 AM', home: 'Werder Bremen', away: 'TSG Hoffenheim', channel: 'ESPN+' },
-            { date: '2026-01-10', time: '12:30 PM', home: 'Bayer Leverkusen', away: 'VfB Stuttgart', channel: 'ESPN+' },
-            { date: '2026-01-11', time: '9:30 AM', home: 'Borussia Mönchengladbach', away: 'FC Augsburg', channel: 'ESPN+' },
-            { date: '2026-01-11', time: '11:30 AM', home: 'Bayern Munich', away: 'VfL Wolfsburg', channel: 'ESPN+' },
-            { date: '2026-01-14', time: '12:30 PM', home: 'VfL Wolfsburg', away: 'St. Pauli', channel: 'ESPN+' },
-            { date: '2026-01-14', time: '2:30 PM', home: 'FC Cologne', away: 'Bayern Munich', channel: 'ESPN+' },
-            { date: '2026-01-14', time: '2:30 PM', home: 'RB Leipzig', away: 'SC Freiburg', channel: 'ESPN+' },
-            { date: '2026-01-14', time: '2:30 PM', home: 'TSG Hoffenheim', away: 'Borussia Mönchengladbach', channel: 'ESPN+' },
-            { date: '2026-01-15', time: '2:30 PM', home: 'FC Augsburg', away: '1. FC Union Berlin', channel: 'ESPN+' },
-            { date: '2026-01-16', time: '2:30 PM', home: 'Werder Bremen', away: 'Eintracht Frankfurt', channel: 'ESPN+' },
-            { date: '2026-01-17', time: '9:30 AM', home: 'Borussia Dortmund', away: 'St. Pauli', channel: 'ESPN+' },
-            { date: '2026-01-17', time: '9:30 AM', home: 'FC Cologne', away: 'Mainz', channel: 'ESPN+' },
-            { date: '2026-01-17', time: '9:30 AM', home: 'Hamburg SV', away: 'Borussia Mönchengladbach', channel: 'ESPN+' },
-            { date: '2026-01-17', time: '9:30 AM', home: 'TSG Hoffenheim', away: 'Bayer Leverkusen', channel: 'ESPN+' },
-            { date: '2026-01-17', time: '9:30 AM', home: 'VfL Wolfsburg', away: '1. FC Heidenheim 1846', channel: 'ESPN+' },
-            { date: '2026-01-17', time: '12:30 PM', home: 'RB Leipzig', away: 'Bayern Munich', channel: 'ESPN+' },
-            { date: '2026-01-18', time: '9:30 AM', home: 'VfB Stuttgart', away: '1. FC Union Berlin', channel: 'ESPN+' },
-            { date: '2026-01-18', time: '11:30 AM', home: 'FC Augsburg', away: 'SC Freiburg', channel: 'ESPN+' },
-            { date: '2026-01-23', time: '2:30 PM', home: 'St. Pauli', away: 'Hamburg SV', channel: 'ESPN+' },
-            { date: '2026-01-24', time: '9:30 AM', home: '1. FC Heidenheim 1846', away: 'RB Leipzig', channel: 'ESPN+' },
-            { date: '2026-01-24', time: '9:30 AM', home: 'Bayer Leverkusen', away: 'Werder Bremen', channel: 'ESPN+' },
-            { date: '2026-01-24', time: '9:30 AM', home: 'Bayern Munich', away: 'FC Augsburg', channel: 'ESPN+' },
-            { date: '2026-01-24', time: '9:30 AM', home: 'Eintracht Frankfurt', away: 'TSG Hoffenheim', channel: 'ESPN+' },
-            { date: '2026-01-24', time: '9:30 AM', home: 'Mainz', away: 'VfL Wolfsburg', channel: 'ESPN+' },
-            { date: '2026-01-24', time: '12:30 PM', home: '1. FC Union Berlin', away: 'Borussia Dortmund', channel: 'ESPN+' }
+          { date: '2026-01-09', time: '2:30 PM', home: 'Frankfurt', away: 'Dortmund', channel: 'ESPN2' },
+          { date: '2026-01-10', time: '9:30 AM', home: 'Heidenheim', away: 'Köln', channel: 'ESPN+' },
+          { date: '2026-01-10', time: '9:30 AM', home: 'Union Berlin', away: 'Mainz', channel: 'ESPN+' },
+          { date: '2026-01-10', time: '9:30 AM', home: 'Freiburg', away: 'Hamburg', channel: 'ESPN+' },
+          { date: '2026-01-10', time: '9:30 AM', home: 'St Pauli', away: 'RB Leipzig', channel: 'ESPN+' },
+          { date: '2026-01-10', time: '9:30 AM', home: 'Bremen', away: 'Hoffenheim', channel: 'ESPN+' },
+          { date: '2026-01-10', time: '12:30 PM', home: 'Leverkusen', away: 'Stuttgart', channel: 'ESPN+' },
+          { date: '2026-01-11', time: '9:30 AM', home: 'Mönchengladbach', away: 'Augsburg', channel: 'ESPN+' },
+          { date: '2026-01-11', time: '11:30 AM', home: 'Bayern', away: 'Wolfsburg', channel: 'ESPN+' },
+          { date: '2026-01-14', time: '12:30 PM', home: 'Wolfsburg', away: 'St Pauli', channel: 'ESPN+' },
+          { date: '2026-01-14', time: '2:30 PM', home: 'Köln', away: 'Bayern', channel: 'ESPN+' },
+          { date: '2026-01-14', time: '2:30 PM', home: 'RB Leipzig', away: 'Freiburg', channel: 'ESPN+' },
+          { date: '2026-01-14', time: '2:30 PM', home: 'Hoffenheim', away: 'Mönchengladbach', channel: 'ESPN+' },
+          { date: '2026-01-15', time: '2:30 PM', home: 'Augsburg', away: 'Union Berlin', channel: 'ESPN+' },
+          { date: '2026-01-16', time: '2:30 PM', home: 'Bremen', away: 'Frankfurt', channel: 'ESPN+' },
+          { date: '2026-01-17', time: '9:30 AM', home: 'Dortmund', away: 'St Pauli', channel: 'ESPN+' },
+          { date: '2026-01-17', time: '9:30 AM', home: 'Köln', away: 'Mainz', channel: 'ESPN+' },
+          { date: '2026-01-17', time: '9:30 AM', home: 'Hamburg', away: 'Mönchengladbach', channel: 'ESPN+' },
+          { date: '2026-01-17', time: '9:30 AM', home: 'Hoffenheim', away: 'Leverkusen', channel: 'ESPN+' },
+          { date: '2026-01-17', time: '9:30 AM', home: 'Wolfsburg', away: 'Heidenheim', channel: 'ESPN+' },
+          { date: '2026-01-17', time: '12:30 PM', home: 'RB Leipzig', away: 'Bayern', channel: 'ESPN+' },
+          { date: '2026-01-18', time: '9:30 AM', home: 'Stuttgart', away: 'Union Berlin', channel: 'ESPN+' },
+          { date: '2026-01-18', time: '11:30 AM', home: 'Augsburg', away: 'Freiburg', channel: 'ESPN+' },
+          { date: '2026-01-23', time: '2:30 PM', home: 'St Pauli', away: 'Hamburg', channel: 'ESPN+' },
+          { date: '2026-01-24', time: '9:30 AM', home: 'Heidenheim', away: 'RB Leipzig', channel: 'ESPN+' },
+          { date: '2026-01-24', time: '9:30 AM', home: 'Leverkusen', away: 'Bremen', channel: 'ESPN+' },
+          { date: '2026-01-24', time: '9:30 AM', home: 'Bayern', away: 'Augsburg', channel: 'ESPN+' },
+          { date: '2026-01-24', time: '9:30 AM', home: 'Frankfurt', away: 'Hoffenheim', channel: 'ESPN+' },
+          { date: '2026-01-24', time: '9:30 AM', home: 'Mainz', away: 'Wolfsburg', channel: 'ESPN+' },
+          { date: '2026-01-24', time: '12:30 PM', home: 'Union Berlin', away: 'Dortmund', channel: 'ESPN+' }
         ],
         'LaLiga': [
             { date: '2026-01-02', time: '3:00 PM', home: 'Rayo Vallecano', away: 'Getafe', channel: 'ESPN+' },
@@ -9620,6 +9593,87 @@ document.addEventListener('DOMContentLoaded', function () {
         return cleaned.toUpperCase();
     }
 
+    function normalizeChannel(ch) {
+      if (!ch) return '';
+      if (typeof ch !== 'string') ch = String(ch);
+      const trimmed = ch.trim();
+      if (trimmed === '' ) return '';
+      // Hide these Canada-only services
+      if (trimmed === 'DAZN Canada' || trimmed === 'fuboTV Canada') return '';
+      // Shorten common long names
+      return trimmed.replace(/USA Network/g, 'USA');
+    }
+
+    function normalizeTeamName(leagueKey, name) {
+      if (!name) return name;
+      const trimmed = name.trim();
+      const premier = {
+        'Manchester City': 'Man City',
+        'Man City': 'Man City',
+        'Manchester United': 'Man United',
+        'Man United': 'Man United',
+        'AFC Bournemouth': 'Bournemouth',
+        'Bournemouth': 'Bournemouth',
+        'Crystal Palace': 'Palace',
+        'Palace': 'Palace',
+        'Nottingham Forest': 'Forest',
+        'Forest': 'Forest',
+        'Brighton & Hove Albion': 'Brighton',
+        'Brighton': 'Brighton',
+        'Wolverhampton Wanderers': 'Wolves',
+        'Wolves': 'Wolves',
+        'Tottenham Hotspur': 'Tottenham',
+        'Tottenham': 'Tottenham'
+      };
+      const bundes = {
+        'Eintracht Frankfurt': 'Frankfurt',
+        'Frankfurt': 'Frankfurt',
+        'Borussia Dortmund': 'Dortmund',
+        'Dortmund': 'Dortmund',
+        '1. FC Heidenheim 1846': 'Heidenheim',
+        '1. FC Heidenheim': 'Heidenheim',
+        'FC Cologne': 'Köln',
+        'Cologne': 'Köln',
+        'Köln': 'Köln',
+        '1. FC Union Berlin': 'Union Berlin',
+        'Union Berlin': 'Union Berlin',
+        'Mainz': 'Mainz',
+        'SC Freiburg': 'Freiburg',
+        'Freiburg': 'Freiburg',
+        'Hamburg SV': 'Hamburg',
+        'Hamburg': 'Hamburg',
+        'St. Pauli': 'St Pauli',
+        'St Pauli': 'St Pauli',
+        'RB Leipzig': 'RB Leipzig',
+        'Werder Bremen': 'Bremen',
+        'Bremen': 'Bremen',
+        'TSG Hoffenheim': 'Hoffenheim',
+        'Hoffenheim': 'Hoffenheim',
+        'Bayer Leverkusen': 'Leverkusen',
+        'Leverkusen': 'Leverkusen',
+        'VfB Stuttgart': 'Stuttgart',
+        'Stuttgart': 'Stuttgart',
+        'Borussia Mönchengladbach': 'Mönchengladbach',
+        'Mönchengladbach': 'Mönchengladbach',
+        'FC Augsburg': 'Augsburg',
+        'Augsburg': 'Augsburg',
+        'Bayern Munich': 'Bayern',
+        'Bayern': 'Bayern',
+        'VfL Wolfsburg': 'Wolfsburg',
+        'Wolfsburg': 'Wolfsburg'
+      };
+      const lig1 = {
+        'Olympique Marseille': 'Marseille',
+        'Olympique Lyonnais': 'Lyon',
+        'Angers SCO': 'Angers',
+      };
+
+      if (leagueKey === 'PremierLeague' && premier[trimmed]) return premier[trimmed];
+      if (leagueKey === 'Bundesliga' && bundes[trimmed]) return bundes[trimmed];
+      if (leagueKey === 'Ligue1' && lig1[trimmed]) return lig1[trimmed];
+      return trimmed;
+    }
+
     function renderGames(container, gamesData, isGroupedByLeague, isYesterdayScores = false) {
         container.innerHTML = "";
         // Note: gamesData is already filtered at the data level in updateDisplay() - no need to filter here
@@ -11407,7 +11461,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.League && data.League.includes('ATP')) {
                         featuredChannelToDisplay = 'Tennis Channel';
                     }
-                    let featuredChannelDisplay = (!isFinal && featuredChannelToDisplay) ? featuredChannelToDisplay : '';
+                    let featuredChannelDisplay = normalizeChannel((!isFinal && featuredChannelToDisplay) ? featuredChannelToDisplay : '');
                     
                     // For UFC and Boxing: if no channel, make team names gray (#C0C0C0)
                     const isFeaturedUFCOrBoxing = displayLeagueForCheck === 'UFC' || displayLeagueForCheck === 'Boxing';
@@ -11691,7 +11745,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.League && data.League.includes('ATP')) {
                     channelToDisplay = 'Tennis Channel';
                 }
-                const channelDisplay = (channelToDisplay && !isFinal) ? channelToDisplay : '';
+                const channelDisplay = normalizeChannel((channelToDisplay && !isFinal) ? channelToDisplay : '');
                 
                 // For UFC and Boxing: handle sub-items (gray text, no time) vs main items (white text, shows time)
                 const isUFCOrBoxing = displayLeague === 'UFC' || displayLeague === 'Boxing';
@@ -13023,6 +13077,56 @@ document.addEventListener('DOMContentLoaded', function () {
         
         try {
             let teams = [];
+
+          // Immediate override for NFL: use hard-coded W/L/T standings and skip Firestore/cache
+          if (leagueKey === 'NFL') {
+            const hardcodedNFL = [
+              {Team:'New England Patriots',Division:'AFC East',Wins:'13',Losses:'3',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Buffalo Bills',Division:'AFC East',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Miami Dolphins',Division:'AFC East',Wins:'7',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'New York Jets',Division:'AFC East',Wins:'3',Losses:'13',Ties:'0',lastUpdated:new Date().toISOString()},
+
+              {Team:'Pittsburgh Steelers',Division:'AFC North',Wins:'9',Losses:'7',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Baltimore Ravens',Division:'AFC North',Wins:'8',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Cincinnati Bengals',Division:'AFC North',Wins:'6',Losses:'10',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Cleveland Browns',Division:'AFC North',Wins:'4',Losses:'12',Ties:'0',lastUpdated:new Date().toISOString()},
+
+              {Team:'Jacksonville Jaguars',Division:'AFC South',Wins:'12',Losses:'4',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Houston Texans',Division:'AFC South',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Indianapolis Colts',Division:'AFC South',Wins:'8',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Tennessee Titans',Division:'AFC South',Wins:'3',Losses:'13',Ties:'0',lastUpdated:new Date().toISOString()},
+
+              {Team:'Denver Broncos',Division:'AFC West',Wins:'13',Losses:'3',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Los Angeles Chargers',Division:'AFC West',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Kansas City Chiefs',Division:'AFC West',Wins:'6',Losses:'10',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Las Vegas Raiders',Division:'AFC West',Wins:'2',Losses:'14',Ties:'0',lastUpdated:new Date().toISOString()},
+
+              {Team:'Philadelphia Eagles',Division:'NFC East',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Dallas Cowboys',Division:'NFC East',Wins:'7',Losses:'8',Ties:'1',lastUpdated:new Date().toISOString()},
+              {Team:'Washington Commanders',Division:'NFC East',Wins:'4',Losses:'12',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'New York Giants',Division:'NFC East',Wins:'3',Losses:'13',Ties:'0',lastUpdated:new Date().toISOString()},
+
+              {Team:'Chicago Bears',Division:'NFC North',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Green Bay Packers',Division:'NFC North',Wins:'9',Losses:'6',Ties:'1',lastUpdated:new Date().toISOString()},
+              {Team:'Minnesota Vikings',Division:'NFC North',Wins:'8',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Detroit Lions',Division:'NFC North',Wins:'8',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
+
+              {Team:'Carolina Panthers',Division:'NFC South',Wins:'8',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Tampa Bay Buccaneers',Division:'NFC South',Wins:'7',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Atlanta Falcons',Division:'NFC South',Wins:'7',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'New Orleans Saints',Division:'NFC South',Wins:'6',Losses:'10',Ties:'0',lastUpdated:new Date().toISOString()},
+
+              {Team:'Seattle Seahawks',Division:'NFC West',Wins:'13',Losses:'3',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'San Francisco 49ers',Division:'NFC West',Wins:'12',Losses:'4',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Los Angeles Rams',Division:'NFC West',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
+              {Team:'Arizona Cardinals',Division:'NFC West',Wins:'3',Losses:'13',Ties:'0',lastUpdated:new Date().toISOString()}
+            ];
+
+            hardcodedNFL.forEach(t => { t.W = t.Wins; t.L = t.Losses; t.T = t.Ties; });
+            cacheStandings(leagueKey, hardcodedNFL);
+            displayStandingsTable(leagueKey, hardcodedNFL, document.getElementById('league-standings-content'));
+            return true;
+          }
             
             // Check if this league uses the new collection format (like NFLStandings)
             if (collectionName !== 'standings') {
@@ -13281,7 +13385,49 @@ document.addEventListener('DOMContentLoaded', function () {
         return html;
     }
     
-    function createNFLConferenceStandings(teams, conference) {
+      // Return mascot/short team name for known full team names. Falls back to last word.
+      function getMascotName(fullName) {
+        const map = {
+          'New England Patriots': 'Patriots',
+          'Buffalo Bills': 'Bills',
+          'Miami Dolphins': 'Dolphins',
+          'New York Jets': 'Jets',
+          'Pittsburgh Steelers': 'Steelers',
+          'Baltimore Ravens': 'Ravens',
+          'Cincinnati Bengals': 'Bengals',
+          'Cleveland Browns': 'Browns',
+          'Jacksonville Jaguars': 'Jaguars',
+          'Houston Texans': 'Texans',
+          'Indianapolis Colts': 'Colts',
+          'Tennessee Titans': 'Titans',
+          'Denver Broncos': 'Broncos',
+          'Los Angeles Chargers': 'Chargers',
+          'Kansas City Chiefs': 'Chiefs',
+          'Las Vegas Raiders': 'Raiders',
+          'Philadelphia Eagles': 'Eagles',
+          'Dallas Cowboys': 'Cowboys',
+          'Washington Commanders': 'Commanders',
+          'New York Giants': 'Giants',
+          'Chicago Bears': 'Bears',
+          'Green Bay Packers': 'Packers',
+          'Minnesota Vikings': 'Vikings',
+          'Detroit Lions': 'Lions',
+          'Carolina Panthers': 'Panthers',
+          'Tampa Bay Buccaneers': 'Buccaneers',
+          'Atlanta Falcons': 'Falcons',
+          'New Orleans Saints': 'Saints',
+          'Seattle Seahawks': 'Seahawks',
+          'San Francisco 49ers': '49ers',
+          'Los Angeles Rams': 'Rams',
+          'Arizona Cardinals': 'Cardinals'
+        };
+        if (!fullName) return '';
+        if (map[fullName]) return map[fullName];
+        const parts = fullName.split(' ');
+        return parts.slice(-1).join(' ');
+      }
+
+      function createNFLConferenceStandings(teams, conference) {
         const divisions = ['AFC East', 'AFC North', 'AFC South', 'AFC West', 'NFC East', 'NFC North', 'NFC South', 'NFC West'];
         const conferenceDivisions = divisions.filter(div => div.startsWith(conference));
         let html = '';
@@ -13319,14 +13465,15 @@ document.addEventListener('DOMContentLoaded', function () {
             html += '<tbody>';
             
             divisionTeams.forEach((team, index) => {
-                const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-                html += '<tr style="' + rowStyle + '">';
-                html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + team.Team + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Wins + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Losses + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + (team.Ties || 0) + '</td>';
-                html += '</tr>';
-            });
+            const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+            const displayName = getMascotName(team.Team);
+            html += '<tr style="' + rowStyle + '">';
+            html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + displayName + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Wins + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Losses + '</td>';
+            html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + (team.Ties || 0) + '</td>';
+            html += '</tr>';
+          });
             
             html += '</tbody></table></div>';
         });
@@ -16231,13 +16378,13 @@ async function fetchFeaturedGames() {
                     if (game.League && game.League.includes('ATP')) {
                         channelToDisplay = 'Tennis Channel';
                     }
-                    const channelDisplay = (channelToDisplay && !isFinal) ? channelToDisplay : '';
+                    const channelDisplay = normalizeChannel((channelToDisplay && !isFinal) ? channelToDisplay : '');
                     
                     html += `<tr class="game-row">`;
                     html += `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>`;
                     html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${homeTeam}</td>`;
                     html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${homeScoreDisplay}</td>`;
-                    html += `<td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
+                    html += `<td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
                     html += `</tr>`;
                     
                     html += `<tr class="game-row game-separator">`;
@@ -16661,7 +16808,11 @@ async function fetchFeaturedGames() {
         // Check for hardcoded schedule first
         if (HARDCODED_UPCOMING_SCHEDULES[leagueKey]) {
             const todayStr = luxon.DateTime.now().setZone('America/New_York').toISODate();
-            const allGames = HARDCODED_UPCOMING_SCHEDULES[leagueKey];
+            const allGames = HARDCODED_UPCOMING_SCHEDULES[leagueKey].map(g => ({
+              ...g,
+              home: normalizeTeamName(leagueKey, g.home),
+              away: normalizeTeamName(leagueKey, g.away)
+            }));
             
             // Filter to only future games
             const futureGames = allGames.filter(game => game.date > todayStr);
@@ -17139,17 +17290,17 @@ async function fetchFeaturedGames() {
                             const dayDisplay = round.day || '';
                             const roundName = round.round || '';
                             const timeDisplay = round.time || '';
-                            const channelDisplay = round.channel || '';
+                            const channelDisplay = normalizeChannel(round.channel || '');
                             
                             html += `
-                                <div class="round-row" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: ${index < game.rounds.length - 1 ? '1px solid #374151' : 'none'}; background-color: #1f2937;">
-                                    <div class="round-info" style="flex: 1; display: flex; gap: 12px;">
-                                        ${dayDisplay ? `<span style="color: white; font-size: 11px;">${dayDisplay}</span>` : ''}
-                                        <span style="color: white; font-size: 11px;">${roundName}</span>
-                                        ${timeDisplay ? `<span style="color: #9ca3af; font-size: 10px;">${timeDisplay}</span>` : ''}
-                                        ${channelDisplay ? `<span style="color: #9ca3af; font-size: 10px;">${channelDisplay}</span>` : ''}
-                                    </div>
+                              <div class="round-row" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: ${index < game.rounds.length - 1 ? '1px solid #374151' : 'none'}; background-color: #1f2937;">
+                                <div class="round-info" style="flex: 1; display: flex; gap: 12px;">
+                                  ${dayDisplay ? `<span style="color: white; font-size: 11px;">${dayDisplay}</span>` : ''}
+                                  <span style="color: white; font-size: 11px;">${roundName}</span>
+                                  ${timeDisplay ? `<span style="color: #9ca3af; font-size: 10px;">${timeDisplay}</span>` : ''}
+                                  ${channelDisplay ? `<span class="channel-inline" style="color: #9ca3af; font-size: 10px;">${channelDisplay}</span>` : ''}
                                 </div>
+                              </div>
                             `;
                         });
                         html += `<div style="margin-bottom: 20px;"></div>`;
@@ -17246,7 +17397,7 @@ async function fetchFeaturedGames() {
                     if (game.League && game.League.includes('ATP')) {
                         channelToDisplay = 'Tennis Channel';
                     }
-                    const channelDisplay = channelToDisplay;
+                    const channelDisplay = normalizeChannel(channelToDisplay);
                     
                     // Use getTeamDisplayName to match home page formatting
                     const gameLeague = game.League || '';
@@ -17276,7 +17427,7 @@ async function fetchFeaturedGames() {
                             <td rowspan="2" style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0; ${awayColor}">${awayTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
-                            <td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
+                            <td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
                         </tr>
                         <tr class="game-row game-separator scheduled-game">
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0; ${homeColor}">${homeTeam}</td>
@@ -17321,7 +17472,7 @@ async function fetchFeaturedGames() {
                     if (game.League && game.League.includes('ATP')) {
                         channelToDisplay = 'Tennis Channel';
                     }
-                    const channelDisplay = channelToDisplay;
+                    const channelDisplay = normalizeChannel(channelToDisplay);
                     
                     // Use getTeamDisplayName to match home page formatting
                     const gameLeague = game.League || '';
@@ -17342,7 +17493,7 @@ async function fetchFeaturedGames() {
                             <td rowspan="2" style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${homeTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
-                            <td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
+                            <td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
                         </tr>
                         <tr class="game-row game-separator scheduled-game">
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${awayTeam}</td>
@@ -17409,7 +17560,7 @@ async function fetchFeaturedGames() {
                     if (game.League && game.League.includes('ATP')) {
                         channelToDisplay = 'Tennis Channel';
                     }
-                    const channelDisplay = channelToDisplay;
+                    const channelDisplay = normalizeChannel(channelToDisplay);
                     const timeDisplay = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
@@ -17417,10 +17568,10 @@ async function fetchFeaturedGames() {
                                 <div class="event" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px; display: flex; flex-direction: column; align-items: flex-end;">
-                                <div>${timeDisplay}</div>
-                                ${channelDisplay ? `<div style="color: #9ca3af; font-size: 10px; margin-top: 2px;">${channelDisplay}</div>` : ''}
-                            </div>
+                    <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px; display: flex; flex-direction: column; align-items: center;">
+                      <div>${timeDisplay}</div>
+                      ${channelDisplay ? `<div class="channel-inline" style="color: #9ca3af; font-size: 10px; margin-top: 2px; text-align: center;">${channelDisplay}</div>` : ''}
+                    </div>
                         </div>
                     `;
                 } else if (leagueKey === 'MotoGP') {
