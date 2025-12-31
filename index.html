@@ -7448,7 +7448,8 @@ document.addEventListener('DOMContentLoaded', function () {
         NCAAF: {
           "Mississippi State": "MS State",
           "Wisconsin-River Falls": "WI-River Falls",
-          "North Central College": "N Central"
+          "North Central College": "N Central",
+          "Texas Tech": "TX Tech"
         },
         // NBA
         NBA: {
@@ -9112,6 +9113,11 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Return original name if no mapping found
         return p;
+    }
+
+    // Utility to escape strings for RegExp
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
     
     // Granular Live Status Display Function
@@ -16830,6 +16836,7 @@ async function fetchFeaturedGames() {
         // Check for hardcoded schedule first
         if (HARDCODED_UPCOMING_SCHEDULES[leagueKey]) {
             const todayStr = luxon.DateTime.now().setZone('America/New_York').toISODate();
+            // Keep canonical normalized names here; display names are derived later so rankings work
             const allGames = HARDCODED_UPCOMING_SCHEDULES[leagueKey].map(g => ({
               ...g,
               home: normalizeTeamName(leagueKey, g.home),
@@ -16875,8 +16882,8 @@ async function fetchFeaturedGames() {
             }
             
             // Check if this league uses the Featured Only / Expand All toggle
-            const isNcaaLeague = (leagueKey === 'NCAAM' || leagueKey === 'NCAAW');
-            const importantTeamsSet = leagueKey === 'NCAAM' ? IMPORTANT_NCAAM_TEAMS : (leagueKey === 'NCAAW' ? IMPORTANT_NCAAW_TEAMS : null);
+            const isNcaaLeague = (leagueKey === 'NCAAM' || leagueKey === 'NCAAW' || leagueKey === 'NCAAF');
+            const importantTeamsSet = leagueKey === 'NCAAM' ? IMPORTANT_NCAAM_TEAMS : (leagueKey === 'NCAAW' ? IMPORTANT_NCAAW_TEAMS : (leagueKey === 'NCAAF' ? IMPORTANT_NCAAF_TEAMS : null));
             
             // Function to check if a game involves important teams
             function isImportantGame(game) {
@@ -16932,7 +16939,8 @@ async function fetchFeaturedGames() {
                 html += `<div style="background-color: #2a2a2a; padding: 6px 10px; font-weight: bold; font-size: 11px; border-bottom: 1px solid #3a3a3a; margin-top: 10px;">${dateHeader}</div>`;
                 
                     // Add toggle button under each date header if there are non-featured games
-                    if (isNcaaLeague && nonFeaturedGamesCount > 0) {
+                    // Only show the toggle for NCAA leagues when there are at least 10 total upcoming games
+                    if (isNcaaLeague && nonFeaturedGamesCount > 0 && futureGames.length >= 10) {
                         html += `
                             <div class="upcoming-schedule-toggle" data-date="${dateStr}" style="font-size: 10px; padding: 6px 10px; cursor: pointer; color: #9ca3af; border-bottom: 1px solid #2a2a2a;">
                                 <span style="text-decoration: underline;">${isExpanded ? 'Featured only' : 'Expand all'}</span>
@@ -16941,7 +16949,8 @@ async function fetchFeaturedGames() {
                     }
                     
                     // Filter games for this date based on its expand state
-                    const datesToShow = isExpanded ? gamesByDate[dateStr] : gamesByDate[dateStr].filter(g => g.isImportant);
+                    // If the league has fewer than 10 upcoming games, always show all games and don't show the toggle
+                    const datesToShow = (isNcaaLeague && futureGames.length < 10) ? gamesByDate[dateStr] : (isExpanded ? gamesByDate[dateStr] : gamesByDate[dateStr].filter(g => g.isImportant));
                     
                     datesToShow.forEach(game => {
                     // Parse time as EST and convert to user's local time (or keep TBD)
@@ -16956,23 +16965,28 @@ async function fetchFeaturedGames() {
                     
                     // Determine display order based on league type
                     const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia'].includes(leagueKey);
-                    
+
                     let topTeam, bottomTeam;
                     if (isSoccerLeague) {
-                        // Soccer: Home team on top, away team on bottom
-                        topTeam = game.home;
-                        bottomTeam = game.away;
+                      // Soccer: Home team on top, away team on bottom
+                      topTeam = game.home;
+                      bottomTeam = game.away;
+                    } else if (isNcaaLeague) {
+                      // NCAA (football/basketball): preserve canonical names for ranking, derive display names separately
+                      const awayCanonical = game.away;
+                      const homeCanonical = game.home;
+                      const awayDisplay = getTeamDisplayName(awayCanonical, leagueKey);
+                      const homeDisplay = getTeamDisplayName(homeCanonical, leagueKey);
+                      // Format display with ranking using the canonical name for lookups
+                      topTeam = formatDisplayUsingCanonical(awayCanonical, awayDisplay, leagueKey);
+                      bottomTeam = formatDisplayUsingCanonical(homeCanonical, homeDisplay, leagueKey);
                     } else {
-                        // Other sports (NFL, etc.): Away team on top, home team on bottom
-                        topTeam = getMascotName(game.away);
-                        bottomTeam = getMascotName(game.home);
+                      // Other sports (NFL, etc.): Away team on top, home team on bottom, strip city prefixes
+                      topTeam = getMascotName(game.away);
+                      bottomTeam = getMascotName(game.home);
                     }
                         
-                        // Apply Top 25 rankings for NCAA leagues
-                        if (isNcaaLeague) {
-                            topTeam = formatTeamNameWithRanking(topTeam, leagueKey);
-                            bottomTeam = formatTeamNameWithRanking(bottomTeam, leagueKey);
-                        }
+                        // Rankings and display mapping already applied above for NCAA leagues
                     
                     html += `
                         <div style="display: flex; align-items: center; padding: 8px 10px; border-bottom: 1px solid #2a2a2a; font-size: 11px;">
@@ -17022,9 +17036,9 @@ async function fetchFeaturedGames() {
             if (defaultContent) {
                 defaultContent.innerHTML = renderSchedule();
                 
-                // Add click handlers for all toggle buttons
-                if (isNcaaLeague && nonFeaturedGamesCount > 0) {
-                    attachToggleHandlers();
+                // Add click handlers for all toggle buttons (only if we displayed toggles)
+                if (isNcaaLeague && nonFeaturedGamesCount > 0 && futureGames.length >= 10) {
+                  attachToggleHandlers();
                 }
             }
             return;
@@ -20064,6 +20078,68 @@ function getCFPRank(displayName) {
     return cfpRankingsCache[displayName] || null;
 }
 
+// Resolve ranking for a display name, honoring TEAM_DISPLAY_MAP mappings
+function getRankingForDisplayName(displayName, leagueKey) {
+  if (!displayName) return null;
+  const nameStr = displayName.toString();
+  const nameLower = nameStr.toLowerCase();
+
+  // NCAAF uses CFP cache
+  if (leagueKey === 'NCAAF') {
+    if (cfpRankingsCache && cfpRankingsCache[nameStr]) return cfpRankingsCache[nameStr];
+
+    // If displayName is a short/mapped name, reverse lookup to full name
+    if (TEAM_DISPLAY_MAP && TEAM_DISPLAY_MAP['NCAAF']) {
+      for (const [fullName, shortName] of Object.entries(TEAM_DISPLAY_MAP['NCAAF'])) {
+        if ((shortName || '').toString() === nameStr) {
+          if (cfpRankingsCache && cfpRankingsCache[fullName]) return cfpRankingsCache[fullName];
+          const norm = normalizeTeamName('NCAAF', fullName);
+          if (cfpRankingsCache && cfpRankingsCache[norm]) return cfpRankingsCache[norm];
+        }
+      }
+    }
+
+    // Case-insensitive direct match
+    if (cfpRankingsCache) {
+      for (const [k, v] of Object.entries(cfpRankingsCache)) {
+        if (k.toString().toLowerCase() === nameLower) return v;
+      }
+      // Fuzzy contains match
+      for (const [k, v] of Object.entries(cfpRankingsCache)) {
+        const kLower = k.toString().toLowerCase();
+        if (kLower.includes(nameLower) || nameLower.includes(kLower)) return v;
+      }
+    }
+
+    return null;
+  }
+
+  // For NCAAM/NCAAW use top25RankingsCache
+  const topCache = top25RankingsCache[leagueKey] || {};
+  if (topCache[nameStr]) return topCache[nameStr];
+
+  if (TEAM_DISPLAY_MAP && TEAM_DISPLAY_MAP[leagueKey]) {
+    for (const [fullName, shortName] of Object.entries(TEAM_DISPLAY_MAP[leagueKey])) {
+      if ((shortName || '').toString() === nameStr) {
+        if (topCache[fullName]) return topCache[fullName];
+        const norm = normalizeTeamName(leagueKey, fullName);
+        if (topCache[norm]) return topCache[norm];
+      }
+    }
+  }
+
+  // Case-insensitive direct and fuzzy matches
+  for (const [k, v] of Object.entries(topCache)) {
+    if (k.toString().toLowerCase() === nameLower) return v;
+  }
+  for (const [k, v] of Object.entries(topCache)) {
+    const kLower = k.toString().toLowerCase();
+    if (kLower.includes(nameLower) || nameLower.includes(kLower)) return v;
+  }
+
+  return null;
+}
+
 // Get league key from game data (for Top 25 matching)
 function getLeagueKeyFromGame(game) {
     if (!game) return null;
@@ -20092,17 +20168,19 @@ function formatTeamNameWithRanking(displayName, leagueKey) {
     if (!leagueKey || !['NCAAF', 'NCAAM', 'NCAAW'].includes(leagueKey)) {
         return displayName;
     }
-    
-    // For NCAAF, use CFP rankings instead of Top 25
-    let rank = null;
-    if (leagueKey === 'NCAAF') {
-        rank = getCFPRank(displayName);
-    } else {
-        // displayName is in ESPN format (e.g., "Duke Blue Devils")
-        // Cache has ESPN names as keys, so direct lookup works
-        rank = getTop25Rank(displayName, leagueKey);
-    }
-    
+
+      
+  const rank = getRankingForDisplayName(displayName, leagueKey);
+  if (rank !== null && rank !== undefined) {
+    return `<span style="font-size: 0.75em;">${rank}</span> ${displayName}`;
+  }
+  return displayName;
+}
+
+// Format a display name with ranking using the canonical team name for lookups
+function formatDisplayUsingCanonical(canonicalName, displayName, leagueKey) {
+    if (!canonicalName) return displayName;
+    const rank = getRankingForDisplayName(canonicalName, leagueKey);
     if (rank !== null && rank !== undefined) {
         return `<span style="font-size: 0.75em;">${rank}</span> ${displayName}`;
     }
