@@ -2903,11 +2903,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="news-section-header">Headlines</div>
       <div id="headlines-tabs">
         <div class="headlines-tab active" data-source="espn">ESPN</div>
+        <div class="headlines-tab" data-source="br">B/R</div>
         <div class="headlines-tab" data-source="cbs">CBS</div>
         <div class="headlines-tab" data-source="yahoo">Yahoo</div>
         <div class="headlines-tab" data-source="fox">FOX</div>
       </div>
       <div class="news-feed-content" id="espn-feed" style="display: block;">Loading ESPN...</div>
+      <div class="news-feed-content" id="br-feed" style="display:none;">Loading B/R...</div>
       <div class="news-feed-content" id="cbs-feed" style="display:none;">Loading CBS...</div>
       <div class="news-feed-content" id="yahoo-feed" style="display:none;">Loading Yahoo...</div>
       <div class="news-feed-content" id="fox-feed" style="display:none;">Loading FOX...</div>
@@ -4542,7 +4544,794 @@ function loadCustomRSSFeed(feedUrl, container) {
       </script>
 
   <script>
+    // --- GLOBAL GAME CLICK HANDLER (must be global for inline onclick) ---
+    function handleGameClick(gameId) {
+        console.log('[handleGameClick] Called with gameId:', gameId);
+        if (!gameId) {
+            console.log('[handleGameClick] No gameId, returning');
+            return;
+        }
+        
+        // Clear News column content (keep header)
+        document.querySelectorAll(".news .content-section").forEach(s => s.style.display = "none");
+        const newsFeed = document.querySelector('.column.news .news-feed');
+        if (newsFeed) newsFeed.remove();
+        
+        // Clear Social column content and load game social posts
+        const socialContainer = document.getElementById('social-feed-container');
+        if (socialContainer) {
+            socialContainer.innerHTML = `
+                <div style="padding:16px;color:white;background:#0066cc;min-height:100vh;display:flex;align-items:center;justify-content:center;">
+                    <div style="text-align:center;">
+                        Loading game social posts...<br/>gameId: ${gameId}
+                    </div>
+                </div>
+            `;
+            if (window.loadGameContent) {
+                window.loadGameContent(gameId, 'social', socialContainer);
+            } else {
+                console.error('[handleGameClick] loadGameContent not available yet');
+            }
+        }
+        
+        // Clear Media column content and load game videos
+        const videosContent = document.getElementById('videos-content');
+        if (videosContent) {
+            // Restore structure if needed
+            if (!document.getElementById('dynamicVideosContent')) {
+                videosContent.innerHTML = `
+                    <div id="videosWrapper">
+                        <div id="videosLoading" class="loading-indicator hidden">
+                            <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="loading-text">Loading videos...</p>
+                        </div>
+                        <div id="videosErrorMessage" class="error-message hidden" role="alert">
+                            <strong>Error!</strong>
+                            <span id="videosErrorText"></span>
+                        </div>
+                        <div id="dynamicVideosContent"></div>
+                    </div>
+                `;
+            }
+            const dynamicVideosContent = document.getElementById('dynamicVideosContent');
+            if (dynamicVideosContent) {
+                dynamicVideosContent.innerHTML = `
+                    <div style="padding:16px;color:white;background:#008000;min-height:100vh;display:flex;align-items:center;justify-content:center;">
+                        <div style="text-align:center;">
+                            Loading game videos...<br/>gameId: ${gameId}
+                        </div>
+                    </div>
+                `;
+                if (window.loadGameContent) {
+                    window.loadGameContent(gameId, 'media', dynamicVideosContent);
+                } else {
+                    console.error('[handleGameClick] loadGameContent not available yet');
+                }
+            }
+        }
+        
+        // Render game news
+        if (window.renderNews) {
+            console.log('[handleGameClick] Calling renderNews');
+            window.renderNews(gameId, 'game');
+        } else {
+            console.error('[handleGameClick] window.renderNews not found! Creating placeholder directly...');
+            // Fallback: create game placeholder directly if renderNews isn't ready
+            const newsContainer = document.querySelector('.column.news');
+            if (newsContainer) {
+                const newsFeed = document.createElement('div');
+                newsFeed.className = 'news-feed';
+                newsFeed.innerHTML = `
+                    <div style="padding:16px;color:white;background:#8b0000;min-height:100vh;display:flex;align-items:center;justify-content:center;">
+                        <div style="text-align:center;">
+                            GAME NEWS MODE<br/>gameId: ${gameId}
+                        </div>
+                    </div>
+                `;
+                newsContainer.appendChild(newsFeed);
+            }
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
+        // --- UNIFIED RENDER NEWS FUNCTION ---
+        function renderNews(selectedId, type) {
+            const newsContainer = document.querySelector('.column.news');
+            if (!newsContainer) return;
+
+            // Remove any previous .news-feed child (but do not replace container or headers)
+            const existingFeed = newsContainer.querySelector('.news-feed');
+            if (existingFeed) {
+                existingFeed.remove();
+            }
+
+            // Create new .news-feed div
+            const newsFeed = document.createElement('div');
+            newsFeed.className = 'news-feed';
+
+            if (type === 'league') {
+                // League mode: use existing league rendering logic (ready for future Firestore league news)
+                const section = selectedId || 'Home';
+                document.querySelectorAll(".news .content-section").forEach(s => s.style.display = "none");
+                const news = document.getElementById("news-" + section);
+                if (news) {
+                    news.style.display = "block";
+                    const newsSubMenu = document.getElementById("newsSubMenu");
+                    if (newsSubMenu) newsSubMenu.style.display = section === "Home" ? "flex" : "none";
+                    const container = document.querySelector(".news");
+                    if (container) container.scrollTop = 0;
+                    
+                    setTimeout(() => {
+                        loadHeadlinesAndBreakingFeeds(section);
+                    }, 50);
+                }
+                // Append .news-feed for consistency (architecture ready for Firestore)
+                newsContainer.appendChild(newsFeed);
+            } else if (type === 'game') {
+                // Game mode: load and display game-specific news from Firestore
+                newsFeed.innerHTML = `
+                    <div style="padding:16px;color:white;background:#8b0000;min-height:100vh;display:flex;align-items:center;justify-content:center;">
+                        <div style="text-align:center;">
+                            Loading game news...<br/>gameId: ${selectedId}
+                        </div>
+                    </div>
+                `;
+                newsContainer.appendChild(newsFeed);
+                // Load game content from Firestore
+                if (window.loadGameContent) {
+                    window.loadGameContent(selectedId, 'news', newsFeed);
+                } else {
+                    console.error('[renderNews] loadGameContent not available');
+                }
+            }
+        }
+
+        // Make renderNews globally accessible
+        window.renderNews = renderNews;
+        
+        console.log('[DOMContentLoaded] renderNews assigned to window.renderNews');
+        
+        // --- GAME CONTENT LOADING FUNCTION ---
+        /**
+         * Load game-specific content (news/social/media) from Firestore based on keywords
+         * @param {string} gameId - The game ID from sportsGames collection
+         * @param {string} contentType - 'news', 'social', or 'media'
+         * @param {HTMLElement} container - DOM element to render content into
+         */
+        async function loadGameContent(gameId, contentType, container) {
+            try {
+                // Ensure Firebase is initialized
+                if (!firebase.apps.length) {
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyD3bw8d4q2oO2qpbgGiUG6Qnlf4aABK3Bc",
+                        authDomain: "flashlive-daily-scraper.firebaseapp.com",
+                        projectId: "flashlive-daily-scraper",
+                        storageBucket: "flashlive-daily-scraper.appspot.com",
+                        messagingSenderId: "124291936014",
+                        appId: "1:124291936014:web:acadcaa791d6046849315f"
+                    };
+                    firebase.initializeApp(firebaseConfig);
+                }
+                const db = firebase.firestore();
+                
+                // 1. Fetch game document to get teams and league
+                const gameDocRef = db.collection("artifacts/flashlive-daily-scraper/public/data/sportsGames").doc(gameId);
+                const gameDoc = await gameDocRef.get();
+                
+                if (!gameDoc.exists) {
+                    container.innerHTML = `<div style="padding: 20px; color: #ff6b6b;">Game not found: ${gameId}</div>`;
+                    return;
+                }
+                
+                const gameData = gameDoc.data();
+                const homeTeam = gameData['Home Team'] || '';
+                const awayTeam = gameData['Away Team'] || '';
+                const league = gameData['League'] || '';
+                
+                if (!homeTeam || !awayTeam) {
+                    container.innerHTML = `
+                        <div style="padding: 20px; color: #ffa500;">
+                            Game document missing team information (Home Team or Away Team).<br/>
+                            <small>Game ID: ${gameId}</small>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // 2. Extract league name from League field (e.g., "USA: NHL" -> "NHL")
+                let leagueName = league;
+                if (league.includes(':')) {
+                    leagueName = league.split(':').pop().trim();
+                }
+                
+                // Also check Sport field as fallback
+                if (!leagueName || leagueName === '') {
+                    const sport = gameData['Sport'] || '';
+                    // Map sport to league if needed
+                    const sportToLeague = {
+                        'Ice Hockey': 'NHL',
+                        'American Football': 'NFL',
+                        'Basketball': 'NBA',
+                        'Baseball': 'MLB'
+                    };
+                    leagueName = sportToLeague[sport] || sport;
+                }
+                
+                console.log(`[loadGameContent] Game: ${awayTeam} vs ${homeTeam} (${leagueName})`);
+                
+                // For social content, bypass Perspectives and directly render team RSS feeds
+                if (contentType === 'social') {
+                    console.log(`[loadGameContent] Rendering social team tabs for ${awayTeam} vs ${homeTeam}`);
+                    try {
+                        renderSocialWithTeamTabs(homeTeam, awayTeam, container);
+                    } catch (error) {
+                        console.error('[loadGameContent] Error in renderSocialWithTeamTabs:', error);
+                        container.innerHTML = `
+                            <div style="padding: 20px; color: #ff6b6b;">
+                                Error rendering social tabs: ${error.message}<br/>
+                                <small>Check console for details</small>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+                
+                // For news and media, use Perspectives data from game document (written by pipeline)
+                container.innerHTML = `<div style="padding: 20px; color: #888;">Loading ${contentType} content...</div>`;
+                
+                const perspectives = gameData.perspectives || {};
+                const contentTypeKey = contentType === 'media' ? 'videos' : contentType;
+                
+                if (!perspectives[contentTypeKey] || !Array.isArray(perspectives[contentTypeKey]) || perspectives[contentTypeKey].length === 0) {
+                    container.innerHTML = `
+                        <div style="padding: 20px; color: #ffa500;">
+                            No ${contentType} content found for this game.<br/>
+                            <small>The Perspectives pipeline may not have run yet.<br/>
+                            Run it via: <code>POST /perspectives/runPipeline</code> endpoint</small><br/>
+                            <small>Game ID: ${gameId}</small>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Use Perspectives data (already matched by pipeline)
+                console.log(`[loadGameContent] Using Perspectives data: ${perspectives[contentTypeKey].length} items`);
+                let matchingItems = perspectives[contentTypeKey];
+                
+                // Sort by date (most recent first)
+                matchingItems.sort((a, b) => {
+                    const dateA = a.publishedAt ? (typeof a.publishedAt === 'string' ? new Date(a.publishedAt) : (a.publishedAt.toDate ? a.publishedAt.toDate() : new Date(a.publishedAt))) : new Date(0);
+                    const dateB = b.publishedAt ? (typeof b.publishedAt === 'string' ? new Date(b.publishedAt) : (b.publishedAt.toDate ? b.publishedAt.toDate() : new Date(b.publishedAt))) : new Date(0);
+                    return dateB - dateA;
+                });
+                
+                // Render the results
+                if (contentType === 'news') {
+                    renderNewsItems(matchingItems, container);
+                } else if (contentType === 'media') {
+                    renderMediaItems(matchingItems, container);
+                }
+                
+            } catch (error) {
+                console.error(`[loadGameContent] Error loading ${contentType} for game ${gameId}:`, error);
+                container.innerHTML = `
+                    <div style="padding: 20px; color: #ff6b6b;">
+                        Error loading ${contentType}: ${error.message}<br/>
+                        <small>Check console for details</small>
+                    </div>
+                `;
+            }
+        }
+        
+        // Helper function to render news items
+        function renderNewsItems(items, container) {
+            container.innerHTML = `
+                <div style="padding: 10px; background: #1a1a1a; min-height: 100vh;">
+                    ${items.map(item => `
+                        <div style="padding: 15px; margin-bottom: 10px; background: #2a2a2a; border-left: 3px solid #8b0000; cursor: pointer;" 
+                             onclick="window.open('${item.link || '#'}', '_blank')">
+                            <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 14px; font-weight: bold;">
+                                ${item.title || 'Untitled'}
+                            </h3>
+                            <p style="margin: 0 0 8px 0; color: #ccc; font-size: 12px; line-height: 1.4;">
+                                ${item.description ? item.description.substring(0, 150) + '...' : ''}
+                            </p>
+                            <div style="font-size: 10px; color: #888;">
+                                ${item.source ? `<span>Source: ${item.source}</span> | ` : ''}
+                                ${item.publishedAt ? `<span>${formatDate(item.publishedAt)}</span>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        // Helper function to render social items
+        function renderSocialItems(items, container) {
+            container.innerHTML = `
+                <div style="padding: 10px; background: #1a1a1a; min-height: 100vh;">
+                    ${items.map(item => `
+                        <div style="padding: 15px; margin-bottom: 10px; background: #2a2a2a; border-left: 3px solid #0066cc; cursor: pointer;" 
+                             onclick="window.open('${item.link || item.url || '#'}', '_blank')">
+                            <div style="margin-bottom: 8px;">
+                                ${item.platform ? `<span style="color: #0066cc; font-size: 11px; font-weight: bold;">${item.platform.toUpperCase()}</span>` : ''}
+                            </div>
+                            <p style="margin: 0 0 8px 0; color: #ccc; font-size: 12px; line-height: 1.4;">
+                                ${item.title || item.text || item.description || 'Social post'}
+                            </p>
+                            ${item.image ? `<img src="${item.image}" style="max-width: 100%; margin-top: 8px; border-radius: 4px;" />` : ''}
+                            <div style="font-size: 10px; color: #888; margin-top: 8px;">
+                                ${item.publishedAt ? `<span>${formatDate(item.publishedAt)}</span>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        // Helper function to render media/video items
+        function renderMediaItems(items, container) {
+            container.innerHTML = `
+                <div style="padding: 10px; background: #1a1a1a; min-height: 100vh;">
+                    ${items.map(item => {
+                        const videoId = extractVideoId(item.link || item.url || '');
+                        const thumbnail = item.thumbnail || item.image || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '');
+                        
+                        return `
+                            <div style="padding: 15px; margin-bottom: 15px; background: #2a2a2a; border-left: 3px solid #008000; cursor: pointer;" 
+                                 onclick="window.open('${item.link || item.url || '#'}', '_blank')">
+                                ${thumbnail ? `
+                                    <div style="margin-bottom: 10px;">
+                                        <img src="${thumbnail}" style="width: 100%; border-radius: 4px;" />
+                                    </div>
+                                ` : ''}
+                                <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 14px; font-weight: bold;">
+                                    ${item.title || 'Untitled Video'}
+                                </h3>
+                                <p style="margin: 0 0 8px 0; color: #ccc; font-size: 12px; line-height: 1.4;">
+                                    ${item.description ? item.description.substring(0, 150) + '...' : ''}
+                                </p>
+                                <div style="font-size: 10px; color: #888;">
+                                    ${item.source ? `<span>Source: ${item.source}</span> | ` : ''}
+                                    ${item.publishedAt ? `<span>${formatDate(item.publishedAt)}</span>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+        
+        // Map team names to RSS feed URLs
+        // Use backend proxy to avoid CORS issues
+        const RSS_FEED_SERVICE_URL = 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app';
+        const TEAM_TO_RSS_FEED = {
+            'Buffalo Sabres': RSS_FEED_SERVICE_URL + '/proxy/json-feed?url=' + encodeURIComponent('https://rss-bridge.org/bridge01/?action=display&bridge=MastodonBridge&canusername=%40BuffaloSabres%40sportsbots.xyz&signaturetype=noquery&format=Json'),
+            'Columbus Blue Jackets': null, // No feed yet - will show blank
+            // Add more team mappings as needed
+        };
+        
+        console.log('[TEAM_TO_RSS_FEED] Buffalo Sabres feed URL:', TEAM_TO_RSS_FEED['Buffalo Sabres']);
+        
+        // Get short team name for display (e.g., "Buffalo Sabres" -> "Sabres")
+        function getShortTeamName(fullTeamName) {
+            const TEAM_SHORT_NAMES = {
+                "Boston Bruins": "Bruins",
+                "Buffalo Sabres": "Sabres",
+                "Calgary Flames": "Flames",
+                "Carolina Hurricanes": "Hurricanes",
+                "Chicago Blackhawks": "Blackhawks",
+                "Colorado Avalanche": "Avalanche",
+                "Columbus Blue Jackets": "Blue Jackets",
+                "Dallas Stars": "Stars",
+                "Detroit Red Wings": "Red Wings",
+                "Edmonton Oilers": "Oilers",
+                "Florida Panthers": "Panthers",
+                "Los Angeles Kings": "Kings",
+                "Minnesota Wild": "Wild",
+                "Montreal Canadiens": "Canadiens",
+                "Nashville Predators": "Predators",
+                "New Jersey Devils": "Devils",
+                "New York Islanders": "Islanders",
+                "New York Rangers": "Rangers",
+                "Ottawa Senators": "Senators",
+                "Philadelphia Flyers": "Flyers",
+                "Pittsburgh Penguins": "Penguins",
+                "San Jose Sharks": "Sharks",
+                "Seattle Kraken": "Kraken",
+                "St. Louis Blues": "Blues",
+                "Tampa Bay Lightning": "Lightning",
+                "Toronto Maple Leafs": "Maple Leafs",
+                "Utah Mammoth": "Mammoth",
+                "Vancouver Canucks": "Canucks",
+                "Vegas Golden Knights": "Golden Knights",
+                "Washington Capitals": "Capitals",
+                "Winnipeg Jets": "Jets"
+            };
+            return TEAM_SHORT_NAMES[fullTeamName] || fullTeamName;
+        }
+        
+        // Helper function to render social with team tabs
+        function renderSocialWithTeamTabs(homeTeam, awayTeam, container) {
+            console.log('[renderSocialWithTeamTabs] Called with:', { homeTeam, awayTeam, container });
+            
+            if (!container) {
+                console.error('[renderSocialWithTeamTabs] Container is null/undefined!');
+                return;
+            }
+            
+            const homeShort = getShortTeamName(homeTeam);
+            const awayShort = getShortTeamName(awayTeam);
+            const homeFeedUrl = TEAM_TO_RSS_FEED[homeTeam];
+            const awayFeedUrl = TEAM_TO_RSS_FEED[awayTeam];
+            
+            console.log('[renderSocialWithTeamTabs] Feed URLs:', { homeFeedUrl, awayFeedUrl, homeShort, awayShort });
+            
+            // Build tabs array - always include both teams, even if no feed yet
+            const tabs = [
+                {
+                    name: awayShort,
+                    feedUrl: awayFeedUrl,
+                    team: awayTeam
+                },
+                {
+                    name: homeShort,
+                    feedUrl: homeFeedUrl,
+                    team: homeTeam
+                }
+            ];
+            
+            // Generate unique IDs for tabs and content areas
+            const tabIds = tabs.map((_, i) => `social-tab-content-${i}`);
+            const uniqueId = `social-${Date.now()}`;
+            
+            // Build tabs HTML
+            const tabsHTML = tabs.map((tab, i) => `
+                <button 
+                    class="social-team-tab" 
+                    data-tab-index="${i}"
+                    data-feed-url="${tab.feedUrl || ''}"
+                    data-team="${tab.team}"
+                    data-unique-id="${uniqueId}"
+                    onclick="window.switchSocialTeamTab(${i}, '${uniqueId}')"
+                    style="
+                        padding: 8px 16px;
+                        margin-right: 8px;
+                        background: ${i === 0 ? '#0066cc' : '#333'};
+                        color: white;
+                        border: none;
+                        border-radius: 4px 4px 0 0;
+                        cursor: pointer;
+                        font-size: 14px;
+                        font-weight: ${i === 0 ? 'bold' : 'normal'};
+                    "
+                >
+                    ${tab.name}
+                </button>
+            `).join('');
+            
+            // Build content areas HTML (loading state initially)
+            const contentHTML = tabs.map((tab, i) => `
+                <div 
+                    id="${tabIds[i]}" 
+                    class="social-team-content" 
+                    data-unique-id="${uniqueId}"
+                    style="display: ${i === 0 ? 'block' : 'none'}; height: calc(100vh - 120px); overflow-y: auto; background: #1a1a1a; padding: 10px;"
+                >
+                    <div style="padding: 20px; text-align: center; color: #888;">
+                        Loading ${tab.name} feed...
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; height: 100vh;">
+                    <div style="
+                        display: flex;
+                        padding: 10px 10px 0 10px;
+                        background: #1a1a1a;
+                        border-bottom: 2px solid #333;
+                        flex-shrink: 0;
+                    ">
+                        ${tabsHTML}
+                    </div>
+                    <div style="flex: 1; overflow: hidden; background: #1a1a1a;">
+                        ${contentHTML}
+                    </div>
+                </div>
+            `;
+            
+            // Load the first tab's feed immediately
+            if (tabs[0].feedUrl) {
+                loadTeamRSSFeed(tabs[0].feedUrl, tabIds[0], tabs[0].name);
+            } else {
+                const firstContent = document.getElementById(tabIds[0]);
+                if (firstContent) {
+                    firstContent.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #888;">
+                            No RSS feed configured for ${tabs[0].name} yet.
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Function to load and display RSS feed (JSON Feed format)
+        async function loadTeamRSSFeed(feedUrl, contentElementId, teamName) {
+            const contentElement = document.getElementById(contentElementId);
+            if (!contentElement) return;
+            
+            try {
+                // Show loading state
+                contentElement.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #888;">
+                        Loading ${teamName} feed...
+                    </div>
+                `;
+                
+                const response = await fetch(feedUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const feedData = await response.json();
+                
+                // Check if it's a JSON Feed format
+                if (!feedData.items || !Array.isArray(feedData.items)) {
+                    throw new Error('Invalid feed format - expected JSON Feed with items array');
+                }
+                
+                const items = feedData.items;
+                
+                if (items.length === 0) {
+                    contentElement.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #888;">
+                            No posts found for ${teamName}.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Render feed items
+                const itemsHTML = items.map(item => {
+                    // Extract plain text from HTML content if needed
+                    const textContent = item.content_html 
+                        ? item.content_html.replace(/<[^>]*>/g, '').substring(0, 200)
+                        : item.title || '';
+                    
+                    // Extract image URL if present in content_html
+                    const imageMatch = item.content_html ? item.content_html.match(/<img[^>]+src="([^"]+)"/) : null;
+                    const imageUrl = imageMatch ? imageMatch[1] : null;
+                    
+                    // Check if this is a Twitter/X status URL (may contain video)
+                    const isTwitterStatus = item.url && (item.url.includes('x.com/') || item.url.includes('twitter.com/')) && item.url.includes('/status/');
+                    const twitterStatusId = isTwitterStatus ? item.url.match(/\/(\d+)$/)?.[1] || item.url.match(/\/status\/(\d+)/)?.[1] : null;
+                    
+                    // Extract video content (video tags, iframes, or video URLs)
+                    let videoContent = null;
+                    let videoLink = null;
+                    if (item.content_html) {
+                        // Check for video tags (including self-closing and with attributes)
+                        const videoTagMatch = item.content_html.match(/<video[^>]*(?:>.*?<\/video>|>)/is);
+                        if (videoTagMatch) {
+                            // Preserve the full video tag with all attributes
+                            videoContent = videoTagMatch[0];
+                        } else {
+                            // Check for iframes (YouTube, Vimeo, etc.)
+                            const iframeMatch = item.content_html.match(/<iframe[^>]*src="([^"]+)"[^>]*>.*?<\/iframe>/i);
+                            if (iframeMatch) {
+                                const iframeSrc = iframeMatch[1];
+                                // Extract YouTube video ID if it's a YouTube URL
+                                const youtubeMatch = iframeSrc.match(/(?:youtube\.com\/embed\/|youtu\.be\/|youtube\.com\/watch\?v=)([^&\s]+)/);
+                                if (youtubeMatch) {
+                                    const videoId = youtubeMatch[1];
+                                    videoContent = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 4px; max-width: 100%;"></iframe>`;
+                                } else {
+                                    // Use the iframe as-is
+                                    videoContent = iframeMatch[0];
+                                }
+                            } else {
+                                // Check for X.com/Twitter broadcast links
+                                const broadcastMatch = item.content_html.match(/https?:\/\/(?:x\.com|twitter\.com)\/i\/broadcasts\/([^\s"<>]+)/i);
+                                if (broadcastMatch) {
+                                    const broadcastId = broadcastMatch[1];
+                                    videoLink = `https://x.com/i/broadcasts/${broadcastId}`;
+                                    videoContent = `
+                                        <div style="margin: 10px 0; padding: 15px; background: #1a1a1a; border-radius: 4px; border: 1px solid #0066cc;">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <span style="font-size: 24px;">▶️</span>
+                                                <div style="flex: 1;">
+                                                    <div style="color: #fff; font-weight: bold; margin-bottom: 4px;">Live Broadcast</div>
+                                                    <a href="${videoLink}" target="_blank" style="color: #0066cc; text-decoration: none; font-size: 12px;">Watch on X.com →</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                } else {
+                                    // Check for direct video URLs
+                                    const videoUrlMatch = item.content_html.match(/(https?:\/\/[^\s"<>]+\.(mp4|webm|ogg|mov|avi|wmv|flv|mkv))/i);
+                                    if (videoUrlMatch) {
+                                        const videoUrl = videoUrlMatch[1];
+                                        videoContent = `<video controls style="width: 100%; max-width: 100%; border-radius: 4px;" src="${videoUrl}"></video>`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // If it's a Twitter/X status and no video content found, try to embed it or create a video preview
+                    // Convert Mastodon/sportsbots.xyz URLs to X.com URLs for embedding
+                    if (isTwitterStatus && !videoContent) {
+                        videoLink = item.url;
+                        
+                        // Try to convert to X.com URL if it's a sportsbots.xyz URL
+                        let xComUrl = item.url;
+                        if (item.url.includes('sportsbots.xyz') && twitterStatusId) {
+                            // Extract the username from sportsbots URL
+                            const usernameMatch = item.url.match(/users\/([^\/]+)/);
+                            if (usernameMatch) {
+                                const username = usernameMatch[1].replace('@sportsbots.xyz', '');
+                                xComUrl = `https://x.com/${username}/status/${twitterStatusId}`;
+                            }
+                        }
+                        
+                        // Create an embedded tweet preview using Twitter's widget
+                        // Note: Twitter widgets require loading their script, but we can create a clickable preview
+                        videoContent = `
+                            <div style="margin: 10px 0; position: relative; cursor: pointer; border-radius: 8px; overflow: hidden; background: #000; max-width: 100%;" onclick="window.open('${xComUrl}', '_blank')">
+                                <div style="position: relative; width: 100%; padding-bottom: 56.25%; background: linear-gradient(135deg, #1DA1F2 0%, #0d8bd9 100%);">
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #fff;">
+                                        <div style="font-size: 48px; margin-bottom: 10px;">▶️</div>
+                                        <div style="font-size: 14px; font-weight: bold;">Watch Video</div>
+                                        <div style="font-size: 11px; margin-top: 5px; opacity: 0.9;">Click to open on X.com</div>
+                                    </div>
+                                    ${imageUrl ? `
+                                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('${imageUrl}'); background-size: cover; background-position: center; opacity: 0.3;"></div>
+                                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(29, 161, 242, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px;">▶</div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    const publishedDate = item.date_modified || item.date_published || '';
+                    const formattedDate = publishedDate ? new Date(publishedDate).toLocaleString() : '';
+                    
+                    return `
+                        <div style="padding: 15px; margin-bottom: 10px; background: #2a2a2a; border-left: 3px solid #0066cc; ${videoLink ? '' : 'cursor: pointer;'}" 
+                             ${videoLink ? '' : `onclick="window.open('${item.url || '#'}', '_blank')"`}>
+                            <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 14px; font-weight: bold;">
+                                ${item.title || 'Social post'}
+                            </h3>
+                            ${videoContent ? `
+                                <div style="margin: 10px 0;">
+                                    ${videoContent}
+                                </div>
+                            ` : imageUrl ? `
+                                <div style="margin: 10px 0; position: relative; cursor: ${isTwitterStatus ? 'pointer' : 'default'};" ${isTwitterStatus ? `onclick="window.open('${item.url}', '_blank')"` : ''}>
+                                    <img src="${imageUrl}" style="max-width: 100%; border-radius: 4px; display: block;" onerror="this.style.display='none';" />
+                                    ${isTwitterStatus ? `
+                                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;">
+                                            <div style="background: rgba(29, 161, 242, 0.9); border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                                                <span style="font-size: 32px; color: #fff; margin-left: 4px;">▶</span>
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                            <p style="margin: 0 0 8px 0; color: #ccc; font-size: 12px; line-height: 1.4;">
+                                ${textContent}${textContent.length >= 200 ? '...' : ''}
+                            </p>
+                            <div style="font-size: 10px; color: #888; margin-top: 8px;">
+                                ${formattedDate ? `<span>${formattedDate}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                contentElement.innerHTML = `
+                    <div style="padding: 10px; background: #1a1a1a; min-height: 100vh;">
+                        ${itemsHTML}
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error(`Error loading RSS feed for ${teamName}:`, error);
+                contentElement.innerHTML = `
+                    <div style="padding: 20px; color: #ff6b6b;">
+                        Error loading ${teamName} feed: ${error.message}<br/>
+                        <small>Feed URL: ${feedUrl}</small>
+                    </div>
+                `;
+            }
+        }
+        
+        // Global function to switch between team tabs
+        window.switchSocialTeamTab = function(activeIndex, uniqueId) {
+            // Find the container by searching for the unique ID
+            const allTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${uniqueId}"]`);
+            const allContents = document.querySelectorAll(`.social-team-content[data-unique-id="${uniqueId}"]`);
+            
+            if (allTabs.length === 0 || allContents.length === 0) return;
+            
+            // Get the active tab data
+            const activeTab = allTabs[activeIndex];
+            if (!activeTab) return;
+            
+            const feedUrl = activeTab.getAttribute('data-feed-url');
+            const teamName = activeTab.getAttribute('data-team');
+            const contentElementId = allContents[activeIndex].id;
+            
+            // Update tab styling
+            allTabs.forEach((tab, i) => {
+                const isActive = i === activeIndex;
+                tab.style.background = isActive ? '#0066cc' : '#333';
+                tab.style.fontWeight = isActive ? 'bold' : 'normal';
+            });
+            
+            // Update content visibility
+            allContents.forEach((content, i) => {
+                const isActive = i === activeIndex;
+                content.style.display = isActive ? 'block' : 'none';
+                
+                // Load feed if this tab is being activated and has a feed URL
+                if (isActive && feedUrl) {
+                    // Check if content is already loaded (has more than just loading message)
+                    const currentContent = content.innerHTML.trim();
+                    if (currentContent.includes('Loading') || currentContent.includes('No RSS feed')) {
+                        loadTeamRSSFeed(feedUrl, contentElementId, teamName);
+                    }
+                } else if (isActive && !feedUrl) {
+                    // Show "no feed" message if tab has no feed URL
+                    content.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #888;">
+                            No RSS feed configured for ${teamName} yet.
+                        </div>
+                    `;
+                }
+            });
+        };
+        
+        // Helper function to format dates
+        function formatDate(dateObj) {
+            if (!dateObj) return '';
+            
+            let date;
+            if (dateObj.toDate) {
+                date = dateObj.toDate();
+            } else if (dateObj instanceof Date) {
+                date = dateObj;
+            } else {
+                date = new Date(dateObj);
+            }
+            
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+        
+        // Helper function to extract YouTube video ID
+        function extractVideoId(url) {
+            if (!url) return null;
+            const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            return match ? match[1] : null;
+        }
+        
+        // Make loadGameContent globally accessible
+        window.loadGameContent = loadGameContent;
+
         // --- NEW: FALLBACK URLs FOR THE HOME PAGE ---
         const HOME_PAGE_FEEDS = {
             breaking: "https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/home-breaking.xml",
@@ -4626,6 +5415,7 @@ function loadCustomRSSFeed(feedUrl, container) {
         // --- Initial Feed Loads for Home Page (Headlines) ---
         const feedMap = {
             espn: "https://www.espn.com/espn/rss/news",
+            br: "https://rss.app/feeds/pWbrNkGvyfWqnMwn.xml",
             cbs: "https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/cbs-headlines-rss.xml",
             yahoo: "https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/yahoo-sports-rss.xml",
             fox: "https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/foxsports-home-api.xml"
@@ -4741,19 +5531,43 @@ function loadCustomRSSFeed(feedUrl, container) {
                     updateStandingsTabText(section);
                 }
 
-                document.querySelectorAll(".news .content-section, #social-feed-container .content-section").forEach(s => s.style.display = "none");
+                // --- RENDER NEWS FOR LEAGUE (ALWAYS reset regardless of previous game selection) ---
+                renderNews(section, 'league');
 
-                const news = document.getElementById("news-" + section);
-                const social = document.getElementById("social-" + section);
-                if (news) {
-                    news.style.display = "block";
-                    const newsSubMenu = document.getElementById("newsSubMenu");
-                    if (newsSubMenu) newsSubMenu.style.display = section === "Home" ? "flex" : "none";
-                    const container = document.querySelector(".news");
-                    if (container) container.scrollTop = 0;
-                    loadHeadlinesAndBreakingFeeds(section);
+                // Social column - reset to league content (ALWAYS, regardless of previous game selection)
+                // Clear the container first to remove any game placeholder, then load league feed
+                const socialContainer = document.getElementById('social-feed-container');
+                if (socialContainer) {
+                    socialContainer.innerHTML = '';
                 }
-                if (social) social.style.display = "block";
+                // Force reload by resetting currentFeedSection if it exists
+                if (typeof currentFeedSection !== 'undefined') {
+                    currentFeedSection = null;
+                }
+                loadSocialFeed(section);
+                
+                // Media column - reset to league content (ALWAYS, regardless of previous game selection)
+                // Restore videos-content structure if it was destroyed by game placeholder
+                const videosContent = document.getElementById('videos-content');
+                if (videosContent && !document.getElementById('dynamicVideosContent')) {
+                    videosContent.innerHTML = `
+                        <div id="videosWrapper">
+                            <div id="videosLoading" class="loading-indicator hidden">
+                                <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p class="loading-text">Loading videos...</p>
+                            </div>
+                            <div id="videosErrorMessage" class="error-message hidden" role="alert">
+                                <strong>Error!</strong>
+                                <span id="videosErrorText"></span>
+                            </div>
+                            <div id="dynamicVideosContent"></div>
+                        </div>
+                    `;
+                }
+                initializeVideosColumn(section);
             });
         });
 
@@ -4913,9 +5727,9 @@ function loadCustomRSSFeed(feedUrl, container) {
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // ── A) Grab all four tab elements and define their order ──
+    // ── A) Grab all tab elements and define their order ──
     const tabs    = Array.from(document.querySelectorAll(".headlines-tab"));
-    const sources = ["espn", "cbs", "yahoo", "fox"];
+    const sources = ["espn", "br", "cbs", "yahoo", "fox"];
 
     // ── B) Keep track of which feeds already have a scroll listener ──
     const scrollListeners = {};
@@ -9003,7 +9817,8 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         // Scottish Premiership
         ScottishPremiership: {
-            "Dundee United": "Dundee",
+            "Dundee United": "Dundee Utd",
+            "Dundee": "Dundee FC",
             "Heart of Midlothian": "Hearts"
         },
         // England: National League
@@ -11537,6 +12352,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (row2) {
                         row2.dataset.matchStatus = matchStatusValue;
                     }
+
+                    // Add click handlers for game selection (News column only)
+                    const gameId = data["Game ID"] || data.gameId || data["GameID"] || null;
+                    if (gameId) {
+                        const gameIdString = String(gameId);
+                        row1.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}')`);
+                        row2.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}')`);
+                        row1.style.cursor = 'pointer';
+                        row2.style.cursor = 'pointer';
+                    }
                     
                 // Add separator line between games (but not after the last game in the same table)
                 if (i < sortedFeaturedGames.length - 1) {
@@ -12011,6 +12836,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 if (row2) {
                     row2.dataset.matchStatus = matchStatusValue;
+                }
+
+                // Add click handlers for game selection (News column only)
+                const gameId = data["Game ID"] || data.gameId || data["GameID"] || null;
+                if (gameId) {
+                    const gameIdString = String(gameId);
+                    row1.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}')`);
+                    row2.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}')`);
+                    row1.style.cursor = 'pointer';
+                    row2.style.cursor = 'pointer';
                 }
                 
                 // Add separator line between games (but not after the last game)
