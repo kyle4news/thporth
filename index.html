@@ -330,6 +330,42 @@ table.game-table td:nth-child(1) {
     color: white;
 }
 
+/* Social team tabs - matching videos-tab styling exactly */
+.social-team-tab {
+    flex: 1;
+    background-color: #2a2a2a;
+    border: none;
+    color: #5f5f5f;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.social-team-tab:hover {
+    background-color: #2a2a2a;
+    color: #5f5f5f;
+}
+
+.social-team-tab.active {
+    background-color: #3c3c3c;
+    color: white;
+}
+
+/* Social team tabs container - matching videos-tabs container */
+.social-team-tabs {
+    height: 18px;
+    background-color: #2a2a2a;
+    display: flex;
+    margin-top: 1px;
+    border-top: 1px solid #1a1a1a;
+}
+
         .videos-content {
             flex: 1;
             padding: 0;
@@ -3663,7 +3699,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="column social" style="padding: 0; margin: 0;">
         <div
           id="socialHeader"
-          style="position: sticky; top: 0; width: 100%; height: 18px; background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif; font-size: 10px; display: flex; align-items: center; padding-left: 10px; z-index: 11;"
+          style="position: sticky; top: 0; width: 100%; height: 18px; background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif; font-size: 10px; display: flex; align-items: center; padding-left: 10px; z-index: 11; border: none; outline: none; box-shadow: none;"
         ><strong>Social</strong>
         </div>
         <!-- Single dynamic container for social feeds -->
@@ -4905,11 +4941,11 @@ function loadCustomRSSFeed(feedUrl, container) {
             `;
         }
         
-        // Map team names to RSS feed URLs
-        // Use backend proxy to avoid CORS issues
+        // Map team names to Nitter URLs or RSS feed URLs
+        // Use Nitter for direct embedding, or RSS feeds for parsed content
         const RSS_FEED_SERVICE_URL = 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app';
         const TEAM_TO_RSS_FEED = {
-            'Buffalo Sabres': RSS_FEED_SERVICE_URL + '/proxy/json-feed?url=' + encodeURIComponent('https://rss-bridge.org/bridge01/?action=display&bridge=MastodonBridge&canusername=%40BuffaloSabres%40sportsbots.xyz&signaturetype=noquery&format=Json'),
+            'Buffalo Sabres': 'https://nitter.net/BuffaloSabres', // Embed Nitter directly
             'Columbus Blue Jackets': null, // No feed yet - will show blank
             // Add more team mappings as needed
         };
@@ -4975,12 +5011,14 @@ function loadCustomRSSFeed(feedUrl, container) {
                 {
                     name: awayShort,
                     feedUrl: awayFeedUrl,
-                    team: awayTeam
+                    team: awayTeam,
+                    originalUrl: awayFeedUrl // Store original URL for reset
                 },
                 {
                     name: homeShort,
                     feedUrl: homeFeedUrl,
-                    team: homeTeam
+                    team: homeTeam,
+                    originalUrl: homeFeedUrl // Store original URL for reset
                 }
             ];
             
@@ -4990,27 +5028,17 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             // Build tabs HTML
             const tabsHTML = tabs.map((tab, i) => `
-                <button 
-                    class="social-team-tab" 
+                <div 
+                    class="social-team-tab ${i === 0 ? 'active' : ''}" 
                     data-tab-index="${i}"
                     data-feed-url="${tab.feedUrl || ''}"
+                    data-original-url="${tab.originalUrl || ''}"
                     data-team="${tab.team}"
                     data-unique-id="${uniqueId}"
                     onclick="window.switchSocialTeamTab(${i}, '${uniqueId}')"
-                    style="
-                        padding: 8px 16px;
-                        margin-right: 8px;
-                        background: ${i === 0 ? '#0066cc' : '#333'};
-                        color: white;
-                        border: none;
-                        border-radius: 4px 4px 0 0;
-                        cursor: pointer;
-                        font-size: 14px;
-                        font-weight: ${i === 0 ? 'bold' : 'normal'};
-                    "
                 >
-                    ${tab.name}
-                </button>
+                    ${tab.name.toUpperCase()}
+                </div>
             `).join('');
             
             // Build content areas HTML (loading state initially)
@@ -5029,13 +5057,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             container.innerHTML = `
                 <div style="display: flex; flex-direction: column; height: 100vh;">
-                    <div style="
-                        display: flex;
-                        padding: 10px 10px 0 10px;
-                        background: #1a1a1a;
-                        border-bottom: 2px solid #333;
-                        flex-shrink: 0;
-                    ">
+                    <div class="social-team-tabs">
                         ${tabsHTML}
                     </div>
                     <div style="flex: 1; overflow: hidden; background: #1a1a1a;">
@@ -5044,18 +5066,143 @@ function loadCustomRSSFeed(feedUrl, container) {
                 </div>
             `;
             
-            // Load the first tab's feed immediately
+            // Load the first tab's content immediately
             if (tabs[0].feedUrl) {
-                loadTeamRSSFeed(tabs[0].feedUrl, tabIds[0], tabs[0].name);
+                // Check if it's a Nitter URL (embed directly) or RSS feed (fetch and parse)
+                if (tabs[0].feedUrl.includes('nitter.net') || tabs[0].feedUrl.includes('nitter.') || tabs[0].feedUrl.includes('nitter/')) {
+                    embedNitterProfile(tabs[0].feedUrl, tabIds[0], tabs[0].name);
+                } else {
+                    loadTeamRSSFeed(tabs[0].feedUrl, tabIds[0], tabs[0].name);
+                }
             } else {
                 const firstContent = document.getElementById(tabIds[0]);
                 if (firstContent) {
                     firstContent.innerHTML = `
                         <div style="padding: 20px; text-align: center; color: #888;">
-                            No RSS feed configured for ${tabs[0].name} yet.
+                            No social feed configured for ${tabs[0].name} yet.
                         </div>
                     `;
                 }
+            }
+        }
+        
+        // Function to embed Nitter profile
+        function embedNitterProfile(nitterUrl, contentElementId, teamName) {
+            const contentElement = document.getElementById(contentElementId);
+            if (!contentElement) return;
+            
+            // Clean up the Nitter URL to ensure it's a profile URL
+            let cleanUrl = nitterUrl;
+            if (!cleanUrl.endsWith('/')) {
+                cleanUrl = cleanUrl + '/';
+            }
+            
+            // Create a wrapper div to handle iframe reloads
+            const wrapperId = `nitter-wrapper-${contentElementId}`;
+            contentElement.innerHTML = `
+                <div id="${wrapperId}" style="width: 100%; height: 100%; position: relative;">
+                    <iframe 
+                        id="nitter-iframe-${contentElementId}"
+                        src="${cleanUrl}" 
+                        style="
+                            width: 100%;
+                            height: 100%;
+                            border: none;
+                            background: #000;
+                        "
+                        title="${teamName} Social Feed (Nitter)"
+                    ></iframe>
+                </div>
+            `;
+            
+            // Handle iframe to prevent it from going black when clicked and open links in new tab
+            const iframe = document.getElementById(`nitter-iframe-${contentElementId}`);
+            if (iframe) {
+                const originalUrl = cleanUrl;
+                let lastKnownUrl = cleanUrl;
+                
+                // Track iframe navigation to detect when user clicks on a post
+                const trackNavigation = () => {
+                    try {
+                        const currentSrc = iframe.src;
+                        // If iframe has navigated to a different page (like a tweet detail)
+                        if (currentSrc && currentSrc !== lastKnownUrl && currentSrc !== originalUrl) {
+                            // Open the new URL in a new tab
+                            window.open(currentSrc, '_blank');
+                            // Reset iframe back to profile page
+                            setTimeout(() => {
+                                iframe.src = originalUrl;
+                                lastKnownUrl = originalUrl;
+                            }, 100);
+                        } else if (currentSrc === originalUrl) {
+                            lastKnownUrl = originalUrl;
+                        }
+                    } catch (e) {
+                        // Cross-origin error is expected
+                    }
+                };
+                
+                // Check for navigation changes frequently
+                const navCheckInterval = setInterval(trackNavigation, 500);
+                
+                // Also intercept clicks on the iframe to open in new tab
+                // We'll use a technique where we detect when iframe URL changes after a click
+                let clickTimeout;
+                const wrapper = document.getElementById(wrapperId);
+                if (wrapper) {
+                    wrapper.addEventListener('click', (e) => {
+                        // Small delay to let iframe navigation happen, then check
+                        clearTimeout(clickTimeout);
+                        clickTimeout = setTimeout(() => {
+                            trackNavigation();
+                        }, 300);
+                    });
+                }
+                
+                // Monitor iframe and reload if it appears to be broken/black
+                let reloadCount = 0;
+                const maxReloads = 3;
+                
+                const checkIframe = () => {
+                    try {
+                        // Check if iframe src is still valid
+                        if (!iframe.src || iframe.src === 'about:blank') {
+                            console.log('[Nitter] Iframe src is blank, reloading...');
+                            if (reloadCount < maxReloads) {
+                                reloadCount++;
+                                iframe.src = originalUrl;
+                                lastKnownUrl = originalUrl;
+                            }
+                            return;
+                        }
+                        
+                        // Reset reload count if iframe seems OK
+                        if (iframe.contentWindow) {
+                            reloadCount = 0;
+                        }
+                    } catch (e) {
+                        // Cross-origin error is expected and normal
+                    }
+                };
+                
+                // Check periodically, but not too aggressively
+                const checkInterval = setInterval(checkIframe, 3000);
+                
+                // Store intervals for potential cleanup
+                iframe.dataset.navCheckInterval = navCheckInterval;
+                iframe.dataset.checkInterval = checkInterval;
+                
+                // Reload iframe if it fails to load
+                iframe.onerror = () => {
+                    console.warn(`[Nitter] Error loading ${cleanUrl}`);
+                    if (reloadCount < maxReloads) {
+                        reloadCount++;
+                        setTimeout(() => {
+                            iframe.src = originalUrl;
+                            lastKnownUrl = originalUrl;
+                        }, 2000);
+                    }
+                };
             }
         }
         
@@ -5262,33 +5409,57 @@ function loadCustomRSSFeed(feedUrl, container) {
             if (!activeTab) return;
             
             const feedUrl = activeTab.getAttribute('data-feed-url');
+            const originalUrl = activeTab.getAttribute('data-original-url') || feedUrl;
             const teamName = activeTab.getAttribute('data-team');
             const contentElementId = allContents[activeIndex].id;
+            const content = allContents[activeIndex];
             
-            // Update tab styling
+            // Check if this tab is already active
+            const isAlreadyActive = activeTab.classList.contains('active');
+            
+            // Update tab styling using classes
             allTabs.forEach((tab, i) => {
                 const isActive = i === activeIndex;
-                tab.style.background = isActive ? '#0066cc' : '#333';
-                tab.style.fontWeight = isActive ? 'bold' : 'normal';
+                if (isActive) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
             });
             
             // Update content visibility
-            allContents.forEach((content, i) => {
+            allContents.forEach((contentItem, i) => {
                 const isActive = i === activeIndex;
-                content.style.display = isActive ? 'block' : 'none';
+                contentItem.style.display = isActive ? 'block' : 'none';
                 
                 // Load feed if this tab is being activated and has a feed URL
                 if (isActive && feedUrl) {
-                    // Check if content is already loaded (has more than just loading message)
-                    const currentContent = content.innerHTML.trim();
-                    if (currentContent.includes('Loading') || currentContent.includes('No RSS feed')) {
-                        loadTeamRSSFeed(feedUrl, contentElementId, teamName);
+                    // If tab was already active and clicked again, reset to original URL
+                    if (isAlreadyActive && originalUrl) {
+                        console.log(`[switchSocialTeamTab] Resetting ${teamName} tab to original URL: ${originalUrl}`);
+                        // Check if it's a Nitter URL (embed directly) or RSS feed (fetch and parse)
+                        if (originalUrl.includes('nitter.net') || originalUrl.includes('nitter.') || originalUrl.includes('nitter/')) {
+                            embedNitterProfile(originalUrl, contentElementId, teamName);
+                        } else {
+                            loadTeamRSSFeed(originalUrl, contentElementId, teamName);
+                        }
+                    } else {
+                        // Normal tab activation - check if content is already loaded
+                        const currentContent = contentItem.innerHTML.trim();
+                        if (currentContent.includes('Loading') || currentContent.includes('No social feed') || currentContent.includes('No RSS feed')) {
+                            // Check if it's a Nitter URL (embed directly) or RSS feed (fetch and parse)
+                            if (feedUrl.includes('nitter.net') || feedUrl.includes('nitter.') || feedUrl.includes('nitter/')) {
+                                embedNitterProfile(feedUrl, contentElementId, teamName);
+                            } else {
+                                loadTeamRSSFeed(feedUrl, contentElementId, teamName);
+                            }
+                        }
                     }
                 } else if (isActive && !feedUrl) {
                     // Show "no feed" message if tab has no feed URL
-                    content.innerHTML = `
+                    contentItem.innerHTML = `
                         <div style="padding: 20px; text-align: center; color: #888;">
-                            No RSS feed configured for ${teamName} yet.
+                            No social feed configured for ${teamName} yet.
                         </div>
                     `;
                 }
