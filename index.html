@@ -383,6 +383,42 @@ table.game-table td:nth-child(1) {
     transition: all 0.2s ease;
 }
 
+/* News team tabs - matching social/media tabs styling exactly */
+.news-team-tab {
+    flex: 1;
+    background-color: #2a2a2a;
+    border: none;
+    color: #5f5f5f;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.news-team-tab:hover {
+    background-color: #2a2a2a;
+    color: #5f5f5f;
+}
+
+.news-team-tab.active {
+    background-color: #3c3c3c;
+    color: white;
+}
+
+/* News team tabs container - matching videos-tabs container */
+.news-team-tabs {
+    height: 18px;
+    background-color: #2a2a2a;
+    display: flex;
+    margin-top: 1px;
+    border-top: 1px solid #1a1a1a;
+}
+
 .media-team-tab:hover {
     background-color: #2a2a2a;
     color: #5f5f5f;
@@ -4833,6 +4869,23 @@ function loadCustomRSSFeed(feedUrl, container) {
                 
                 console.log(`[loadGameContent] Game: ${awayTeam} vs ${homeTeam} (${leagueName})`);
                 
+                // For news content, render team tabs with vertical split (50% top, 50% bottom)
+                if (contentType === 'news') {
+                    console.log(`[loadGameContent] Rendering news team tabs for ${awayTeam} vs ${homeTeam}`);
+                    try {
+                        renderNewsWithTeamTabs(homeTeam, awayTeam, container);
+                    } catch (error) {
+                        console.error('[loadGameContent] Error in renderNewsWithTeamTabs:', error);
+                        container.innerHTML = `
+                            <div style="padding: 20px; color: #ff6b6b;">
+                                Error rendering news tabs: ${error.message}<br/>
+                                <small>Check console for details</small>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+                
                 // For social content, bypass Perspectives and directly render team RSS feeds
                 if (contentType === 'social') {
                     console.log(`[loadGameContent] Rendering social team tabs for ${awayTeam} vs ${homeTeam}`);
@@ -5198,6 +5251,28 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         console.log('[TEAM_TO_RSS_FEED] Buffalo Sabres feed URL:', TEAM_TO_RSS_FEED['Buffalo Sabres']);
         
+        // Team to news feed mapping (RSS feeds - can be array for multiple feeds to merge)
+        const TEAM_TO_NEWS_FEED = {
+            'Buffalo Sabres': [
+                'https://www.sabrespace.com/feed/',
+                'https://www.buffalohockeybeat.com/feed/',
+                'https://www.diebytheblade.com/feed/',
+                'https://www.prohockeyrumors.com/buffalo-sabres/feed',
+                'https://www.wivb.com/sports/buffalo-sabres/feed/',
+                'https://thehockeywriters.com/category/buffalo-sabres/feed/',
+                'https://buffalonews.com/search/?f=rss&t=article&c=sports/sabres&l=50&s=start_time&sd=desc'
+            ],
+            'New York Rangers': [
+                'https://thehockeywriters.com/category/new-york-rangers/feed',
+                'https://www.foreverblueshirts.com/feed',
+                'https://blueseatblogs.com/feed/',
+                'https://blueshirtsnation.com/feed/',
+                'https://nyrangersnews.com/feed/',
+                'https://bluecollarblueshirts.com/feed/'
+            ],
+            // Add more teams as needed
+        };
+        
         // Team to media feed mapping (YouTube channel RSS feeds)
         const TEAM_TO_MEDIA_FEED = {
             'Anaheim Ducks': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-anaheimducks.xml',
@@ -5271,6 +5346,329 @@ function loadCustomRSSFeed(feedUrl, container) {
             };
             return TEAM_SHORT_NAMES[fullTeamName] || fullTeamName;
         }
+        
+        // Helper function to render news with team tabs (side by side, matching social/media columns)
+        function renderNewsWithTeamTabs(homeTeam, awayTeam, container) {
+            console.log('[renderNewsWithTeamTabs] Called with:', { homeTeam, awayTeam, container });
+            
+            if (!container) {
+                console.error('[renderNewsWithTeamTabs] Container is null/undefined!');
+                return;
+            }
+            
+            const homeShort = getShortTeamName(homeTeam);
+            const awayShort = getShortTeamName(awayTeam);
+            const homeFeedUrls = TEAM_TO_NEWS_FEED[homeTeam] || null;
+            const awayFeedUrls = TEAM_TO_NEWS_FEED[awayTeam] || null;
+            
+            // Build tabs array - always include both teams, even if no feed yet
+            const tabs = [
+                {
+                    name: awayShort,
+                    team: awayTeam,
+                    feedUrls: awayFeedUrls
+                },
+                {
+                    name: homeShort,
+                    team: homeTeam,
+                    feedUrls: homeFeedUrls
+                }
+            ];
+            
+            // Generate unique IDs for tabs and content areas
+            const tabIds = tabs.map((_, i) => `news-tab-content-${i}`);
+            const uniqueId = `news-${Date.now()}`;
+            
+            // Build tabs HTML
+            const tabsHTML = tabs.map((tab, i) => `
+                <div 
+                    class="news-team-tab ${i === 0 ? 'active' : ''}" 
+                    data-tab-index="${i}"
+                    data-team="${tab.team}"
+                    data-unique-id="${uniqueId}"
+                    onclick="window.switchNewsTeamTab(${i}, '${uniqueId}')"
+                >
+                    ${tab.name.toUpperCase()}
+                </div>
+            `).join('');
+            
+            // Build content areas HTML (loading state initially)
+            const contentHTML = tabs.map((tab, i) => `
+                <div 
+                    id="${tabIds[i]}" 
+                    class="news-team-content" 
+                    data-unique-id="${uniqueId}"
+                    style="display: ${i === 0 ? 'block' : 'none'}; height: calc(100vh - 120px); overflow-y: auto; background: #1a1a1a; padding: 10px;"
+                >
+                    <div style="padding: 20px; text-align: center; color: #888;">
+                        Loading ${tab.name} news...
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; height: 100vh;">
+                    <div class="news-team-tabs">
+                        ${tabsHTML}
+                    </div>
+                    <div style="flex: 1; overflow: hidden; background: #1a1a1a;">
+                        ${contentHTML}
+                    </div>
+                </div>
+            `;
+            
+            // Load the first tab's content immediately
+            if (tabs[0].feedUrls && Array.isArray(tabs[0].feedUrls)) {
+                loadTeamNewsFeeds(tabs[0].feedUrls, tabIds[0], tabs[0].name);
+            } else {
+                const firstContent = document.getElementById(tabIds[0]);
+                if (firstContent) {
+                    firstContent.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #888;">
+                            No news feed configured for ${tabs[0].name} yet.
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Function to load and merge multiple news RSS feeds, then render
+        async function loadTeamNewsFeeds(feedUrls, contentElementId, teamName) {
+            const contentElement = document.getElementById(contentElementId);
+            if (!contentElement) return;
+            
+            try {
+                // Show loading state
+                contentElement.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #888;">
+                        Loading ${teamName} news...
+                    </div>
+                `;
+                
+                // Fetch all RSS feeds in parallel and parse XML
+                // Try to request more items from WordPress feeds (many default to 10)
+                const feedPromises = feedUrls.map(async (url, feedIndex) => {
+                    try {
+                        console.log(`[loadTeamNewsFeeds] Fetching feed ${feedIndex + 1}/${feedUrls.length}: ${url}`);
+                        
+                        // Use RSS feed service proxy to bypass CORS
+                        const RSS_FEED_SERVICE_URL = 'https://rss-feed-service-124291936014.us-central1.run.app';
+                        
+                        // For WordPress feeds, try to get more items by adding posts_per_page parameter
+                        let originalUrl = url;
+                        if (url.includes('wordpress') || url.includes('/feed') || url.includes('thehockeywriters') || 
+                            url.includes('sabrespace') || url.includes('buffalohockeybeat') || url.includes('diebytheblade') ||
+                            url.includes('foreverblueshirts') || url.includes('blueseatblogs') || url.includes('blueshirtsnation') ||
+                            url.includes('nyrangersnews') || url.includes('bluecollarblueshirts') ||
+                            url.includes('prohockeyrumors') || url.includes('buffalonews') || url.includes('wivb')) {
+                            // Try to append posts_per_page parameter (works for most WordPress feeds)
+                            const separator = url.includes('?') ? '&' : '?';
+                            originalUrl = `${url}${separator}posts_per_page=50`;
+                            console.log(`[loadTeamNewsFeeds] Using WordPress parameter: ${originalUrl}`);
+                        }
+                        
+                        // Proxy through RSS feed service to bypass CORS
+                        const proxyUrl = `${RSS_FEED_SERVICE_URL}/proxy/rss?url=${encodeURIComponent(originalUrl)}`;
+                        console.log(`[loadTeamNewsFeeds] Fetching via proxy: ${proxyUrl}`);
+                        
+                        const response = await fetch(proxyUrl);
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        const xmlText = await response.text();
+                        
+                        if (!xmlText || xmlText.length < 100) {
+                            throw new Error(`Feed returned empty or too short content (${xmlText?.length || 0} chars)`);
+                        }
+                        
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                        
+                        // Check for parse errors
+                        const parseError = xmlDoc.querySelector('parsererror');
+                        if (parseError) {
+                            const errorText = parseError.textContent || 'Unknown parse error';
+                            throw new Error(`XML parse error: ${errorText.substring(0, 100)}`);
+                        }
+                        
+                        // Extract items from RSS XML (handle both RSS and Atom feeds)
+                        const items = Array.from(xmlDoc.querySelectorAll('item, entry')).map(item => {
+                            const title = item.querySelector('title')?.textContent || '';
+                            const link = item.querySelector('link')?.textContent || item.querySelector('link')?.getAttribute('href') || '';
+                            const description = item.querySelector('description')?.textContent || item.querySelector('summary')?.textContent || '';
+                            const pubDate = item.querySelector('pubDate')?.textContent || item.querySelector('published')?.textContent || '';
+                            
+                            return {
+                                title,
+                                link,
+                                description,
+                                publishedAt: pubDate ? new Date(pubDate).toISOString() : '',
+                                pubDate,
+                                source: url // Track which feed this came from
+                            };
+                        });
+                        
+                        console.log(`[loadTeamNewsFeeds] Successfully fetched ${items.length} items from ${url}`);
+                        return { url, items, success: true };
+                    } catch (e) {
+                        console.error(`[loadTeamNewsFeeds] ❌ Error fetching feed ${feedIndex + 1} (${url}):`, e.message);
+                        return { url, items: [], success: false, error: e.message };
+                    }
+                });
+                
+                const feedResults = await Promise.all(feedPromises);
+                
+                // Debug: log results from each feed
+                console.log(`[loadTeamNewsFeeds] === Feed Aggregation Results ===`);
+                feedResults.forEach((result, idx) => {
+                    if (result.success) {
+                        console.log(`✅ Feed ${idx + 1}: ${result.url} - ${result.items.length} items`);
+                    } else {
+                        console.log(`❌ Feed ${idx + 1}: ${result.url} - FAILED: ${result.error}`);
+                    }
+                });
+                
+                // Merge all items from all feeds
+                let allItems = [];
+                feedResults.forEach((result, idx) => {
+                    if (result.success && result.items && Array.isArray(result.items) && result.items.length > 0) {
+                        console.log(`[loadTeamNewsFeeds] ✅ Adding ${result.items.length} items from: ${result.url}`);
+                        allItems = allItems.concat(result.items);
+                    } else if (!result.success) {
+                        console.log(`[loadTeamNewsFeeds] ⚠️  Skipping failed feed: ${result.url}`);
+                    }
+                });
+                
+                console.log(`[loadTeamNewsFeeds] Total items from all feeds (before deduplication): ${allItems.length}`);
+                
+                if (allItems.length === 0) {
+                    contentElement.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #888;">
+                            No news found for ${teamName}.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Remove duplicates by URL
+                const seen = new Set();
+                const uniqueItems = [];
+                for (const item of allItems) {
+                    const id = item.link || item.title;
+                    if (!seen.has(id)) {
+                        seen.add(id);
+                        uniqueItems.push(item);
+                    }
+                }
+                
+                console.log(`[loadTeamNewsFeeds] Unique items after deduplication: ${uniqueItems.length}`);
+                
+                // Sort by publishedAt (most recent first)
+                uniqueItems.sort((a, b) => {
+                    const dateA = new Date(a.publishedAt || 0);
+                    const dateB = new Date(b.publishedAt || 0);
+                    return dateB - dateA;
+                });
+                
+                // Limit to 50 most recent items
+                const limitedItems = uniqueItems.slice(0, 50);
+                
+                // Render items
+                const itemsHTML = limitedItems.map(item => {
+                    const publishedDate = item.pubDate || item.publishedAt || '';
+                    const formattedDate = publishedDate ? new Date(publishedDate).toLocaleDateString() : '';
+                    
+                    // Clean up description HTML
+                    let descriptionText = item.description || '';
+                    // Remove HTML tags for preview
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = descriptionText;
+                    descriptionText = tempDiv.textContent || tempDiv.innerText || '';
+                    
+                    return `
+                        <div style="padding: 15px; margin-bottom: 10px; background: #2a2a2a; cursor: pointer;" onclick="window.open('${item.link || '#'}', '_blank')">
+                            <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 14px; font-weight: 600;">
+                                ${item.title || 'Untitled'}
+                            </h3>
+                            ${descriptionText ? `
+                                <p style="margin: 0 0 8px 0; color: #bebebe; font-size: 12px; line-height: 1.4;">
+                                    ${descriptionText.substring(0, 150)}${descriptionText.length > 150 ? '...' : ''}
+                                </p>
+                            ` : ''}
+                            ${formattedDate ? `
+                                <div style="font-size: 10px; color: #888; margin-top: 8px;">
+                                    ${formattedDate}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                contentElement.innerHTML = `
+                    <div style="padding: 10px; background: #1a1a1a;">
+                        ${itemsHTML}
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error(`Error loading news feeds for ${teamName}:`, error);
+                contentElement.innerHTML = `
+                    <div style="padding: 20px; color: #ff6b6b;">
+                        Error loading ${teamName} news: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Global function to switch news team tabs
+        window.switchNewsTeamTab = function(activeIndex, uniqueId) {
+            const allTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${uniqueId}"]`);
+            const allContents = document.querySelectorAll(`.news-team-content[data-unique-id="${uniqueId}"]`);
+            
+            if (allTabs.length === 0 || allContents.length === 0) return;
+            
+            const activeTab = allTabs[activeIndex];
+            if (!activeTab) return;
+            
+            const teamName = activeTab.getAttribute('data-team');
+            const contentElementId = allContents[activeIndex].id;
+            const feedUrls = TEAM_TO_NEWS_FEED[teamName] || null;
+            
+            const isAlreadyActive = activeTab.classList.contains('active');
+            
+            // Update tab styling
+            allTabs.forEach((tab, i) => {
+                if (i === activeIndex) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Update content visibility
+            allContents.forEach((contentItem, i) => {
+                contentItem.style.display = i === activeIndex ? 'block' : 'none';
+            });
+            
+            // Load feed if this tab is being activated and has feed URLs
+            if (!isAlreadyActive && feedUrls && Array.isArray(feedUrls)) {
+                const contentElement = allContents[activeIndex];
+                if (contentElement && (!contentElement.dataset.loaded || contentElement.innerHTML.includes('Loading'))) {
+                    loadTeamNewsFeeds(feedUrls, contentElementId, teamName);
+                    contentElement.dataset.loaded = 'true';
+                }
+            } else if (!feedUrls) {
+                const contentElement = allContents[activeIndex];
+                if (contentElement && !contentElement.dataset.loaded) {
+                    contentElement.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #888;">
+                            No news feed configured for ${teamName} yet.
+                        </div>
+                    `;
+                    contentElement.dataset.loaded = 'true';
+                }
+            }
+        };
         
         // Helper function to render social with team tabs
         function renderSocialWithTeamTabs(homeTeam, awayTeam, container) {
@@ -14726,48 +15124,48 @@ document.addEventListener('DOMContentLoaded', function () {
             let teams = [];
 
           // Immediate override for NFL: use hard-coded W/L/T standings and skip Firestore/cache
-          if (leagueKey === 'NFL') {
-            const hardcodedNFL = [
-              {Team:'New England Patriots',Division:'AFC East',Wins:'13',Losses:'3',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Buffalo Bills',Division:'AFC East',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Miami Dolphins',Division:'AFC East',Wins:'7',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'New York Jets',Division:'AFC East',Wins:'3',Losses:'13',Ties:'0',lastUpdated:new Date().toISOString()},
+                    if (leagueKey === 'NFL') {
+                        const hardcodedNFL = [
+                            {Team:'New England Patriots',Division:'AFC East',Wins:'14',Losses:'3',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Buffalo Bills',Division:'AFC East',Wins:'12',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Miami Dolphins',Division:'AFC East',Wins:'7',Losses:'10',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'New York Jets',Division:'AFC East',Wins:'3',Losses:'14',Ties:'0',lastUpdated:new Date().toISOString()},
 
-              {Team:'Pittsburgh Steelers',Division:'AFC North',Wins:'9',Losses:'7',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Baltimore Ravens',Division:'AFC North',Wins:'8',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Cincinnati Bengals',Division:'AFC North',Wins:'6',Losses:'10',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Cleveland Browns',Division:'AFC North',Wins:'4',Losses:'12',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Pittsburgh Steelers',Division:'AFC North',Wins:'10',Losses:'7',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Baltimore Ravens',Division:'AFC North',Wins:'8',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Cincinnati Bengals',Division:'AFC North',Wins:'6',Losses:'11',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Cleveland Browns',Division:'AFC North',Wins:'5',Losses:'12',Ties:'0',lastUpdated:new Date().toISOString()},
 
-              {Team:'Jacksonville Jaguars',Division:'AFC South',Wins:'12',Losses:'4',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Houston Texans',Division:'AFC South',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Indianapolis Colts',Division:'AFC South',Wins:'8',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Tennessee Titans',Division:'AFC South',Wins:'3',Losses:'13',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Jacksonville Jaguars',Division:'AFC South',Wins:'13',Losses:'4',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Houston Texans',Division:'AFC South',Wins:'12',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Indianapolis Colts',Division:'AFC South',Wins:'8',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Tennessee Titans',Division:'AFC South',Wins:'3',Losses:'14',Ties:'0',lastUpdated:new Date().toISOString()},
 
-              {Team:'Denver Broncos',Division:'AFC West',Wins:'13',Losses:'3',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Los Angeles Chargers',Division:'AFC West',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Kansas City Chiefs',Division:'AFC West',Wins:'6',Losses:'10',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Las Vegas Raiders',Division:'AFC West',Wins:'2',Losses:'14',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Denver Broncos',Division:'AFC West',Wins:'14',Losses:'3',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Los Angeles Chargers',Division:'AFC West',Wins:'11',Losses:'6',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Kansas City Chiefs',Division:'AFC West',Wins:'6',Losses:'11',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Las Vegas Raiders',Division:'AFC West',Wins:'3',Losses:'14',Ties:'0',lastUpdated:new Date().toISOString()},
 
-              {Team:'Philadelphia Eagles',Division:'NFC East',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Dallas Cowboys',Division:'NFC East',Wins:'7',Losses:'8',Ties:'1',lastUpdated:new Date().toISOString()},
-              {Team:'Washington Commanders',Division:'NFC East',Wins:'4',Losses:'12',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'New York Giants',Division:'NFC East',Wins:'3',Losses:'13',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Philadelphia Eagles',Division:'NFC East',Wins:'11',Losses:'6',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Dallas Cowboys',Division:'NFC East',Wins:'7',Losses:'9',Ties:'1',lastUpdated:new Date().toISOString()},
+                            {Team:'Washington Commanders',Division:'NFC East',Wins:'5',Losses:'12',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'New York Giants',Division:'NFC East',Wins:'4',Losses:'13',Ties:'0',lastUpdated:new Date().toISOString()},
 
-              {Team:'Chicago Bears',Division:'NFC North',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Green Bay Packers',Division:'NFC North',Wins:'9',Losses:'6',Ties:'1',lastUpdated:new Date().toISOString()},
-              {Team:'Minnesota Vikings',Division:'NFC North',Wins:'8',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Detroit Lions',Division:'NFC North',Wins:'8',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Chicago Bears',Division:'NFC North',Wins:'11',Losses:'6',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Green Bay Packers',Division:'NFC North',Wins:'9',Losses:'7',Ties:'1',lastUpdated:new Date().toISOString()},
+                            {Team:'Minnesota Vikings',Division:'NFC North',Wins:'9',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Detroit Lions',Division:'NFC North',Wins:'9',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
 
-              {Team:'Carolina Panthers',Division:'NFC South',Wins:'8',Losses:'8',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Tampa Bay Buccaneers',Division:'NFC South',Wins:'7',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Atlanta Falcons',Division:'NFC South',Wins:'7',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'New Orleans Saints',Division:'NFC South',Wins:'6',Losses:'10',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Carolina Panthers',Division:'NFC South',Wins:'8',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Tampa Bay Buccaneers',Division:'NFC South',Wins:'8',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Atlanta Falcons',Division:'NFC South',Wins:'8',Losses:'9',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'New Orleans Saints',Division:'NFC South',Wins:'6',Losses:'11',Ties:'0',lastUpdated:new Date().toISOString()},
 
-              {Team:'Seattle Seahawks',Division:'NFC West',Wins:'13',Losses:'3',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'San Francisco 49ers',Division:'NFC West',Wins:'12',Losses:'4',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Los Angeles Rams',Division:'NFC West',Wins:'11',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
-              {Team:'Arizona Cardinals',Division:'NFC West',Wins:'3',Losses:'13',Ties:'0',lastUpdated:new Date().toISOString()}
-            ];
+                            {Team:'Seattle Seahawks',Division:'NFC West',Wins:'14',Losses:'3',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Los Angeles Rams',Division:'NFC West',Wins:'12',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'San Francisco 49ers',Division:'NFC West',Wins:'12',Losses:'5',Ties:'0',lastUpdated:new Date().toISOString()},
+                            {Team:'Arizona Cardinals',Division:'NFC West',Wins:'3',Losses:'14',Ties:'0',lastUpdated:new Date().toISOString()}
+                        ];
 
             hardcodedNFL.forEach(t => { t.W = t.Wins; t.L = t.Losses; t.T = t.Ties; });
             cacheStandings(leagueKey, hardcodedNFL);
@@ -23220,10 +23618,10 @@ const VIDEOS_CONFIG = {
     
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
-        'NFL': {
-          highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gn1WlB_2MRD6ZGGhflq5u-n.xml',
-            allVideos: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-nfl.xml'
-        },
+                'NFL': {
+                    highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gmf9GXquXmWjML4mY428WSR.xml',
+                        allVideos: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-nfl.xml'
+                },
         'MLB': {
             highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-mlb-playlist.xml',
             allVideos: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-mlb.xml'
