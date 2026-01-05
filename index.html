@@ -4945,9 +4945,38 @@ function loadCustomRSSFeed(feedUrl, container) {
         // Use Nitter for direct embedding, or RSS feeds for parsed content
         const RSS_FEED_SERVICE_URL = 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app';
         const TEAM_TO_RSS_FEED = {
-            'Buffalo Sabres': 'https://nitter.net/BuffaloSabres', // Embed Nitter directly
-            'Columbus Blue Jackets': null, // No feed yet - will show blank
-            // Add more team mappings as needed
+            'Anaheim Ducks': 'https://nitter.net/AnaheimDucks',
+  'Boston Bruins': 'https://nitter.net/NHLBruins',
+  'Buffalo Sabres': 'https://nitter.net/BuffaloSabres',
+  'Calgary Flames': 'https://nitter.net/NHLFlames',
+  'Carolina Hurricanes': 'https://nitter.net/NHLCanes',
+  'Chicago Blackhawks': 'https://nitter.net/NHLBlackhawks',
+  'Colorado Avalanche': 'https://nitter.net/Avalanche',
+  'Columbus Blue Jackets': 'https://nitter.net/BlueJacketsNHL',
+  'Dallas Stars': 'https://nitter.net/DallasStars',
+  'Detroit Red Wings': 'https://nitter.net/DetroitRedWings',
+  'Edmonton Oilers': 'https://nitter.net/EdmontonOilers',
+  'Florida Panthers': 'https://nitter.net/FlaPanthers',
+  'Los Angeles Kings': 'https://nitter.net/LAKings',
+  'Minnesota Wild': 'https://nitter.net/mnwild',
+  'Montreal Canadiens': 'https://nitter.net/CanadiensMTL',
+  'Nashville Predators': 'https://nitter.net/PredsNHL',
+  'New Jersey Devils': 'https://nitter.net/NJDevils',
+  'New York Islanders': 'https://nitter.net/NYIslanders',
+  'New York Rangers': 'https://nitter.net/NYRangers',
+  'Ottawa Senators': 'https://nitter.net/Senators',
+  'Philadelphia Flyers': 'https://nitter.net/NHLFlyers',
+  'Pittsburgh Penguins': 'https://nitter.net/penguins',
+  'San Jose Sharks': 'https://nitter.net/SanJoseSharks',
+  'Seattle Kraken': 'https://nitter.net/SeattleKraken',
+  'St. Louis Blues': 'https://nitter.net/StLouisBlues',
+  'Tampa Bay Lightning': 'https://nitter.net/TBLightning',
+  'Toronto Maple Leafs': 'https://nitter.net/MapleLeafs',
+  'Utah Mammoth': 'https://nitter.net/UtahMammoth',
+  'Vancouver Canucks': 'https://nitter.net/Canucks',
+  'Vegas Golden Knights': 'https://nitter.net/GoldenKnights',
+  'Washington Capitals': 'https://nitter.net/Capitals',
+  'Winnipeg Jets': 'https://nitter.net/NHLJets'
         };
         
         console.log('[TEAM_TO_RSS_FEED] Buffalo Sabres feed URL:', TEAM_TO_RSS_FEED['Buffalo Sabres']);
