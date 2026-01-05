@@ -10688,6 +10688,11 @@ document.addEventListener('DOMContentLoaded', function () {
       return trimmed;
     }
 
+    // Global state to persist expand/collapse state across re-renders
+    if (!window.leagueExpandState) {
+        window.leagueExpandState = {};
+    }
+
     function renderGames(container, gamesData, isGroupedByLeague, isYesterdayScores = false) {
         container.innerHTML = "";
         // Note: gamesData is already filtered at the data level in updateDisplay() - no need to filter here
@@ -13172,9 +13177,11 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (shouldPrioritizeImportant) {
                 if (hasHiddenGames) {
-                    let showAllImportantGames = false;
+                    // Restore expand state from global state object, keyed by league
+                    const stateKey = detectedLeagueKey || leagueNameKey;
+                    let showAllImportantGames = window.leagueExpandState[stateKey] === true;
                     table.dataset.hasImportanceToggle = "true";
-                    table.dataset.showingAll = "false";
+                    table.dataset.showingAll = showAllImportantGames ? 'true' : 'false';
                     
                     const toggleContainer = document.createElement("div");
                     toggleContainer.style.fontSize = "10px";
@@ -13187,7 +13194,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     toggleContainer.style.width = "calc(100% - 10px)";
                     
                     const toggleLink = document.createElement("span");
-                    toggleLink.textContent = "Expand all";
+                    toggleLink.textContent = showAllImportantGames ? "Featured only" : "Expand all";
                     toggleLink.style.textDecoration = "underline";
                     toggleLink.style.color = "#bebebe";
                     toggleContainer.appendChild(toggleLink);
@@ -13308,6 +13315,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     toggleContainer.addEventListener('click', () => {
                         showAllImportantGames = !showAllImportantGames;
+                        // Save state to global object
+                        const stateKey = detectedLeagueKey || leagueNameKey;
+                        window.leagueExpandState[stateKey] = showAllImportantGames;
                         toggleLink.textContent = showAllImportantGames ? "Featured only" : "Expand all";
                         updateImportanceVisibility();
                     });
