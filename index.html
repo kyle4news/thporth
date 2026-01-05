@@ -22908,10 +22908,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!contentPane) return;
     contentPane.innerHTML = '<p>Loading...</p>';
 
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const finalUrl = proxyUrl + encodeURIComponent(url);
-
-    fetch(finalUrl)
+    fetch(url)
       .then(r => r.text())
       .then(str => {
         const parser = new DOMParser();
@@ -22984,10 +22981,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!contentPane) return;
     contentPane.innerHTML = '<p>Loading...</p>';
 
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const finalUrl = proxyUrl + encodeURIComponent(url);
-
-    fetch(finalUrl)
+    fetch(url)
       .then(r => r.text())
       .then(str => {
         const parser = new DOMParser();
@@ -23126,7 +23120,12 @@ document.addEventListener('DOMContentLoaded', function() {
     contentPane.innerHTML = '<p>Loading...</p>';
 
     fetch(url)
-      .then(r => r.text())
+      .then(r => {
+        if (!r.ok) {
+          throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+        }
+        return r.text();
+      })
       .then(str => {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(str, "text/xml");
@@ -23196,10 +23195,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!contentPane) return;
     contentPane.innerHTML = '<p>Loading...</p>';
 
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const finalUrl = proxyUrl + encodeURIComponent(url);
-
-    fetch(finalUrl)
+    fetch(url)
       .then(r => r.text())
       .then(str => {
         const parser = new DOMParser();
@@ -23273,10 +23269,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!contentPane) return;
     contentPane.innerHTML = '<p>Loading...</p>';
 
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const finalUrl = proxyUrl + encodeURIComponent(url);
-
-    fetch(finalUrl)
+    fetch(url)
       .then(r => r.text())
       .then(str => {
         const parser = new DOMParser();
