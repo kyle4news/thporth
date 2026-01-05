@@ -366,6 +366,41 @@ table.game-table td:nth-child(1) {
     border-top: 1px solid #1a1a1a;
 }
 
+/* Media team tabs - matching social team tabs styling exactly */
+.media-team-tab {
+    flex: 1;
+    background-color: #2a2a2a;
+    border: none;
+    color: #5f5f5f;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.media-team-tab:hover {
+    background-color: #2a2a2a;
+    color: #5f5f5f;
+}
+
+.media-team-tab.active {
+    background-color: #3c3c3c;
+    color: white;
+}
+
+.media-team-tabs {
+    height: 18px;
+    background-color: #2a2a2a;
+    display: flex;
+    margin-top: 1px;
+    border-top: 1px solid #1a1a1a;
+}
+
         .videos-content {
             flex: 1;
             padding: 0;
@@ -4815,7 +4850,24 @@ function loadCustomRSSFeed(feedUrl, container) {
                     return;
                 }
                 
-                // For news and media, use Perspectives data from game document (written by pipeline)
+                // For media content, bypass Perspectives and directly render team media feeds
+                if (contentType === 'media') {
+                    console.log(`[loadGameContent] Rendering media team tabs for ${awayTeam} vs ${homeTeam}`);
+                    try {
+                        renderMediaWithTeamTabs(homeTeam, awayTeam, container);
+                    } catch (error) {
+                        console.error('[loadGameContent] Error in renderMediaWithTeamTabs:', error);
+                        container.innerHTML = `
+                            <div style="padding: 20px; color: #ff6b6b;">
+                                Error rendering media tabs: ${error.message}<br/>
+                                <small>Check console for details</small>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+                
+                // For news, use Perspectives data from game document (written by pipeline)
                 container.innerHTML = `<div style="padding: 20px; color: #888;">Loading ${contentType} content...</div>`;
                 
                 const perspectives = gameData.perspectives || {};
@@ -5145,6 +5197,12 @@ function loadCustomRSSFeed(feedUrl, container) {
         };
         
         console.log('[TEAM_TO_RSS_FEED] Buffalo Sabres feed URL:', TEAM_TO_RSS_FEED['Buffalo Sabres']);
+        
+        // Team to media feed mapping (YouTube channel RSS feeds)
+        const TEAM_TO_MEDIA_FEED = {
+            'Buffalo Sabres': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-buffalosabres.xml',
+            // Add more teams as needed
+        };
         
         // Get short team name for display (e.g., "Buffalo Sabres" -> "Sabres")
         function getShortTeamName(fullTeamName) {
@@ -5590,6 +5648,264 @@ function loadCustomRSSFeed(feedUrl, container) {
             }
         }
         
+        // Helper function to render media with team tabs (similar to renderSocialWithTeamTabs)
+        function renderMediaWithTeamTabs(homeTeam, awayTeam, container) {
+            console.log('[renderMediaWithTeamTabs] Called with:', { homeTeam, awayTeam, container });
+            
+            if (!container) {
+                console.error('[renderMediaWithTeamTabs] Container is null/undefined!');
+                return;
+            }
+            
+            const homeShort = getShortTeamName(homeTeam);
+            const awayShort = getShortTeamName(awayTeam);
+            const homeFeedUrl = TEAM_TO_MEDIA_FEED[homeTeam] || null;
+            const awayFeedUrl = TEAM_TO_MEDIA_FEED[awayTeam] || null;
+            
+            console.log('[renderMediaWithTeamTabs] Feed URLs:', { homeFeedUrl, awayFeedUrl, homeShort, awayShort });
+            
+            // Build tabs array - always include both teams, even if no feed yet
+            const tabs = [
+                {
+                    name: awayShort,
+                    feedUrl: awayFeedUrl,
+                    team: awayTeam
+                },
+                {
+                    name: homeShort,
+                    feedUrl: homeFeedUrl,
+                    team: homeTeam
+                }
+            ];
+            
+            // Generate unique IDs for tabs and content areas
+            const tabIds = tabs.map((_, i) => `media-tab-content-${i}`);
+            const uniqueId = `media-${Date.now()}`;
+            
+            // Build tabs HTML
+            const tabsHTML = tabs.map((tab, i) => `
+                <div 
+                    class="media-team-tab ${i === 0 ? 'active' : ''}" 
+                    data-tab-index="${i}"
+                    data-team="${tab.team}"
+                    data-unique-id="${uniqueId}"
+                    onclick="window.switchMediaTeamTab(${i}, '${uniqueId}')"
+                >
+                    ${tab.name.toUpperCase()}
+                </div>
+            `).join('');
+            
+            // Build content areas HTML (loading state initially)
+            const contentHTML = tabs.map((tab, i) => `
+                <div 
+                    id="${tabIds[i]}" 
+                    class="media-team-content" 
+                    data-unique-id="${uniqueId}"
+                    style="display: ${i === 0 ? 'block' : 'none'}; height: calc(100vh - 120px); overflow-y: auto; background: #1a1a1a; padding: 10px;"
+                >
+                    <div style="padding: 20px; text-align: center; color: #888;">
+                        Loading ${tab.name} media...
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; height: 100vh;">
+                    <div class="media-team-tabs">
+                        ${tabsHTML}
+                    </div>
+                    <div style="flex: 1; overflow: hidden; background: #1a1a1a;">
+                        ${contentHTML}
+                    </div>
+                </div>
+            `;
+            
+            // Load the first tab's content immediately
+            if (tabs[0].feedUrl) {
+                loadTeamMediaFeed(tabs[0].feedUrl, tabIds[0], tabs[0].name);
+            } else {
+                const firstContent = document.getElementById(tabIds[0]);
+                if (firstContent) {
+                    firstContent.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #888;">
+                            No media feed configured for ${tabs[0].name} yet.
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Function to load and render a single RSS feed (RSS XML)
+        async function loadTeamMediaFeed(feedUrl, contentElementId, teamName) {
+            const contentElement = document.getElementById(contentElementId);
+            if (!contentElement) return;
+            
+            try {
+                // Show loading state
+                contentElement.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #888;">
+                        Loading ${teamName} media...
+                    </div>
+                `;
+                
+                // Fetch RSS feed and parse XML
+                const response = await fetch(feedUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                
+                // Check for parse errors
+                const parseError = xmlDoc.querySelector('parsererror');
+                if (parseError) {
+                    throw new Error('XML parse error');
+                }
+                
+                // Extract items from RSS XML (handle both RSS and Atom feeds)
+                const items = Array.from(xmlDoc.querySelectorAll('item, entry')).map(item => {
+                    const title = item.querySelector('title')?.textContent || '';
+                    const link = item.querySelector('link')?.textContent || item.querySelector('link')?.getAttribute('href') || '';
+                    const description = item.querySelector('description')?.textContent || item.querySelector('summary')?.textContent || '';
+                    const pubDate = item.querySelector('pubDate')?.textContent || item.querySelector('published')?.textContent || '';
+                    const thumbnail = item.querySelector('media\\:thumbnail')?.getAttribute('url') || 
+                                   item.querySelector('thumbnail')?.getAttribute('url') ||
+                                   item.querySelector('enclosure[type^="image"]')?.getAttribute('url') || null;
+                    
+                    return {
+                        title,
+                        link,
+                        description,
+                        publishedAt: pubDate ? new Date(pubDate).toISOString() : '',
+                        thumbnail
+                    };
+                });
+                
+                if (items.length === 0) {
+                    contentElement.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #888;">
+                            No media found for ${teamName}.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Sort by publishedAt (most recent first)
+                items.sort((a, b) => {
+                    const dateA = new Date(a.publishedAt || 0);
+                    const dateB = new Date(b.publishedAt || 0);
+                    return dateB - dateA;
+                });
+                
+                const allItems = items;
+                
+                // Render items
+                const itemsHTML = allItems.map(item => {
+                    const publishedDate = item.publishedAt || '';
+                    const formattedDate = publishedDate ? new Date(publishedDate).toLocaleDateString() : '';
+                    
+                    // Extract YouTube video ID from link
+                    const youtubeMatch = item.link ? item.link.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/) : null;
+                    const videoId = youtubeMatch ? youtubeMatch[1] : null;
+                    
+                    return `
+                        <div style="margin-bottom: 20px; padding: 15px; background: #2a2a2a; border-radius: 4px; border: 1px solid #3a3a3a;">
+                            ${videoId ? `
+                                <div style="margin-bottom: 10px;">
+                                    <iframe 
+                                        width="100%" 
+                                        height="315" 
+                                        src="https://www.youtube.com/embed/${videoId}" 
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen 
+                                        style="border-radius: 4px; max-width: 100%;"
+                                    ></iframe>
+                                </div>
+                            ` : item.thumbnail ? `
+                                <div style="margin-bottom: 10px;">
+                                    <img src="${item.thumbnail}" alt="${item.title}" style="width: 100%; border-radius: 4px;" />
+                                </div>
+                            ` : ''}
+                            <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 14px; font-weight: 600;">
+                                <a href="${item.link}" target="_blank" style="color: #fff; text-decoration: none;">${item.title}</a>
+                            </h3>
+                            ${item.description ? `
+                                <p style="margin: 0 0 8px 0; color: #bebebe; font-size: 12px; line-height: 1.4;">
+                                    ${item.description.substring(0, 150)}${item.description.length > 150 ? '...' : ''}
+                                </p>
+                            ` : ''}
+                            ${formattedDate ? `
+                                <div style="font-size: 10px; color: #888; margin-top: 8px;">
+                                    ${formattedDate}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                contentElement.innerHTML = `
+                    <div style="padding: 10px; background: #1a1a1a; min-height: 100vh;">
+                        ${itemsHTML}
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error(`Error loading media feeds for ${teamName}:`, error);
+                contentElement.innerHTML = `
+                    <div style="padding: 20px; color: #ff6b6b;">
+                        Error loading ${teamName} media: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Global function to switch between media team tabs
+        window.switchMediaTeamTab = function(activeIndex, uniqueId) {
+            const allTabs = document.querySelectorAll(`.media-team-tab[data-unique-id="${uniqueId}"]`);
+            const allContents = document.querySelectorAll(`.media-team-content[data-unique-id="${uniqueId}"]`);
+            
+            if (allTabs.length === 0 || allContents.length === 0) return;
+            
+            const activeTab = allTabs[activeIndex];
+            if (!activeTab) return;
+            
+            const teamName = activeTab.getAttribute('data-team');
+            const contentElementId = allContents[activeIndex].id;
+            const feedUrl = TEAM_TO_MEDIA_FEED[teamName] || null;
+            
+            const isAlreadyActive = activeTab.classList.contains('active');
+            
+            // Update tab styling
+            allTabs.forEach((tab, i) => {
+                if (i === activeIndex) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Update content visibility
+            allContents.forEach((contentItem, i) => {
+                contentItem.style.display = i === activeIndex ? 'block' : 'none';
+                
+                // Load feed if this tab is being activated and has feed URL
+                if (i === activeIndex && feedUrl) {
+                    // Only reload if not already active (to avoid unnecessary reloads)
+                    if (!isAlreadyActive) {
+                        loadTeamMediaFeed(feedUrl, contentElementId, teamName);
+                    }
+                } else if (i === activeIndex && !feedUrl) {
+                    contentItem.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #888;">
+                            No media feed configured for ${teamName} yet.
+                        </div>
+                    `;
+                }
+            });
+        };
+        
         // Global function to switch between team tabs
         window.switchSocialTeamTab = function(activeIndex, uniqueId) {
             // Find the container by searching for the unique ID
@@ -5825,7 +6141,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                     gamesContent.style.display = 'flex';
                     f1Content.style.display = 'none';
 
-                  // Ensure TODAY tab reloads (and resets Live filter) when returning to Home
+                    // Ensure TODAY tab reloads (and resets Live filter) when returning to Home
                   // Unsubscribe any existing TODAY listeners to avoid stale state
                   if (window.activeListenerUnsubscribe && typeof window.activeListenerUnsubscribe === 'function') {
                     try {
@@ -7209,7 +7525,7 @@ document.addEventListener('DOMContentLoaded', function () {
             { date: '2026-01-31', time: '12:30 PM', home: 'Chelsea', away: 'West Ham', channel: '' },
             { date: '2026-01-31', time: '3:00 PM', home: 'Liverpool', away: 'Newcastle', channel: '' }
         ],
-          'LigaMX': [
+        'LigaMX': [
             { date: '2026-01-09', time: '10:00 PM', home: 'Atlas', away: 'Puebla', channel: 'ViX' },
             { date: '2026-01-09', time: '10:00 PM', home: 'Mazatlán', away: 'Juárez', channel: 'ViX' },
             { date: '2026-01-09', time: '10:00 PM', home: 'Tijuana', away: 'América', channel: 'ViX' },
@@ -7319,19 +7635,19 @@ document.addEventListener('DOMContentLoaded', function () {
             { date: '2026-01-25', time: 'TBD', home: 'Villarreal', away: 'Real Madrid', channel: 'ESPN+' }
         ],
         'NFL': [
-          { date: '2025-12-27', time: '4:30 PM', away: 'Houston Texans', home: 'Los Angeles Chargers', channel: 'NFL Net' },
-          { date: '2025-12-27', time: '8:00 PM', away: 'Baltimore Ravens', home: 'Green Bay Packers', channel: 'Peacock' },
-          { date: '2025-12-28', time: '1:00 PM', away: 'Pittsburgh Steelers', home: 'Cleveland Browns', channel: 'CBS' },
-          { date: '2025-12-28', time: '1:00 PM', away: 'New England Patriots', home: 'New York Jets', channel: 'FOX' },
-          { date: '2025-12-28', time: '1:00 PM', away: 'New Orleans Saints', home: 'Tennessee Titans', channel: 'CBS' },
-          { date: '2025-12-28', time: '1:00 PM', away: 'Jacksonville Jaguars', home: 'Indianapolis Colts', channel: 'FOX' },
-          { date: '2025-12-28', time: '1:00 PM', away: 'Tampa Bay Buccaneers', home: 'Miami Dolphins', channel: 'FOX' },
-          { date: '2025-12-28', time: '1:00 PM', away: 'Seattle Seahawks', home: 'Carolina Panthers', channel: 'CBS' },
-          { date: '2025-12-28', time: '1:00 PM', away: 'Arizona Cardinals', home: 'Cincinnati Bengals', channel: 'FOX' },
-          { date: '2025-12-28', time: '4:05 PM', away: 'New York Giants', home: 'Las Vegas Raiders', channel: 'CBS' },
-          { date: '2025-12-28', time: '4:25 PM', away: 'Philadelphia Eagles', home: 'Buffalo Bills', channel: 'FOX' },
-          { date: '2025-12-28', time: '8:20 PM', away: 'Chicago Bears', home: 'San Francisco 49ers', channel: 'NBC' },
-          { date: '2025-12-29', time: '8:15 PM', away: 'Los Angeles Rams', home: 'Atlanta Falcons', channel: 'ESPN' },
+            { date: '2025-12-27', time: '4:30 PM', away: 'Houston Texans', home: 'Los Angeles Chargers', channel: 'NFL Net' },
+            { date: '2025-12-27', time: '8:00 PM', away: 'Baltimore Ravens', home: 'Green Bay Packers', channel: 'Peacock' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Pittsburgh Steelers', home: 'Cleveland Browns', channel: 'CBS' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'New England Patriots', home: 'New York Jets', channel: 'FOX' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'New Orleans Saints', home: 'Tennessee Titans', channel: 'CBS' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Jacksonville Jaguars', home: 'Indianapolis Colts', channel: 'FOX' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Tampa Bay Buccaneers', home: 'Miami Dolphins', channel: 'FOX' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Seattle Seahawks', home: 'Carolina Panthers', channel: 'CBS' },
+            { date: '2025-12-28', time: '1:00 PM', away: 'Arizona Cardinals', home: 'Cincinnati Bengals', channel: 'FOX' },
+            { date: '2025-12-28', time: '4:05 PM', away: 'New York Giants', home: 'Las Vegas Raiders', channel: 'CBS' },
+            { date: '2025-12-28', time: '4:25 PM', away: 'Philadelphia Eagles', home: 'Buffalo Bills', channel: 'FOX' },
+            { date: '2025-12-28', time: '8:20 PM', away: 'Chicago Bears', home: 'San Francisco 49ers', channel: 'NBC' },
+            { date: '2025-12-29', time: '8:15 PM', away: 'Los Angeles Rams', home: 'Atlanta Falcons', channel: 'ESPN' },
 
             { date: '2026-01-03', time: '4:30 PM', away: 'Carolina Panthers', home: 'Tampa Bay Buccaneers', channel: 'ABC' },
             { date: '2026-01-03', time: '8:00 PM', away: 'Seattle Seahawks', home: 'San Francisco 49ers', channel: 'ABC' },
@@ -10748,36 +11064,36 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return null;
       }
-
-      const now = Math.floor(Date.now() / 1000); // Current time in seconds
+        
+        const now = Math.floor(Date.now() / 1000); // Current time in seconds
       const startSec = toEpochSeconds(startTime);
       const stageStartSec = toEpochSeconds(stageStartTime);
 
       // If we don't have any meaningful start time, signal LIVE so caller can fallback
       if (!startSec && startSec !== 0) return "LIVE";
-
-      // If we have StageStartTime, use it for accurate calculation
+        
+        // If we have StageStartTime, use it for accurate calculation
       if (stageStartSec || stageStartSec === 0) {
         const halfStartTime = stageStartSec; // When current half started in epoch seconds
         let minutesElapsed = Math.floor((now - halfStartTime) / 60);
         if (isNaN(minutesElapsed) || minutesElapsed < 0) minutesElapsed = 0;
-
-        // Add 45 minutes for second half
-        if (stage === "SECOND_HALF") {
-          return Math.min(minutesElapsed + 45, 90); // Cap at 90 minutes
+            
+            // Add 45 minutes for second half
+            if (stage === "SECOND_HALF") {
+                return Math.min(minutesElapsed + 45, 90); // Cap at 90 minutes
+            }
+            return Math.min(minutesElapsed, 45); // Cap at 45 minutes for first half
         }
-        return Math.min(minutesElapsed, 45); // Cap at 45 minutes for first half
-      }
-
-      // Fallback: estimate minute from game start time
+        
+        // Fallback: estimate minute from game start time
       let minutesElapsed = Math.floor((now - startSec) / 60);
       if (isNaN(minutesElapsed) || minutesElapsed < 0) minutesElapsed = 0;
-
-      // Add 45 minutes for second half
-      if (stage === "SECOND_HALF") {
-        return Math.min(minutesElapsed + 45, 90); // Cap at 90 minutes
-      }
-      return Math.min(minutesElapsed, 45); // Cap at 45 minutes for first half
+        
+        // Add 45 minutes for second half
+        if (stage === "SECOND_HALF") {
+            return Math.min(minutesElapsed + 45, 90); // Cap at 90 minutes
+        }
+        return Math.min(minutesElapsed, 45); // Cap at 45 minutes for first half
     }
     
     // --- 5. CORE RENDERING FUNCTION ---
@@ -12494,8 +12810,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // Fallback to displayTime if Start Time parsing failed
                                 if (data.displayTime && data.displayTime !== '' && data.displayTime !== 'TBD') {
                                     currentTimeLabel = data.displayTime;
-                                } else {
-                                    currentTimeLabel = "TBD";
+                        } else {
+                            currentTimeLabel = "TBD";
                                 }
                             }
                         } else {
@@ -14726,9 +15042,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (map[fullName]) return map[fullName];
         const parts = fullName.split(' ');
         return parts.slice(-1).join(' ');
-      }
-
-      function createNFLConferenceStandings(teams, conference) {
+    }
+    
+    function createNFLConferenceStandings(teams, conference) {
         const divisions = ['AFC East', 'AFC North', 'AFC South', 'AFC West', 'NFC East', 'NFC North', 'NFC South', 'NFC West'];
         const conferenceDivisions = divisions.filter(div => div.startsWith(conference));
         let html = '';
@@ -14766,15 +15082,15 @@ document.addEventListener('DOMContentLoaded', function () {
             html += '<tbody>';
             
             divisionTeams.forEach((team, index) => {
-            const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
             const displayName = getMascotName(team.Team);
-            html += '<tr style="' + rowStyle + '">';
+                html += '<tr style="' + rowStyle + '">';
             html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + displayName + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Wins + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Losses + '</td>';
-            html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + (team.Ties || 0) + '</td>';
-            html += '</tr>';
-          });
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Wins + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Losses + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + (team.Ties || 0) + '</td>';
+                html += '</tr>';
+            });
             
             html += '</tbody></table></div>';
         });
@@ -16434,7 +16750,7 @@ async function fetchFeaturedGames() {
               // Run FSM with empty data to keep state in sync, then invoke callback
               try { handleTodayFSM([]).catch(() => {}); } catch (e) {}
               if (callback) callback();
-              return;
+                return;
             }
             
             let gamesToRender = [];
@@ -18337,12 +18653,12 @@ async function fetchFeaturedGames() {
                     
                     // Determine display order based on league type
                     const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia'].includes(leagueKey);
-
+                    
                     let topTeam, bottomTeam;
                     if (isSoccerLeague) {
-                      // Soccer: Home team on top, away team on bottom
-                      topTeam = game.home;
-                      bottomTeam = game.away;
+                        // Soccer: Home team on top, away team on bottom
+                        topTeam = game.home;
+                        bottomTeam = game.away;
                     } else if (isNcaaLeague) {
                       // NCAA (football/basketball): preserve canonical names for ranking, derive display names separately
                       const awayCanonical = game.away;
@@ -18354,8 +18670,8 @@ async function fetchFeaturedGames() {
                       bottomTeam = formatDisplayUsingCanonical(homeCanonical, homeDisplay, leagueKey);
                     } else {
                       // Other sports (NFL, etc.): Away team on top, home team on bottom, strip city prefixes
-                      topTeam = getMascotName(game.away);
-                      bottomTeam = getMascotName(game.home);
+                        topTeam = getMascotName(game.away);
+                        bottomTeam = getMascotName(game.home);
                     }
                         
                         // Rankings and display mapping already applied above for NCAA leagues
@@ -18702,14 +19018,14 @@ async function fetchFeaturedGames() {
                             const channelDisplay = normalizeChannel(round.channel || '');
                             
                             html += `
-                              <div class="round-row" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: ${index < game.rounds.length - 1 ? '1px solid #374151' : 'none'}; background-color: #1f2937;">
-                                <div class="round-info" style="flex: 1; display: flex; gap: 12px;">
-                                  ${dayDisplay ? `<span style="color: white; font-size: 11px;">${dayDisplay}</span>` : ''}
-                                  <span style="color: white; font-size: 11px;">${roundName}</span>
-                                  ${timeDisplay ? `<span style="color: #9ca3af; font-size: 10px;">${timeDisplay}</span>` : ''}
+                                <div class="round-row" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: ${index < game.rounds.length - 1 ? '1px solid #374151' : 'none'}; background-color: #1f2937;">
+                                    <div class="round-info" style="flex: 1; display: flex; gap: 12px;">
+                                        ${dayDisplay ? `<span style="color: white; font-size: 11px;">${dayDisplay}</span>` : ''}
+                                        <span style="color: white; font-size: 11px;">${roundName}</span>
+                                        ${timeDisplay ? `<span style="color: #9ca3af; font-size: 10px;">${timeDisplay}</span>` : ''}
                                   ${channelDisplay ? `<span class="channel-inline" style="color: #9ca3af; font-size: 10px;">${channelDisplay}</span>` : ''}
+                                    </div>
                                 </div>
-                              </div>
                             `;
                         });
                         html += `<div style="margin-bottom: 20px;"></div>`;
@@ -18978,9 +19294,9 @@ async function fetchFeaturedGames() {
                                 <div class="blank" style="color: white; font-size: 11px; line-height: 1.4;"></div>
                             </div>
                     <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px; display: flex; flex-direction: column; align-items: center;">
-                      <div>${timeDisplay}</div>
+                                <div>${timeDisplay}</div>
                       ${channelDisplay ? `<div class="channel-inline" style="color: #9ca3af; font-size: 10px; margin-top: 2px; text-align: center;">${channelDisplay}</div>` : ''}
-                    </div>
+                            </div>
                         </div>
                     `;
                 } else if (leagueKey === 'MotoGP') {
@@ -21540,7 +21856,7 @@ function formatTeamNameWithRanking(displayName, leagueKey) {
     if (!leagueKey || !['NCAAF', 'NCAAM', 'NCAAW'].includes(leagueKey)) {
         return displayName;
     }
-
+    
       
   const rank = getRankingForDisplayName(displayName, leagueKey);
   if (rank !== null && rank !== undefined) {
@@ -22876,7 +23192,7 @@ const VIDEOS_CONFIG = {
     twoTabs: {
         'NFL': {
           highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gn1WlB_2MRD6ZGGhflq5u-n.xml',
-          allVideos: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-nfl.xml'
+            allVideos: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-nfl.xml'
         },
         'MLB': {
             highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-mlb-playlist.xml',
