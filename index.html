@@ -15312,6 +15312,53 @@ document.addEventListener('DOMContentLoaded', function () {
             displayStandingsTable(leagueKey, hardcodedNFL, document.getElementById('league-standings-content'));
             return true;
           }
+                    // Immediate override for UEFA Europa League: use provided hardcoded table
+                    if (leagueKey === 'UEFA Europa League') {
+                                                const hardcodedEuropa = [
+                                                        {Rank:1,Team:'Lyon',MP:6,Wins:5,Draws:0,Losses:1,GF:13,GA:3,GD:10,Points:15,Last5:'WinWinLossWinWin'},
+                                                        {Rank:2,Team:'Midtjylland',MP:6,Wins:5,Draws:0,Losses:1,GF:13,GA:5,GD:8,Points:15,Last5:'WinWinWinLossWin'},
+                                                        {Rank:3,Team:'Aston Villa',MP:6,Wins:5,Draws:0,Losses:1,GF:10,GA:4,GD:6,Points:15,Last5:'WinLossWinWinWin'},
+                                                        {Rank:4,Team:'Real Betis',MP:6,Wins:4,Draws:2,Losses:0,GF:11,GA:4,GD:7,Points:14,Last5:'WinDrawWinWinWin'},
+                                                        {Rank:5,Team:'SC Freiburg',MP:6,Wins:4,Draws:2,Losses:0,GF:9,GA:3,GD:6,Points:14,Last5:'DrawWinWinDrawWin'},
+                                                        {Rank:6,Team:'Ferencváros',MP:6,Wins:4,Draws:2,Losses:0,GF:11,GA:6,GD:5,Points:14,Last5:'WinWinWinDrawWin'},
+                                                        {Rank:7,Team:'Braga',MP:6,Wins:4,Draws:1,Losses:1,GF:10,GA:5,GD:5,Points:13,Last5:'WinWinLossDrawWin'},
+                                                        {Rank:8,Team:'Porto',MP:6,Wins:4,Draws:1,Losses:1,GF:9,GA:5,GD:4,Points:13,Last5:'WinLossDrawWinWin'},
+                                                        {Rank:9,Team:'VfB Stuttgart',MP:6,Wins:4,Draws:0,Losses:2,GF:12,GA:5,GD:7,Points:12,Last5:'LossLossWinWinWin'},
+                                                        {Rank:10,Team:'Roma',MP:6,Wins:4,Draws:0,Losses:2,GF:10,GA:5,GD:5,Points:12,Last5:'LossLossWinWinWin'},
+                                                        {Rank:11,Team:'Nottm Forest',MP:6,Wins:3,Draws:2,Losses:1,GF:11,GA:6,GD:5,Points:11,Last5:'LossWinDrawWinWin'},
+                                                        {Rank:12,Team:'Fenerbahçe',MP:6,Wins:3,Draws:2,Losses:1,GF:9,GA:5,GD:4,Points:11,Last5:'WinWinDrawDrawWin'},
+                                                        {Rank:13,Team:'Bologna',MP:6,Wins:3,Draws:2,Losses:1,GF:9,GA:5,GD:4,Points:11,Last5:'DrawWinDrawWinWin'},
+                                                        {Rank:14,Team:'Viktoria Plzeň',MP:6,Wins:2,Draws:4,Losses:0,GF:6,GA:2,GD:4,Points:10,Last5:'WinWinDrawDrawDraw'},
+                                                        {Rank:15,Team:'Panathinaikos',MP:6,Wins:3,Draws:1,Losses:2,GF:9,GA:7,GD:2,Points:10,Last5:'LossLossWinWinDraw'},
+                                                        {Rank:16,Team:'Genk',MP:6,Wins:3,Draws:1,Losses:2,GF:7,GA:6,GD:1,Points:10,Last5:'LossDrawWinWinLoss'},
+                                                        {Rank:17,Team:'Crvena zvezda',MP:6,Wins:3,Draws:1,Losses:2,GF:5,GA:5,GD:0,Points:10,Last5:'LossLossWinWinWin'},
+                                                        {Rank:18,Team:'PAOK',MP:6,Wins:2,Draws:3,Losses:1,GF:13,GA:10,GD:3,Points:9,Last5:'LossWinWinDrawDraw'},
+                                                        {Rank:19,Team:'Celta Vigo',MP:6,Wins:3,Draws:0,Losses:3,GF:12,GA:9,GD:3,Points:9,Last5:'WinWinWinLossLoss'},
+                                                        {Rank:20,Team:'LOSC',MP:6,Wins:3,Draws:0,Losses:3,GF:10,GA:7,GD:3,Points:9,Last5:'WinLossLossWinLoss'},
+                                                        {Rank:21,Team:'Young Boys',MP:6,Wins:3,Draws:0,Losses:3,GF:8,GA:12,GD:-4,Points:9,Last5:'WinWinLossLossWin'},
+                                                        {Rank:22,Team:'Brann',MP:6,Wins:2,Draws:2,Losses:2,GF:6,GA:7,GD:-1,Points:8,Last5:'WinWinDrawDrawLoss'},
+                                                        {Rank:23,Team:'Ludogorets',MP:6,Wins:2,Draws:1,Losses:3,GF:11,GA:14,GD:-3,Points:7,Last5:'LossLossLossWinDraw'},
+                                                        {Rank:24,Team:'Celtic',MP:6,Wins:2,Draws:1,Losses:3,GF:7,GA:11,GD:-4,Points:7,Last5:'LossWinLossWinLoss'},
+                                                        {Rank:25,Team:'Dinamo Zagreb',MP:6,Wins:2,Draws:1,Losses:3,GF:8,GA:13,GD:-5,Points:7,Last5:'WinDrawLossLossLoss'},
+                                                        {Rank:26,Team:'Basel',MP:6,Wins:2,Draws:0,Losses:4,GF:8,GA:9,GD:-1,Points:6,Last5:'WinLossWinLossLoss'},
+                                                        {Rank:27,Team:'FCSB',MP:6,Wins:2,Draws:0,Losses:4,GF:7,GA:11,GD:-4,Points:6,Last5:'LossLossLossLossWin'},
+                                                        {Rank:28,Team:'Go Ahead Eagles',MP:6,Wins:2,Draws:0,Losses:4,GF:5,GA:11,GD:-6,Points:6,Last5:'WinWinLossLossLoss'},
+                                                        {Rank:29,Team:'SK Sturm Graz',MP:6,Wins:1,Draws:1,Losses:4,GF:4,GA:8,GD:-4,Points:4,Last5:'WinLossDrawLossLoss'},
+                                                        {Rank:30,Team:'Feyenoord',MP:6,Wins:1,Draws:0,Losses:5,GF:7,GA:13,GD:-6,Points:3,Last5:'LossWinLossLossLoss'},
+                                                        {Rank:31,Team:'RB Salzburg',MP:6,Wins:1,Draws:0,Losses:5,GF:5,GA:11,GD:-6,Points:3,Last5:'LossLossWinLossLoss'},
+                                                        {Rank:32,Team:'Utrecht',MP:6,Wins:0,Draws:1,Losses:5,GF:3,GA:9,GD:-6,Points:1,Last5:'LossLossDrawLossLoss'},
+                                                        {Rank:33,Team:'Rangers',MP:6,Wins:0,Draws:1,Losses:5,GF:3,GA:11,GD:-8,Points:1,Last5:'LossLossLossDrawLoss'},
+                                                        {Rank:34,Team:'Malmö',MP:6,Wins:0,Draws:1,Losses:5,GF:3,GA:12,GD:-9,Points:1,Last5:'LossDrawLossLossLoss'},
+                                                        {Rank:35,Team:'M. Tel-Aviv',MP:6,Wins:0,Draws:1,Losses:5,GF:2,GA:18,GD:-16,Points:1,Last5:'LossLossLossLossLoss'},
+                                                        {Rank:36,Team:'Nice',MP:6,Wins:0,Draws:0,Losses:6,GF:4,GA:13,GD:-9,Points:0,Last5:'LossLossLossLossLoss'}
+                                                ];
+
+                        // Ensure fields expected by displayStandingsTable exist
+                        hardcodedEuropa.forEach(t => { t.MP = t.MP || t.MatchesPlayed || 0; t.Points = t.Points || 0; t.Wins = t.Wins || 0; t.Draws = t.Draws || 0; t.Losses = t.Losses || 0; });
+                        cacheStandings(leagueKey, hardcodedEuropa);
+                        displayStandingsTable(leagueKey, hardcodedEuropa, document.getElementById('league-standings-content'));
+                        return true;
+                    }
             
             // Check if this league uses the new collection format (like NFLStandings)
             if (collectionName !== 'standings') {
@@ -22794,7 +22841,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const feedMapNWSL = {
     headlines: "https://rss.app/feeds/zL71BDnU9LO5QpOP.xml",
-    reddit: "https://rss.app/feeds/HL9rA42ELIkqWXJg.xml"
+    reddit: "https://www.reddit.com/r/NWSL/new.rss"
   };
 
   function fetchFeedNWSL(targetId, url) {
@@ -22802,19 +22849,38 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!contentPane) return;
     contentPane.innerHTML = '<p>Loading...</p>';
 
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const finalUrl = proxyUrl + encodeURIComponent(url);
-
-    fetch(finalUrl)
-      .then(r => r.text())
+    fetch(url)
+      .then(r => {
+        if (!r.ok) {
+          throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+        }
+        return r.text();
+      })
       .then(str => {
+        if (!str || str.trim() === '') {
+          throw new Error('Empty response from feed');
+        }
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(str, "text/xml");
-        const items = xmlDoc.querySelectorAll("item");
+        
+        // Check for parse errors
+        const parseError = xmlDoc.querySelector('parsererror');
+        if (parseError) {
+          throw new Error('XML parse error');
+        }
+        
+        // Handle both RSS (item) and Atom (entry) formats
+        const items = xmlDoc.querySelectorAll("item, entry");
+        if (items.length === 0) {
+          contentPane.innerHTML = '<p>No items found in feed.</p>';
+          return;
+        }
+        
         let html = '<ul style="margin:0; padding:0; list-style:none;">';
         items.forEach(el => {
           const title = el.querySelector("title")?.textContent || 'No title';
-          const link = el.querySelector("link")?.textContent || '#';
+          // Handle both RSS and Atom link formats
+          const link = el.querySelector("link")?.textContent || el.querySelector("link")?.getAttribute('href') || '#';
           html += `
             <li style="margin-bottom:0.5em; padding:4px 0; border-bottom:1px solid #C9C8C7;">
               <a href="${link}" target="_blank" style="text-decoration:none; color:inherit;">
@@ -22827,7 +22893,8 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .catch(err => {
         console.error("Error fetching RSS feed:", err);
-        contentPane.innerHTML = `<p>Failed to load news. Please try again later.</p>`;
+        console.error("Feed URL:", url);
+        contentPane.innerHTML = `<p>Failed to load news: ${err.message || 'Unknown error'}</p>`;
       });
   }
 
@@ -22847,7 +22914,10 @@ document.addEventListener('DOMContentLoaded', function() {
           targetPane.style.display = 'block';
           e.target.classList.add('active');
         }
-        if (feedMapNWSL[source]) {
+        const url = e.target.dataset.url;
+        if (url) {
+          fetchFeedNWSL(`#${source}-feed-NWSL`, url);
+        } else if (feedMapNWSL[source]) {
           fetchFeedNWSL(`#${source}-feed-NWSL`, feedMapNWSL[source]);
         }
       }
@@ -22857,7 +22927,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const initialActiveTab = document.querySelector('#nwsltabs-NWSL .headlines-tab.active');
     if (initialActiveTab) {
       const source = initialActiveTab.dataset.source;
-      fetchFeedNWSL(`#${source}-feed-NWSL`, feedMapNWSL[source]);
+      const url = initialActiveTab.dataset.url;
+      if (url) {
+        fetchFeedNWSL(`#${source}-feed-NWSL`, url);
+      } else if (feedMapNWSL[source]) {
+        fetchFeedNWSL(`#${source}-feed-NWSL`, feedMapNWSL[source]);
+      }
     }
   }
 });
