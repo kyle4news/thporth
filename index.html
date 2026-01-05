@@ -1227,6 +1227,13 @@ table.game-table td:nth-child(1) {
     padding: 0 !important;
 }
 
+/* News feed container (for game mode) - dark background only for game content */
+.news-feed {
+    background-color: #1a1a1a !important;
+    height: 100%;
+    overflow: hidden;
+}
+
 /* 2) Main container for both headlines and breaking news sections.
       It needs to fill the full available height of the news column minus the header. */
 .news-main-container {
@@ -4667,6 +4674,7 @@ function loadCustomRSSFeed(feedUrl, container) {
         // Clear Social column content and load game social posts
         const socialContainer = document.getElementById('social-feed-container');
         if (socialContainer) {
+            socialContainer.style.backgroundColor = '#1a1a1a';
             socialContainer.innerHTML = `
                 <div style="padding:16px;color:white;background:#0066cc;min-height:100vh;display:flex;align-items:center;justify-content:center;">
                     <div style="text-align:center;">
@@ -4779,6 +4787,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 newsContainer.appendChild(newsFeed);
             } else if (type === 'game') {
                 // Game mode: load and display game-specific news from Firestore
+                newsFeed.style.backgroundColor = '#1a1a1a';
                 newsFeed.innerHTML = `
                     <div style="padding:16px;color:white;background:#8b0000;min-height:100vh;display:flex;align-items:center;justify-content:center;">
                         <div style="text-align:center;">
@@ -5347,6 +5356,98 @@ function loadCustomRSSFeed(feedUrl, container) {
             return TEAM_SHORT_NAMES[fullTeamName] || fullTeamName;
         }
         
+        // Convert team name to sportspyder RSS feed URL
+        // Format: https://sportspyder.com/[league]/[team-slug]/news.xml
+        function getSportspyderFeedUrl(teamName) {
+            if (!teamName) return null;
+            
+            // Map team names to their league (sportspyder league abbreviation)
+            const TEAM_TO_LEAGUE = {
+                // NHL teams
+                "Anaheim Ducks": "nhl", "Boston Bruins": "nhl", "Buffalo Sabres": "nhl",
+                "Calgary Flames": "nhl", "Carolina Hurricanes": "nhl", "Chicago Blackhawks": "nhl",
+                "Colorado Avalanche": "nhl", "Columbus Blue Jackets": "nhl", "Dallas Stars": "nhl",
+                "Detroit Red Wings": "nhl", "Edmonton Oilers": "nhl", "Florida Panthers": "nhl",
+                "Los Angeles Kings": "nhl", "Minnesota Wild": "nhl", "Montreal Canadiens": "nhl",
+                "Nashville Predators": "nhl", "New Jersey Devils": "nhl", "New York Islanders": "nhl",
+                "New York Rangers": "nhl", "Ottawa Senators": "nhl", "Philadelphia Flyers": "nhl",
+                "Pittsburgh Penguins": "nhl", "San Jose Sharks": "nhl", "Seattle Kraken": "nhl",
+                "St. Louis Blues": "nhl", "Tampa Bay Lightning": "nhl", "Toronto Maple Leafs": "nhl",
+                "Utah Mammoth": "nhl", "Vancouver Canucks": "nhl", "Vegas Golden Knights": "nhl",
+                "Washington Capitals": "nhl", "Winnipeg Jets": "nhl",
+                // NBA teams
+                "Atlanta Hawks": "nba", "Boston Celtics": "nba", "Brooklyn Nets": "nba",
+                "Charlotte Hornets": "nba", "Chicago Bulls": "nba", "Cleveland Cavaliers": "nba",
+                "Dallas Mavericks": "nba", "Denver Nuggets": "nba", "Detroit Pistons": "nba",
+                "Golden State Warriors": "nba", "Houston Rockets": "nba", "Indiana Pacers": "nba",
+                "Los Angeles Clippers": "nba", "Los Angeles Lakers": "nba", "Memphis Grizzlies": "nba",
+                "Miami Heat": "nba", "Milwaukee Bucks": "nba", "Minnesota Timberwolves": "nba",
+                "New Orleans Pelicans": "nba", "New York Knicks": "nba", "Oklahoma City Thunder": "nba",
+                "Orlando Magic": "nba", "Philadelphia 76ers": "nba", "Phoenix Suns": "nba",
+                "Portland Trail Blazers": "nba", "Sacramento Kings": "nba", "San Antonio Spurs": "nba",
+                "Toronto Raptors": "nba", "Utah Jazz": "nba", "Washington Wizards": "nba",
+                // MLB teams
+                "Arizona Diamondbacks": "mlb", "Atlanta Braves": "mlb", "Baltimore Orioles": "mlb",
+                "Boston Red Sox": "mlb", "Chicago Cubs": "mlb", "Chicago White Sox": "mlb",
+                "Cincinnati Reds": "mlb", "Cleveland Guardians": "mlb", "Colorado Rockies": "mlb",
+                "Detroit Tigers": "mlb", "Houston Astros": "mlb", "Kansas City Royals": "mlb",
+                "Los Angeles Angels": "mlb", "Los Angeles Dodgers": "mlb", "Miami Marlins": "mlb",
+                "Milwaukee Brewers": "mlb", "Minnesota Twins": "mlb", "New York Mets": "mlb",
+                "New York Yankees": "mlb", "Oakland Athletics": "mlb", "Philadelphia Phillies": "mlb",
+                "Pittsburgh Pirates": "mlb", "San Diego Padres": "mlb", "San Francisco Giants": "mlb",
+                "Seattle Mariners": "mlb", "St. Louis Cardinals": "mlb", "Tampa Bay Rays": "mlb",
+                "Texas Rangers": "mlb", "Toronto Blue Jays": "mlb", "Washington Nationals": "mlb",
+                // NFL teams
+                "Arizona Cardinals": "nfl", "Atlanta Falcons": "nfl", "Baltimore Ravens": "nfl",
+                "Buffalo Bills": "nfl", "Carolina Panthers": "nfl", "Chicago Bears": "nfl",
+                "Cincinnati Bengals": "nfl", "Cleveland Browns": "nfl", "Dallas Cowboys": "nfl",
+                "Denver Broncos": "nfl", "Detroit Lions": "nfl", "Green Bay Packers": "nfl",
+                "Houston Texans": "nfl", "Indianapolis Colts": "nfl", "Jacksonville Jaguars": "nfl",
+                "Kansas City Chiefs": "nfl", "Las Vegas Raiders": "nfl", "Los Angeles Chargers": "nfl",
+                "Los Angeles Rams": "nfl", "Miami Dolphins": "nfl", "Minnesota Vikings": "nfl",
+                "New England Patriots": "nfl", "New Orleans Saints": "nfl", "New York Giants": "nfl",
+                "New York Jets": "nfl", "Philadelphia Eagles": "nfl", "Pittsburgh Steelers": "nfl",
+                "San Francisco 49ers": "nfl", "Seattle Seahawks": "nfl", "Tampa Bay Buccaneers": "nfl",
+                "Tennessee Titans": "nfl", "Washington Commanders": "nfl"
+            };
+            
+            // Get league for this team
+            const league = TEAM_TO_LEAGUE[teamName];
+            if (!league) {
+                console.warn(`[getSportspyderFeedUrl] No league mapping found for team: ${teamName}`);
+                return null;
+            }
+            
+            // Convert team name to slug format (lowercase, replace spaces with hyphens, remove special chars)
+            let slug = teamName.toLowerCase()
+                .replace(/\./g, '') // Remove periods
+                .replace(/\s+/g, '-') // Replace spaces with hyphens
+                .replace(/[^a-z0-9-]/g, '') // Remove special characters
+                .replace(/-+/g, '-') // Replace multiple hyphens with single
+                .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+            
+            // Sportspyder RSS feed format: https://sportspyder.com/[league]/[team-slug]/news.xml
+            const feedUrl = `https://sportspyder.com/${league}/${slug}/news.xml`;
+            console.log(`[getSportspyderFeedUrl] Generated URL for ${teamName}: ${feedUrl}`);
+            return feedUrl;
+        }
+        
+        // Get news feeds for a team - ONLY sportspyder feed (no aggregation)
+        function getTeamNewsFeeds(teamName) {
+            if (!teamName) return null;
+            
+            // ONLY return sportspyder feed - no aggregation with other feeds
+            const sportspyderUrl = getSportspyderFeedUrl(teamName);
+            
+            if (sportspyderUrl) {
+                console.log(`[getTeamNewsFeeds] Using sportspyder feed for ${teamName}:`, sportspyderUrl);
+                return [sportspyderUrl];
+            }
+            
+            console.log(`[getTeamNewsFeeds] No sportspyder feed found for ${teamName}`);
+            return null;
+        }
+        
         // Helper function to render news with team tabs (side by side, matching social/media columns)
         function renderNewsWithTeamTabs(homeTeam, awayTeam, container) {
             console.log('[renderNewsWithTeamTabs] Called with:', { homeTeam, awayTeam, container });
@@ -5358,8 +5459,8 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             const homeShort = getShortTeamName(homeTeam);
             const awayShort = getShortTeamName(awayTeam);
-            const homeFeedUrls = TEAM_TO_NEWS_FEED[homeTeam] || null;
-            const awayFeedUrls = TEAM_TO_NEWS_FEED[awayTeam] || null;
+            const homeFeedUrls = getTeamNewsFeeds(homeTeam);
+            const awayFeedUrls = getTeamNewsFeeds(awayTeam);
             
             // Build tabs array - always include both teams, even if no feed yet
             const tabs = [
@@ -5407,7 +5508,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             `).join('');
             
             container.innerHTML = `
-                <div style="display: flex; flex-direction: column; height: 100vh;">
+                <div style="display: flex; flex-direction: column; height: 100vh; background-color: #1a1a1a;">
                     <div class="news-team-tabs">
                         ${tabsHTML}
                     </div>
@@ -5418,9 +5519,12 @@ function loadCustomRSSFeed(feedUrl, container) {
             `;
             
             // Load the first tab's content immediately
-            if (tabs[0].feedUrls && Array.isArray(tabs[0].feedUrls)) {
+            console.log('[renderNewsWithTeamTabs] First tab feedUrls:', tabs[0].feedUrls);
+            if (tabs[0].feedUrls && Array.isArray(tabs[0].feedUrls) && tabs[0].feedUrls.length > 0) {
+                console.log('[renderNewsWithTeamTabs] Loading feeds for first tab:', tabs[0].name, tabs[0].feedUrls);
                 loadTeamNewsFeeds(tabs[0].feedUrls, tabIds[0], tabs[0].name);
             } else {
+                console.log('[renderNewsWithTeamTabs] No feeds for first tab:', tabs[0].name);
                 const firstContent = document.getElementById(tabIds[0]);
                 if (firstContent) {
                     firstContent.innerHTML = `
@@ -5465,6 +5569,12 @@ function loadCustomRSSFeed(feedUrl, container) {
                             const separator = url.includes('?') ? '&' : '?';
                             originalUrl = `${url}${separator}posts_per_page=50`;
                             console.log(`[loadTeamNewsFeeds] Using WordPress parameter: ${originalUrl}`);
+                        }
+                        
+                        // Sportspyder feeds - use proxy service (handles CORS and redirects)
+                        if (url.includes('sportspyder.com')) {
+                            originalUrl = url;
+                            console.log(`[loadTeamNewsFeeds] Loading sportspyder feed via proxy: ${originalUrl}`);
                         }
                         
                         // Proxy through RSS feed service to bypass CORS
@@ -5519,14 +5629,33 @@ function loadCustomRSSFeed(feedUrl, container) {
                 const feedResults = await Promise.all(feedPromises);
                 
                 // Debug: log results from each feed
-                console.log(`[loadTeamNewsFeeds] === Feed Aggregation Results ===`);
+                console.log(`[loadTeamNewsFeeds] === Feed Aggregation Results for ${teamName} ===`);
                 feedResults.forEach((result, idx) => {
                     if (result.success) {
                         console.log(`✅ Feed ${idx + 1}: ${result.url} - ${result.items.length} items`);
                     } else {
-                        console.log(`❌ Feed ${idx + 1}: ${result.url} - FAILED: ${result.error}`);
+                        console.error(`❌ Feed ${idx + 1}: ${result.url} - FAILED: ${result.error}`);
                     }
                 });
+                
+                // If all feeds failed, show error message
+                const allFailed = feedResults.every(result => !result.success);
+                if (allFailed && feedResults.length > 0) {
+                    console.error(`[loadTeamNewsFeeds] All feeds failed for ${teamName}`);
+                    const errorMessages = feedResults.map(r => r.error || 'Unknown error').join(', ');
+                    contentElement.innerHTML = `
+                        <div style="padding: 20px; color: #ff6b6b;">
+                            <h3 style="margin: 0 0 10px 0;">Error loading news feeds</h3>
+                            <p style="margin: 0; font-size: 12px; color: #ccc;">
+                                Failed to load feeds for ${teamName}. Errors: ${errorMessages}
+                            </p>
+                            <p style="margin: 10px 0 0 0; font-size: 11px; color: #888;">
+                                Check browser console for details.
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
                 
                 // Merge all items from all feeds
                 let allItems = [];
@@ -5632,7 +5761,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             const teamName = activeTab.getAttribute('data-team');
             const contentElementId = allContents[activeIndex].id;
-            const feedUrls = TEAM_TO_NEWS_FEED[teamName] || null;
+            const feedUrls = getTeamNewsFeeds(teamName);
             
             const isAlreadyActive = activeTab.classList.contains('active');
             
@@ -5736,7 +5865,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             `).join('');
             
             container.innerHTML = `
-                <div style="display: flex; flex-direction: column; height: 100vh;">
+                <div style="display: flex; flex-direction: column; height: 100vh; background-color: #1a1a1a;">
                     <div class="social-team-tabs">
                         ${tabsHTML}
                     </div>
@@ -24197,4 +24326,5 @@ setInterval(() => {
     // }, 5000);
   </script>
   </body>
+</html>
 </html>
