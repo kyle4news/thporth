@@ -5658,6 +5658,17 @@ function loadCustomRSSFeed(feedUrl, container) {
                     const publishedDate = item.pubDate || item.publishedAt || '';
                     const formattedDate = publishedDate ? new Date(publishedDate).toLocaleDateString() : '';
                     
+                    // Extract source from title if it's in brackets (e.g., "[NHL: Utah Hockey Club] - Title")
+                    let title = item.title || 'Untitled';
+                    let source = '';
+                    
+                    // Check for pattern: [Source] - Title or [Source] Title
+                    const bracketMatch = title.match(/^\[([^\]]+)\]\s*[-–—]?\s*(.+)$/);
+                    if (bracketMatch) {
+                        source = bracketMatch[1].trim();
+                        title = bracketMatch[2].trim();
+                    }
+                    
                     // Clean up description HTML
                     let descriptionText = item.description || '';
                     // Remove HTML tags for preview
@@ -5665,19 +5676,29 @@ function loadCustomRSSFeed(feedUrl, container) {
                     tempDiv.innerHTML = descriptionText;
                     descriptionText = tempDiv.textContent || tempDiv.innerText || '';
                     
+                    // Build date/source line - date first, then source
+                    let dateSourceLine = '';
+                    if (formattedDate && source) {
+                        dateSourceLine = `${formattedDate} - ${source}`;
+                    } else if (formattedDate) {
+                        dateSourceLine = formattedDate;
+                    } else if (source) {
+                        dateSourceLine = source;
+                    }
+                    
                     return `
                         <div style="padding: 15px; margin-bottom: 10px; background: #2a2a2a; cursor: pointer;" onclick="window.open('${item.link || '#'}', '_blank')">
                             <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 14px; font-weight: 600;">
-                                ${item.title || 'Untitled'}
+                                ${title}
                             </h3>
                             ${descriptionText ? `
                                 <p style="margin: 0 0 8px 0; color: #bebebe; font-size: 12px; line-height: 1.4;">
                                     ${descriptionText.substring(0, 150)}${descriptionText.length > 150 ? '...' : ''}
                                 </p>
                             ` : ''}
-                            ${formattedDate ? `
+                            ${dateSourceLine ? `
                                 <div style="font-size: 10px; color: #888; margin-top: 8px;">
-                                    ${formattedDate}
+                                    ${dateSourceLine}
                                 </div>
                             ` : ''}
                         </div>
