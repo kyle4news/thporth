@@ -5200,8 +5200,38 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // Team to media feed mapping (YouTube channel RSS feeds)
         const TEAM_TO_MEDIA_FEED = {
+            'Anaheim Ducks': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-anaheimducks.xml',
+            'Boston Bruins': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-bostonbruins.xml',
             'Buffalo Sabres': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-buffalosabres.xml',
-            // Add more teams as needed
+            'Calgary Flames': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-calgaryflames.xml',
+            'Carolina Hurricanes': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-carolinahurricanes.xml',
+            'Chicago Blackhawks': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-chicagoblackhawks.xml',
+            'Colorado Avalanche': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-coloradoavalanche.xml',
+            'Columbus Blue Jackets': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-bluejackets.xml',
+            'Dallas Stars': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-dallasstars.xml',
+            'Detroit Red Wings': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-detroitredwings.xml',
+            'Edmonton Oilers': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-edmontonoilers.xml',
+            'Florida Panthers': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-floridapanthers.xml',
+            'Los Angeles Kings': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-losangeleskings.xml',
+            'Minnesota Wild': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-minnesotawild.xml',
+            'Montreal Canadiens': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-montrealcanadiens.xml',
+            'Nashville Predators': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nashvillepredators.xml',
+            'New Jersey Devils': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-newjerseydevils.xml',
+            'New York Islanders': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-newyorkislanders.xml',
+            'New York Rangers': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-newyorkrangers.xml',
+            'Ottawa Senators': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-ottawasenators.xml',
+            'Philadelphia Flyers': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-philadelphiaflyers.xml',
+            'Pittsburgh Penguins': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-pittsburghpenguins.xml',
+            'San Jose Sharks': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-sanjosesharks.xml',
+            'Seattle Kraken': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-seattlekraken.xml',
+            'St. Louis Blues': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-stlouisblues.xml',
+            'Tampa Bay Lightning': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-tampabaylightning.xml',
+            'Toronto Maple Leafs': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-torontomapleleafs.xml',
+            'Utah Mammoth': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-utahmammoth.xml',
+            'Vancouver Canucks': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-vancouvercanucks.xml',
+            'Vegas Golden Knights': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-vegasgoldenknights.xml',
+            'Washington Capitals': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-washingtoncapitals.xml',
+            'Winnipeg Jets': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-winnipegjets.xml'
         };
         
         // Get short team name for display (e.g., "Buffalo Sabres" -> "Sabres")
@@ -5812,15 +5842,15 @@ function loadCustomRSSFeed(feedUrl, container) {
                     return `
                         <div style="margin-bottom: 20px; padding: 15px; background: #2a2a2a; border-radius: 4px; border: 1px solid #3a3a3a;">
                             ${videoId ? `
-                                <div style="margin-bottom: 10px;">
+                                <div style="margin-bottom: 10px; position: relative; width: 100%; padding-bottom: 75%; border-radius: 4px; overflow: hidden; background: #000;">
                                     <iframe 
                                         width="100%" 
-                                        height="315" 
+                                        height="100%" 
                                         src="https://www.youtube.com/embed/${videoId}" 
                                         frameborder="0" 
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                                         allowfullscreen 
-                                        style="border-radius: 4px; max-width: 100%;"
+                                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 4px;"
                                     ></iframe>
                                 </div>
                             ` : item.thumbnail ? `
