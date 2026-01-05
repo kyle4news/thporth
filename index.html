@@ -1227,13 +1227,6 @@ table.game-table td:nth-child(1) {
     padding: 0 !important;
 }
 
-/* News feed container (for game mode) - dark background only for game content */
-.news-feed {
-    background-color: #1a1a1a !important;
-    height: 100%;
-    overflow: hidden;
-}
-
 /* 2) Main container for both headlines and breaking news sections.
       It needs to fill the full available height of the news column minus the header. */
 .news-main-container {
@@ -4674,7 +4667,6 @@ function loadCustomRSSFeed(feedUrl, container) {
         // Clear Social column content and load game social posts
         const socialContainer = document.getElementById('social-feed-container');
         if (socialContainer) {
-            socialContainer.style.backgroundColor = '#1a1a1a';
             socialContainer.innerHTML = `
                 <div style="padding:16px;color:white;background:#0066cc;min-height:100vh;display:flex;align-items:center;justify-content:center;">
                     <div style="text-align:center;">
@@ -4787,7 +4779,6 @@ function loadCustomRSSFeed(feedUrl, container) {
                 newsContainer.appendChild(newsFeed);
             } else if (type === 'game') {
                 // Game mode: load and display game-specific news from Firestore
-                newsFeed.style.backgroundColor = '#1a1a1a';
                 newsFeed.innerHTML = `
                     <div style="padding:16px;color:white;background:#8b0000;min-height:100vh;display:flex;align-items:center;justify-content:center;">
                         <div style="text-align:center;">
@@ -5356,12 +5347,11 @@ function loadCustomRSSFeed(feedUrl, container) {
             return TEAM_SHORT_NAMES[fullTeamName] || fullTeamName;
         }
         
-        // Convert team name to sportspyder RSS feed URL
-        // Format: https://sportspyder.com/[league]/[team-slug]/news.xml
+        // Convert team name to sportspyder RSS feed URL (NHL, NFL, NBA only)
         function getSportspyderFeedUrl(teamName) {
             if (!teamName) return null;
             
-            // Map team names to their league (sportspyder league abbreviation)
+            // Map team names to their league (sportspyder league abbreviation) - NHL, NFL, NBA only
             const TEAM_TO_LEAGUE = {
                 // NHL teams
                 "Anaheim Ducks": "nhl", "Boston Bruins": "nhl", "Buffalo Sabres": "nhl",
@@ -5386,17 +5376,6 @@ function loadCustomRSSFeed(feedUrl, container) {
                 "Orlando Magic": "nba", "Philadelphia 76ers": "nba", "Phoenix Suns": "nba",
                 "Portland Trail Blazers": "nba", "Sacramento Kings": "nba", "San Antonio Spurs": "nba",
                 "Toronto Raptors": "nba", "Utah Jazz": "nba", "Washington Wizards": "nba",
-                // MLB teams
-                "Arizona Diamondbacks": "mlb", "Atlanta Braves": "mlb", "Baltimore Orioles": "mlb",
-                "Boston Red Sox": "mlb", "Chicago Cubs": "mlb", "Chicago White Sox": "mlb",
-                "Cincinnati Reds": "mlb", "Cleveland Guardians": "mlb", "Colorado Rockies": "mlb",
-                "Detroit Tigers": "mlb", "Houston Astros": "mlb", "Kansas City Royals": "mlb",
-                "Los Angeles Angels": "mlb", "Los Angeles Dodgers": "mlb", "Miami Marlins": "mlb",
-                "Milwaukee Brewers": "mlb", "Minnesota Twins": "mlb", "New York Mets": "mlb",
-                "New York Yankees": "mlb", "Oakland Athletics": "mlb", "Philadelphia Phillies": "mlb",
-                "Pittsburgh Pirates": "mlb", "San Diego Padres": "mlb", "San Francisco Giants": "mlb",
-                "Seattle Mariners": "mlb", "St. Louis Cardinals": "mlb", "Tampa Bay Rays": "mlb",
-                "Texas Rangers": "mlb", "Toronto Blue Jays": "mlb", "Washington Nationals": "mlb",
                 // NFL teams
                 "Arizona Cardinals": "nfl", "Atlanta Falcons": "nfl", "Baltimore Ravens": "nfl",
                 "Buffalo Bills": "nfl", "Carolina Panthers": "nfl", "Chicago Bears": "nfl",
@@ -5414,8 +5393,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             // Get league for this team
             const league = TEAM_TO_LEAGUE[teamName];
             if (!league) {
-                console.warn(`[getSportspyderFeedUrl] No league mapping found for team: ${teamName}`);
-                return null;
+                return null; // Not NHL, NFL, or NBA
             }
             
             // Convert team name to slug format (lowercase, replace spaces with hyphens, remove special chars)
@@ -5427,25 +5405,26 @@ function loadCustomRSSFeed(feedUrl, container) {
                 .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
             
             // Sportspyder RSS feed format: https://sportspyder.com/[league]/[team-slug]/news.xml
-            const feedUrl = `https://sportspyder.com/${league}/${slug}/news.xml`;
-            console.log(`[getSportspyderFeedUrl] Generated URL for ${teamName}: ${feedUrl}`);
-            return feedUrl;
+            return `https://sportspyder.com/${league}/${slug}/news.xml`;
         }
         
-        // Get news feeds for a team - ONLY sportspyder feed (no aggregation)
+        // Get news feeds for a team - add sportspyder for NHL, NFL, NBA teams
         function getTeamNewsFeeds(teamName) {
             if (!teamName) return null;
             
-            // ONLY return sportspyder feed - no aggregation with other feeds
+            const existingFeeds = TEAM_TO_NEWS_FEED[teamName] || [];
             const sportspyderUrl = getSportspyderFeedUrl(teamName);
             
+            // If sportspyder URL exists (NHL, NFL, NBA only), add it
             if (sportspyderUrl) {
-                console.log(`[getTeamNewsFeeds] Using sportspyder feed for ${teamName}:`, sportspyderUrl);
-                return [sportspyderUrl];
+                const hasSportspyder = existingFeeds.some(url => url && url.includes('sportspyder.com'));
+                if (!hasSportspyder) {
+                    // Add sportspyder feed at the beginning
+                    return [sportspyderUrl, ...existingFeeds];
+                }
             }
             
-            console.log(`[getTeamNewsFeeds] No sportspyder feed found for ${teamName}`);
-            return null;
+            return existingFeeds.length > 0 ? existingFeeds : null;
         }
         
         // Helper function to render news with team tabs (side by side, matching social/media columns)
@@ -5508,7 +5487,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             `).join('');
             
             container.innerHTML = `
-                <div style="display: flex; flex-direction: column; height: 100vh; background-color: #1a1a1a;">
+                <div style="display: flex; flex-direction: column; height: 100vh;">
                     <div class="news-team-tabs">
                         ${tabsHTML}
                     </div>
@@ -5519,12 +5498,9 @@ function loadCustomRSSFeed(feedUrl, container) {
             `;
             
             // Load the first tab's content immediately
-            console.log('[renderNewsWithTeamTabs] First tab feedUrls:', tabs[0].feedUrls);
-            if (tabs[0].feedUrls && Array.isArray(tabs[0].feedUrls) && tabs[0].feedUrls.length > 0) {
-                console.log('[renderNewsWithTeamTabs] Loading feeds for first tab:', tabs[0].name, tabs[0].feedUrls);
+            if (tabs[0].feedUrls && Array.isArray(tabs[0].feedUrls)) {
                 loadTeamNewsFeeds(tabs[0].feedUrls, tabIds[0], tabs[0].name);
             } else {
-                console.log('[renderNewsWithTeamTabs] No feeds for first tab:', tabs[0].name);
                 const firstContent = document.getElementById(tabIds[0]);
                 if (firstContent) {
                     firstContent.innerHTML = `
@@ -5569,12 +5545,6 @@ function loadCustomRSSFeed(feedUrl, container) {
                             const separator = url.includes('?') ? '&' : '?';
                             originalUrl = `${url}${separator}posts_per_page=50`;
                             console.log(`[loadTeamNewsFeeds] Using WordPress parameter: ${originalUrl}`);
-                        }
-                        
-                        // Sportspyder feeds - use proxy service (handles CORS and redirects)
-                        if (url.includes('sportspyder.com')) {
-                            originalUrl = url;
-                            console.log(`[loadTeamNewsFeeds] Loading sportspyder feed via proxy: ${originalUrl}`);
                         }
                         
                         // Proxy through RSS feed service to bypass CORS
@@ -5629,33 +5599,14 @@ function loadCustomRSSFeed(feedUrl, container) {
                 const feedResults = await Promise.all(feedPromises);
                 
                 // Debug: log results from each feed
-                console.log(`[loadTeamNewsFeeds] === Feed Aggregation Results for ${teamName} ===`);
+                console.log(`[loadTeamNewsFeeds] === Feed Aggregation Results ===`);
                 feedResults.forEach((result, idx) => {
                     if (result.success) {
                         console.log(`✅ Feed ${idx + 1}: ${result.url} - ${result.items.length} items`);
                     } else {
-                        console.error(`❌ Feed ${idx + 1}: ${result.url} - FAILED: ${result.error}`);
+                        console.log(`❌ Feed ${idx + 1}: ${result.url} - FAILED: ${result.error}`);
                     }
                 });
-                
-                // If all feeds failed, show error message
-                const allFailed = feedResults.every(result => !result.success);
-                if (allFailed && feedResults.length > 0) {
-                    console.error(`[loadTeamNewsFeeds] All feeds failed for ${teamName}`);
-                    const errorMessages = feedResults.map(r => r.error || 'Unknown error').join(', ');
-                    contentElement.innerHTML = `
-                        <div style="padding: 20px; color: #ff6b6b;">
-                            <h3 style="margin: 0 0 10px 0;">Error loading news feeds</h3>
-                            <p style="margin: 0; font-size: 12px; color: #ccc;">
-                                Failed to load feeds for ${teamName}. Errors: ${errorMessages}
-                            </p>
-                            <p style="margin: 10px 0 0 0; font-size: 11px; color: #888;">
-                                Check browser console for details.
-                            </p>
-                        </div>
-                    `;
-                    return;
-                }
                 
                 // Merge all items from all feeds
                 let allItems = [];
@@ -5707,17 +5658,6 @@ function loadCustomRSSFeed(feedUrl, container) {
                     const publishedDate = item.pubDate || item.publishedAt || '';
                     const formattedDate = publishedDate ? new Date(publishedDate).toLocaleDateString() : '';
                     
-                    // Extract source from title if it's in brackets (e.g., "[NHL: Utah Hockey Club] - Title")
-                    let title = item.title || 'Untitled';
-                    let source = '';
-                    
-                    // Check for pattern: [Source] - Title or [Source] Title
-                    const bracketMatch = title.match(/^\[([^\]]+)\]\s*[-–—]?\s*(.+)$/);
-                    if (bracketMatch) {
-                        source = bracketMatch[1].trim();
-                        title = bracketMatch[2].trim();
-                    }
-                    
                     // Clean up description HTML
                     let descriptionText = item.description || '';
                     // Remove HTML tags for preview
@@ -5725,29 +5665,19 @@ function loadCustomRSSFeed(feedUrl, container) {
                     tempDiv.innerHTML = descriptionText;
                     descriptionText = tempDiv.textContent || tempDiv.innerText || '';
                     
-                    // Build date/source line
-                    let dateSourceLine = '';
-                    if (source && formattedDate) {
-                        dateSourceLine = `${source} - ${formattedDate}`;
-                    } else if (source) {
-                        dateSourceLine = source;
-                    } else if (formattedDate) {
-                        dateSourceLine = formattedDate;
-                    }
-                    
                     return `
                         <div style="padding: 15px; margin-bottom: 10px; background: #2a2a2a; cursor: pointer;" onclick="window.open('${item.link || '#'}', '_blank')">
                             <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 14px; font-weight: 600;">
-                                ${title}
+                                ${item.title || 'Untitled'}
                             </h3>
                             ${descriptionText ? `
                                 <p style="margin: 0 0 8px 0; color: #bebebe; font-size: 12px; line-height: 1.4;">
                                     ${descriptionText.substring(0, 150)}${descriptionText.length > 150 ? '...' : ''}
                                 </p>
                             ` : ''}
-                            ${dateSourceLine ? `
+                            ${formattedDate ? `
                                 <div style="font-size: 10px; color: #888; margin-top: 8px;">
-                                    ${dateSourceLine}
+                                    ${formattedDate}
                                 </div>
                             ` : ''}
                         </div>
@@ -5886,7 +5816,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             `).join('');
             
             container.innerHTML = `
-                <div style="display: flex; flex-direction: column; height: 100vh; background-color: #1a1a1a;">
+                <div style="display: flex; flex-direction: column; height: 100vh;">
                     <div class="social-team-tabs">
                         ${tabsHTML}
                     </div>
@@ -24347,5 +24277,4 @@ setInterval(() => {
     // }, 5000);
   </script>
   </body>
-</html>
 </html>
