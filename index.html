@@ -2997,7 +2997,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <!-- NEWS PANEL -->
       <div class="column news" style="height: 100%;">
         <!-- News header -->
-        <div class="news-header" style="width: 100%; height: 18px;
+        <div class="news-header" style="width: 100%; height: 18px; min-height: 18px;
             background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif;
             font-size: 10px; display: flex; align-items: center;
             padding-left: 1px; z-index: 11; border-bottom: 1px solid #1f1f1f;">News</div>
@@ -4659,6 +4659,22 @@ function loadCustomRSSFeed(feedUrl, container) {
             return;
         }
         
+        // Set column backgrounds to #1a1a1a for game mode
+        const newsColumn = document.querySelector('.column.news');
+        if (newsColumn) {
+            newsColumn.style.backgroundColor = '#1a1a1a';
+        }
+        const socialColumn = document.querySelector('.column.social');
+        if (socialColumn) {
+            socialColumn.style.backgroundColor = '#1a1a1a';
+        }
+        
+        // Set news header height to match social header in game mode (remove border-bottom)
+        const newsHeader = document.querySelector('.news-header');
+        if (newsHeader) {
+            newsHeader.style.borderBottom = 'none';
+        }
+        
         // Clear News column content (keep header)
         document.querySelectorAll(".news .content-section").forEach(s => s.style.display = "none");
         const newsFeed = document.querySelector('.column.news .news-feed');
@@ -4760,6 +4776,22 @@ function loadCustomRSSFeed(feedUrl, container) {
             newsFeed.className = 'news-feed';
 
             if (type === 'league') {
+                // Reset column backgrounds to default for league mode
+                const newsColumn = document.querySelector('.column.news');
+                if (newsColumn) {
+                    newsColumn.style.backgroundColor = '#fafaf9';
+                }
+                const socialColumn = document.querySelector('.column.social');
+                if (socialColumn) {
+                    socialColumn.style.backgroundColor = '';
+                }
+                
+                // Reset news header border for league mode
+                const newsHeader = document.querySelector('.news-header');
+                if (newsHeader) {
+                    newsHeader.style.borderBottom = '1px solid #1f1f1f';
+                }
+                
                 // League mode: use existing league rendering logic (ready for future Firestore league news)
                 const section = selectedId || 'Home';
                 document.querySelectorAll(".news .content-section").forEach(s => s.style.display = "none");
@@ -4778,7 +4810,14 @@ function loadCustomRSSFeed(feedUrl, container) {
                 // Append .news-feed for consistency (architecture ready for Firestore)
                 newsContainer.appendChild(newsFeed);
             } else if (type === 'game') {
+                // Set column background to #1a1a1a for game mode
+                const newsColumn = document.querySelector('.column.news');
+                if (newsColumn) {
+                    newsColumn.style.backgroundColor = '#1a1a1a';
+                }
+                
                 // Game mode: load and display game-specific news from Firestore
+                newsFeed.style.backgroundColor = '#1a1a1a';
                 newsFeed.innerHTML = `
                     <div style="padding:16px;color:white;background:#8b0000;min-height:100vh;display:flex;align-items:center;justify-content:center;">
                         <div style="text-align:center;">
