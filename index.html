@@ -269,33 +269,36 @@ table.game-table td:nth-child(1) {
 .game-row.live-filter-hidden {
     display: none !important;
 }
+
+/* Active game state - background color on game rows and separator line above */
+/* Highlight separator line above to fill the 14px gap */
+.game-separator-line.active-above td {
+    background-color: #3c3c3c !important;
+}
+
+.game-row.active,
+.game-row.game-separator.active {
+    background-color: #3c3c3c !important;
+}
 /* Game row selected state - same styling as league menu items */
 .game-row.selected,
 .game-row.game-separator.selected,
-.game-separator-line.selected,
 table.game-table .game-row.selected,
 table.game-table .game-row.game-separator.selected,
-table.game-table .game-separator-line.selected,
 #tv-listings-today .game-row.selected,
 #tv-listings-today .game-row.game-separator.selected,
-#tv-listings-today .game-separator-line.selected,
 .column.tv-listings .game-row.selected,
-.column.tv-listings .game-row.game-separator.selected,
-.column.tv-listings .game-separator-line.selected {
+.column.tv-listings .game-row.game-separator.selected {
     background-color: #3c3c3c !important;
 }
 .game-row.selected td,
 .game-row.game-separator.selected td,
-.game-separator-line.selected td,
 table.game-table .game-row.selected td,
 table.game-table .game-row.game-separator.selected td,
-table.game-table .game-separator-line.selected td,
 #tv-listings-today .game-row.selected td,
 #tv-listings-today .game-row.game-separator.selected td,
-#tv-listings-today .game-separator-line.selected td,
 .column.tv-listings .game-row.selected td,
-.column.tv-listings .game-row.game-separator.selected td,
-.column.tv-listings .game-separator-line.selected td {
+.column.tv-listings .game-row.game-separator.selected td {
     color: white !important;
 }
 .game-row.selected .team-cell,
@@ -4699,14 +4702,30 @@ function loadCustomRSSFeed(feedUrl, container) {
             return;
         }
         
-        // UNIVERSAL RULE: Only ONE game can be highlighted at a time, anywhere on the site
-        // STEP 1: NUCLEAR CLEAR - Remove highlight from EVERY game-related element FIRST
-        // Clear ALL games, regardless of whether they have .selected class or not (catch edge cases)
-        const allGameRows = document.querySelectorAll('.game-row, .game-separator');
-        const allSeparatorLines = document.querySelectorAll('.game-separator-line');
+        // Function to remove all highlights (UNIVERSAL RULE: ONLY ONE GAME CAN BE ACTIVE AT A TIME)
+        function clearHighlights() {
+            document.querySelectorAll('.game-row.active, .game-row.game-separator.active, .game-separator-line.active-above').forEach(el => {
+                el.classList.remove('active', 'active-above');
+                el.style.backgroundColor = '';
+                // Also clear background from separator line cells
+                if (el.classList.contains('game-separator-line')) {
+                    el.querySelectorAll('td').forEach(td => {
+                        td.style.backgroundColor = '';
+                    });
+                }
+            });
+        }
         
-        // Clear ALL game rows (not just ones with .selected - catch everything)
-        allGameRows.forEach(row => {
+        // STEP 1: IMMEDIATELY clear all active states from ALL games (before doing anything else)
+        clearHighlights();
+        
+        // Store the selected game ID globally - this will be checked during renderGames()
+        // The next time renderGames() is called (via Firestore listeners), it will automatically
+        // apply the 'selected' class to rows matching this gameId during HTML construction
+        window.currentSelectedGameId = gameId;
+        
+        // Remove selected class from all game rows (for immediate visual feedback)
+        document.querySelectorAll('.game-row.selected').forEach(row => {
             row.classList.remove('selected');
             row.style.backgroundColor = '';
             row.style.color = '';
@@ -4716,17 +4735,6 @@ function loadCustomRSSFeed(feedUrl, container) {
                 cell.style.backgroundColor = '';
             });
         });
-        
-        // Clear ALL separator lines
-        allSeparatorLines.forEach(separator => {
-            separator.classList.remove('selected');
-            separator.style.backgroundColor = '';
-        });
-        
-        console.log(`[handleGameClick] NUCLEAR CLEAR: Cleared ${allGameRows.length} game rows and ${allSeparatorLines.length} separator lines`);
-        
-        // STEP 2: NOW update global state (after clearing, before highlighting)
-        window.currentSelectedGameId = gameId;
         
         // Find the clicked row using the event object
         let clickedRows = [];
@@ -4776,6 +4784,24 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         console.log(`[handleGameClick] Found ${clickedRows.length} rows to highlight for gameId: ${gameId}`);
         
+        // STEP 2: Apply active state to the game rows AND separator line above
+        if (clickedRows.length > 0) {
+            const row1 = clickedRows[0];
+            const row2 = clickedRows.length > 1 ? clickedRows[1] : null;
+            
+            // Apply active class to separator line above to fill the 14px gap
+            const separatorAbove = row1.previousElementSibling;
+            if (separatorAbove && separatorAbove.classList.contains('game-separator-line')) {
+                separatorAbove.classList.add('active-above');
+            }
+            
+            // Apply active class to the game rows
+            row1.classList.add('active');
+            if (row2 && row2.classList.contains('game-separator')) {
+                row2.classList.add('active');
+            }
+        }
+        
         // Add selected class to clicked game rows (same as leagues)
         clickedRows.forEach(row => {
             row.classList.add('selected');
@@ -4789,18 +4815,6 @@ function loadCustomRSSFeed(feedUrl, container) {
             });
             // Make sure row has pointer cursor
             row.style.cursor = 'pointer';
-            
-            // Also highlight the separator line above this game (if it exists)
-            // Only check for the first row (row1) to avoid duplicate checks
-            if (row.classList.contains('game-row') && !row.classList.contains('game-separator')) {
-                const previousSibling = row.previousElementSibling;
-                if (previousSibling && previousSibling.classList.contains('game-separator-line')) {
-                    previousSibling.style.backgroundColor = '#3c3c3c';
-                    previousSibling.classList.add('selected');
-                    console.log(`[handleGameClick] ✓ Also highlighted separator line above game for gameId: ${gameId}`);
-                }
-            }
-            
             console.log(`[handleGameClick] ✓ Added 'selected' class and inline styles to row for gameId: ${gameId}`);
         });
         
@@ -4954,21 +4968,6 @@ function loadCustomRSSFeed(feedUrl, container) {
                         cell.style.color = '';
                         cell.style.backgroundColor = '';
                     });
-                    
-                    // Also clear separator line above if this is row1 (not the separator row itself)
-                    if (row.classList.contains('game-row') && !row.classList.contains('game-separator')) {
-                        const previousSibling = row.previousElementSibling;
-                        if (previousSibling && previousSibling.classList.contains('game-separator-line')) {
-                            previousSibling.classList.remove('selected');
-                            previousSibling.style.backgroundColor = '';
-                        }
-                    }
-                });
-                
-                // Also remove selected class from any orphaned separator lines
-                document.querySelectorAll('.game-separator-line.selected').forEach(separator => {
-                    separator.classList.remove('selected');
-                    separator.style.backgroundColor = '';
                 });
                 
                 // Clear the selected game ID and highlight flag
@@ -7704,6 +7703,18 @@ function loadCustomRSSFeed(feedUrl, container) {
                 }
                 document.querySelectorAll("#menuList li[data-section]").forEach(li => li.classList.remove("selected"));
                 item.classList.add("selected");
+                
+                // Clear all active game states when switching leagues
+                document.querySelectorAll('.game-row.active, .game-row.game-separator.active, .game-separator-line.active-above').forEach(el => {
+                    el.classList.remove('active', 'active-above');
+                    el.style.backgroundColor = '';
+                    if (el.classList.contains('game-separator-line')) {
+                        el.querySelectorAll('td').forEach(td => {
+                            td.style.backgroundColor = '';
+                        });
+                    }
+                });
+                window.currentSelectedGameId = null;
                 
                 // Scroll the selected item into view in the menu
                 item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -12546,6 +12557,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderGames(container, gamesData, isGroupedByLeague, isYesterdayScores = false) {
+        // Store active game ID before clearing container
+        const activeGameId = window.currentSelectedGameId;
+        
         container.innerHTML = "";
         // Note: gamesData is already filtered at the data level in updateDisplay() - no need to filter here
         
@@ -14354,32 +14368,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    // Check if this game should be selected (must check gameId here, before row creation)
-                    const gameId = data["Game ID"] || data.gameId || data["GameID"] || null;
-                    const gameIdString = gameId ? String(gameId) : null;
-                    const isSelected = gameIdString && window.currentSelectedGameId === gameIdString;
-
                     const row1 = currentTable.insertRow();
-                    row1.className = "game-row" + (isSelected ? " selected" : "");
+                    row1.className = "game-row";
                     const row2 = currentTable.insertRow();
-                    row2.className = "game-row game-separator" + (isSelected ? " selected" : "");
-                    
-                    // Apply selected styles immediately if this is the selected game
-                    if (isSelected) {
-                        row1.style.backgroundColor = '#3c3c3c';
-                        row1.style.color = 'white';
-                        row2.style.backgroundColor = '#3c3c3c';
-                        row2.style.color = 'white';
-                        
-                        // Also highlight the separator line above this game (if it exists)
-                        // Separators are inserted after each game, so the separator above this game
-                        // would be the previous sibling of row1
-                        const previousSibling = row1.previousElementSibling;
-                        if (previousSibling && previousSibling.classList.contains('game-separator-line')) {
-                            previousSibling.style.backgroundColor = '#3c3c3c';
-                            previousSibling.classList.add('selected');
-                        }
-                    }
+                    row2.className = "game-row game-separator";
                     
                     // Add special class for ATP Finals (Doubles) to add extra spacing
                     const isAtpDoubles = displayLeagueForCheck === "ATP Finals (Doubles)";
@@ -14773,15 +14765,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     row1.style.color = 'white';
                     row2.style.backgroundColor = '#3c3c3c';
                     row2.style.color = 'white';
-                    
-                    // Also highlight the separator line above this game (if it exists)
-                    // Separators are inserted after each game, so the separator above this game
-                    // would be the previous sibling of row1
-                    const previousSibling = row1.previousElementSibling;
-                    if (previousSibling && previousSibling.classList.contains('game-separator-line')) {
-                        previousSibling.style.backgroundColor = '#3c3c3c';
-                        previousSibling.classList.add('selected');
-                    }
                 }
                 
                 // Add special class for ATP Finals (Doubles) to add extra spacing
@@ -15361,88 +15344,73 @@ document.addEventListener('DOMContentLoaded', function () {
             container.appendChild(leagueSection);
         });
         
-        // UNIVERSAL RULE ENFORCEMENT: Clear any games that have 'selected' but don't match currentSelectedGameId
-        // This ensures only ONE game can ever be highlighted, even if renderGames() is called multiple times
-        const allGameRows = document.querySelectorAll('.game-row, .game-separator');
-        const allSeparatorLines = document.querySelectorAll('.game-separator-line');
-        
-        allGameRows.forEach(row => {
-            const rowGameId = row.getAttribute('data-game-id');
-            // Only keep highlight if it matches currentSelectedGameId, otherwise clear it
-            if (!window.currentSelectedGameId || rowGameId !== window.currentSelectedGameId) {
-                // This game is selected but shouldn't be - clear it
-                row.classList.remove('selected');
-                row.style.backgroundColor = '';
-                row.style.color = '';
-                const cells = row.querySelectorAll('td');
-                cells.forEach(cell => {
-                    cell.style.color = '';
-                    cell.style.backgroundColor = '';
-                });
-            }
-        });
-        
-        allSeparatorLines.forEach(separator => {
-            // Check if the separator is above a game that doesn't match currentSelectedGameId
-            const nextSibling = separator.nextElementSibling;
-            if (nextSibling) {
-                const nextGameId = nextSibling.getAttribute('data-game-id');
-                // Only keep highlight if separator is above the selected game
-                if (!window.currentSelectedGameId || nextGameId !== window.currentSelectedGameId) {
-                    separator.classList.remove('selected');
-                    separator.style.backgroundColor = '';
+        // Re-apply active state to selected game after rendering (if one is selected)
+        // Use immediate synchronous re-apply to prevent flickering
+        if (activeGameId) {
+            // Use a single immediate re-apply, no delays to prevent flickering
+            const reapplyActiveState = () => {
+                const gameIdToHighlight = window.currentSelectedGameId;
+                if (!gameIdToHighlight || gameIdToHighlight !== activeGameId) {
+                    return; // Game was deselected or changed
                 }
-            } else {
-                // Orphaned separator - clear it
-                separator.classList.remove('selected');
-                separator.style.backgroundColor = '';
-            }
-        });
-        
-        // Re-apply highlight to selected game after rendering (if one is selected)
-        // Use setTimeout to ensure DOM is fully rendered and all async operations complete
-        if (window.currentSelectedGameId) {
-            // Use requestAnimationFrame for better timing, then setTimeout as fallback
-            requestAnimationFrame(() => {
-                setTimeout(() => {
-                    const gameIdToHighlight = window.currentSelectedGameId;
-                    if (!gameIdToHighlight) return; // Game was deselected
+                
+                // Find all rows with matching data-game-id or onclick attribute
+                const allRows = container.querySelectorAll('.game-row');
+                const selectedRows = [];
+                
+                allRows.forEach(row => {
+                    const rowGameId = row.getAttribute('data-game-id');
+                    const onclick = row.getAttribute('onclick') || '';
+                    if (rowGameId === gameIdToHighlight || onclick.includes(gameIdToHighlight)) {
+                        selectedRows.push(row);
+                    }
+                });
+                
+                if (selectedRows.length > 0) {
+                    // Find row1 and row2 for the game
+                    const row1 = selectedRows.find(row => !row.classList.contains('game-separator')) || selectedRows[0];
+                    const row2 = selectedRows.find(row => row.classList.contains('game-separator')) || null;
                     
-                    // Find all rows with matching data-game-id
-                    const allRows = document.querySelectorAll('.game-row');
-                    const selectedRows = [];
-                    
-                    allRows.forEach(row => {
-                        const rowGameId = row.getAttribute('data-game-id');
-                        if (rowGameId === gameIdToHighlight) {
-                            selectedRows.push(row);
+                    // Clear all active states first (UNIVERSAL RULE: ONLY ONE GAME CAN BE ACTIVE AT A TIME)
+                    container.querySelectorAll('.game-row.active, .game-row.game-separator.active, .game-separator-line.active-above').forEach(el => {
+                        el.classList.remove('active', 'active-above');
+                        el.style.backgroundColor = '';
+                        if (el.classList.contains('game-separator-line')) {
+                            el.querySelectorAll('td').forEach(td => {
+                                td.style.backgroundColor = '';
+                            });
                         }
                     });
                     
-                    console.log(`[renderGames] Looking for gameId: ${gameIdToHighlight}, found ${selectedRows.length} rows`);
+                    // Apply active state to separator line above and game rows
+                    const separatorAbove = row1.previousElementSibling;
+                    if (separatorAbove && separatorAbove.classList.contains('game-separator-line')) {
+                        separatorAbove.classList.add('active-above');
+                    }
                     
-                    // Apply highlight to all matching rows
+                    row1.classList.add('active');
+                    if (row2 && row2.classList.contains('game-separator')) {
+                        row2.classList.add('active');
+                    }
+                    
+                    // Also apply selected class for backward compatibility
                     selectedRows.forEach(row => {
                         row.classList.add('selected');
                         row.style.backgroundColor = '#3c3c3c';
                         row.style.color = 'white';
-                        // Also apply styles to all cells
                         const cells = row.querySelectorAll('td');
                         cells.forEach(cell => {
                             cell.style.color = 'white';
                             cell.style.backgroundColor = 'transparent';
                         });
-                        // Make sure row has pointer cursor
                         row.style.cursor = 'pointer';
                     });
-                    
-                    if (selectedRows.length > 0) {
-                        console.log(`[renderGames] ✓ Re-applied highlight to ${selectedRows.length} rows for gameId: ${gameIdToHighlight}`);
-                    } else {
-                        console.warn(`[renderGames] ⚠ Could not find rows for gameId: ${gameIdToHighlight}`);
-                    }
-                }, 50); // Small delay to ensure DOM is fully updated
-            });
+                }
+            };
+            
+            // Apply immediately and also after a microtask to catch any async rendering
+            reapplyActiveState();
+            Promise.resolve().then(() => reapplyActiveState());
         }
     }
 
