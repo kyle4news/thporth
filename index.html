@@ -4777,6 +4777,18 @@ function loadCustomRSSFeed(feedUrl, container) {
             });
             // Make sure row has pointer cursor
             row.style.cursor = 'pointer';
+            
+            // Also highlight the separator line above this game (if it exists)
+            // Only check for the first row (row1) to avoid duplicate checks
+            if (row.classList.contains('game-row') && !row.classList.contains('game-separator')) {
+                const previousSibling = row.previousElementSibling;
+                if (previousSibling && previousSibling.classList.contains('game-separator-line')) {
+                    previousSibling.style.backgroundColor = '#3c3c3c';
+                    previousSibling.classList.add('selected');
+                    console.log(`[handleGameClick] ✓ Also highlighted separator line above game for gameId: ${gameId}`);
+                }
+            }
+            
             console.log(`[handleGameClick] ✓ Added 'selected' class and inline styles to row for gameId: ${gameId}`);
         });
         
