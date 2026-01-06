@@ -6912,9 +6912,6 @@ function loadCustomRSSFeed(feedUrl, container) {
                                     ` : ''}
                                 </div>
                             ` : ''}
-                            <p style="margin: 0 0 8px 0; color: #ccc; font-size: 12px; line-height: 1.4;">
-                                ${textContent}${textContent.length >= 200 ? '...' : ''}
-                            </p>
                             <div style="font-size: 10px; color: #888; margin-top: 8px;">
                                 ${formattedDate ? `<span>${formattedDate}</span>` : ''}
                             </div>
@@ -7122,11 +7119,6 @@ function loadCustomRSSFeed(feedUrl, container) {
                             <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 14px; font-weight: 600;">
                                 <a href="${item.link}" target="_blank" style="color: #fff; text-decoration: none;">${item.title}</a>
                             </h3>
-                            ${item.description ? `
-                                <p style="margin: 0 0 8px 0; color: #bebebe; font-size: 12px; line-height: 1.4;">
-                                    ${item.description.substring(0, 150)}${item.description.length > 150 ? '...' : ''}
-                                </p>
-                            ` : ''}
                             ${formattedDate ? `
                                 <div style="font-size: 10px; color: #888; margin-top: 8px;">
                                     ${formattedDate}
