@@ -269,6 +269,35 @@ table.game-table td:nth-child(1) {
 .game-row.live-filter-hidden {
     display: none !important;
 }
+/* Game row selected state - same styling as league menu items */
+.game-row.selected,
+.game-row.game-separator.selected,
+table.game-table .game-row.selected,
+table.game-table .game-row.game-separator.selected,
+#tv-listings-today .game-row.selected,
+#tv-listings-today .game-row.game-separator.selected,
+.column.tv-listings .game-row.selected,
+.column.tv-listings .game-row.game-separator.selected {
+    background-color: #3c3c3c !important;
+}
+.game-row.selected td,
+.game-row.game-separator.selected td,
+table.game-table .game-row.selected td,
+table.game-table .game-row.game-separator.selected td,
+#tv-listings-today .game-row.selected td,
+#tv-listings-today .game-row.game-separator.selected td,
+.column.tv-listings .game-row.selected td,
+.column.tv-listings .game-row.game-separator.selected td {
+    color: white !important;
+}
+.game-row.selected .team-cell,
+.game-row.game-separator.selected .team-cell,
+table.game-table .game-row.selected .team-cell,
+table.game-table .game-row.game-separator.selected .team-cell,
+.column.tv-listings .game-row.selected .team-cell,
+.column.tv-listings .game-row.game-separator.selected .team-cell {
+    color: white !important;
+}
 .game-separator {
     /* Add line break after each game */
 }
@@ -4651,13 +4680,100 @@ function loadCustomRSSFeed(feedUrl, container) {
       </script>
 
   <script>
+    // Store the currently selected game ID globally so we can re-apply highlight after re-renders
+    window.currentSelectedGameId = null;
+    
     // --- GLOBAL GAME CLICK HANDLER (must be global for inline onclick) ---
-    function handleGameClick(gameId) {
+    function handleGameClick(gameId, event) {
         console.log('[handleGameClick] Called with gameId:', gameId);
         if (!gameId) {
             console.log('[handleGameClick] No gameId, returning');
             return;
         }
+        
+        // Store the selected game ID globally - this will be checked during renderGames()
+        // The next time renderGames() is called (via Firestore listeners), it will automatically
+        // apply the 'selected' class to rows matching this gameId during HTML construction
+        window.currentSelectedGameId = gameId;
+        
+        // Remove selected class from all game rows (for immediate visual feedback)
+        document.querySelectorAll('.game-row.selected').forEach(row => {
+            row.classList.remove('selected');
+            row.style.backgroundColor = '';
+            row.style.color = '';
+            const cells = row.querySelectorAll('td');
+            cells.forEach(cell => {
+                cell.style.color = '';
+                cell.style.backgroundColor = '';
+            });
+        });
+        
+        // Find the clicked row using the event object
+        let clickedRows = [];
+        
+        console.log(`[handleGameClick] Event object:`, event);
+        
+        if (event && event.target) {
+            console.log(`[handleGameClick] Event target:`, event.target);
+            // Find the closest game-row from the clicked element
+            const clickedRow = event.target.closest('.game-row');
+            console.log(`[handleGameClick] Closest game-row:`, clickedRow);
+            if (clickedRow) {
+                clickedRows.push(clickedRow);
+                
+                // Find the sibling row (the other row of the same game)
+                // Games have two rows: row1 and row2 (game-separator)
+                if (clickedRow.classList.contains('game-separator')) {
+                    // If we clicked row2, find row1 (previous sibling)
+                    const prevRow = clickedRow.previousElementSibling;
+                    if (prevRow && prevRow.classList.contains('game-row') && !prevRow.classList.contains('game-separator')) {
+                        clickedRows.unshift(prevRow);
+                    }
+                } else {
+                    // If we clicked row1, find row2 (next sibling with game-separator class)
+                    const nextRow = clickedRow.nextElementSibling;
+                    if (nextRow && nextRow.classList.contains('game-separator')) {
+                        clickedRows.push(nextRow);
+                    }
+                }
+            }
+        }
+        
+        // Fallback: if event didn't work, search by onclick attribute
+        if (clickedRows.length === 0) {
+            console.log(`[handleGameClick] Event method failed, trying onclick search...`);
+            const allRows = document.querySelectorAll('.game-row');
+            console.log(`[handleGameClick] Total game rows found: ${allRows.length}`);
+            clickedRows = Array.from(allRows).filter(row => {
+                const onclick = row.getAttribute('onclick') || '';
+                const matches = onclick.includes(gameId);
+                if (matches) {
+                    console.log(`[handleGameClick] Found matching row via onclick:`, row, onclick);
+                }
+                return matches;
+            });
+        }
+        
+        console.log(`[handleGameClick] Found ${clickedRows.length} rows to highlight for gameId: ${gameId}`);
+        
+        // Add selected class to clicked game rows (same as leagues)
+        clickedRows.forEach(row => {
+            row.classList.add('selected');
+            // Also add inline styles as backup - these will persist through re-renders
+            row.style.backgroundColor = '#3c3c3c';
+            row.style.color = 'white';
+            const cells = row.querySelectorAll('td');
+            cells.forEach(cell => {
+                cell.style.color = 'white';
+                cell.style.backgroundColor = 'transparent';
+            });
+            // Make sure row has pointer cursor
+            row.style.cursor = 'pointer';
+            console.log(`[handleGameClick] ✓ Added 'selected' class and inline styles to row for gameId: ${gameId}`);
+        });
+        
+        // Also store a flag to indicate we should persist this highlight
+        window.persistGameHighlight = true;
         
         // Set column backgrounds to #1a1a1a for game mode
         const newsColumn = document.querySelector('.column.news');
@@ -4762,6 +4878,10 @@ function loadCustomRSSFeed(feedUrl, container) {
     document.addEventListener("DOMContentLoaded", () => {
         // --- UNIFIED RENDER NEWS FUNCTION ---
         function renderNews(selectedId, type) {
+            // Clear selected class from all game rows when switching to league view (same as leagues)
+            document.querySelectorAll('.game-row.selected').forEach(row => {
+                row.classList.remove('selected');
+            });
             const newsContainer = document.querySelector('.column.news');
             if (!newsContainer) return;
 
@@ -4791,6 +4911,22 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (newsHeader) {
                     newsHeader.style.borderBottom = '1px solid #1f1f1f';
                 }
+                
+                // Clear selected state from all game rows
+                document.querySelectorAll('.game-row.selected').forEach(row => {
+                    row.classList.remove('selected');
+                    row.style.backgroundColor = '';
+                    row.style.color = '';
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach(cell => {
+                        cell.style.color = '';
+                        cell.style.backgroundColor = '';
+                    });
+                });
+                
+                // Clear the selected game ID and highlight flag
+                window.currentSelectedGameId = null;
+                window.persistGameHighlight = false;
                 
                 // League mode: use existing league rendering logic (ready for future Firestore league news)
                 const section = selectedId || 'Home';
@@ -14237,13 +14373,28 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     // Add click handlers for game selection (News column only)
-                    const gameId = data["Game ID"] || data.gameId || data["GameID"] || null;
-                    if (gameId) {
-                        const gameIdString = String(gameId);
-                        row1.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}')`);
-                        row2.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}')`);
+                    // Note: gameId and gameIdString already extracted above
+                    if (gameIdString) {
+                        row1.setAttribute('data-game-id', gameIdString);
+                        row2.setAttribute('data-game-id', gameIdString);
+                        row1.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)`);
+                        row2.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)`);
                         row1.style.cursor = 'pointer';
                         row2.style.cursor = 'pointer';
+                        
+                        // If selected, also apply styles to cells
+                        if (isSelected) {
+                            const cells1 = row1.querySelectorAll('td');
+                            const cells2 = row2.querySelectorAll('td');
+                            cells1.forEach(cell => {
+                                cell.style.color = 'white';
+                                cell.style.backgroundColor = 'transparent';
+                            });
+                            cells2.forEach(cell => {
+                                cell.style.color = 'white';
+                                cell.style.backgroundColor = 'transparent';
+                            });
+                        }
                     }
                     
                 // Add separator line between games (but not after the last game in the same table)
@@ -14537,10 +14688,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
+                // Check if this game should be selected (must check gameId here, before row creation)
+                const gameId = data["Game ID"] || data.gameId || data["GameID"] || null;
+                const gameIdString = gameId ? String(gameId) : null;
+                const isSelected = gameIdString && window.currentSelectedGameId === gameIdString;
+                
                 const row1 = table.insertRow();
-                row1.className = "game-row";
+                row1.className = "game-row" + (isSelected ? " selected" : "");
                 const row2 = table.insertRow();
-                row2.className = "game-row game-separator";
+                row2.className = "game-row game-separator" + (isSelected ? " selected" : "");
+                
+                // Apply selected styles immediately if this is the selected game
+                if (isSelected) {
+                    row1.style.backgroundColor = '#3c3c3c';
+                    row1.style.color = 'white';
+                    row2.style.backgroundColor = '#3c3c3c';
+                    row2.style.color = 'white';
+                }
                 
                 // Add special class for ATP Finals (Doubles) to add extra spacing
                 const isAtpDoubles = displayLeague === "ATP Finals (Doubles)";
@@ -14747,13 +14911,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // Add click handlers for game selection (News column only)
-                const gameId = data["Game ID"] || data.gameId || data["GameID"] || null;
-                if (gameId) {
-                    const gameIdString = String(gameId);
-                    row1.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}')`);
-                    row2.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}')`);
+                // Note: gameId and gameIdString already extracted above
+                if (gameIdString) {
+                    row1.setAttribute('data-game-id', gameIdString);
+                    row2.setAttribute('data-game-id', gameIdString);
+                    row1.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)`);
+                    row2.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)`);
                     row1.style.cursor = 'pointer';
                     row2.style.cursor = 'pointer';
+                    
+                    // If selected, also apply styles to cells
+                    if (isSelected) {
+                        const cells1 = row1.querySelectorAll('td');
+                        const cells2 = row2.querySelectorAll('td');
+                        cells1.forEach(cell => {
+                            cell.style.color = 'white';
+                            cell.style.backgroundColor = 'transparent';
+                        });
+                        cells2.forEach(cell => {
+                            cell.style.color = 'white';
+                            cell.style.backgroundColor = 'transparent';
+                        });
+                    }
                 }
                 
                 // Add separator line between games (but not after the last game)
@@ -15103,6 +15282,52 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             container.appendChild(leagueSection);
         });
+        
+        // Re-apply highlight to selected game after rendering (if one is selected)
+        // Use setTimeout to ensure DOM is fully rendered and all async operations complete
+        if (window.currentSelectedGameId) {
+            // Use requestAnimationFrame for better timing, then setTimeout as fallback
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const gameIdToHighlight = window.currentSelectedGameId;
+                    if (!gameIdToHighlight) return; // Game was deselected
+                    
+                    // Find all rows with matching data-game-id
+                    const allRows = document.querySelectorAll('.game-row');
+                    const selectedRows = [];
+                    
+                    allRows.forEach(row => {
+                        const rowGameId = row.getAttribute('data-game-id');
+                        if (rowGameId === gameIdToHighlight) {
+                            selectedRows.push(row);
+                        }
+                    });
+                    
+                    console.log(`[renderGames] Looking for gameId: ${gameIdToHighlight}, found ${selectedRows.length} rows`);
+                    
+                    // Apply highlight to all matching rows
+                    selectedRows.forEach(row => {
+                        row.classList.add('selected');
+                        row.style.backgroundColor = '#3c3c3c';
+                        row.style.color = 'white';
+                        // Also apply styles to all cells
+                        const cells = row.querySelectorAll('td');
+                        cells.forEach(cell => {
+                            cell.style.color = 'white';
+                            cell.style.backgroundColor = 'transparent';
+                        });
+                        // Make sure row has pointer cursor
+                        row.style.cursor = 'pointer';
+                    });
+                    
+                    if (selectedRows.length > 0) {
+                        console.log(`[renderGames] ✓ Re-applied highlight to ${selectedRows.length} rows for gameId: ${gameIdToHighlight}`);
+                    } else {
+                        console.warn(`[renderGames] ⚠ Could not find rows for gameId: ${gameIdToHighlight}`);
+                    }
+                }, 50); // Small delay to ensure DOM is fully updated
+            });
+        }
     }
 
     // --- 6. DATA FETCHING AND LOGIC FUNCTIONS ---
