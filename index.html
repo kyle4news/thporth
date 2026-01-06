@@ -272,22 +272,30 @@ table.game-table td:nth-child(1) {
 /* Game row selected state - same styling as league menu items */
 .game-row.selected,
 .game-row.game-separator.selected,
+.game-separator-line.selected,
 table.game-table .game-row.selected,
 table.game-table .game-row.game-separator.selected,
+table.game-table .game-separator-line.selected,
 #tv-listings-today .game-row.selected,
 #tv-listings-today .game-row.game-separator.selected,
+#tv-listings-today .game-separator-line.selected,
 .column.tv-listings .game-row.selected,
-.column.tv-listings .game-row.game-separator.selected {
+.column.tv-listings .game-row.game-separator.selected,
+.column.tv-listings .game-separator-line.selected {
     background-color: #3c3c3c !important;
 }
 .game-row.selected td,
 .game-row.game-separator.selected td,
+.game-separator-line.selected td,
 table.game-table .game-row.selected td,
 table.game-table .game-row.game-separator.selected td,
+table.game-table .game-separator-line.selected td,
 #tv-listings-today .game-row.selected td,
 #tv-listings-today .game-row.game-separator.selected td,
+#tv-listings-today .game-separator-line.selected td,
 .column.tv-listings .game-row.selected td,
-.column.tv-listings .game-row.game-separator.selected td {
+.column.tv-listings .game-row.game-separator.selected td,
+.column.tv-listings .game-separator-line.selected td {
     color: white !important;
 }
 .game-row.selected .team-cell,
@@ -14307,10 +14315,32 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
+                    // Check if this game should be selected (must check gameId here, before row creation)
+                    const gameId = data["Game ID"] || data.gameId || data["GameID"] || null;
+                    const gameIdString = gameId ? String(gameId) : null;
+                    const isSelected = gameIdString && window.currentSelectedGameId === gameIdString;
+
                     const row1 = currentTable.insertRow();
-                    row1.className = "game-row";
+                    row1.className = "game-row" + (isSelected ? " selected" : "");
                     const row2 = currentTable.insertRow();
-                    row2.className = "game-row game-separator";
+                    row2.className = "game-row game-separator" + (isSelected ? " selected" : "");
+                    
+                    // Apply selected styles immediately if this is the selected game
+                    if (isSelected) {
+                        row1.style.backgroundColor = '#3c3c3c';
+                        row1.style.color = 'white';
+                        row2.style.backgroundColor = '#3c3c3c';
+                        row2.style.color = 'white';
+                        
+                        // Also highlight the separator line above this game (if it exists)
+                        // Separators are inserted after each game, so the separator above this game
+                        // would be the previous sibling of row1
+                        const previousSibling = row1.previousElementSibling;
+                        if (previousSibling && previousSibling.classList.contains('game-separator-line')) {
+                            previousSibling.style.backgroundColor = '#3c3c3c';
+                            previousSibling.classList.add('selected');
+                        }
+                    }
                     
                     // Add special class for ATP Finals (Doubles) to add extra spacing
                     const isAtpDoubles = displayLeagueForCheck === "ATP Finals (Doubles)";
@@ -14704,6 +14734,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     row1.style.color = 'white';
                     row2.style.backgroundColor = '#3c3c3c';
                     row2.style.color = 'white';
+                    
+                    // Also highlight the separator line above this game (if it exists)
+                    // Separators are inserted after each game, so the separator above this game
+                    // would be the previous sibling of row1
+                    const previousSibling = row1.previousElementSibling;
+                    if (previousSibling && previousSibling.classList.contains('game-separator-line')) {
+                        previousSibling.style.backgroundColor = '#3c3c3c';
+                        previousSibling.classList.add('selected');
+                    }
                 }
                 
                 // Add special class for ATP Finals (Doubles) to add extra spacing
