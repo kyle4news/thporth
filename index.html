@@ -6443,6 +6443,49 @@ function loadCustomRSSFeed(feedUrl, container) {
             }
         }
         
+        // Helper function to find team index by team name across all columns
+        // Since each column has a different uniqueId, we search all tabs of the given type
+        function findTeamIndexByTeamName(teamName, uniqueId, tabType) {
+            // Find all tabs of this type (ignore uniqueId since each column has different one)
+            const allTabs = document.querySelectorAll(`.${tabType}-team-tab`);
+            
+            // Find the container that matches the current uniqueId's column context
+            // We need to find tabs in the same game context (same team names)
+            // So we look for tabs that have the same team name and are in the same visible game context
+            
+            // First, try to find tabs with matching team name and get their index within their container
+            const matchingTabs = Array.from(allTabs).filter(tab => 
+                tab.getAttribute('data-team') === teamName
+            );
+            
+            if (matchingTabs.length === 0) return -1;
+            
+            // Find the parent container of one of these tabs to get all tabs in that container
+            const container = matchingTabs[0].closest('.news-team-tabs, .social-team-tabs, .media-team-tabs');
+            if (!container) return -1;
+            
+            // Get all tabs in this container and find the index
+            const containerTabs = container.querySelectorAll(`.${tabType}-team-tab`);
+            for (let i = 0; i < containerTabs.length; i++) {
+                if (containerTabs[i].getAttribute('data-team') === teamName) {
+                    return i;
+                }
+            }
+            
+            return -1;
+        }
+        
+        // Helper function to find uniqueId for a tab type by team name
+        function findUniqueIdByTeamName(teamName, tabType) {
+            const tabs = document.querySelectorAll(`.${tabType}-team-tab`);
+            for (const tab of tabs) {
+                if (tab.getAttribute('data-team') === teamName) {
+                    return tab.getAttribute('data-unique-id');
+                }
+            }
+            return null;
+        }
+        
         // Global function to switch news team tabs
         window.switchNewsTeamTab = function(activeIndex, uniqueId) {
             const allTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${uniqueId}"]`);
@@ -6489,6 +6532,25 @@ function loadCustomRSSFeed(feedUrl, container) {
                         </div>
                     `;
                     contentElement.dataset.loaded = 'true';
+                }
+            }
+            
+            // Synchronize with other columns (only if not already active to avoid loops)
+            const socialIndex = findTeamIndexByTeamName(teamName, uniqueId, 'social');
+            const mediaIndex = findTeamIndexByTeamName(teamName, uniqueId, 'media');
+            const socialUniqueId = findUniqueIdByTeamName(teamName, 'social');
+            const mediaUniqueId = findUniqueIdByTeamName(teamName, 'media');
+            
+            if (socialIndex >= 0 && socialUniqueId) {
+                const socialTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${socialUniqueId}"]`);
+                if (socialTabs[socialIndex] && !socialTabs[socialIndex].classList.contains('active')) {
+                    window.switchSocialTeamTab(socialIndex, socialUniqueId);
+                }
+            }
+            if (mediaIndex >= 0 && mediaUniqueId) {
+                const mediaTabs = document.querySelectorAll(`.media-team-tab[data-unique-id="${mediaUniqueId}"]`);
+                if (mediaTabs[mediaIndex] && !mediaTabs[mediaIndex].classList.contains('active')) {
+                    window.switchMediaTeamTab(mediaIndex, mediaUniqueId);
                 }
             }
         };
@@ -7187,6 +7249,25 @@ function loadCustomRSSFeed(feedUrl, container) {
                     `;
                 }
             });
+            
+            // Synchronize with other columns (only if not already active to avoid loops)
+            const newsIndex = findTeamIndexByTeamName(teamName, uniqueId, 'news');
+            const socialIndex = findTeamIndexByTeamName(teamName, uniqueId, 'social');
+            const newsUniqueId = findUniqueIdByTeamName(teamName, 'news');
+            const socialUniqueId = findUniqueIdByTeamName(teamName, 'social');
+            
+            if (newsIndex >= 0 && newsUniqueId) {
+                const newsTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${newsUniqueId}"]`);
+                if (newsTabs[newsIndex] && !newsTabs[newsIndex].classList.contains('active')) {
+                    window.switchNewsTeamTab(newsIndex, newsUniqueId);
+                }
+            }
+            if (socialIndex >= 0 && socialUniqueId) {
+                const socialTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${socialUniqueId}"]`);
+                if (socialTabs[socialIndex] && !socialTabs[socialIndex].classList.contains('active')) {
+                    window.switchSocialTeamTab(socialIndex, socialUniqueId);
+                }
+            }
         };
         
         // Global function to switch between team tabs
@@ -7265,6 +7346,25 @@ function loadCustomRSSFeed(feedUrl, container) {
                     `;
                 }
             });
+            
+            // Synchronize with other columns (only if not already active to avoid loops)
+            const newsIndex = findTeamIndexByTeamName(teamName, uniqueId, 'news');
+            const mediaIndex = findTeamIndexByTeamName(teamName, uniqueId, 'media');
+            const newsUniqueId = findUniqueIdByTeamName(teamName, 'news');
+            const mediaUniqueId = findUniqueIdByTeamName(teamName, 'media');
+            
+            if (newsIndex >= 0 && newsUniqueId) {
+                const newsTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${newsUniqueId}"]`);
+                if (newsTabs[newsIndex] && !newsTabs[newsIndex].classList.contains('active')) {
+                    window.switchNewsTeamTab(newsIndex, newsUniqueId);
+                }
+            }
+            if (mediaIndex >= 0 && mediaUniqueId) {
+                const mediaTabs = document.querySelectorAll(`.media-team-tab[data-unique-id="${mediaUniqueId}"]`);
+                if (mediaTabs[mediaIndex] && !mediaTabs[mediaIndex].classList.contains('active')) {
+                    window.switchMediaTeamTab(mediaIndex, mediaUniqueId);
+                }
+            }
         };
         
         // Helper function to format dates
