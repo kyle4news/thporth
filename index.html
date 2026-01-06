@@ -4699,13 +4699,14 @@ function loadCustomRSSFeed(feedUrl, container) {
             return;
         }
         
-        // Store the selected game ID globally - this will be checked during renderGames()
-        // The next time renderGames() is called (via Firestore listeners), it will automatically
-        // apply the 'selected' class to rows matching this gameId during HTML construction
-        window.currentSelectedGameId = gameId;
+        // UNIVERSAL RULE: Only ONE game can be highlighted at a time, anywhere on the site
+        // STEP 1: NUCLEAR CLEAR - Remove highlight from EVERY game-related element FIRST
+        // Clear ALL games, regardless of whether they have .selected class or not (catch edge cases)
+        const allGameRows = document.querySelectorAll('.game-row, .game-separator');
+        const allSeparatorLines = document.querySelectorAll('.game-separator-line');
         
-        // Remove selected class from all game rows (for immediate visual feedback)
-        document.querySelectorAll('.game-row.selected').forEach(row => {
+        // Clear ALL game rows (not just ones with .selected - catch everything)
+        allGameRows.forEach(row => {
             row.classList.remove('selected');
             row.style.backgroundColor = '';
             row.style.color = '';
@@ -4715,6 +4716,17 @@ function loadCustomRSSFeed(feedUrl, container) {
                 cell.style.backgroundColor = '';
             });
         });
+        
+        // Clear ALL separator lines
+        allSeparatorLines.forEach(separator => {
+            separator.classList.remove('selected');
+            separator.style.backgroundColor = '';
+        });
+        
+        console.log(`[handleGameClick] NUCLEAR CLEAR: Cleared ${allGameRows.length} game rows and ${allSeparatorLines.length} separator lines`);
+        
+        // STEP 2: NOW update global state (after clearing, before highlighting)
+        window.currentSelectedGameId = gameId;
         
         // Find the clicked row using the event object
         let clickedRows = [];
@@ -4942,6 +4954,21 @@ function loadCustomRSSFeed(feedUrl, container) {
                         cell.style.color = '';
                         cell.style.backgroundColor = '';
                     });
+                    
+                    // Also clear separator line above if this is row1 (not the separator row itself)
+                    if (row.classList.contains('game-row') && !row.classList.contains('game-separator')) {
+                        const previousSibling = row.previousElementSibling;
+                        if (previousSibling && previousSibling.classList.contains('game-separator-line')) {
+                            previousSibling.classList.remove('selected');
+                            previousSibling.style.backgroundColor = '';
+                        }
+                    }
+                });
+                
+                // Also remove selected class from any orphaned separator lines
+                document.querySelectorAll('.game-separator-line.selected').forEach(separator => {
+                    separator.classList.remove('selected');
+                    separator.style.backgroundColor = '';
                 });
                 
                 // Clear the selected game ID and highlight flag
@@ -15332,6 +15359,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 leagueSection.style.marginBottom = "";
             }
             container.appendChild(leagueSection);
+        });
+        
+        // UNIVERSAL RULE ENFORCEMENT: Clear any games that have 'selected' but don't match currentSelectedGameId
+        // This ensures only ONE game can ever be highlighted, even if renderGames() is called multiple times
+        const allGameRows = document.querySelectorAll('.game-row, .game-separator');
+        const allSeparatorLines = document.querySelectorAll('.game-separator-line');
+        
+        allGameRows.forEach(row => {
+            const rowGameId = row.getAttribute('data-game-id');
+            // Only keep highlight if it matches currentSelectedGameId, otherwise clear it
+            if (!window.currentSelectedGameId || rowGameId !== window.currentSelectedGameId) {
+                // This game is selected but shouldn't be - clear it
+                row.classList.remove('selected');
+                row.style.backgroundColor = '';
+                row.style.color = '';
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => {
+                    cell.style.color = '';
+                    cell.style.backgroundColor = '';
+                });
+            }
+        });
+        
+        allSeparatorLines.forEach(separator => {
+            // Check if the separator is above a game that doesn't match currentSelectedGameId
+            const nextSibling = separator.nextElementSibling;
+            if (nextSibling) {
+                const nextGameId = nextSibling.getAttribute('data-game-id');
+                // Only keep highlight if separator is above the selected game
+                if (!window.currentSelectedGameId || nextGameId !== window.currentSelectedGameId) {
+                    separator.classList.remove('selected');
+                    separator.style.backgroundColor = '';
+                }
+            } else {
+                // Orphaned separator - clear it
+                separator.classList.remove('selected');
+                separator.style.backgroundColor = '';
+            }
         });
         
         // Re-apply highlight to selected game after rendering (if one is selected)
