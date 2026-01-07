@@ -2967,15 +2967,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- Standings Tab Content (hidden by default) -->
     <div id="standings-tab-content" class="main-tab-content" style="display: none; padding: 5px; height: calc(100% - 18px); flex-direction: column; overflow-y: auto;">
-        <!-- NCAA Standings Sub-Tabs (CFP for NCAAF only, Top 25, Standings) - only for NCAAF, NCAAM, NCAAW -->
+        <!-- NCAA Standings Sub-Tabs (Top 25, Standings) - only for NCAAF, NCAAM, NCAAW -->
         <div id="ncaa-standings-tabs" style="display: none; height: 18px; background-color: #2a2a2a; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%; gap: 2px;">
-            <div class="ncaa-standings-tab active" data-ncaa-standings-tab="cfp" id="ncaa-cfp-tab" style="display: none; flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">CFP</div>
-            <div class="ncaa-standings-tab" data-ncaa-standings-tab="top25" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Top 25</div>
+            <div class="ncaa-standings-tab active" data-ncaa-standings-tab="top25" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Top 25</div>
             <div class="ncaa-standings-tab" data-ncaa-standings-tab="standings" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">Standings</div>
         </div>
-        
-        <!-- CFP Content (only for NCAAF) -->
-        <div id="league-cfp-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">CFP rankings coming soon...</p></div>
         
         <!-- Top 25 Content (active by default for NCAA leagues) -->
         <div id="league-top25-content" class="ncaa-standings-sub-content" style="display: none; flex: 1; overflow-y: auto; padding-bottom: 150px;"><p style="color: #9ca3af;">Loading Top 25...</p></div>
@@ -9771,11 +9767,9 @@ document.addEventListener('DOMContentLoaded', function () {
             return true;
         }
 
-        const homeRank = getTop25Rank(homeTeamName, leagueKey);
-        const awayRank = getTop25Rank(awayTeamName, leagueKey);
-        if ((homeRank !== null && homeRank !== undefined) || (awayRank !== null && awayRank !== undefined)) {
-            return true;
-        }
+        // Rankings are now in game data, check if game has rankings
+        // This function is used for importance checking, so we'll check game data directly
+        // For now, skip ranking-based importance check since rankings are in game data
 
         const rankFields = [
             gameData?.HomeTop25Rank,
@@ -14093,8 +14087,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         const leagueKey = getLeagueKeyFromGame(data);
                         const homeDisplay = getTeamDisplayName(data["Home Team"] || "", displayLeague);
                         const awayDisplay = getTeamDisplayName(data["Away Team"] || "", displayLeague);
-                        const home = formatTeamNameWithRanking(homeDisplay, leagueKey);
-                        const away = formatTeamNameWithRanking(awayDisplay, leagueKey);
+                        const home = formatTeamNameWithRanking(homeDisplay, leagueKey, data["Home Team Ranking"]);
+                        const away = formatTeamNameWithRanking(awayDisplay, leagueKey, data["Away Team Ranking"]);
                         // Check if names contain <br> (doubles tennis) to adjust styling
                         const isHomeDoubles = homeDisplay.includes('<br>');
                         const isAwayDoubles = awayDisplay.includes('<br>');
@@ -14583,8 +14577,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (shouldPrioritizeImportant && !isImportantGame) {
                     hasHiddenGames = true;
                 }
-                const home = formatTeamNameWithRanking(homeDisplay, leagueKey);
-                const away = formatTeamNameWithRanking(awayDisplay, leagueKey);
+                const home = formatTeamNameWithRanking(homeDisplay, leagueKey, data["Home Team Ranking"]);
+                const away = formatTeamNameWithRanking(awayDisplay, leagueKey, data["Away Team Ranking"]);
                 // Check if names contain <br> (doubles tennis) to adjust styling
                 const isHomeDoubles = homeDisplay.includes('<br>');
                 const isAwayDoubles = awayDisplay.includes('<br>');
@@ -17536,10 +17530,7 @@ async function fetchFeaturedGames() {
         // Load Top 25 rankings cache in background (non-blocking)
         // Don't wait for it - games should load immediately from today.json
         Promise.all([
-            loadTop25RankingsCache('NCAAF'),
-            loadTop25RankingsCache('NCAAM'),
-            loadTop25RankingsCache('NCAAW'),
-            loadCFPRankingsCache()
+        // Rankings are now included in game data from backend
         ]).catch(err => {
             console.warn('Background cache loading failed (non-critical):', err);
         });
@@ -18263,25 +18254,14 @@ async function fetchFeaturedGames() {
             leagueTodayGamesUnsubscribe = null;
         }
         
-        // Show/hide NCAA standings sub-tabs (CFP for NCAAF only, Top 25, Standings) for NCAAF, NCAAM, NCAAW
+        // Show/hide NCAA standings sub-tabs (Top 25, Standings) for NCAAF, NCAAM, NCAAW
         const isNCALeague = ['NCAAF', 'NCAAM', 'NCAAW'].includes(leagueKey);
         const ncaaStandingsTabs = document.getElementById('ncaa-standings-tabs');
         const top25Content = document.getElementById('league-top25-content');
         const standingsContentOnly = document.getElementById('league-standings-content');
-        const cfpContent = document.getElementById('league-cfp-content');
-        const cfpTab = document.getElementById('ncaa-cfp-tab');
         
         if (ncaaStandingsTabs) {
             ncaaStandingsTabs.style.display = isNCALeague ? 'flex' : 'none';
-        }
-        
-        // Show CFP tab only for NCAAF
-        if (cfpTab) {
-            if (leagueKey === 'NCAAF') {
-                cfpTab.style.display = ''; // Remove display: none to make it a flex item
-            } else {
-                cfpTab.style.display = 'none';
-            }
         }
         
         // Clear old Top 25 content when switching leagues
@@ -18290,63 +18270,29 @@ async function fetchFeaturedGames() {
         }
         
         if (isNCALeague) {
-            // Load Top 25 rankings cache for this league
-            // Wait for cache to load before proceeding
-            const cachePromises = [loadTop25RankingsCache(leagueKey)];
-            if (leagueKey === 'NCAAF') {
-                cachePromises.push(loadCFPRankingsCache());
-            }
-            await Promise.all(cachePromises);
-            
-            // Set CFP tab as active by default for NCAAF, Top 25 for others
+            // Rankings are now included in game data from backend
+            // Set Top 25 tab as active by default for all NCAA leagues
             const top25Tab = ncaaStandingsTabs.querySelector('.ncaa-standings-tab[data-ncaa-standings-tab="top25"]');
             const standingsTab = ncaaStandingsTabs.querySelector('.ncaa-standings-tab[data-ncaa-standings-tab="standings"]');
             
-            if (leagueKey === 'NCAAF' && cfpTab) {
-                // For NCAAF, set CFP tab as active by default
-                cfpTab.classList.add('active');
-                cfpTab.style.color = '#fff';
-                cfpTab.style.borderBottom = '2px solid #fff';
-                if (top25Tab) {
-                    top25Tab.classList.remove('active');
-                    top25Tab.style.color = '#ccc';
-                    top25Tab.style.borderBottom = 'none';
-                }
-                if (standingsTab) {
-                    standingsTab.classList.remove('active');
-                    standingsTab.style.color = '#ccc';
-                    standingsTab.style.borderBottom = 'none';
-                }
-                // Show CFP content, hide other content
-                if (cfpContent) {
-                    cfpContent.style.display = 'block';
-                    loadCFPData();
-                }
-                if (top25Content) top25Content.style.display = 'none';
-                if (standingsContentOnly) standingsContentOnly.style.display = 'none';
-            } else {
-                // For NCAAM and NCAAW, set Top 25 tab as active by default
-                if (top25Tab && standingsTab) {
-                    top25Tab.classList.add('active');
-                    top25Tab.style.color = '#fff';
-                    top25Tab.style.borderBottom = '2px solid #fff';
-                    standingsTab.classList.remove('active');
-                    standingsTab.style.color = '#ccc';
-                    standingsTab.style.borderBottom = 'none';
-                }
-                // Show Top 25 content, hide other content, and LOAD the data
-                if (top25Content) {
-                    top25Content.style.display = 'block';
-                    loadTop25Data(leagueKey); // LOAD THE DATA!
-                }
-                if (standingsContentOnly) standingsContentOnly.style.display = 'none';
-                if (cfpContent) cfpContent.style.display = 'none';
+            if (top25Tab && standingsTab) {
+                top25Tab.classList.add('active');
+                top25Tab.style.color = '#fff';
+                top25Tab.style.borderBottom = '2px solid #fff';
+                standingsTab.classList.remove('active');
+                standingsTab.style.color = '#ccc';
+                standingsTab.style.borderBottom = 'none';
             }
+            // Show Top 25 content, hide other content, and LOAD the data
+            if (top25Content) {
+                top25Content.style.display = 'block';
+                loadTop25Data(leagueKey); // LOAD THE DATA!
+            }
+            if (standingsContentOnly) standingsContentOnly.style.display = 'none';
         } else {
             // For non-NCAA leagues, show standings content only
             if (top25Content) top25Content.style.display = 'none';
             if (standingsContentOnly) standingsContentOnly.style.display = 'block';
-            if (cfpContent) cfpContent.style.display = 'none';
         }
         
         // Hide yesterday content when loading new league
@@ -19330,8 +19276,8 @@ async function fetchFeaturedGames() {
                     const leagueKey = getLeagueKeyFromGame(game);
                     const homeDisplay = getTeamDisplayName(game['Home Team'] || '', displayLeague);
                     const awayDisplay = getTeamDisplayName(game['Away Team'] || '', displayLeague);
-                    const homeTeam = formatTeamNameWithRanking(homeDisplay, leagueKey);
-                    const awayTeam = formatTeamNameWithRanking(awayDisplay, leagueKey);
+                    const homeTeam = formatTeamNameWithRanking(homeDisplay, leagueKey, game['Home Team Ranking']);
+                    const awayTeam = formatTeamNameWithRanking(awayDisplay, leagueKey, game['Away Team Ranking']);
                     const homeScore = game['Home Score'] || '';
                     const awayScore = game['Away Score'] || '';
                     const status = game['Match Status'] || '';
@@ -20513,8 +20459,8 @@ async function fetchFeaturedGames() {
                     }
                     const awayDisplay = getTeamDisplayName(game.away || '', displayLeague);
                     const homeDisplay = getTeamDisplayName(game.home || '', displayLeague);
-                    let awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey);
-                    let homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey);
+                    let awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey, game['Away Team Ranking']);
+                    let homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey, game['Home Team Ranking']);
                     
                     // For UFC and Boxing: handle sub-items (gray text) vs main items (white text)
                     let awayColor = '';
@@ -20588,8 +20534,8 @@ async function fetchFeaturedGames() {
                     }
                     const homeDisplay = getTeamDisplayName(game.home || '', displayLeague);
                     const awayDisplay = getTeamDisplayName(game.away || '', displayLeague);
-                    const homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey);
-                    const awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey);
+                    const homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey, game['Home Team Ranking']);
+                    const awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey, game['Away Team Ranking']);
                     
                     // Use EXACT same table format as renderGames function for soccer (10px font for time column in league-specific column)
                     html += `
@@ -22458,44 +22404,11 @@ if (mainTabsContainer) {
                 const ncaaStandingsTabs = document.getElementById('ncaa-standings-tabs');
                 const top25Tab = ncaaStandingsTabs ? ncaaStandingsTabs.querySelector('.ncaa-standings-tab[data-ncaa-standings-tab="top25"]') : null;
                 const standingsTab = ncaaStandingsTabs ? ncaaStandingsTabs.querySelector('.ncaa-standings-tab[data-ncaa-standings-tab="standings"]') : null;
-                const cfpTab = document.getElementById('ncaa-cfp-tab');
                 const top25Content = document.getElementById('league-top25-content');
                 const standingsContentOnly = document.getElementById('league-standings-content');
-                const cfpContent = document.getElementById('league-cfp-content');
                 
-                // Show CFP tab only for NCAAF
-                if (cfpTab) {
-                    if (leagueKey === 'NCAAF') {
-                        cfpTab.style.display = ''; // Remove display: none to make it a flex item
-                    } else {
-                        cfpTab.style.display = 'none';
-                    }
-                }
-                
-                if (leagueKey === 'NCAAF' && cfpTab) {
-                    // For NCAAF, activate CFP tab by default
-                    cfpTab.classList.add('active');
-                    cfpTab.style.color = '#fff';
-                    cfpTab.style.borderBottom = '2px solid #fff';
-                    if (top25Tab) {
-                        top25Tab.classList.remove('active');
-                        top25Tab.style.color = '#ccc';
-                        top25Tab.style.borderBottom = 'none';
-                    }
-                    if (standingsTab) {
-                        standingsTab.classList.remove('active');
-                        standingsTab.style.color = '#ccc';
-                        standingsTab.style.borderBottom = 'none';
-                    }
-                    // Show CFP content, hide other content
-                    if (cfpContent) {
-                        cfpContent.style.display = 'block';
-                        loadCFPData();
-                    }
-                    if (top25Content) top25Content.style.display = 'none';
-                    if (standingsContentOnly) standingsContentOnly.style.display = 'none';
-                } else if (top25Tab && standingsTab) {
-                    // For NCAAM and NCAAW, activate Top 25 tab by default
+                if (top25Tab && standingsTab) {
+                    // For all NCAA leagues, activate Top 25 tab by default
                     top25Tab.classList.add('active');
                     top25Tab.style.color = '#fff';
                     top25Tab.style.borderBottom = '2px solid #fff';
@@ -22508,7 +22421,6 @@ if (mainTabsContainer) {
                         loadTop25Data(leagueKey);
                     }
                     if (standingsContentOnly) standingsContentOnly.style.display = 'none';
-                    if (cfpContent) cfpContent.style.display = 'none';
                 }
             } else {
                 // For non-NCAA leagues, load standings normally
@@ -22554,25 +22466,15 @@ if (ncaaStandingsTabsContainer) {
         // Show/hide content
         const top25Content = document.getElementById('league-top25-content');
         const standingsContentOnly = document.getElementById('league-standings-content');
-        const cfpContent = document.getElementById('league-cfp-content');
         
-        if (tabType === 'cfp') {
-            if (cfpContent) {
-                cfpContent.style.display = 'block';
-                loadCFPData();
-            }
-            if (top25Content) top25Content.style.display = 'none';
-            if (standingsContentOnly) standingsContentOnly.style.display = 'none';
-        } else if (tabType === 'top25') {
+        if (tabType === 'top25') {
             if (top25Content) {
                 top25Content.style.display = 'block';
                 loadTop25Data(leagueKey);
             }
             if (standingsContentOnly) standingsContentOnly.style.display = 'none';
-            if (cfpContent) cfpContent.style.display = 'none';
         } else if (tabType === 'standings') {
             if (top25Content) top25Content.style.display = 'none';
-            if (cfpContent) cfpContent.style.display = 'none';
             if (standingsContentOnly) {
                 standingsContentOnly.style.display = 'block';
                 const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
@@ -22584,10 +22486,9 @@ if (ncaaStandingsTabsContainer) {
     });
 }
 
-// --- TOP 25 RANKINGS CACHE ---
-// Cache for Top 25 rankings by league key: { 'NCAAF': { 'Ohio State': 1, ... }, ... }
-let top25RankingsCache = {};
-let cfpRankingsCache = {};
+// --- TOP 25 RANKINGS ---
+// Rankings are now included directly in game data (Home Team Ranking, Away Team Ranking)
+// No cache needed - rankings come from backend with each game
 
 // ESPN team name to NCAA API team name mapping
 // ESPN provides full names with mascots (e.g., "Duke Blue Devils")
@@ -22972,294 +22873,7 @@ function getTop25DisplayName(teamName, leagueKey) {
 }
 
 // Load Top 25 rankings into cache (keyed by display name)
-async function loadTop25RankingsCache(leagueKey) {
-    try {
-        // Fetch from backend endpoint (no direct Firestore access)
-        const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
-        const data = await fetch(`${BACKEND_URL}/data/standings.json`, { cache: 'no-store' }).then(r => r.json());
-        
-        if (!data || !data.standings) {
-            top25RankingsCache[leagueKey] = {};
-            return;
-        }
-        
-        // Map league keys to collection names
-        const leagueMap = {
-            'NCAAF': 'NCAAFStandings',
-            'NCAAM': 'NCAAMStandings',
-            'NCAAW': 'NCAAWStandings'
-        };
-        
-        const collectionName = leagueMap[leagueKey];
-        if (!collectionName) {
-            console.warn(`No collection mapping for league key: ${leagueKey}`);
-            top25RankingsCache[leagueKey] = {};
-            return;
-        }
-        
-        // Get the standings data for this collection
-        // Backend returns: { standings: { 'NCAAFStandings': { docId1: teamData1, docId2: teamData2, ... } } }
-        const collectionData = data.standings[collectionName];
-        if (!collectionData || typeof collectionData !== 'object') {
-            top25RankingsCache[leagueKey] = {};
-            return;
-        }
-        
-        // Convert object of documents to array of team data
-        const teams = Object.values(collectionData).filter(item => item && typeof item === 'object');
-        
-        if (teams.length === 0) {
-            top25RankingsCache[leagueKey] = {};
-            return;
-        }
-        
-        // Build cache with 3 variants for each team:
-        // 1. NCAA API name (e.g., "Duke")
-        // 2. ESPN name with mascot (e.g., "Duke Blue Devils")
-        // 3. ESPN name without mascot (e.g., "Duke")
-        const rankingsMap = {};
-        const ncaaToEspnMap = {};
-        
-        // Build reverse mapping (NCAA -> ESPN)
-        for (const [espnName, ncaaName] of Object.entries(ESPN_TO_NCAA_TEAM_MAP)) {
-            ncaaToEspnMap[ncaaName] = espnName;
-        }
-        
-        teams.forEach(teamData => {
-            if (teamData.Top25Rank !== null && teamData.Top25Rank !== undefined && teamData.Team) {
-                const ncaaTeamName = teamData.Team; // e.g., "Duke" or "Michigan St" or "Michigan State"
-                const rank = parseInt(teamData.Top25Rank) || null;
-                
-                // Store NCAA name from Firestore: "Michigan St" or "Michigan State"
-                    rankingsMap[ncaaTeamName] = rank;
-                    
-                // Find the ESPN name for this NCAA name (reverse lookup)
-                let espnName = ncaaToEspnMap[ncaaTeamName];
-                
-                // If reverse lookup fails, try alternative variations
-                if (!espnName) {
-                    // Try "Michigan St" -> "Michigan St."
-                    if (ncaaTeamName === 'Michigan St') {
-                        espnName = ncaaToEspnMap['Michigan St.'];
-                    }
-                    // Try "Michigan St." -> "Michigan St"
-                    else if (ncaaTeamName === 'Michigan St.') {
-                        espnName = ncaaToEspnMap['Michigan St'];
-                    }
-                    // Try "Michigan State" -> "Michigan St."
-                    else if (ncaaTeamName === 'Michigan State') {
-                        espnName = ncaaToEspnMap['Michigan St.'];
-                    }
-                }
-                
-                if (espnName) {
-                    // Store ESPN full name: "Michigan State Spartans"
-                    rankingsMap[espnName] = rank;
-                    
-                    // Store NCAA name from ESPN_TO_NCAA_TEAM_MAP (might have period): "Michigan St."
-                    const ncaaNameFromMap = ESPN_TO_NCAA_TEAM_MAP[espnName];
-                    if (ncaaNameFromMap) {
-                        rankingsMap[ncaaNameFromMap] = rank;
-                    }
-                    
-                    // Store all Michigan State variations to handle period differences
-                    if (/^Michigan\s+(St|State|St\.)$/i.test(ncaaTeamName)) {
-                        rankingsMap['Michigan St'] = rank;
-                        rankingsMap['Michigan St.'] = rank;
-                        rankingsMap['Michigan State'] = rank;
-                    }
-                    
-                    // ESPN without mascot (extract school name from full name)
-                    const schoolNameOnly = espnName.split(' ')[0]; // "Duke" from "Duke Blue Devils"
-                    // For multi-word schools, try to be smarter
-                    const mascotWords = ['Wildcats', 'Tigers', 'Bulldogs', 'Bears', 'Eagles', 'Panthers', 
-                                       'Hawks', 'Huskies', 'Cardinals', 'Cavaliers', 'Cyclones', 'Buckeyes',
-                                       'Crimson Tide', 'Crimson', 'Bruins', 'Cougars', 'Spartans', 'Wolverines', 'Volunteers',
-                                       'Jayhawks', 'Terrapins', 'Hoosiers', 'Tar Heels', 'Blue Devils',
-                                       'Demon Deacons', 'Yellow Jackets', 'Commodores', 'Razorbacks',
-                                       'Mountaineers', 'Aggies', 'Gamecocks', 'Seminoles', 'Gators', 'Tide'];
-                    
-                    // Find where mascot starts
-                    let schoolName = espnName;
-                    for (const mascot of mascotWords) {
-                        const idx = espnName.indexOf(' ' + mascot);
-                        if (idx > 0) {
-                            schoolName = espnName.substring(0, idx);
-                            break;
-                        }
-                    }
-                    rankingsMap[schoolName] = rank;
-                } else {
-                    // Even if no ESPN mapping, store Michigan State variations
-                    if (/^Michigan\s+(St|State|St\.)$/i.test(ncaaTeamName)) {
-                        rankingsMap['Michigan St'] = rank;
-                        rankingsMap['Michigan St.'] = rank;
-                        rankingsMap['Michigan State'] = rank;
-                    }
-                }
-            }
-        });
-        
-        top25RankingsCache[leagueKey] = rankingsMap;
-        console.log(`✅ Loaded Top 25 rankings for ${leagueKey}`);
-    } catch (error) {
-        console.error(`Error loading Top 25 rankings cache for ${leagueKey}:`, error);
-        top25RankingsCache[leagueKey] = {};
-    }
-}
-
-// Get Top 25 rank for a team display name and league
-function getTop25Rank(displayName, leagueKey) {
-    if (!displayName || !leagueKey) return null;
-    
-    const rankings = top25RankingsCache[leagueKey];
-    if (!rankings) return null;
-    
-    // Cache now stores with ESPN names as keys, so direct lookup
-    return rankings[displayName] || null;
-}
-
-// Load CFP rankings into cache (keyed by ESPN display name)
-async function loadCFPRankingsCache() {
-    try {
-        // Fetch from backend endpoint (no direct Firestore access)
-        const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
-        const data = await fetch(`${BACKEND_URL}/data/cfp-standings.json`, { cache: 'no-store' }).then(r => r.json());
-        
-        if (!data || !data.standings || !Array.isArray(data.standings) || data.standings.length === 0) {
-            cfpRankingsCache = {};
-            return;
-        }
-        
-        // CFP data is an array of team objects
-        const teams = data.standings;
-        
-        // Build reverse mapping (NCAA -> ESPN) for NCAAF
-        const ncaaToEspnMap = {};
-        for (const [espnName, ncaaName] of Object.entries(ESPN_TO_NCAA_TEAM_MAP)) {
-            ncaaToEspnMap[ncaaName] = espnName;
-        }
-        
-        // Build cache with 3 variants for each team
-        const rankingsMap = {};
-        const mascotWords = ['Wildcats', 'Tigers', 'Bulldogs', 'Bears', 'Eagles', 'Panthers', 
-                           'Hawks', 'Huskies', 'Cardinals', 'Cavaliers', 'Cyclones', 'Buckeyes',
-                           'Crimson Tide', 'Crimson', 'Bruins', 'Cougars', 'Spartans', 'Wolverines', 'Volunteers',
-                           'Jayhawks', 'Terrapins', 'Hoosiers', 'Tar Heels', 'Blue Devils',
-                           'Demon Deacons', 'Yellow Jackets', 'Commodores', 'Razorbacks',
-                           'Mountaineers', 'Aggies', 'Gamecocks', 'Seminoles', 'Gators', 'Tide'];
-        
-        teams.forEach(teamData => {
-            if (teamData.Rk !== null && teamData.Rk !== undefined && teamData.Team) {
-                const ncaaTeamName = teamData.Team; // e.g., "Alabama"
-                const rank = parseInt(teamData.Rk) || null;
-                
-                // Find the ESPN name for this NCAA name
-                const espnName = ncaaToEspnMap[ncaaTeamName];
-                
-                if (espnName) {
-                    // Store with all 3 variants:
-                    // 1. NCAA name
-                    rankingsMap[ncaaTeamName] = rank;
-                    
-                    // 2. ESPN full name
-                    rankingsMap[espnName] = rank;
-                    
-                    // 3. ESPN without mascot
-                    let schoolName = espnName;
-                    for (const mascot of mascotWords) {
-                        const idx = espnName.indexOf(' ' + mascot);
-                        if (idx > 0) {
-                            schoolName = espnName.substring(0, idx);
-                            break;
-                        }
-                    }
-                    rankingsMap[schoolName] = rank;
-                } else {
-                    // If no ESPN mapping found, store NCAA name
-                    rankingsMap[ncaaTeamName] = rank;
-                }
-            }
-        });
-        
-        cfpRankingsCache = rankingsMap;
-        console.log(`✅ Loaded CFP rankings`);
-    } catch (error) {
-        console.error(`Error loading CFP rankings cache:`, error);
-        cfpRankingsCache = {};
-    }
-}
-
-// Get CFP rank for a team display name
-function getCFPRank(displayName) {
-    if (!displayName) return null;
-    
-    if (!cfpRankingsCache || Object.keys(cfpRankingsCache).length === 0) return null;
-    
-    return cfpRankingsCache[displayName] || null;
-}
-
-// Resolve ranking for a display name, honoring TEAM_DISPLAY_MAP mappings
-function getRankingForDisplayName(displayName, leagueKey) {
-  if (!displayName) return null;
-  const nameStr = displayName.toString();
-  const nameLower = nameStr.toLowerCase();
-
-  // NCAAF uses CFP cache
-  if (leagueKey === 'NCAAF') {
-    if (cfpRankingsCache && cfpRankingsCache[nameStr]) return cfpRankingsCache[nameStr];
-
-    // If displayName is a short/mapped name, reverse lookup to full name
-    if (TEAM_DISPLAY_MAP && TEAM_DISPLAY_MAP['NCAAF']) {
-      for (const [fullName, shortName] of Object.entries(TEAM_DISPLAY_MAP['NCAAF'])) {
-        if ((shortName || '').toString() === nameStr) {
-          if (cfpRankingsCache && cfpRankingsCache[fullName]) return cfpRankingsCache[fullName];
-          const norm = normalizeTeamName('NCAAF', fullName);
-          if (cfpRankingsCache && cfpRankingsCache[norm]) return cfpRankingsCache[norm];
-        }
-      }
-    }
-
-    // Case-insensitive direct match
-    if (cfpRankingsCache) {
-      for (const [k, v] of Object.entries(cfpRankingsCache)) {
-        if (k.toString().toLowerCase() === nameLower) return v;
-      }
-      // Fuzzy contains match
-      for (const [k, v] of Object.entries(cfpRankingsCache)) {
-        const kLower = k.toString().toLowerCase();
-        if (kLower.includes(nameLower) || nameLower.includes(kLower)) return v;
-      }
-    }
-
-    return null;
-  }
-
-  // For NCAAM/NCAAW use top25RankingsCache
-  const topCache = top25RankingsCache[leagueKey] || {};
-  if (topCache[nameStr]) return topCache[nameStr];
-
-  if (TEAM_DISPLAY_MAP && TEAM_DISPLAY_MAP[leagueKey]) {
-    for (const [fullName, shortName] of Object.entries(TEAM_DISPLAY_MAP[leagueKey])) {
-      if ((shortName || '').toString() === nameStr) {
-        if (topCache[fullName]) return topCache[fullName];
-        const norm = normalizeTeamName(leagueKey, fullName);
-        if (topCache[norm]) return topCache[norm];
-      }
-    }
-  }
-
-  // Case-insensitive direct and fuzzy matches
-  for (const [k, v] of Object.entries(topCache)) {
-    if (k.toString().toLowerCase() === nameLower) return v;
-  }
-  for (const [k, v] of Object.entries(topCache)) {
-    const kLower = k.toString().toLowerCase();
-    if (kLower.includes(nameLower) || nameLower.includes(kLower)) return v;
-  }
-
-  return null;
-}
+// Top 25 ranking cache functions removed - rankings are now included directly in game data
 
 // Get league key from game data (for Top 25 matching)
 function getLeagueKeyFromGame(game) {
@@ -23284,29 +22898,25 @@ function getLeagueKeyFromGame(game) {
     return null;
 }
 
-// Format team name with Top 25 ranking (if ranked)
-function formatTeamNameWithRanking(displayName, leagueKey) {
+// Format team name with ranking (if ranked)
+// ranking: optional ranking number from game data (Home Team Ranking or Away Team Ranking)
+function formatTeamNameWithRanking(displayName, leagueKey, ranking) {
     if (!leagueKey || !['NCAAF', 'NCAAM', 'NCAAW'].includes(leagueKey)) {
         return displayName;
     }
     
-      
-  const rank = getRankingForDisplayName(displayName, leagueKey);
-  if (rank !== null && rank !== undefined) {
-    return `<span style="font-size: 0.75em;">${rank}</span> ${displayName}`;
-  }
-  return displayName;
-}
-
-// Format a display name with ranking using the canonical team name for lookups
-function formatDisplayUsingCanonical(canonicalName, displayName, leagueKey) {
-    if (!canonicalName) return displayName;
-    const rank = getRankingForDisplayName(canonicalName, leagueKey);
-    if (rank !== null && rank !== undefined) {
-        return `<span style="font-size: 0.75em;">${rank}</span> ${displayName}`;
+    // Use ranking from game data if provided
+    if (ranking !== null && ranking !== undefined && ranking !== '') {
+        const rankNum = parseInt(ranking);
+        if (!isNaN(rankNum) && rankNum > 0) {
+            return `<span style="font-size: 0.75em;">${rankNum}</span> ${displayName}`;
+        }
     }
+    
     return displayName;
 }
+
+// formatDisplayUsingCanonical removed - use formatTeamNameWithRanking with ranking from game data instead
 
 // --- TOP 25 DATA LOADING AND DISPLAY FUNCTIONS ---
 async function loadTop25Data(leagueKey) {
@@ -23485,74 +23095,7 @@ function createTop25Table(teams, leagueKey) {
     return html;
 }
 
-// --- CFP DATA LOADING AND DISPLAY FUNCTIONS ---
-async function loadCFPData() {
-    const cfpContent = document.getElementById('league-cfp-content');
-    if (!cfpContent) return;
-    
-    cfpContent.innerHTML = '<p style="color: #9ca3af;">Loading CFP rankings...</p>';
-    
-    try {
-        // Get all documents from CFP collection
-        const snapshot = await db.collection('CFP').get();
-        
-        if (snapshot.empty) {
-            cfpContent.innerHTML = '<p style="color: #9ca3af;">No CFP rankings available.</p>';
-            return;
-        }
-        
-        // Convert to array and sort by Rk
-        const rankings = snapshot.docs
-            .map(doc => doc.data())
-            .sort((a, b) => {
-                const rankA = parseInt(a.Rk) || 999;
-                const rankB = parseInt(b.Rk) || 999;
-                return rankA - rankB;
-            });
-        
-        if (rankings.length === 0) {
-            cfpContent.innerHTML = '<p style="color: #9ca3af;">No CFP rankings available.</p>';
-            return;
-        }
-        
-        const html = createCFPTable(rankings);
-        cfpContent.innerHTML = html;
-        
-    } catch (error) {
-        console.error('Error loading CFP data:', error);
-        cfpContent.innerHTML = '<p style="color: #ef4444;">Error loading CFP rankings.</p>';
-    }
-}
-
-function createCFPTable(rankings) {
-    let html = '<div class="cfp-standings" style="color: #ffffff;">';
-    html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; table-layout: fixed;">';
-    html += '<colgroup>';
-    html += '<col style="width: 50px;">';
-    html += '<col style="width: auto;">';
-    html += '<col style="width: 100px;">';
-    html += '</colgroup>';
-    html += '<thead>';
-    html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
-    html += '<th style="padding: 8px; text-align: center; border-bottom: 1px solid #666;">Rk</th>';
-    html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
-    html += '<th style="padding: 8px; text-align: right; border-bottom: 1px solid #666;">Record</th>';
-    html += '</tr>';
-    html += '</thead>';
-    html += '<tbody>';
-    
-    rankings.forEach((ranking, index) => {
-        const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
-        html += '<tr style="' + rowStyle + '">';
-        html += '<td style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff;">' + (ranking.Rk || '') + '</td>';
-        html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + (ranking.Team || '') + '</td>';
-        html += '<td style="padding: 8px; text-align: right; font-size: 12px; color: #ffffff;">' + (ranking.Record || '') + '</td>';
-        html += '</tr>';
-    });
-    
-    html += '</tbody></table></div>';
-    return html;
-}
+// CFP functionality removed - user will hardcode it
 
 // --- SCHEDULE TABS INITIALIZATION ---
 const scheduleTabsContainer = document.getElementById('schedule-tabs');
