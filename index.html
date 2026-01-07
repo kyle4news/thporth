@@ -15729,15 +15729,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
         yesterdayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading yesterday\'s scores...</p>';
 
-        // Direct path: read entire yesterdayScores (no date filter), then organize by league
+        // Use JSON endpoint instead of direct Firestore access
+        const YESTERDAY_JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json';
+        
         try {
-            const refAll = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
-            const snapAll = await refAll.get();
-            if (snapAll.empty) {
+            const response = await fetch(YESTERDAY_JSON_ENDPOINT, { cache: 'no-store' });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            const jsonData = await response.json();
+            if (!jsonData.games || jsonData.games.length === 0) {
                 yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
                 return;
             }
-            const allGames = snapAll.docs.map(d => d.data());
+            const allGames = jsonData.games;
             // Flexible league matching (exact → key-based → partials)
             let leagueGames = allGames.filter(game => {
                 if (game.League === leagueId) return true;
@@ -15829,8 +15834,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Fast path: use JSON endpoint, then client-filter by league
-        const YESTERDAY_JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json';
+        // Fast path: use JSON endpoint, then client-filter by league (fallback if try block fails)
         fetch(YESTERDAY_JSON_ENDPOINT, { cache: 'no-store' })
             .then(response => {
                 if (!response.ok) {
