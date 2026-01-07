@@ -2,9 +2,7 @@
 <html lang="en">
   <head>
     <meta name="google-site-verification" content="VoA7EfXHDZCU-Em6FGijJneXQVJfMKXUFZNcGNew_i8" />
-	  <script defer src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
-<script defer src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script> <!-- ✅ NEW -->
-<script defer src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
+<!-- Firebase/Firestore scripts removed - all data now comes from backend endpoints -->
     <!-- Luxon for date/time handling - Deferred to improve page load performance -->
     <script defer src="https://cdn.jsdelivr.net/npm/luxon@3.x/build/global/luxon.min.js"></script>
 	 <style>
@@ -5054,30 +5052,18 @@ function loadCustomRSSFeed(feedUrl, container) {
          */
         async function loadGameContent(gameId, contentType, container) {
             try {
-                // Ensure Firebase is initialized
-                if (!firebase.apps.length) {
-                    const firebaseConfig = {
-                        apiKey: "AIzaSyD3bw8d4q2oO2qpbgGiUG6Qnlf4aABK3Bc",
-                        authDomain: "flashlive-daily-scraper.firebaseapp.com",
-                        projectId: "flashlive-daily-scraper",
-                        storageBucket: "flashlive-daily-scraper.appspot.com",
-                        messagingSenderId: "124291936014",
-                        appId: "1:124291936014:web:acadcaa791d6046849315f"
-                    };
-                    firebase.initializeApp(firebaseConfig);
+                // Fetch game data from backend endpoint (no direct Firestore access)
+                const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
+                const response = await fetch(`${BACKEND_URL}/data/game/${gameId}.json`, { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error(`Backend request failed: ${response.status}`);
                 }
-                const db = firebase.firestore();
+                const gameData = await response.json();
                 
-                // 1. Fetch game document to get teams and league
-                const gameDocRef = db.collection("artifacts/flashlive-daily-scraper/public/data/sportsGames").doc(gameId);
-                const gameDoc = await gameDocRef.get();
-                
-                if (!gameDoc.exists) {
+                if (!gameData || !gameData['Game ID']) {
                     container.innerHTML = `<div style="padding: 20px; color: #ff6b6b;">Game not found: ${gameId}</div>`;
                     return;
                 }
-                
-                const gameData = gameDoc.data();
                 const homeTeam = gameData['Home Team'] || '';
                 const awayTeam = gameData['Away Team'] || '';
                 const league = gameData['League'] || '';
@@ -8559,26 +8545,21 @@ async function loadDriverStandings() {
         errorDiv.style.display = 'none';
         table.style.display = 'none';
         
-        // Get Firestore db instance
-        let firestoreDb;
-        if (typeof db !== 'undefined' && db) {
-            firestoreDb = db;
-        } else if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firestoreDb = firebase.firestore();
-        } else {
-            throw new Error('Firestore database not initialized');
+        // Fetch from backend endpoint (no direct Firestore access)
+        const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
+        const response = await fetch(`${BACKEND_URL}/data/f1-driver-standings.json`, { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error(`Backend request failed: ${response.status}`);
         }
+        const data = await response.json();
         
-        // Fetch from Firestore
-        const snapshot = await firestoreDb.collection('F1DriverStandings').get();
-        
-        if (snapshot.empty) {
-            throw new Error('No driver standings found in Firestore');
+        if (!data.standings || data.standings.length === 0) {
+            throw new Error('No driver standings found');
         }
         
         const drivers = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
+        data.standings.forEach(item => {
+            const itemData = item;
             drivers.push({
                 Rank: data.Rank || 0,
                 Driver: data.Driver || '',
@@ -8631,26 +8612,21 @@ async function loadConstructorStandings() {
         errorDiv.style.display = 'none';
         table.style.display = 'none';
         
-        // Get Firestore db instance
-        let firestoreDb;
-        if (typeof db !== 'undefined' && db) {
-            firestoreDb = db;
-        } else if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firestoreDb = firebase.firestore();
-        } else {
-            throw new Error('Firestore database not initialized');
+        // Fetch from backend endpoint (no direct Firestore access)
+        const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
+        const response = await fetch(`${BACKEND_URL}/data/f1-constructor-standings.json`, { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error(`Backend request failed: ${response.status}`);
         }
+        const data = await response.json();
         
-        // Fetch from Firestore
-        const snapshot = await firestoreDb.collection('F1ConstructorStandings').get();
-        
-        if (snapshot.empty) {
-            throw new Error('No constructor standings found in Firestore');
+        if (!data.standings || data.standings.length === 0) {
+            throw new Error('No constructor standings found');
         }
         
         const constructors = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
+        data.standings.forEach(item => {
+            const itemData = item;
             constructors.push({
                 Rank: data.Rank || 0,
                 Constructor: data.Constructor || '',
@@ -8696,44 +8672,28 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     const scheduleContainer = document.getElementById('f1-schedule-container');
 
-    // Fetches F1 schedule data from Firestore.
+    // Fetches F1 schedule data from backend endpoint (no direct Firestore access).
     async function fetchF1ScheduleData() {
         try {
-            // Ensure Firebase is initialized - try to use global db first, otherwise initialize Firebase
-            let firestoreDb = typeof db !== 'undefined' ? db : null;
-            if (!firestoreDb && typeof firebase !== 'undefined') {
-                try {
-                    if (firebase.apps && firebase.apps.length === 0) {
-                        // Firebase not initialized - get config from the main script or use fallback
-                        // The main script should initialize Firebase, but if it hasn't, we'll try
-                        firestoreDb = firebase.firestore();
-                    } else {
-                        firestoreDb = firebase.firestore();
-                    }
-                } catch (e) {
-                    console.error('F1 Schedule: Error accessing Firestore:', e);
-                }
-            }
-            
-            if (!firestoreDb) {
-                console.error('F1 Schedule: Firestore database not available');
-                scheduleContainer.innerHTML = `<p style="color: #ef4444;">Error loading schedule.</p>`;
-                return [];
-            }
-
             const { DateTime } = luxon;
-            const snapshot = await firestoreDb.collection('FormulaOne').get();
+            // Fetch from backend endpoint (no direct Firestore access)
+            const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
+            const response = await fetch(`${BACKEND_URL}/data/f1-schedule.json`, { cache: 'no-store' });
+            if (!response.ok) {
+                throw new Error(`Backend request failed: ${response.status}`);
+            }
+            const backendData = await response.json();
             
-            console.log(`F1 Schedule: Found ${snapshot.size} documents in Firestore`);
+            console.log(`F1 Schedule: Found ${backendData.events ? backendData.events.length : 0} events from backend`);
             
-            if (snapshot.empty) {
-                console.log('F1 Schedule: Firestore collection is empty');
+            if (!backendData.events || backendData.events.length === 0) {
+                console.log('F1 Schedule: No events found');
                 return [];
             }
 
             const events = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
+            backendData.events.forEach(item => {
+                const data = item;
                 
                 // Extract fields from Firestore document
                 const home = data['home'] || '';
@@ -9870,20 +9830,12 @@ document.addEventListener('DOMContentLoaded', function () {
     "England: National League"
     ];
 
-    // --- 2. FIREBASE INITIALIZATION (SINGLETON) + CACHING ---
-    if (!firebase.apps.length) {
-        const firebaseConfig = {
-            apiKey: "AIzaSyD3bw8d4q2oO2qpbgGiUG6Qnlf4aABK3Bc",
-            authDomain: "flashlive-daily-scraper.firebaseapp.com",
-            projectId: "flashlive-daily-scraper",
-            storageBucket: "flashlive-daily-scraper.appspot.com",
-            messagingSenderId: "124291936014",
-            appId: "1:124291936014:web:acadcaa791d6046849315f"
-        };
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-    const gamesCollectionRef = db.collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
+    // --- 2. FIREBASE INITIALIZATION REMOVED ---
+    // All data now comes from backend endpoints (no direct Firestore access)
+    // Firebase scripts have been removed from HTML
+    // Stub db and gamesCollectionRef to prevent ReferenceErrors (will be replaced with backend calls)
+    const db = null; // No longer used - replaced with backend endpoints
+    const gamesCollectionRef = null; // No longer used - replaced with backend endpoints
 
     // --- CACHING SYSTEM ---
     const cache = {
@@ -9962,7 +9914,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // --- 4. OPTIMIZED FIRESTORE FUNCTIONS ---
     
-    // Cached version of Firestore queries to reduce costs
+    // Cached version - now uses backend endpoint instead of Firestore
     async function getCachedGames(leagueId, gameDate) {
         const cacheKey = `games_${leagueId}_${gameDate}`;
         let cachedData = cache.get(cacheKey);
@@ -9972,43 +9924,64 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         
         try {
-            const leagueIdLower = (leagueId || '').toLowerCase();
-            // Try exact match first
-            let snapshot = await gamesCollectionRef
-                .where('League', '==', leagueId)
-                .where('gameDate', '==', gameDate)
-                .get();
+            // Fetch from backend endpoint (no direct Firestore access)
+            const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
+            const response = await fetch(`${BACKEND_URL}/data/today.json`, { cache: 'no-store' });
+            if (!response.ok) {
+                throw new Error(`Backend request failed: ${response.status}`);
+            }
+            const data = await response.json();
             
-            // If no exact match, try case-insensitive search
-            if (snapshot.empty) {
-                console.log(`No exact match for leagueId: ${leagueId}, trying case-insensitive search...`);
-                const allGamesSnapshot = await gamesCollectionRef
-                    .where('gameDate', '==', gameDate)
-                    .get();
-                
-                const gamesData = allGamesSnapshot.docs
-                    .map(doc => doc.data())
-                    .filter(game => {
-                    if (leagueIdLower.includes('formula one') || leagueIdLower.includes('formula 1') || leagueIdLower === 'formulaone') {
-                        return isFormulaOneGame(game);
-                    }
-                    const gameLeague = (game.League || '').toLowerCase();
-                    return gameLeague.includes(leagueIdLower) || leagueIdLower.includes(gameLeague);
-                    });
-                
-                cache.set(cacheKey, gamesData);
-                return gamesData;
+            if (!data || !data.games || !Array.isArray(data.games)) {
+                console.error('Invalid data from backend:', data);
+                return [];
             }
             
-            const gamesData = snapshot.docs.map(doc => doc.data());
-        if (leagueIdLower.includes('formula one') || leagueIdLower.includes('formula 1') || leagueIdLower === 'formulaone') {
-            cache.set(cacheKey, gamesData.filter(isFormulaOneGame));
-            return cache.get(cacheKey) || [];
-        }
+            // Filter games by league and date - EXACT match like original Firestore query
+            // Original: gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr)
+            console.log(`[getCachedGames] Filtering for leagueId="${leagueId}", gameDate="${gameDate}", total games=${data.games.length}`);
+            
+            let gamesData = data.games.filter(game => {
+                // Check date match
+                const gameDateStr = game.gameDate || '';
+                if (gameDateStr !== gameDate) {
+                    return false;
+                }
+                
+                // Check league match - EXACT match (same as original Firestore query)
+                // Trim whitespace to handle any edge cases
+                const gameLeague = (game.League || '').trim();
+                const leagueIdTrimmed = (leagueId || '').trim();
+                
+                // Handle Formula One special case
+                const leagueIdLower = leagueIdTrimmed.toLowerCase();
+                if (leagueIdLower.includes('formula one') || leagueIdLower.includes('formula 1') || leagueIdLower === 'formulaone') {
+                    return isFormulaOneGame(game);
+                }
+                
+                // Exact match on League field (same as Firestore .where('League', '==', leagueId))
+                const matches = gameLeague === leagueIdTrimmed;
+                
+                // Log first few matches for debugging
+                if (data.games.indexOf(game) < 5) {
+                    console.log(`[getCachedGames] Game: League="${gameLeague}", leagueId="${leagueId}", matches=${matches}`);
+                }
+                
+                return matches;
+            });
+            
+            console.log(`[getCachedGames] Found ${gamesData.length} games after filtering`);
+            
+            // Handle Formula One filtering (additional pass)
+            const leagueIdLower = (leagueId || '').toLowerCase();
+            if (leagueIdLower.includes('formula one') || leagueIdLower.includes('formula 1') || leagueIdLower === 'formulaone') {
+                gamesData = gamesData.filter(isFormulaOneGame);
+            }
+            
             cache.set(cacheKey, gamesData);
             return gamesData;
         } catch (error) {
-            console.error('Error fetching games:', error);
+            console.error('Error fetching games from backend:', error);
             return [];
         }
     }
@@ -15615,60 +15588,30 @@ document.addEventListener('DOMContentLoaded', function () {
         // For mixed or non-manual games with same time, maintain original order (no change)
         return 0;
     }
-     function fetchLeagueSchedule(leagueId, leagueName) {
+     async function fetchLeagueSchedule(leagueId, leagueName) {
         scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
-        const { DateTime } = luxon;
-         // Match home column logic (Denver) for gameDate equality
-         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
-         
-         // League config is not required for today's games; read from sportsGames
-         // 1) Exact League + gameDate (primary)
-         let q = gamesCollectionRef.where('League', '==', leagueId).where('gameDate', '==', todayStr);
-         if (leagueId === 'USA: NCAA') {
-             let desiredSport = 'American Football'; // default
-             if (leagueName && leagueName.toLowerCase().includes('hockey')) {
-                 desiredSport = 'Hockey';
-             } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
-                 desiredSport = 'Basketball';
-             }
-             q = q.where('Sport', '==', desiredSport);
-         }
-         if (leagueId === 'USA: NCAA Women') {
-             q = q.where('Sport', '==', 'Basketball');
-         }
-         q.onSnapshot(snapshot => {
-             if (!snapshot.empty) {
-                 const gamesData = snapshot.docs.map(d => d.data()).sort(sortGames);
-                 renderGames(scheduleContent, gamesData, false);
-            return;
+        try {
+            const { DateTime } = luxon;
+            const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+            
+            console.log(`[League Schedule] Fetching games for leagueId: "${leagueId}", leagueName: "${leagueName}", date: ${todayStr}`);
+            
+            // Fetch from backend endpoint (no direct Firestore access)
+            const gamesData = await getCachedGames(leagueId, todayStr);
+            
+            console.log(`[League Schedule] Found ${gamesData ? gamesData.length : 0} games for ${leagueName}`);
+            
+            if (gamesData && gamesData.length > 0) {
+                const sortedGames = gamesData.sort(sortGames);
+                renderGames(scheduleContent, sortedGames, false);
+            } else {
+                console.warn(`[League Schedule] No games found for ${leagueName} (leagueId: ${leagueId}) on ${todayStr}`);
+                scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
+            }
+        } catch (error) {
+            console.error('[League Schedule] Error loading league schedule:', error);
+            scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>';
         }
-             // 2) Fallback to exact League + scheduledDate (if backend provided it)
-             let q2 = gamesCollectionRef.where('League', '==', leagueId).where('scheduledDate', '==', todayStr);
-             if (leagueId === 'USA: NCAA') {
-                 let desiredSport = 'American Football'; // default
-                 if (leagueName && leagueName.toLowerCase().includes('hockey')) {
-                     desiredSport = 'Hockey';
-                 } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
-                     desiredSport = 'Basketball';
-                 }
-                 q2 = q2.where('Sport', '==', desiredSport);
-             }
-             if (leagueId === 'USA: NCAA Women') {
-                 q2 = q2.where('Sport', '==', 'Basketball');
-             }
-             q2.onSnapshot(s2 => {
-                 if (!s2.empty) {
-                     const gamesData2 = s2.docs.map(d => d.data()).sort(sortGames);
-                     renderGames(scheduleContent, gamesData2, false);
-                    return;
-                }
-                 scheduleContent.innerHTML = `<p>No ${leagueName} games found for today.</p>`;
-             }, _err => {
-                 scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>';
-             });
-         }, _err => {
-             scheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading schedule.</p>';
-         });
      }
 
     async function fetchYesterdayScoresForLeague(leagueId, leagueName) {
@@ -15677,17 +15620,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
         yesterdayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading yesterday\'s scores...</p>';
 
-        // Direct path: read entire yesterdayScores (no date filter), then organize by league
         try {
-            const refAll = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
-            const snapAll = await refAll.get();
-            if (snapAll.empty) {
-                yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
-                return;
+            // Calculate yesterday's date (in Eastern Time to match gameDate storage)
+            const { DateTime } = luxon;
+            const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
+
+            // Ensure Home SCORES cache is available (single source of truth)
+            const nowCheck = Date.now();
+            if (!yesterdayScoresCache || !yesterdayScoresCacheExpiry || nowCheck >= yesterdayScoresCacheExpiry) {
+                try { 
+                    await fetchYesterdayScores(); 
+                } catch (e) {
+                    console.error('[fetchYesterdayScoresForLeague] Error fetching yesterday scores:', e);
+                }
             }
-            const allGames = snapAll.docs.map(d => d.data());
+
+            // Use cached data if available, otherwise fetch from backend
+            let allGames = [];
+            if (yesterdayScoresCache && yesterdayScoresCacheExpiry && Date.now() < yesterdayScoresCacheExpiry) {
+                allGames = yesterdayScoresCache;
+            } else {
+                // Fetch from backend endpoint (no direct Firestore access)
+                const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
+                const response = await fetch(`${BACKEND_URL}/data/yesterday.json`, { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error(`Backend request failed: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data && data.games && Array.isArray(data.games)) {
+                    allGames = data.games;
+                }
+            }
+
+            // Filter for yesterday's date
+            const yesterdayGames = allGames.filter(game => {
+                const gameDate = game.gameDate || '';
+                return gameDate === yesterdayStr;
+            });
+
             // Flexible league matching (exact → key-based → partials)
-            let leagueGames = allGames.filter(game => {
+            let leagueGames = yesterdayGames.filter(game => {
                 if (game.League === leagueId) return true;
                 const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
                 const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId || '');
@@ -15697,6 +15669,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) return true;
                 return gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName);
             });
+
             // NCAA split
             if (leagueId === 'USA: NCAA') {
                 let desiredSport = 'American Football'; // default
@@ -15710,305 +15683,20 @@ document.addEventListener('DOMContentLoaded', function () {
             if (leagueId === 'USA: NCAA Women') {
                 leagueGames = leagueGames.filter(g => g.Sport === 'Basketball');
             }
+
             if (leagueGames.length === 0) {
                 yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
                 return;
             }
+
             // Render as completed (same as Home SCORES)
             renderGames(yesterdayScheduleContent, leagueGames.sort(sortGames), false, true);
-            return;
-        } catch (e) {
-            // Fall through to existing logic if this path fails
-        }
-
-        // Calculate yesterday in both Denver and New York to handle edge timezone mismatches
-        const { DateTime } = luxon;
-        // Use Eastern Time for gameDate queries (matches backend storage)
-        const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
-
-        // Ensure Home SCORES cache is available (single source of truth)
-        const nowCheck = Date.now();
-        if (!yesterdayScoresCache || !yesterdayScoresCacheExpiry || nowCheck >= yesterdayScoresCacheExpiry) {
-            try { fetchYesterdayScores(); } catch (e) {}
-            // Wait briefly for cache to build
-            const waitForYesterdayCache = (maxMs = 4000, interval = 200) => new Promise(resolve => {
-                const start = Date.now();
-                const timer = setInterval(() => {
-                    const ready = yesterdayScoresCache && yesterdayScoresCacheExpiry && Date.now() < yesterdayScoresCacheExpiry;
-                    if (ready || (Date.now() - start) >= maxMs) {
-                        clearInterval(timer);
-                        resolve(ready);
-                    }
-                }, interval);
-            });
-            await waitForYesterdayCache();
-        }
-
-        // If cache is ready now, use it directly and return
-        const nowAfterWait = Date.now();
-        if (yesterdayScoresCache && yesterdayScoresCacheExpiry && nowAfterWait < yesterdayScoresCacheExpiry) {
-            const allGames = yesterdayScoresCache;
-            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayStr);
-            let leagueGames = yesterdayGames.filter(game => {
-                if (game.League === leagueId) return true;
-                const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
-                const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId || '');
-                if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) return true;
-                const targetLeagueName = leagueName.toLowerCase();
-                const gameLeagueName = (game.League || '').toLowerCase();
-                if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) return true;
-                return gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName);
-            });
-            if (leagueId === 'USA: NCAA') {
-                let desiredSport = 'American Football'; // default
-                if (leagueName && leagueName.toLowerCase().includes('hockey')) {
-                    desiredSport = 'Hockey';
-                } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
-                    desiredSport = 'Basketball';
-                }
-                leagueGames = leagueGames.filter(g => g.Sport === desiredSport);
-            }
-            if (leagueId === 'USA: NCAA Women') {
-                leagueGames = leagueGames.filter(g => g.Sport === 'Basketball');
-            }
-            if (leagueGames.length > 0) {
-                renderGames(yesterdayScheduleContent, leagueGames.sort(sortGames), false, true);
-                return;
-            }
-        }
-
-        // Fast path: query by date only, then client-filter by league (mirrors home SCORES logic)
-        const col = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
-        Promise.all([
-            col.where('gameDate', '==', yesterdayStr).get()
-        ]).then(([snapA, snapB]) => {
-            if (!snapA.empty || !snapB.empty) {
-                let allGames = [...snapA.docs, ...snapB.docs].map(d => d.data());
-                // Flexible league matching
-                let leagueGames = allGames.filter(game => {
-                    if (game.League === leagueId) return true;
-                    const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
-                    const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId || '');
-                    if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) return true;
-                    const targetLeagueName = leagueName.toLowerCase();
-                    const gameLeagueName = (game.League || '').toLowerCase();
-                    if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) return true;
-                    return gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName);
-                });
-                // NCAA sport split
-                if (leagueId === 'USA: NCAA') {
-                    let desiredSport = 'American Football'; // default
-                    if (leagueName && leagueName.toLowerCase().includes('hockey')) {
-                        desiredSport = 'Hockey';
-                    } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
-                        desiredSport = 'Basketball';
-                    }
-                    leagueGames = leagueGames.filter(g => g.Sport === desiredSport);
-                }
-                if (leagueId === 'USA: NCAA Women') {
-                    leagueGames = leagueGames.filter(g => g.Sport === 'Basketball');
-                }
-                if (leagueGames.length > 0) {
-                    renderGames(yesterdayScheduleContent, leagueGames.sort(sortGames), false, true);
-                    return;
-                }
-            }
-            // Fallback to cached/all-games path
-            continueWithCachedOrAll();
-        }).catch(() => continueWithCachedOrAll());
-
-        function continueWithCachedOrAll() {
-        // If we have a valid cache (same data the Home SCORES tab uses), use it for identical results
-        const nowMs = Date.now();
-        if (yesterdayScoresCache && yesterdayScoresCacheExpiry && nowMs < yesterdayScoresCacheExpiry) {
-            const allGames = yesterdayScoresCache; // includes featured merges; we'll filter by league
-            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayStr);
-            const leagueGames = yesterdayGames.filter(game => {
-                // Exact match first
-                if (game.League === leagueId) return true;
-                // Then try flexible matching based on league key
-                const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
-                const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId || '');
-                if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) return true;
-                // Fallback: display name and partials
-                const targetLeagueName = leagueName.toLowerCase();
-                const gameLeagueName = (game.League || '').toLowerCase();
-                if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) return true;
-                if (gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName)) return true;
-                return false;
-            });
-
-            // For NCAA, filter by sport from yesterday's scores
-            const filteredLeagueGames = leagueGames.filter(game => {
-                if (leagueId === 'USA: NCAA') {
-                    let desiredSport = 'American Football'; // default
-                    if (leagueName && leagueName.toLowerCase().includes('hockey')) {
-                        desiredSport = 'Hockey';
-                    } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
-                        desiredSport = 'Basketball';
-                    }
-                    return game.Sport === desiredSport;
-                }
-                if (leagueId === 'USA: NCAA Women') {
-                    return game.Sport === 'Basketball';
-                }
-                return true;
-            });
-
-            if (filteredLeagueGames.length === 0) {
-                yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
-                return;
-            }
-
-            const gamesData = filteredLeagueGames.sort(sortGames);
-            renderGames(yesterdayScheduleContent, gamesData, false, true);
-            return;
-        }
-
-        // If no cache yet, load it once (same as Home SCORES), then filter
-        if (!yesterdayScoresCache || !yesterdayScoresCacheExpiry || nowMs >= yesterdayScoresCacheExpiry) {
-            try {
-                fetchYesterdayScores();
-            } catch (e) {}
-        }
-
-        // If we have a valid raw cache, use it to avoid refetching
-        if (yesterdayScoresRawCache && yesterdayScoresCacheExpiry && nowMs < yesterdayScoresCacheExpiry) {
-            const allGames = yesterdayScoresRawCache;
-            const yesterdayGames = allGames.filter(game => game.gameDate === yesterdayStr);
-            const leagueGames = yesterdayGames.filter(game => {
-                // Exact match first
-                if (game.League === leagueId) return true;
-                // Then try flexible matching based on league key
-                const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League || '');
-                const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId || '');
-                if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) return true;
-                // Fallback: display name and partials
-                const targetLeagueName = leagueName.toLowerCase();
-                const gameLeagueName = (game.League || '').toLowerCase();
-                if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) return true;
-                if (gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName)) return true;
-                return false;
-            });
-
-            // For NCAA, filter by sport from yesterday's scores
-            const filteredLeagueGames = leagueGames.filter(game => {
-                if (leagueId === 'USA: NCAA') {
-                    let desiredSport = 'American Football'; // default
-                    if (leagueName && leagueName.toLowerCase().includes('hockey')) {
-                        desiredSport = 'Hockey';
-                    } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
-                        desiredSport = 'Basketball';
-                    }
-                    return game.Sport === desiredSport;
-                }
-                if (leagueId === 'USA: NCAA Women') {
-                    return game.Sport === 'Basketball';
-                }
-                return true;
-            });
-
-            if (filteredLeagueGames.length === 0) {
-                yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
-                return;
-            }
-
-            const gamesData = filteredLeagueGames.sort(sortGames);
-            renderGames(yesterdayScheduleContent, gamesData, false, true);
-            return;
-        }
-
-        // Otherwise load from Firestore and refresh caches
-        const yesterdayScoresRef = db.collection("artifacts/flashlive-daily-scraper/public/data/yesterdayScores");
-        
-        yesterdayScoresRef.get()
-            .then(snapshot => {
-                if (snapshot.empty) {
-                    yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
-                    return;
-                }
-                
-                // Filter games by gameDate first (only yesterday's games)
-                const allGames = snapshot.docs.map(doc => doc.data());
-                // Exclude old "Asia: AFC Elite" games from Google Sheets (source is not ESPN_LIVE) and any unmapped "AFC Champions League" games
-                const filteredAllGames = allGames.filter(game => {
-                    // Only exclude if it's an old Google Sheets game (no source or source is not ESPN_LIVE)
-                    if (game.League === "Asia: AFC Elite" && game.source !== "ESPN_LIVE") {
-                        return false;
-                    }
-                    // Exclude unmapped "AFC Champions League" games (shouldn't exist if mapping works)
-                    if (game.League === "AFC Champions League") {
-                        return false;
-                    }
-                    return true;
-                });
-                // Refresh raw cache and its expiry (filtered)
-                yesterdayScoresRawCache = filteredAllGames;
-                yesterdayScoresCacheExpiry = getNextPrepExpiryTimestamp();
-                const yesterdayGames = filteredAllGames.filter(game => game.gameDate === yesterdayStr);
-                
-                // Then filter by league using flexible matching
-                const leagueGames = yesterdayGames.filter(game => {
-                    // First try exact match
-                    if (game.League === leagueId) {
-                        return true;
-                    }
-                    
-                    // Then try flexible matching based on league key
-                    const gameLeagueKey = getLeagueKeyFromDatabaseName(game.League);
-                    const currentLeagueKey = getLeagueKeyFromDatabaseName(leagueId);
-                    
-                    // If both have matching league keys, include the game
-                    if (gameLeagueKey && currentLeagueKey && gameLeagueKey === currentLeagueKey) {
-                        return true;
-                    }
-                    
-                    // Fallback: check if the database league name contains the target league name
-                    const targetLeagueName = leagueName.toLowerCase();
-                    const gameLeagueName = game.League.toLowerCase();
-                    
-                    // For UEFA Champions League, check for "champions league" in the name
-                    if (targetLeagueName.includes('uefa champions league') && gameLeagueName.includes('champions league')) {
-                        return true;
-                    }
-                    // For other leagues, check for partial matches
-                    if (gameLeagueName.includes(targetLeagueName) || targetLeagueName.includes(gameLeagueName)) {
-                        return true;
-                    }
-                    
-                    return false;
-                });
-                
-                // For NCAA, filter by sport from yesterday's scores
-                const filteredLeagueGames = leagueGames.filter(game => {
-                    if (leagueId === 'USA: NCAA') {
-                        let desiredSport = 'American Football'; // default
-                        if (leagueName && leagueName.toLowerCase().includes('hockey')) {
-                            desiredSport = 'Hockey';
-                        } else if (leagueName && (leagueName.toLowerCase().includes('basketball') || leagueName === 'NCAAM' || leagueName === 'NCAA Men')) {
-                            desiredSport = 'Basketball';
-                        }
-                        return game.Sport === desiredSport;
-                    }
-                    if (leagueId === 'USA: NCAA Women') {
-                        return game.Sport === 'Basketball';
-                    }
-                    return true;
-                });
-                
-                if (filteredLeagueGames.length === 0) {
-                    yesterdayScheduleContent.innerHTML = `<p>No completed games found for yesterday.</p>`;
-                    return;
-                }
-                
-                const gamesData = filteredLeagueGames.sort(sortGames);
-                renderGames(yesterdayScheduleContent, gamesData, false, true);
-            }, err => { 
-                console.error('Error fetching yesterday scores for', leagueId, ':', err);
-                yesterdayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading yesterday\'s scores.</p>'; 
-            });
+        } catch (error) {
+            console.error('[fetchYesterdayScoresForLeague] Error:', error);
+            yesterdayScheduleContent.innerHTML = `<p style="color: #ef4444;">Error loading yesterday's scores: ${error.message}</p>`;
         }
     }
+
 
     // Cache configuration
     const STANDINGS_CACHE_PREFIX = 'standings_cache_';
@@ -17643,164 +17331,32 @@ async function fetchFeaturedGames() {
 }
     async function fetchFeaturedGamesForDate(dateStr) {
         try {
-            const db = firebase.firestore();
-            const featuredRef = db.collection("artifacts/flashlive-daily-scraper/public/data/Featured");
+            // Fetch from backend endpoint (no direct Firestore access)
+            const data = await fetchFromBackend('/data/featured.json');
             
-            // Query only featured games for the specific date
-            const snapshot = await featuredRef.where('gameDate', '==', dateStr).get();
-            
-            if (snapshot.empty) {
+            if (!data || !data.games || !Array.isArray(data.games)) {
                 return [];
             }
             
-            const featuredGamesForDate = snapshot.docs.map(doc => doc.data());
-            
-            // Now fetch the LIVE data for these game IDs from sportsGames or yesterdayScores
-            const { DateTime } = luxon;
-            const todayStr = DateTime.now().setZone('America/New_York').toISODate();
-            const isToday = dateStr === todayStr;
-            
-            const collectionName = isToday 
-                ? 'artifacts/flashlive-daily-scraper/public/data/sportsGames'
-                : 'artifacts/flashlive-daily-scraper/public/data/yesterdayScores';
-            
-            const gamesRef = db.collection(collectionName);
-            
-            // Separate MLB games from other games - check multiple possible Sport field values
-            const mlbFeaturedGames = featuredGamesForDate.filter(game => 
-                game.Sport === 'Baseball' || 
-                game.Sport === 'MLB' || 
-                game.Sport === 'baseball' ||
-                game.Sport === 'mlb' ||
-                (game.League && game.League.toLowerCase().includes('mlb')) ||
-                (game.League && game.League.toLowerCase().includes('baseball'))
-            );
-            const nonMlbFeaturedGames = featuredGamesForDate.filter(game => 
-                game.Sport !== 'Baseball' && 
-                game.Sport !== 'MLB' && 
-                game.Sport !== 'baseball' &&
-                game.Sport !== 'mlb' &&
-                !(game.League && game.League.toLowerCase().includes('mlb')) &&
-                !(game.League && game.League.toLowerCase().includes('baseball'))
-            );
-            
-            // Only fetch MLB games from the collection if we have MLB featured games
-            let mlbGamesFromCollection = [];
-            if (mlbFeaturedGames.length > 0) {
-                // Try multiple possible Sport field values
-                const possibleSportValues = ['Baseball', 'MLB', 'baseball', 'mlb'];
-                for (const sportValue of possibleSportValues) {
-                    const mlbSnapshot = await gamesRef.where('Sport', '==', sportValue).get();
-                    if (!mlbSnapshot.empty) {
-                        mlbGamesFromCollection = mlbSnapshot.docs.map(doc => doc.data());
-                        break;
-                    }
-                }
-            }
-            
-            let liveFeaturedGames = [];
-            
-            // Create a map of game IDs to their title, yesterdayTitle, and order from Featured collection
-            const gameIdToTitleMap = {};
-            const gameIdToYesterdayTitleMap = {};
-            const gameIdToOrderMap = {};
-            featuredGamesForDate.forEach(game => {
-                if (game['Game ID']) {
-                    if (game.title) {
-                        gameIdToTitleMap[game['Game ID']] = game.title;
-                    }
-                    if (game.yesterdayTitle) {
-                        gameIdToYesterdayTitleMap[game['Game ID']] = game.yesterdayTitle;
-                    }
-                    if (game.order !== undefined) {
-                        gameIdToOrderMap[game['Game ID']] = game.order;
-                    }
-                }
+            // Filter by date
+            const featuredGamesForDate = data.games.filter(game => {
+                const gameDate = game.gameDate || '';
+                return gameDate === dateStr;
             });
             
-            // Handle non-MLB games by Game ID matching
-            const nonMlbGameIds = nonMlbFeaturedGames.map(g => g['Game ID']);
-            if (nonMlbGameIds.length > 0) {
-                if (nonMlbGameIds.length <= 10) {
-                    const gamesSnapshot = await gamesRef.where('Game ID', 'in', nonMlbGameIds).get();
-                    liveFeaturedGames = gamesSnapshot.docs.map(doc => {
-                        const gameData = doc.data();
-                        const featuredGame = nonMlbFeaturedGames.find(fg => fg['Game ID'] === gameData['Game ID']);
-                        // Add title, yesterdayTitle, order, and channel from Featured collection
-                        gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
-                        gameData.yesterdayTitle = gameIdToYesterdayTitleMap[gameData['Game ID']] || '';
-                        gameData.order = gameIdToOrderMap[gameData['Game ID']];
-                        // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
-                        if (featuredGame && (!gameData.channel && !gameData.Channel)) {
-                            gameData.channel = featuredGame.channel || featuredGame.Channel || '';
-                            gameData.Channel = featuredGame.channel || featuredGame.Channel || '';
-                        }
-                        return gameData;
-                    });
-                } else {
-                    // Batch queries if more than 10 game IDs
-                    for (let i = 0; i < nonMlbGameIds.length; i += 10) {
-                        const batch = nonMlbGameIds.slice(i, i + 10);
-                        const gamesSnapshot = await gamesRef.where('Game ID', 'in', batch).get();
-                        const batchGames = gamesSnapshot.docs.map(doc => {
-                            const gameData = doc.data();
-                            const featuredGame = nonMlbFeaturedGames.find(fg => fg['Game ID'] === gameData['Game ID']);
-                            // Add title, yesterdayTitle, order, and channel from Featured collection
-                            gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
-                            gameData.yesterdayTitle = gameIdToYesterdayTitleMap[gameData['Game ID']] || '';
-                            gameData.order = gameIdToOrderMap[gameData['Game ID']];
-                            // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
-                            if (featuredGame && (!gameData.channel && !gameData.Channel)) {
-                                gameData.channel = featuredGame.channel || featuredGame.Channel || '';
-                                gameData.Channel = featuredGame.channel || featuredGame.Channel || '';
-                            }
-                            return gameData;
-                        });
-                        liveFeaturedGames = liveFeaturedGames.concat(batchGames);
-                    }
-                }
+            if (featuredGamesForDate.length === 0) {
+                return [];
             }
             
-            // Handle MLB games by fuzzy matching team names
-            for (const featuredGame of mlbFeaturedGames) {
-                const featuredHome = (featuredGame['Home Team'] || '').toLowerCase().trim();
-                const featuredAway = (featuredGame['Away Team'] || '').toLowerCase().trim();
-                
-                // Find matching game in live data
-                const matchingGame = mlbGamesFromCollection.find(game => {
-                    const gameHome = (game['Home Team'] || '').toLowerCase().trim();
-                    const gameAway = (game['Away Team'] || '').toLowerCase().trim();
-                    
-                    // Check if teams match (either home/away or away/home since order might differ)
-                    return (gameHome === featuredHome && gameAway === featuredAway) ||
-                           (gameHome === featuredAway && gameAway === featuredHome);
-                });
-                
-                if (matchingGame) {
-                    // Add title, yesterdayTitle, order, and channel from Featured collection
-                    matchingGame.title = featuredGame.title || '';
-                    matchingGame.yesterdayTitle = featuredGame.yesterdayTitle || '';
-                    matchingGame.order = featuredGame.order;
-                    // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
-                    if (!matchingGame.channel && !matchingGame.Channel) {
-                        matchingGame.channel = featuredGame.channel || featuredGame.Channel || '';
-                        matchingGame.Channel = featuredGame.channel || featuredGame.Channel || '';
-                    }
-                    liveFeaturedGames.push(matchingGame);
-                }
-                // Only include featured games that have a matching live game
-                // Do not include non-live featured games
-            }
-            
+            // Return featured games (live data merging is handled by mergeFeaturedWithLive in home page code)
             // Sort by order field to preserve Google Sheets row order
-            // Sort by order from Featured sheet (lower order first) - preserves Google Sheets row order
-            liveFeaturedGames.sort((a, b) => {
+            featuredGamesForDate.sort((a, b) => {
                 const orderA = (a && a.order !== undefined && a.order !== null) ? Number(a.order) : 999999;
                 const orderB = (b && b.order !== undefined && b.order !== null) ? Number(b.order) : 999999;
                 return orderA - orderB;
             });
             
-            return liveFeaturedGames;
+            return featuredGamesForDate;
         } catch (error) {
             console.error(`Error fetching featured games for ${dateStr}:`, error);
             return [];
@@ -17818,115 +17374,73 @@ async function fetchFeaturedGames() {
     let todaySlateUnsubscribe = null; // Firestore listener unsubscribe function
     
     // Get Firestore reference for TODAY latch state (lazy initialization)
-    function getTodaySlateRef() {
-        if (typeof db === 'undefined' || !db) {
-            throw new Error('Firestore db not initialized');
-        }
-        return db.collection('system').doc('todaySlate');
-    }
-    
-    // Initialize TODAY latch state from Firestore (shared state)
+    // Initialize TODAY latch state from localStorage (Firestore removed)
     async function initTodayLatch() {
         const { DateTime } = luxon;
         
         try {
-            // Try to read from Firestore first (shared state)
-            const todaySlateRef = getTodaySlateRef();
-            const doc = await todaySlateRef.get();
+            // Read from localStorage only (no Firestore access)
+            const storedDate = localStorage.getItem('activeTodayDate');
+            const storedHoldUntil = localStorage.getItem('holdUntil');
             
-            if (doc.exists) {
-                const data = doc.data();
-                activeTodayDate = data.activeTodayDate;
-                holdUntil = data.holdUntil || null;
+            if (storedDate) {
+                const today = DateTime.now().setZone('America/New_York').toISODate();
+                const storedDateObj = DateTime.fromISO(storedDate);
+                const todayObj = DateTime.fromISO(today);
                 
-                console.log('📡 Loaded TODAY latch state from Firestore:', activeTodayDate);
-                
-                // If hold expired while page was closed, advance immediately
-                if (holdUntil && Date.now() >= holdUntil) {
-                    await advanceTodayDate();
-                } else if (holdUntil) {
-                    // Restore timer if still in hold period
-                    const delay = holdUntil - Date.now();
-                    if (delay > 0) {
-                        holdTimer = setTimeout(() => {
-                            advanceTodayDate();
-                        }, delay);
-                        console.log(`🔒 TODAY tab held until ${new Date(holdUntil).toLocaleString()}`);
+                // If stored date is in the past, reset to today
+                if (storedDateObj < todayObj) {
+                    console.log(`📅 Stored date ${storedDate} is in the past, resetting to today ${today}`);
+                    activeTodayDate = today;
+                    holdUntil = null;
+                    await persistTodayLatch();
+                } else {
+                    activeTodayDate = storedDate;
+                    holdUntil = storedHoldUntil ? Number(storedHoldUntil) : null;
+                    
+                    console.log('📡 Loaded TODAY latch state from localStorage:', activeTodayDate);
+                    
+                    // If hold expired while page was closed, advance immediately
+                    if (holdUntil && Date.now() >= holdUntil) {
+                        await advanceTodayDate();
+                    } else if (holdUntil) {
+                        // Restore timer if still in hold period
+                        const delay = holdUntil - Date.now();
+                        if (delay > 0) {
+                            holdTimer = setTimeout(() => {
+                                advanceTodayDate();
+                            }, delay);
+                            console.log(`🔒 TODAY tab held until ${new Date(holdUntil).toLocaleString()}`);
+                        }
                     }
                 }
             } else {
-                // No Firestore state - initialize with current date
+                // No stored state - initialize with current date
                 activeTodayDate = DateTime
                     .now()
                     .setZone('America/New_York')
                     .toISODate();
                 
-                // Write initial state to Firestore
+                // Write initial state to localStorage
                 await persistTodayLatch();
                 console.log('✨ Initialized TODAY latch state:', activeTodayDate);
             }
             
-            // Set up real-time listener for TODAY latch state (syncs across all users/devices)
-            todaySlateUnsubscribe = todaySlateRef.onSnapshot((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    const newActiveDate = data.activeTodayDate;
-                    const newHoldUntil = data.holdUntil || null;
-                    
-                    // Only update if state changed (avoid infinite loops)
-                    if (newActiveDate !== activeTodayDate || newHoldUntil !== holdUntil) {
-                        console.log('🔄 TODAY latch state updated from Firestore:', newActiveDate);
-                        
-                        activeTodayDate = newActiveDate;
-                        holdUntil = newHoldUntil;
-                        
-                        // Clear existing timer
-                        if (holdTimer) {
-                            clearTimeout(holdTimer);
-                            holdTimer = null;
-                        }
-                        
-                        // Restore timer if hold is active
-                        if (holdUntil && Date.now() < holdUntil) {
-                            const delay = holdUntil - Date.now();
-                            holdTimer = setTimeout(() => {
-                                advanceTodayDate();
-                            }, delay);
-                        } else if (holdUntil && Date.now() >= holdUntil) {
-                            // Hold expired, advance immediately
-                            advanceTodayDate();
-                        }
-                        
-                        // Reload games if date changed
-                        if (typeof fetchTodayGames === 'function') {
-                            fetchTodayGames(() => {});
-                        }
-                    }
-                }
-            }, (error) => {
-                console.error('❌ Error listening to TODAY latch state:', error);
-            });
+            // No real-time listener (Firestore removed) - state is local only
+            todaySlateUnsubscribe = null; // No unsubscribe needed
             
         } catch (error) {
             console.error('❌ Error initializing TODAY latch state:', error);
-            // Fallback to localStorage if Firestore fails
-            activeTodayDate = localStorage.getItem('activeTodayDate') || 
-                DateTime.now().setZone('America/New_York').toISODate();
-            holdUntil = Number(localStorage.getItem('holdUntil')) || null;
+            // Fallback to current date
+            activeTodayDate = DateTime.now().setZone('America/New_York').toISODate();
+            holdUntil = null;
         }
     }
     
-    // Persist TODAY latch state to Firestore (shared state)
+    // Persist TODAY latch state to localStorage only (Firestore removed)
     async function persistTodayLatch() {
         try {
-            const todaySlateRef = getTodaySlateRef();
-            await todaySlateRef.set({
-                activeTodayDate: activeTodayDate,
-                holdUntil: holdUntil || null,
-                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-            
-            // Also backup to localStorage as fallback
+            // Store in localStorage only (no Firestore access)
             localStorage.setItem('activeTodayDate', activeTodayDate);
             if (holdUntil) {
                 localStorage.setItem('holdUntil', holdUntil);
@@ -18019,14 +17533,16 @@ async function fetchFeaturedGames() {
     }
     
     async function fetchTodayGames(callback) {
-        // Load Top 25 rankings cache for all NCAA leagues (for home page games display)
-        // Wait for all caches to load before rendering games
-        await Promise.all([
+        // Load Top 25 rankings cache in background (non-blocking)
+        // Don't wait for it - games should load immediately from today.json
+        Promise.all([
             loadTop25RankingsCache('NCAAF'),
             loadTop25RankingsCache('NCAAM'),
             loadTop25RankingsCache('NCAAW'),
             loadCFPRankingsCache()
-        ]);
+        ]).catch(err => {
+            console.warn('Background cache loading failed (non-critical):', err);
+        });
         
         const todayContainer = document.getElementById('games');
         const errorDiv = document.getElementById('error');
@@ -18045,7 +17561,11 @@ async function fetchFeaturedGames() {
         
         // Use activeTodayDate (which may be held from previous day) instead of current calendar date
         // Fallback to actual today if activeTodayDate is not set
-        const todayStr = activeTodayDate || DateTime.now().setZone('America/New_York').toISODate();
+        // Ensure activeTodayDate is initialized (initTodayLatch is async, so it might not be done yet)
+        if (!activeTodayDate) {
+            activeTodayDate = DateTime.now().setZone('America/New_York').toISODate();
+        }
+        const todayStr = activeTodayDate;
         console.log(`[fetchTodayGames] Using date: ${todayStr} (activeTodayDate: ${activeTodayDate || 'null'})`);
 
         let regularGames = [];
@@ -18054,8 +17574,25 @@ async function fetchFeaturedGames() {
         let lastRegularGamesData = null; // Store last fetched data for diff comparison
         let regularGamesPollInterval = null; // Store interval ID for cleanup
         
-        // JSON endpoint URL (use the backend service URL)
-        const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json';
+        // Backend service URL - all data comes from here (no direct Firestore access)
+        const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
+        const JSON_ENDPOINT = `${BACKEND_URL}/data/today.json`;
+        
+        // Helper function to fetch data from backend endpoints
+        async function fetchFromBackend(endpoint) {
+            try {
+                const response = await fetch(`${BACKEND_URL}${endpoint}`, { 
+                    cache: 'no-store'
+                });
+                if (!response.ok) {
+                    throw new Error(`Backend request failed: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching from ${endpoint}:`, error);
+                throw error;
+            }
+        }
         
         // Function to fetch regular games from JSON endpoint
         async function fetchRegularGamesFromJSON() {
@@ -18070,6 +17607,7 @@ async function fetchFeaturedGames() {
                 
                 const jsonData = await response.json();
                 console.log(`[JSON Poll] Fetched ${jsonData.gameCount} total games for date ${jsonData.date}`);
+                console.log(`[JSON Poll] Looking for games with gameDate === "${todayStr}"`);
                 
                 // Filter games to match todayStr (active date)
                 const filteredGames = jsonData.games.filter(game => {
@@ -18115,9 +17653,13 @@ async function fetchFeaturedGames() {
                         jsonData.games.slice(0, 5).map(g => ({
                             gameId: g['Game ID'],
                             gameDate: g.gameDate,
-                            startTime: g['Start Time']
+                            startTime: g['Start Time'],
+                            gameDateType: typeof g.gameDate,
+                            todayStrType: typeof todayStr,
+                            gameDateMatch: g.gameDate === todayStr
                         }))
                     );
+                    console.warn(`⚠️ [JSON Poll] todayStr value: "${todayStr}" (type: ${typeof todayStr})`);
                 }
                 
                 // Log score changes for debugging
@@ -18307,60 +17849,93 @@ async function fetchFeaturedGames() {
             updateDisplay();
         }
         
-        // Set up real-time listener for Featured games
-        const featuredRef = firebase.firestore().collection("artifacts/flashlive-daily-scraper/public/data/Featured");
-        const featuredGamesUnsubscribe = featuredRef.where('gameDate', '==', todayStr)
-            .onSnapshot(snapshot => {
-                if (snapshot.empty) {
+        // Fetch featured games from backend (replaces Firestore listener)
+        async function fetchFeaturedGames() {
+            try {
+                const data = await fetchFromBackend('/data/featured.json');
+                
+                if (!data || !data.games || !Array.isArray(data.games)) {
                     featuredGamesData = [];
                     mergeFeaturedWithLive();
                     return;
                 }
                 
-                featuredGamesData = snapshot.docs.map(doc => {
-                    const data = doc.data() || {};
-                    if (data.order !== undefined && data.order !== null) {
-                        data.order = Number(data.order);
-                    }
-                    // Ensure channel is preserved (sync channel and Channel fields)
-                    const channel = data.channel || data.Channel || '';
-                    if (channel) {
-                        data.channel = channel;
-                        data.Channel = channel;
-                    }
-                    return data;
-                }).sort((a, b) => {
-                    const orderA = (a && a.order !== undefined) ? a.order : 999;
-                    const orderB = (b && b.order !== undefined) ? b.order : 999;
-                    return orderA - orderB;
-                });
-                mergeFeaturedWithLive();
-            }, err => { 
-                console.error("Error fetching featured games: ", err);
-            });
-              // track unsubscribe
-              window.activeTodayUnsubscribes.push(featuredGamesUnsubscribe);
-        
-        // Set up real-time listener for live games (sportsGames collection)
-        const gamesRef = firebase.firestore().collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
-        const liveGamesUnsubscribe = gamesRef.where('gameDate', '==', todayStr)
-            .onSnapshot(snapshot => {
-                const previousCount = liveGamesData.length;
-                liveGamesData = snapshot.empty ? [] : snapshot.docs.map(doc => doc.data());
-                const newCount = liveGamesData.length;
-                console.log(`🔄 [Firestore Listener] Live games updated: ${previousCount} → ${newCount} games`);
-                if (snapshot.docChanges && snapshot.docChanges().length > 0) {
-                    snapshot.docChanges().forEach(change => {
-                        const game = change.doc.data();
-                        console.log(`  📝 ${change.type}: ${game['Away Team']} vs ${game['Home Team']} (${game['Match Status'] || 'No status'})`);
+                // Filter by today's date
+                featuredGamesData = data.games
+                    .filter(game => (game.gameDate || '') === todayStr)
+                    .map(game => {
+                        const data = game || {};
+                        if (data.order !== undefined && data.order !== null) {
+                            data.order = Number(data.order);
+                        }
+                        // Ensure channel is preserved
+                        const channel = data.channel || data.Channel || '';
+                        if (channel) {
+                            data.channel = channel;
+                            data.Channel = channel;
+                        }
+                        return data;
+                    })
+                    .sort((a, b) => {
+                        const orderA = (a && a.order !== undefined) ? a.order : 999;
+                        const orderB = (b && b.order !== undefined) ? b.order : 999;
+                        return orderA - orderB;
                     });
-                }
+                
                 mergeFeaturedWithLive();
-            }, err => {
+            } catch (err) {
+                console.error("Error fetching featured games: ", err);
+            }
+        }
+        
+        // Initial fetch and polling (replaces Firestore listener)
+        fetchFeaturedGames();
+        const featuredGamesPollInterval = setInterval(fetchFeaturedGames, 30000); // Poll every 30 seconds
+        const featuredGamesUnsubscribe = () => {
+            if (featuredGamesPollInterval) {
+                clearInterval(featuredGamesPollInterval);
+            }
+        };
+        window.activeTodayUnsubscribes.push(featuredGamesUnsubscribe);
+        
+        // Fetch live games from backend (replaces Firestore listener)
+        async function fetchLiveGames() {
+            try {
+                const data = await fetchFromBackend('/data/today.json');
+                
+                if (!data || !data.games || !Array.isArray(data.games)) {
+                    liveGamesData = [];
+                    mergeFeaturedWithLive();
+                    return;
+                }
+                
+                // Filter by today's date and live status
+                const previousCount = liveGamesData.length;
+                liveGamesData = data.games.filter(game => {
+                    const gameDate = game.gameDate || '';
+                    if (gameDate !== todayStr) return false;
+                    
+                    const matchStatus = (game['Match Status'] || '').toUpperCase();
+                    return matchStatus.includes('IN PROGRESS') || matchStatus.includes('LIVE');
+                });
+                
+                const newCount = liveGamesData.length;
+                console.log(`🔄 [Backend Poll] Live games updated: ${previousCount} → ${newCount} games`);
+                mergeFeaturedWithLive();
+            } catch (err) {
                 console.error("❌ Error fetching live games for featured: ", err);
-            });
-              // track unsubscribe
-              window.activeTodayUnsubscribes.push(liveGamesUnsubscribe);
+            }
+        }
+        
+        // Initial fetch and polling (replaces Firestore listener)
+        fetchLiveGames();
+        const liveGamesPollInterval = setInterval(fetchLiveGames, 30000); // Poll every 30 seconds
+        const liveGamesUnsubscribe = () => {
+            if (liveGamesPollInterval) {
+                clearInterval(liveGamesPollInterval);
+            }
+        };
+        window.activeTodayUnsubscribes.push(liveGamesUnsubscribe);
 
         function updateDisplay() {
             // CRITICAL: Check LIVE filter state directly AND activeTab variable
@@ -18520,7 +18095,7 @@ async function fetchFeaturedGames() {
         }
     }
 
-    function fetchYesterdayScores() {
+    async function fetchYesterdayScores() {
         const scoresContainer = document.getElementById('dynamicScoresContent');
         const scoresLoading = document.getElementById('scoresLoading');
         const scoresError = document.getElementById('scoresErrorMessage');
@@ -18539,133 +18114,124 @@ async function fetchFeaturedGames() {
         scoresError.style.display = 'none';
         scoresContainer.innerHTML = '';
 
-        // Read from sportsGames collection - filter for yesterday's FINAL games
-        const sportsGamesRef = db.collection("artifacts/flashlive-daily-scraper/public/data/sportsGames");
-
         // Get yesterday's date (in Eastern Time to match gameDate storage)
         const { DateTime } = luxon;
         const now = DateTime.now().setZone('America/New_York');
         const yesterdayStr = now.minus({ days: 1 }).toISODate();
 
-        // Query for yesterday's games that are FINAL
-        console.log('[SCORES] Querying for yesterday\'s games. Date:', yesterdayStr);
-        console.log('[SCORES] Current time (Mountain):', now.toISO());
-        console.log('[SCORES] Yesterday date string:', yesterdayStr);
-        sportsGamesRef.where('gameDate', '==', yesterdayStr).get()
-            .then(async snapshot => {
+        // Fetch from backend endpoint (no direct Firestore access)
+        const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
+        console.log('[SCORES] Fetching yesterday\'s games. Date:', yesterdayStr);
+        
+        try {
+            const response = await fetch(`${BACKEND_URL}/data/yesterday.json`, { cache: 'no-store' });
+            if (!response.ok) {
+                throw new Error(`Backend request failed: ${response.status}`);
+            }
+            const data = await response.json();
+            
             scoresLoading.style.display = 'none';
+            
+            console.log('[SCORES] Backend returned', data.gameCount || 0, 'games for', data.date || yesterdayStr);
+            
+            if (!data || !data.games || !Array.isArray(data.games) || data.games.length === 0) {
+                console.log('[SCORES] No games found for yesterday\'s date');
+                scoresContainer.innerHTML = '<p style="padding: 10px;">No completed games found. Check back after games finish.</p>';
+                return;
+            }
+            
+            const allGamesData = data.games;
+            console.log('[SCORES] Total games found:', allGamesData.length);
+            
+            // Log match statuses for debugging
+            const statusCounts = {};
+            allGamesData.forEach(game => {
+                const status = game['Match Status'] || 'NO STATUS';
+                statusCounts[status] = (statusCounts[status] || 0) + 1;
+            });
+            console.log('[SCORES] Match status breakdown:', statusCounts);
+            
+            // Filter to only FINAL games (yesterday's completed games)
+            // Explicitly exclude SCHEDULED, IN PROGRESS, and LIVE games
+            const matchStatusFilter = (status, homeScore, awayScore) => {
+                const upperStatus = (status || '').toUpperCase();
                 
-                console.log('[SCORES] Query result: found', snapshot.size, 'games for', yesterdayStr);
-                
-                if (snapshot.empty) {
-                    console.log('[SCORES] No games found for yesterday\'s date');
-                    console.log('[SCORES] DEBUG: Checking if games exist with different dates...');
-                    // Debug: Check what dates actually exist in the collection
-                    const allGamesSnapshot = await sportsGamesRef.limit(100).get();
-                    const dateCounts = {};
-                    allGamesSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        const gd = data.gameDate || 'NO_DATE';
-                        dateCounts[gd] = (dateCounts[gd] || 0) + 1;
-                    });
-                    console.log('[SCORES] DEBUG: Sample of gameDate values in collection:', dateCounts);
-                    scoresContainer.innerHTML = '<p style="padding: 10px;">No completed games found. Check back after games finish.</p>';
-                    return;
-                }
-                
-                const allGamesData = snapshot.docs.map(doc => doc.data());
-                console.log('[SCORES] Total games found:', allGamesData.length);
-                
-                // Log match statuses for debugging
-                const statusCounts = {};
-                allGamesData.forEach(game => {
-                    const status = game['Match Status'] || 'NO STATUS';
-                    statusCounts[status] = (statusCounts[status] || 0) + 1;
-                });
-                console.log('[SCORES] Match status breakdown:', statusCounts);
-                
-                // Filter to only FINAL games (yesterday's completed games)
                 // Explicitly exclude SCHEDULED, IN PROGRESS, and LIVE games
-                const matchStatusFilter = (status, homeScore, awayScore) => {
-                    const upperStatus = (status || '').toUpperCase();
-                    
-                    // Explicitly exclude SCHEDULED, IN PROGRESS, and LIVE games
-                    if (upperStatus.includes('SCHEDULED') || upperStatus.includes('IN PROGRESS') || upperStatus.includes('LIVE')) {
-                        return false;
-                    }
-                    
-                    // Include FINAL, FINISHED, or GAME OVER games
-                    if (upperStatus.includes('FINAL') || upperStatus.includes('FINISHED') || upperStatus.includes('GAME OVER')) {
-                        return true;
-                    }
-                    
-                    // Include games with scores (indicating they've been played) if not explicitly excluded above
-                    const hasScores = (homeScore !== undefined && homeScore !== null && homeScore !== '') || 
-                                     (awayScore !== undefined && awayScore !== null && awayScore !== '');
-                    return hasScores;
-                };
+                if (upperStatus.includes('SCHEDULED') || upperStatus.includes('IN PROGRESS') || upperStatus.includes('LIVE')) {
+                    return false;
+                }
                 
-                const finalGamesData = allGamesData.filter(game => 
-                    matchStatusFilter(game['Match Status'], game['Home Score'], game['Away Score'])
-                );
-                console.log('[SCORES] FINAL games after filtering:', finalGamesData.length);
-                
-                // Exclude old "Asia: AFC Elite" games from Google Sheets (source is not ESPN_LIVE) and any unmapped "AFC Champions League" games
-                const filteredAllGamesData = finalGamesData.filter(game => {
-                    // Only exclude if it's an old Google Sheets game (no source or source is not ESPN_LIVE)
-                    if (game.League === "Asia: AFC Elite" && game.source !== "ESPN_LIVE") {
-                        return false;
-                    }
-                    // Exclude unmapped "AFC Champions League" games (shouldn't exist if mapping works)
-                    if (game.League === "AFC Champions League") {
-                        return false;
-                    }
+                // Include FINAL, FINISHED, or GAME OVER games
+                if (upperStatus.includes('FINAL') || upperStatus.includes('FINISHED') || upperStatus.includes('GAME OVER')) {
                     return true;
+                }
+                
+                // Include games with scores (indicating they've been played) if not explicitly excluded above
+                const hasScores = (homeScore !== undefined && homeScore !== null && homeScore !== '') || 
+                                 (awayScore !== undefined && awayScore !== null && awayScore !== '');
+                return hasScores;
+            };
+            
+            const finalGamesData = allGamesData.filter(game => 
+                matchStatusFilter(game['Match Status'], game['Home Score'], game['Away Score'])
+            );
+            console.log('[SCORES] FINAL games after filtering:', finalGamesData.length);
+            
+            // Exclude old "Asia: AFC Elite" games from Google Sheets (source is not ESPN_LIVE) and any unmapped "AFC Champions League" games
+            const filteredAllGamesData = finalGamesData.filter(game => {
+                // Only exclude if it's an old Google Sheets game (no source or source is not ESPN_LIVE)
+                if (game.League === "Asia: AFC Elite" && game.source !== "ESPN_LIVE") {
+                    return false;
+                }
+                // Exclude unmapped "AFC Champions League" games (shouldn't exist if mapping works)
+                if (game.League === "AFC Champions League") {
+                    return false;
+                }
+                return true;
+            });
+            console.log('[SCORES] FINAL games after league filtering:', filteredAllGamesData.length);
+            
+            // Keep a raw cache for league Yesterday tabs (filtered)
+            yesterdayScoresRawCache = filteredAllGamesData;
+            
+            // Use the filtered FINAL games from yesterday
+            let gamesData = filteredAllGamesData.sort(sortGames);
+            
+            // If no FINAL games found for yesterday, show message
+            if (gamesData.length === 0) {
+                console.log('[SCORES] No FINAL games found after all filtering');
+                scoresContainer.innerHTML = '<p style="padding: 10px; color: #9ca3af;">No completed games found for yesterday.</p>';
+                return;
+            }
+            
+            // Try to get featured games for the date we're using, but don't fail if it doesn't work
+            let yesterdayFeaturedGames = [];
+            try {
+                const dateToUse = gamesData.length > 0 ? gamesData[0].gameDate : yesterdayStr;
+                yesterdayFeaturedGames = await fetchFeaturedGamesForDate(dateToUse);
+                
+                // Mark yesterday's featured games
+                yesterdayFeaturedGames.forEach(game => {
+                    game.isFeatured = true;
                 });
-                console.log('[SCORES] FINAL games after league filtering:', filteredAllGamesData.length);
-                
-                // Keep a raw cache for league Yesterday tabs (filtered)
-                yesterdayScoresRawCache = filteredAllGamesData;
-                
-                // Use the filtered FINAL games from yesterday
-                let gamesData = filteredAllGamesData.sort(sortGames);
-                
-                // If no FINAL games found for yesterday, show message
-                if (gamesData.length === 0) {
-                    console.log('[SCORES] No FINAL games found after all filtering');
-                    scoresContainer.innerHTML = '<p style="padding: 10px; color: #9ca3af;">No completed games found for yesterday.</p>';
-                    return;
-                }
-                
-                // Try to get featured games for the date we're using, but don't fail if it doesn't work
-                let yesterdayFeaturedGames = [];
-                try {
-                    const dateToUse = gamesData.length > 0 ? gamesData[0].gameDate : yesterdayStr;
-                    yesterdayFeaturedGames = await fetchFeaturedGamesForDate(dateToUse);
-                    
-                    // Mark yesterday's featured games
-                    yesterdayFeaturedGames.forEach(game => {
-                        game.isFeatured = true;
-                    });
-                } catch (error) {
-                    console.error('Error fetching yesterday\'s featured games:', error);
-                    // Continue without featured games if there's an error
-                }
-                // Combine games with yesterday's featured games first
-                const allGames = [...yesterdayFeaturedGames, ...gamesData];
-                
-                // Cache the results until next 3:55 AM ET
-                yesterdayScoresCache = allGames;
-                yesterdayScoresCacheExpiry = getNextPrepExpiryTimestamp();
-                
-                renderYesterdayScores(allGames);
-            })
-            .catch(error => {
+            } catch (error) {
+                console.error('Error fetching yesterday\'s featured games:', error);
+                // Continue without featured games if there's an error
+            }
+            // Combine games with yesterday's featured games first
+            const allGames = [...yesterdayFeaturedGames, ...gamesData];
+            
+            // Cache the results until next 3:55 AM ET
+            yesterdayScoresCache = allGames;
+            yesterdayScoresCacheExpiry = getNextPrepExpiryTimestamp();
+            
+            renderYesterdayScores(allGames);
+        } catch (error) {
             scoresLoading.style.display = 'none';
             scoresError.style.display = 'block';
             if(scoresErrorText) scoresErrorText.textContent = "An error occurred while loading scores.";
             console.error("Error fetching yesterday's scores:", error);
-        });
+        }
     }
 
     function renderYesterdayScores(gamesData) {
@@ -18981,6 +18547,160 @@ async function fetchFeaturedGames() {
         } else {
         todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
         }
+        
+        // Fetch from backend endpoint (no direct Firestore access)
+        const { DateTime } = luxon;
+        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+        
+        // Fetch games using getCachedGames (which uses backend endpoint)
+        getCachedGames(leagueInfo.leagueId, todayStr).then(gamesData => {
+            try {
+                if (!gamesData || gamesData.length === 0) {
+                    if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                        tennisTodayAtpContent.innerHTML = `<p>No ATP games found for today.</p>`;
+                        tennisTodayWtaContent.innerHTML = `<p>No WTA games found for today.</p>`;
+                    } else {
+                        todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                    }
+                    handleNoTodayGames();
+                    return;
+                }
+                
+                // Filter games based on league-specific rules (same as old processGames logic)
+                let filteredGamesData = gamesData;
+                
+                // Special handling for Formula One
+                if (leagueKey === 'FormulaOne') {
+                    filteredGamesData = gamesData.filter(isFormulaOneGame);
+                }
+                
+                // Special handling for Tennis
+                if (leagueKey === 'Tennis') {
+                    filteredGamesData = gamesData.filter(game => {
+                        const leagueNameLower = (game.League || '').toLowerCase();
+                        const sportLower = (game.Sport || '').toLowerCase();
+                        return sportLower === 'tennis' && (leagueNameLower.includes('atp') || leagueNameLower.includes('wta') || leagueNameLower.includes('davis cup'));
+                    });
+                }
+                
+                // Additional filtering for NCAA and other leagues
+                filteredGamesData = filteredGamesData.filter(game => {
+                    const gameLeague = game.League || '';
+                    const gameSport = game.Sport || '';
+                    
+                    if (gameLeague === 'USA: NCAA Women' && gameSport === 'Basketball' && leagueKey !== 'NCAAW') {
+                        return false;
+                    }
+                    if (leagueKey === 'NCAAF' && gameLeague === 'USA: NCAA') {
+                        return gameSport === 'American Football';
+                    }
+                    if (leagueKey === 'NCAAM') {
+                        const leagueName = game.League || '';
+                        if (leagueName.toLowerCase().includes('women') || leagueName.toLowerCase().includes('womens')) {
+                            return false;
+                        }
+                        return gameSport === 'Basketball';
+                    }
+                    if (leagueKey === 'NCAAW') {
+                        const leagueName = game.League || '';
+                        return (leagueName.toLowerCase().includes('women') || leagueName.toLowerCase().includes('womens')) && gameSport === 'Basketball';
+                    }
+                    if (leagueKey === 'NCAABaseball') {
+                        return gameSport === 'Baseball';
+                    }
+                    if (leagueKey === 'NCAASoftball') {
+                        return gameSport === 'Softball';
+                    }
+                    if (leagueKey === 'UEFAChampionsLeague') {
+                        const leagueName = game.League || '';
+                        return !leagueName.toLowerCase().includes('women') && !leagueName.toLowerCase().includes('womens');
+                    }
+                    return true;
+                });
+                
+                if (filteredGamesData.length === 0) {
+                    if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                        tennisTodayAtpContent.innerHTML = `<p>No ATP games found for today.</p>`;
+                        tennisTodayWtaContent.innerHTML = `<p>No WTA games found for today.</p>`;
+                    } else {
+                        todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                    }
+                    handleNoTodayGames();
+                    return;
+                }
+                
+                // Activate Today tab
+                const todayScheduleTab = scheduleTabsContainer?.querySelector('.schedule-tab[data-schedule-tab="today"]');
+                const upcomingScheduleTab = scheduleTabsContainer?.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
+                if (todayScheduleTab) {
+                    todayScheduleTab.classList.add('active');
+                    todayScheduleTab.style.backgroundColor = '#2a2a2a';
+                    todayScheduleTab.style.color = '#fff';
+                    todayScheduleTab.style.borderBottom = '2px solid #fff';
+                }
+                if (upcomingScheduleTab) {
+                    upcomingScheduleTab.classList.remove('active');
+                    upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
+                    upcomingScheduleTab.style.color = '#ccc';
+                    upcomingScheduleTab.style.borderBottom = 'none';
+                }
+                if (todayScheduleContent) todayScheduleContent.style.display = 'block';
+                if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
+                activateMainTab('schedule');
+                
+                // Special handling for Tennis - separate ATP, WTA, and Davis Cup games
+                if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                    const atpGames = filteredGamesData.filter(game => {
+                        const leagueName = (game.League || '').toLowerCase();
+                        return leagueName.includes('atp') || leagueName.includes('davis cup');
+                    });
+                    const wtaGames = filteredGamesData.filter(game => {
+                        const leagueName = (game.League || '').toLowerCase();
+                        return leagueName.includes('wta');
+                    });
+                    
+                    const sortedAtpGames = atpGames.sort(sortGames);
+                    const sortedWtaGames = wtaGames.sort(sortGames);
+                    
+                    if (sortedAtpGames.length > 0) {
+                        renderGames(tennisTodayAtpContent, sortedAtpGames, true);
+                    } else {
+                        tennisTodayAtpContent.innerHTML = `<p>No ATP games found for today.</p>`;
+                    }
+                    
+                    if (sortedWtaGames.length > 0) {
+                        renderGames(tennisTodayWtaContent, sortedWtaGames, true);
+                    } else {
+                        tennisTodayWtaContent.innerHTML = `<p>No WTA games found for today.</p>`;
+                    }
+                } else {
+                    // Render games for non-Tennis leagues
+                    const sortedGames = filteredGamesData.sort(sortGames);
+                    renderGames(todayScheduleContent, sortedGames, false);
+                }
+            } catch (error) {
+                console.error('[loadLeagueSpecificData] Error processing games:', error);
+                if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                    tennisTodayAtpContent.innerHTML = '<p style="color: #ef4444;">Error loading ATP schedule.</p>';
+                    tennisTodayWtaContent.innerHTML = '<p style="color: #ef4444;">Error loading WTA schedule.</p>';
+                } else {
+                    todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
+                }
+            }
+        }).catch(error => {
+            console.error('[loadLeagueSpecificData] Error fetching games:', error);
+            if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+                tennisTodayAtpContent.innerHTML = '<p style="color: #ef4444;">Error loading ATP schedule.</p>';
+                tennisTodayWtaContent.innerHTML = '<p style="color: #ef4444;">Error loading WTA schedule.</p>';
+            } else {
+                todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
+            }
+        });
+        
+        // Legacy Firestore listener code removed - replaced with backend fetch above
+        return; // Exit early to prevent old Firestore code from running
+        
+        /* OLD FIRESTORE CODE - DISABLED
         const { DateTime } = luxon;
         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
         
@@ -19050,8 +18770,9 @@ async function fetchFeaturedGames() {
                 todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
             }
         });
+        END OF OLD FIRESTORE CODE */
         
-        // Helper function to process and filter games
+        // Helper function to process and filter games (DISABLED - was part of Firestore listener)
         function processGames(snapshot) {
                 // Filter games by league using flexible matching
             const allGames = snapshot.docs.map(doc => doc.data());
@@ -23253,22 +22974,41 @@ function getTop25DisplayName(teamName, leagueKey) {
 // Load Top 25 rankings into cache (keyed by display name)
 async function loadTop25RankingsCache(leagueKey) {
     try {
-        const collectionMap = {
+        // Fetch from backend endpoint (no direct Firestore access)
+        const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
+        const data = await fetch(`${BACKEND_URL}/data/standings.json`, { cache: 'no-store' }).then(r => r.json());
+        
+        if (!data || !data.standings) {
+            top25RankingsCache[leagueKey] = {};
+            return;
+        }
+        
+        // Map league keys to collection names
+        const leagueMap = {
             'NCAAF': 'NCAAFStandings',
             'NCAAM': 'NCAAMStandings',
             'NCAAW': 'NCAAWStandings'
         };
         
-        const collectionName = collectionMap[leagueKey];
+        const collectionName = leagueMap[leagueKey];
         if (!collectionName) {
             console.warn(`No collection mapping for league key: ${leagueKey}`);
+            top25RankingsCache[leagueKey] = {};
             return;
         }
         
-        // Get all documents and filter for Top 25 teams client-side
-        const snapshot = await db.collection(collectionName).get();
+        // Get the standings data for this collection
+        // Backend returns: { standings: { 'NCAAFStandings': { docId1: teamData1, docId2: teamData2, ... } } }
+        const collectionData = data.standings[collectionName];
+        if (!collectionData || typeof collectionData !== 'object') {
+            top25RankingsCache[leagueKey] = {};
+            return;
+        }
         
-        if (snapshot.empty) {
+        // Convert object of documents to array of team data
+        const teams = Object.values(collectionData).filter(item => item && typeof item === 'object');
+        
+        if (teams.length === 0) {
             top25RankingsCache[leagueKey] = {};
             return;
         }
@@ -23285,8 +23025,7 @@ async function loadTop25RankingsCache(leagueKey) {
             ncaaToEspnMap[ncaaName] = espnName;
         }
         
-        snapshot.docs.forEach(doc => {
-            const teamData = doc.data();
+        teams.forEach(teamData => {
             if (teamData.Top25Rank !== null && teamData.Top25Rank !== undefined && teamData.Team) {
                 const ncaaTeamName = teamData.Team; // e.g., "Duke" or "Michigan St" or "Michigan State"
                 const rank = parseInt(teamData.Top25Rank) || null;
@@ -23383,12 +23122,17 @@ function getTop25Rank(displayName, leagueKey) {
 // Load CFP rankings into cache (keyed by ESPN display name)
 async function loadCFPRankingsCache() {
     try {
-        const snapshot = await db.collection('CFP').get();
+        // Fetch from backend endpoint (no direct Firestore access)
+        const BACKEND_URL = 'https://flashlive-scraper-124291936014.us-central1.run.app';
+        const data = await fetch(`${BACKEND_URL}/data/cfp-standings.json`, { cache: 'no-store' }).then(r => r.json());
         
-        if (snapshot.empty) {
+        if (!data || !data.standings || !Array.isArray(data.standings) || data.standings.length === 0) {
             cfpRankingsCache = {};
             return;
         }
+        
+        // CFP data is an array of team objects
+        const teams = data.standings;
         
         // Build reverse mapping (NCAA -> ESPN) for NCAAF
         const ncaaToEspnMap = {};
@@ -23405,8 +23149,7 @@ async function loadCFPRankingsCache() {
                            'Demon Deacons', 'Yellow Jackets', 'Commodores', 'Razorbacks',
                            'Mountaineers', 'Aggies', 'Gamecocks', 'Seminoles', 'Gators', 'Tide'];
         
-        snapshot.docs.forEach(doc => {
-            const teamData = doc.data();
+        teams.forEach(teamData => {
             if (teamData.Rk !== null && teamData.Rk !== undefined && teamData.Team) {
                 const ncaaTeamName = teamData.Team; // e.g., "Alabama"
                 const rank = parseInt(teamData.Rk) || null;
