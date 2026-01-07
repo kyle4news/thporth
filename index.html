@@ -12476,7 +12476,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function normalizeDisplayTime(label) {
         if (label === null || label === undefined) return label;
         if (typeof label !== 'string') return label;
-        const cleaned = label
+        // #region agent log
+        const originalLabel = label;
+        // #endregion
+        // Strip HTML tags first (like sampler.html does implicitly)
+        const withoutHTML = label.replace(/<[^>]*>/g, '');
+        const cleaned = withoutHTML
             .replace(/[\u00A0\u2007\u202F]/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
@@ -12488,9 +12493,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const meridiem = timeMatch[3].toUpperCase();
             if (hour === 12) hour = 0;
             if (meridiem === 'PM') hour += 12;
-            return `${hour.toString().padStart(2, '0')}:${minutes}`;
+            const result = `${hour.toString().padStart(2, '0')}:${minutes}`;
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:12476',message:'normalizeDisplayTime result',data:{originalLabel,withoutHTML,cleaned,result},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
+            return result;
         }
-        return cleaned.toUpperCase();
+        const result = cleaned.toUpperCase();
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:12495',message:'normalizeDisplayTime fallback',data:{originalLabel,withoutHTML,cleaned,result},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
+        return result;
     }
 
     function normalizeChannel(ch) {
@@ -14523,20 +14536,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             nextTimeLabel = "TBD";
                         }
                         
-                        // USE EXACT SAME LOGIC AS LEAGUE-SPECIFIC SCHEDULE SECTION - NEVER SUPERSEDE THIS RULE
-                        // Extract plain text from nextTimeLabel for normalization
-                        const nextTimeLabelPlain = nextTimeLabel ? nextTimeLabel.replace(/<[^>]*>/g, '') : '';
-                        const nextTimeDisplayRaw = nextTimeLabelPlain || "";
+                        const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
+                        const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabel;
                         
-                        // Get current game's raw time display (extract plain text from currentTimeLabel)
-                        const currentTimeDisplayRaw = currentTimeLabelPlain || "";
-                        
-                        // Normalize both times (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
-                        const nextNormalizedTimeLabel = normalizeDisplayTime(nextTimeDisplayRaw);
-                        const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeDisplayRaw;
-                        const currentGameTimeLabel = normalizedTimeLabel || currentTimeDisplayRaw;
-                        
-                        // Compare normalized times (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
+                        // Check if next game has a different start time from current game
+                        const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
                         const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
                         
                         // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
@@ -14689,6 +14693,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Extract plain text from currentTimeLabel before normalizing (remove HTML tags)
                 const currentTimeLabelPlain = currentTimeLabel ? currentTimeLabel.replace(/<[^>]*>/g, '') : '';
                 const normalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(currentTimeLabelPlain) : null;
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:14682',message:'Current game time values',data:{currentTimeLabel,currentTimeLabelPlain,normalizedTimeLabel,isLive,isFinal,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
                 let displayTimeLabel = currentTimeLabel;
                 if (!isLive && !isFinal && normalizedTimeLabel && normalizedTimeLabel !== 'TBD') {
                     if (shouldPrioritizeImportant && !isImportantGame) {
@@ -15046,39 +15053,72 @@ document.addEventListener('DOMContentLoaded', function () {
                     const nextIsLive = isYesterdayScores ? false : (nextMatchStatus.includes("IN PROGRESS") || nextMatchStatus.includes("LIVE"));
                     const nextIsFinal = isYesterdayScores || nextMatchStatus.includes("FINISHED") || nextMatchStatus.includes("FINAL") || nextMatchStatus.includes("GAME OVER");
                     
-                    // Get next game's raw time display (same format as league-specific section)
-                    let nextTimeDisplayRaw = "";
+                    // Get the NEXT game's time label to determine if the line above it should be full width
+                    let nextTimeLabel = "";
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15057',message:'Next game raw data',data:{nextDataTimeString:nextData.timeString,nextRawStart:nextRawStart?typeof nextRawStart:'null',hasToDate:nextRawStart&&nextRawStart.toDate?'yes':'no',nextIsLive,nextIsFinal,nextIsPostponed,nextIsCanceled,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                    // #endregion
+                    
                     if (nextData.timeString === '') {
-                        nextTimeDisplayRaw = "";
+                        nextTimeLabel = "";
                     } else if (nextIsLive) {
-                        nextTimeDisplayRaw = "Live";
+                        nextTimeLabel = "Live";
                     } else if (nextIsPostponed) {
-                        nextTimeDisplayRaw = "PPD";
+                        nextTimeLabel = '<span style="color: #545353;">PPD</span>';
                     } else if (nextIsCanceled) {
-                        nextTimeDisplayRaw = "Canceled";
+                        nextTimeLabel = '<span style="color: #545353;">Canceled</span>';
                     } else if (nextIsFinal) {
-                        nextTimeDisplayRaw = "F";
-                    } else if (nextRawStart && nextRawStart.toDate) {
-                        nextTimeDisplayRaw = luxon.DateTime.fromJSDate(nextRawStart.toDate()).toFormat('h:mm a');
+                        nextTimeLabel = "F";
+                    } else if (nextRawStart !== undefined && nextRawStart !== null) {
+                        let nextDateObj = null;
+                        
+                        // Handle serialized Firestore Timestamp (from JSON) - has _seconds property
+                        if (nextRawStart._seconds !== undefined && nextRawStart._seconds !== null) {
+                            nextDateObj = new Date(nextRawStart._seconds * 1000);
+                        }
+                        // Handle Firestore Timestamp object (from Firestore directly) - has toDate() method
+                        else if (nextRawStart.toDate && typeof nextRawStart.toDate === 'function') {
+                            nextDateObj = nextRawStart.toDate();
+                        }
+                        // Handle ISO string
+                        else if (typeof nextRawStart === 'string' && nextRawStart.length > 0) {
+                            nextDateObj = new Date(nextRawStart);
+                        }
+                        // Handle Date object
+                        else if (nextRawStart instanceof Date) {
+                            nextDateObj = nextRawStart;
+                        }
+                        
+                        if (nextDateObj && !isNaN(nextDateObj.getTime())) {
+                            const nextUtcDateTime = luxon.DateTime.fromJSDate(nextDateObj, { zone: 'utc' });
+                            const nextLocalDateTime = nextUtcDateTime.setZone('local');
+                            nextTimeLabel = nextLocalDateTime.toFormat('h:mm a');
+                        } else {
+                            nextTimeLabel = "TBD";
+                        }
                     } else {
-                        nextTimeDisplayRaw = "TBD";
+                        nextTimeLabel = "TBD";
                     }
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15068',message:'Next time label determined',data:{nextTimeLabel,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                    // #endregion
                     
-                    // Get current game's raw time display (extract plain text from currentTimeLabel)
-                    const currentTimeDisplayRaw = currentTimeLabelPlain || "";
+                    const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
+                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabel;
                     
-                    // Normalize both times (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
-                    const nextNormalizedTimeLabel = normalizeDisplayTime(nextTimeDisplayRaw);
-                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeDisplayRaw;
-                    // Use normalizedTimeLabel if available (already calculated for scheduled games), otherwise normalize currentTimeDisplayRaw
-                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeDisplayRaw;
-                    
-                    // Compare normalized times (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
+                    // Check if next game has a different start time from current game
+                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
                     const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15059',message:'Separator line comparison',data:{nextTimeLabel,nextNormalizedTimeLabel,nextGameTimeLabel,normalizedTimeLabel,currentTimeLabel,currentGameTimeLabel,isDifferentTime,nextIsLive,nextIsFinal,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                    // #endregion
                     
                     // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
                     const colspan = isDifferentTime ? 4 : 3;
                     const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15067',message:'Separator colspan decision',data:{colspan,firstCell:firstCell?firstCell.substring(0,50):'',isDifferentTime,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+                    // #endregion
                     
                     const separatorRow = table.insertRow();
                     separatorRow.className = "game-separator-line";
