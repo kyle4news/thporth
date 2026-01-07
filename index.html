@@ -4790,9 +4790,32 @@ function loadCustomRSSFeed(feedUrl, container) {
             const row2 = clickedRows.length > 1 ? clickedRows[1] : null;
             
             // Apply active class to separator line above to fill the 14px gap
-            const separatorAbove = row1.previousElementSibling;
+            // Find separator line above - try multiple methods for robustness
+            let separatorAbove = row1.previousElementSibling;
+            // If previousElementSibling doesn't work, walk up the DOM tree
+            if (!separatorAbove || !separatorAbove.classList.contains('game-separator-line')) {
+                let current = row1.parentElement;
+                if (current) {
+                    // Look for separator line in the same table/tbody
+                    const allSeparators = current.querySelectorAll('.game-separator-line');
+                    // Find the separator that comes immediately before row1
+                    for (let i = 0; i < allSeparators.length; i++) {
+                        const sep = allSeparators[i];
+                        if (sep.nextElementSibling === row1 || 
+                            (sep.nextElementSibling && sep.nextElementSibling.nextElementSibling === row1)) {
+                            separatorAbove = sep;
+                            break;
+                        }
+                    }
+                }
+            }
+            
             if (separatorAbove && separatorAbove.classList.contains('game-separator-line')) {
                 separatorAbove.classList.add('active-above');
+                // Force the background color to persist
+                separatorAbove.querySelectorAll('td').forEach(td => {
+                    td.style.backgroundColor = '#3c3c3c';
+                });
             }
             
             // Apply active class to the game rows
@@ -15383,9 +15406,32 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                     
                     // Apply active state to separator line above and game rows
-                    const separatorAbove = row1.previousElementSibling;
+                    // Find separator line above - try multiple methods for robustness
+                    let separatorAbove = row1.previousElementSibling;
+                    // If previousElementSibling doesn't work, walk up the DOM tree
+                    if (!separatorAbove || !separatorAbove.classList.contains('game-separator-line')) {
+                        let current = row1.parentElement;
+                        if (current) {
+                            // Look for separator line in the same table/tbody
+                            const allSeparators = current.querySelectorAll('.game-separator-line');
+                            // Find the separator that comes immediately before row1
+                            for (let i = 0; i < allSeparators.length; i++) {
+                                const sep = allSeparators[i];
+                                if (sep.nextElementSibling === row1 || 
+                                    (sep.nextElementSibling && sep.nextElementSibling.nextElementSibling === row1)) {
+                                    separatorAbove = sep;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
                     if (separatorAbove && separatorAbove.classList.contains('game-separator-line')) {
                         separatorAbove.classList.add('active-above');
+                        // Force the background color to persist
+                        separatorAbove.querySelectorAll('td').forEach(td => {
+                            td.style.backgroundColor = '#3c3c3c';
+                        });
                     }
                     
                     row1.classList.add('active');
@@ -15408,9 +15454,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             };
             
-            // Apply immediately and also after a microtask to catch any async rendering
+            // Apply immediately and also after microtasks to catch any async rendering
+            // Use multiple microtasks to ensure DOM is fully ready
             reapplyActiveState();
-            Promise.resolve().then(() => reapplyActiveState());
+            Promise.resolve().then(() => {
+                reapplyActiveState();
+                return Promise.resolve();
+            }).then(() => {
+                reapplyActiveState();
+            });
+            
+            // Also use requestAnimationFrame as a fallback for when DOM updates complete
+            requestAnimationFrame(() => {
+                reapplyActiveState();
+            });
         }
     }
 
