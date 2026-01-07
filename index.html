@@ -12627,7 +12627,7 @@ document.addEventListener('DOMContentLoaded', function () {
             : ['singleLeague'];
 
         sortedLeagueNames.forEach(leagueNameKey => {
-            const games = leagueGroups[leagueNameKey];
+            const games = leagueGroups[leagueNameKey].sort(sortGames);
             const leagueSection = document.createElement("div");
             // For Tennis section, never collapse leagues
             const isCollapsedLeague = isGroupedByLeague && !isTennisSection && COLLAPSED_LEAGUES.includes(leagueNameKey);
@@ -14202,8 +14202,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         }
 
+                    // Extract plain text from currentTimeLabel before normalizing (remove HTML tags)
+                    const currentTimeLabelPlain = currentTimeLabel ? currentTimeLabel.replace(/<[^>]*>/g, '') : '';
                     let displayTimeLabel = currentTimeLabel;
-                    const normalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(currentTimeLabel) : null;
+                    const normalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(currentTimeLabelPlain) : null;
                     if (!isLive && !isFinal && normalizedTimeLabel && normalizedTimeLabel !== 'TBD') {
                         if (normalizedTimeLabel === lastDisplayedTimeLabel) {
                             displayTimeLabel = "";
@@ -14521,14 +14523,23 @@ document.addEventListener('DOMContentLoaded', function () {
                             nextTimeLabel = "TBD";
                         }
                         
-                        const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
-                        const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabel;
+                        // USE EXACT SAME LOGIC AS LEAGUE-SPECIFIC SCHEDULE SECTION - NEVER SUPERSEDE THIS RULE
+                        // Extract plain text from nextTimeLabel for normalization
+                        const nextTimeLabelPlain = nextTimeLabel ? nextTimeLabel.replace(/<[^>]*>/g, '') : '';
+                        const nextTimeDisplayRaw = nextTimeLabelPlain || "";
                         
-                        // Check if next game has a different start time from current game
-                        const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
+                        // Get current game's raw time display (extract plain text from currentTimeLabel)
+                        const currentTimeDisplayRaw = currentTimeLabelPlain || "";
+                        
+                        // Normalize both times (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
+                        const nextNormalizedTimeLabel = normalizeDisplayTime(nextTimeDisplayRaw);
+                        const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeDisplayRaw;
+                        const currentGameTimeLabel = normalizedTimeLabel || currentTimeDisplayRaw;
+                        
+                        // Compare normalized times (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
                         const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
                         
-                        // If next game has different time, full width (colspan="4"), otherwise partial width (colspan="3")
+                        // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
                         const colspan = isDifferentTime ? 4 : 3;
                         const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
                         
@@ -14675,7 +14686,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     currentTimeLabel = "TBD";
                 }
 
-                const normalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(currentTimeLabel) : null;
+                // Extract plain text from currentTimeLabel before normalizing (remove HTML tags)
+                const currentTimeLabelPlain = currentTimeLabel ? currentTimeLabel.replace(/<[^>]*>/g, '') : '';
+                const normalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(currentTimeLabelPlain) : null;
                 let displayTimeLabel = currentTimeLabel;
                 if (!isLive && !isFinal && normalizedTimeLabel && normalizedTimeLabel !== 'TBD') {
                     if (shouldPrioritizeImportant && !isImportantGame) {
@@ -15020,48 +15033,50 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 // Add separator line between games (but not after the last game)
+                // USE EXACT SAME LOGIC AS LEAGUE-SPECIFIC SCHEDULE SECTION - NEVER SUPERSEDE THIS RULE
                 if (i < games.length - 1) {
-                    // Get the NEXT game's time label to determine if the line above it should be full width
                     const nextData = games[i + 1];
                     const nextRawStart = nextData["Start Time"];
                     const nextMatchStatus = (nextData["Match Status"] || "").toUpperCase();
                     const nextStageValue = (nextData["Stage"] || "").toUpperCase();
                     const nextStageTypeValue = (nextData["StageType"] || "").toUpperCase();
                     const nextStatusValue = (nextData["Status"] || "").toUpperCase();
-                    // Check if POSTPONED is in any field (Stage, Status, StageType, or Match Status)
                     const nextIsPostponed = nextStageValue.includes("POSTPONED") || nextStatusValue.includes("POSTPONED") || nextStageTypeValue.includes("POSTPONED") || nextMatchStatus.includes("POSTPONED");
-                    // Check if CANCELED is in any field (Stage, Status, StageType, or Match Status)
                     const nextIsCanceled = nextStageValue.includes("CANCELED") || nextStatusValue.includes("CANCELED") || nextStageTypeValue.includes("CANCELED") || nextMatchStatus.includes("CANCELED");
                     const nextIsLive = isYesterdayScores ? false : (nextMatchStatus.includes("IN PROGRESS") || nextMatchStatus.includes("LIVE"));
                     const nextIsFinal = isYesterdayScores || nextMatchStatus.includes("FINISHED") || nextMatchStatus.includes("FINAL") || nextMatchStatus.includes("GAME OVER");
-                    const nextIsPostponedFinal = nextIsFinal && nextIsPostponed;
-                    const nextIsCanceledFinal = nextIsFinal && nextIsCanceled;
-                    let nextTimeLabel = "";
                     
+                    // Get next game's raw time display (same format as league-specific section)
+                    let nextTimeDisplayRaw = "";
                     if (nextData.timeString === '') {
-                        nextTimeLabel = "";
+                        nextTimeDisplayRaw = "";
                     } else if (nextIsLive) {
-                        nextTimeLabel = "Live";
+                        nextTimeDisplayRaw = "Live";
                     } else if (nextIsPostponed) {
-                        nextTimeLabel = '<span style="color: #545353;">PPD</span>';
+                        nextTimeDisplayRaw = "PPD";
                     } else if (nextIsCanceled) {
-                        nextTimeLabel = '<span style="color: #545353;">Canceled</span>';
+                        nextTimeDisplayRaw = "Canceled";
                     } else if (nextIsFinal) {
-                        nextTimeLabel = "F";
+                        nextTimeDisplayRaw = "F";
                     } else if (nextRawStart && nextRawStart.toDate) {
-                        nextTimeLabel = luxon.DateTime.fromJSDate(nextRawStart.toDate()).toFormat('h:mm a');
+                        nextTimeDisplayRaw = luxon.DateTime.fromJSDate(nextRawStart.toDate()).toFormat('h:mm a');
                     } else {
-                        nextTimeLabel = "TBD";
+                        nextTimeDisplayRaw = "TBD";
                     }
                     
-                    const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
-                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabel;
+                    // Get current game's raw time display (extract plain text from currentTimeLabel)
+                    const currentTimeDisplayRaw = currentTimeLabelPlain || "";
                     
-                    // Check if next game has a different start time from current game
-                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
+                    // Normalize both times (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
+                    const nextNormalizedTimeLabel = normalizeDisplayTime(nextTimeDisplayRaw);
+                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeDisplayRaw;
+                    // Use normalizedTimeLabel if available (already calculated for scheduled games), otherwise normalize currentTimeDisplayRaw
+                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeDisplayRaw;
+                    
+                    // Compare normalized times (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
                     const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
                     
-                    // If next game has different time, full width (colspan="4"), otherwise partial width (colspan="3")
+                    // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
                     const colspan = isDifferentTime ? 4 : 3;
                     const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
                     
@@ -15508,7 +15523,35 @@ document.addEventListener('DOMContentLoaded', function () {
         const isManualB = b["Game ID"] && (b["Game ID"].startsWith("manual-") || b["Game ID"].startsWith("sheet-"));
         
         // For all games, sort by time first (this ensures chronological order)
-        const timeDiff = a["Start Time"] - b["Start Time"];
+        // Handle Firestore Timestamp objects properly
+        let timeA = 0;
+        let timeB = 0;
+        
+        if (a["Start Time"]) {
+            if (a["Start Time"].toMillis) {
+                timeA = a["Start Time"].toMillis();
+            } else if (a["Start Time"]._seconds) {
+                timeA = a["Start Time"]._seconds * 1000;
+            } else if (typeof a["Start Time"] === 'number') {
+                timeA = a["Start Time"];
+            } else if (a["Start Time"] instanceof Date) {
+                timeA = a["Start Time"].getTime();
+            }
+        }
+        
+        if (b["Start Time"]) {
+            if (b["Start Time"].toMillis) {
+                timeB = b["Start Time"].toMillis();
+            } else if (b["Start Time"]._seconds) {
+                timeB = b["Start Time"]._seconds * 1000;
+            } else if (typeof b["Start Time"] === 'number') {
+                timeB = b["Start Time"];
+            } else if (b["Start Time"] instanceof Date) {
+                timeB = b["Start Time"].getTime();
+            }
+        }
+        
+        const timeDiff = timeA - timeB;
         if (timeDiff !== 0) return timeDiff;
         
         // If times are equal and both are manual/sheet games from the same league, use displayOrder as tiebreaker
@@ -19734,14 +19777,17 @@ async function fetchFeaturedGames() {
                             }
                         }
                         
+                        // USE EXACT SAME LOGIC AS LEAGUE-SPECIFIC SCHEDULE SECTION - NEVER SUPERSEDE THIS RULE
                         const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextRawTimeDisplay) : null;
                         const nextGameTimeLabel = nextNormalizedTimeLabel || nextRawTimeDisplay;
                         
                         const currentNormalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(rawTimeDisplay) : null;
                         const currentGameTimeLabel = currentNormalizedTimeLabel || rawTimeDisplay;
                         
+                        // Compare normalized times (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
                         const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
                         
+                        // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
                         const colspan = isDifferentTime ? 4 : 3;
                         const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
                         
