@@ -5375,6 +5375,8 @@ function loadCustomRSSFeed(feedUrl, container) {
 'Houston Rockets': 'FRR1xb34ixxf3EOy',
 'Indiana Pacers': 'Ab4T6SxaRwWBLH3k',
 'Los Angeles Clippers': 'sm9uiTRbum4WBhfA',
+'LA Clippers': 'sm9uiTRbum4WBhfA',
+'Clippers': 'sm9uiTRbum4WBhfA',
 'Los Angeles Lakers': 'xCTOVPevBo7faNNj',
   'Memphis Grizzlies': 'https://nitter.net/memgrizz',
   'Miami Heat': 'https://nitter.net/MiamiHEAT',
@@ -5602,6 +5604,8 @@ function loadCustomRSSFeed(feedUrl, container) {
             'Houston Rockets': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-houstonrockets.xml',
             'Indiana Pacers': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-indianapacers.xml',
             'Los Angeles Clippers': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-losangelesclippers.xml',
+            'LA Clippers': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-losangelesclippers.xml',
+            'Clippers': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-losangelesclippers.xml',
             'Los Angeles Lakers': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-losangeleslakers.xml',
             'Memphis Grizzlies': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-memphisgrizzlies.xml',
             'Miami Heat': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-miamiheat.xml',
@@ -5729,6 +5733,11 @@ function loadCustomRSSFeed(feedUrl, container) {
         // Convert team name to sportspyder RSS feed URL (NHL, NFL, NBA, Premier League)
         function getSportspyderFeedUrl(teamName) {
             if (!teamName) return null;
+            
+            // Map Clippers aliases to canonical name for slug generation
+            if (teamName === 'Clippers' || teamName === 'LA Clippers' || teamName === 'Los Angeles Clippers') {
+                teamName = 'Los Angeles Clippers';
+            }
             
             // Reverse mappings: Map frontend display names to Sportspyder mapping keys
             // These map from how teams appear on the frontend (e.g., "Oregon") to full names used in Sportspyder mappings (e.g., "Oregon Ducks")
@@ -6298,7 +6307,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 "Charlotte Hornets": "nba", "Chicago Bulls": "nba", "Cleveland Cavaliers": "nba",
                 "Dallas Mavericks": "nba", "Denver Nuggets": "nba", "Detroit Pistons": "nba",
                 "Golden State Warriors": "nba", "Houston Rockets": "nba", "Indiana Pacers": "nba",
-                "Los Angeles Clippers": "nba", "Los Angeles Lakers": "nba", "Memphis Grizzlies": "nba",
+                "Los Angeles Clippers": "nba", "LA Clippers": "nba", "Clippers": "nba", "Los Angeles Lakers": "nba", "Memphis Grizzlies": "nba",
                 "Miami Heat": "nba", "Milwaukee Bucks": "nba", "Minnesota Timberwolves": "nba",
                 "New Orleans Pelicans": "nba", "New York Knicks": "nba", "Oklahoma City Thunder": "nba",
                 "Orlando Magic": "nba", "Philadelphia 76ers": "nba", "Phoenix Suns": "nba",
@@ -37543,6 +37552,8 @@ document.addEventListener('DOMContentLoaded', function () {
             "Houston Rockets": "Rockets",
             "Indiana Pacers": "Pacers",
             "Los Angeles Clippers": "Clippers",
+            "LA Clippers": "Clippers",
+            "Clippers": "Clippers",
             "Los Angeles Lakers": "Lakers",
             "Memphis Grizzlies": "Grizzlies",
             "Miami Heat": "Heat",
