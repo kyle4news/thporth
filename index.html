@@ -4696,6 +4696,10 @@ function loadCustomRSSFeed(feedUrl, container) {
     
     // --- GLOBAL GAME CLICK HANDLER (must be global for inline onclick) ---
     function handleGameClick(gameId, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         console.log('[handleGameClick] Called with gameId:', gameId);
         if (!gameId) {
             console.log('[handleGameClick] No gameId, returning');
@@ -50763,6 +50767,43 @@ async function loadTop25Data(leagueKey) {
     top25Content.innerHTML = '<p style="color: #9ca3af;">Loading Top 25...</p>';
     
     try {
+        if (leagueKey === 'NCAAF') {
+            const hardcodedTop25 = [
+                { Top25Rank: 1, Team: 'Indiana', OverallRecord: '13-0', Record: '13-0' },
+                { Top25Rank: 2, Team: 'Georgia', OverallRecord: '12-1', Record: '12-1' },
+                { Top25Rank: 3, Team: 'Ohio State', OverallRecord: '12-1', Record: '12-1' },
+                { Top25Rank: 4, Team: 'Texas Tech', OverallRecord: '12-1', Record: '12-1' },
+                { Top25Rank: 5, Team: 'Oregon', OverallRecord: '11-1', Record: '11-1' },
+                { Top25Rank: 6, Team: 'Ole Miss', OverallRecord: '11-1', Record: '11-1' },
+                { Top25Rank: 7, Team: 'Texas A&M', OverallRecord: '11-1', Record: '11-1' },
+                { Top25Rank: 8, Team: 'Oklahoma', OverallRecord: '10-2', Record: '10-2' },
+                { Top25Rank: 9, Team: 'Notre Dame', OverallRecord: '10-2', Record: '10-2' },
+                { Top25Rank: 10, Team: 'Miami', OverallRecord: '10-2', Record: '10-2' },
+                { Top25Rank: 11, Team: 'Alabama', OverallRecord: '10-3', Record: '10-3' },
+                { Top25Rank: 12, Team: 'BYU', OverallRecord: '11-2', Record: '11-2' },
+                { Top25Rank: 13, Team: 'Vanderbilt', OverallRecord: '10-2', Record: '10-2' },
+                { Top25Rank: 14, Team: 'Texas', OverallRecord: '9-3', Record: '9-3' },
+                { Top25Rank: 15, Team: 'Utah', OverallRecord: '10-2', Record: '10-2' },
+                { Top25Rank: 16, Team: 'USC', OverallRecord: '9-3', Record: '9-3' },
+                { Top25Rank: 17, Team: 'Tulane', OverallRecord: '11-2', Record: '11-2' },
+                { Top25Rank: 18, Team: 'Michigan', OverallRecord: '9-3', Record: '9-3' },
+                { Top25Rank: 19, Team: 'James Madison', OverallRecord: '12-1', Record: '12-1' },
+                { Top25Rank: 20, Team: 'Virginia', OverallRecord: '10-3', Record: '10-3' },
+                { Top25Rank: 21, Team: 'Arizona', OverallRecord: '9-3', Record: '9-3' },
+                { Top25Rank: 22, Team: 'Navy', OverallRecord: '9-2', Record: '9-2' },
+                { Top25Rank: 23, Team: 'North Texas', OverallRecord: '11-2', Record: '11-2' },
+                { Top25Rank: 24, Team: 'Georgia Tech', OverallRecord: '9-3', Record: '9-3' },
+                { Top25Rank: 25, Team: 'Missouri', OverallRecord: '8-4', Record: '8-4' }
+            ];
+            const teams = hardcodedTop25.map(team => {
+                const displayName = getTop25DisplayName(team.Team, leagueKey) || team.Team || '';
+                return { ...team, Team: displayName };
+            });
+            const html = createTop25Table(teams, leagueKey);
+            top25Content.innerHTML = html;
+            return;
+        }
+        
         const collectionMap = {
             'NCAAF': 'NCAAFStandings',
             'NCAAM': 'NCAAMStandings',
