@@ -38737,14 +38737,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 // Format time to include seconds if not present
-                let timeStr = game.GameTime;
+                let timeStr = String(game.GameTime || '');
                 if (timeStr && !timeStr.includes(':')) {
                     // If time is just a number (like "11"), add ":00" to make it "11:00"
                     timeStr = timeStr + ':00';
                 }
                 
                 // For American Football, validate and clamp time to 0-15 minutes
-                if (isAmericanFootball && timeStr.includes(':')) {
+                if (isAmericanFootball && timeStr && timeStr.includes(':')) {
                     const [minutes, seconds] = timeStr.split(':').map(Number);
                     // If minutes > 15, it's likely halftime or invalid data
                     if (minutes > 15 || (minutes === 15 && seconds > 0)) {
@@ -38787,7 +38787,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 else if (period === "THIRD" || period === "3RD") period = "3rd";
                 else if (period === "PAUSE") period = "INT";
                 // Format time to include seconds if not present
-                let timeStr = game.GameTime;
+                let timeStr = String(game.GameTime || '');
                 if (timeStr && !timeStr.includes(':')) {
                     timeStr = timeStr + ':00';
                 }
@@ -38839,7 +38839,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 // Format time to include seconds if not present
-                let timeStr = gameTime;
+                let timeStr = String(gameTime || '');
                 if (timeStr && !timeStr.includes(':')) {
                     timeStr = timeStr + ':00';
                 }
@@ -38903,7 +38903,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 // Format time to include seconds if not present
-                let timeStr = gameTime;
+                let timeStr = String(gameTime || '');
                 if (timeStr && !timeStr.includes(':')) {
                     timeStr = timeStr + ':00';
                 }
@@ -39023,7 +39023,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 if (periodStr) {
                     // Format time to include seconds if not present
-                    let timeStr = displayClock;
+                    let timeStr = String(displayClock || '');
                     if (timeStr && !timeStr.includes(':')) {
                         timeStr = timeStr + ':00';
                     }
@@ -40965,9 +40965,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                 
                                 // Extract time - ONLY format like "9:59", "0:40" (numbers with colon)
                                 if (!timeRemaining && gameTime) {
-                                    let timeStr = gameTime;
+                                    let timeStr = String(gameTime || '');
                                     // Ensure it has colon format
-                                    if (!timeStr.includes(':')) {
+                                    if (timeStr && !timeStr.includes(':')) {
                                         timeStr = timeStr + ':00';
                                     }
                                     // Validate it matches time format (digits:digits)
@@ -45456,7 +45456,8 @@ async function fetchFeaturedGames() {
             const statsMainTab = mainTabsContainer.querySelector('.main-tab[data-main-tab=\"stats\"]');
             
             if (standingsMainTab) {
-                if (leagueKey === 'FACup') {
+                const soccerLeagues = ['Soccer','PremierLeague','MLS','LaLiga','SerieA','Bundesliga','Ligue1','LigaMX','NWSL','UEFAChampionsLeague','UEFAEuropaLeague','UEFAConferenceLeague','EFLCup','CopaDelRey','DFBPokal','BelgianProLeague','Brasileirão','LigaPortugal','Eredivisie','CopaLibertadores','CopaSudamericana','CFL',"Women's UCL"];
+                if (leagueKey === 'FACup' || soccerLeagues.includes(leagueKey)) {
                     standingsMainTab.style.display = 'none';
                     if (standingsTabContentEl) {
                         standingsTabContentEl.style.display = 'none';
@@ -45899,19 +45900,33 @@ async function fetchFeaturedGames() {
         
         fetch(JSON_ENDPOINT, { cache: 'no-store' })
             .then(response => {
+                console.log('[Soccer] Fetch response status:', response.status, response.statusText);
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 return response.json();
             })
             .then(jsonData => {
+                console.log('[Soccer] JSON data received:', jsonData);
+                console.log('[Soccer] JSON data keys:', Object.keys(jsonData || {}));
+                console.log('[Soccer] Total games in response:', jsonData.games ? jsonData.games.length : 'games array not found');
+                console.log('[Soccer] Looking for date:', todayStr);
+                
+                if (!jsonData || !jsonData.games || !Array.isArray(jsonData.games)) {
+                    console.error('[Soccer] Invalid data structure. Expected jsonData.games array. Got:', jsonData);
+                    todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error: Invalid data format from server.</p>';
+                    return;
+                }
+                
                 // Filter games by date (gameDate or scheduledDate)
                 const todayGames = jsonData.games.filter(game => {
                     return game.gameDate === todayStr || game.scheduledDate === todayStr;
                 });
                 
+                console.log('[Soccer] Games for today:', todayGames.length);
+                
                 if (todayGames.length === 0) {
-                    todayScheduleContent.innerHTML = '<p>No soccer games found.</p>';
+                    todayScheduleContent.innerHTML = '<p>No soccer games found for today.</p>';
                     return;
                 }
                 
@@ -45922,8 +45937,10 @@ async function fetchFeaturedGames() {
                     return ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers'].includes(displayLeague);
                 });
                 
+                console.log('[Soccer] Soccer games after filtering:', soccerGames.length);
+                
                 if (soccerGames.length === 0) {
-                    todayScheduleContent.innerHTML = '<p>No soccer games found.</p>';
+                    todayScheduleContent.innerHTML = '<p>No soccer games found for today.</p>';
                     return;
                 }
                 
@@ -45938,8 +45955,9 @@ async function fetchFeaturedGames() {
                 renderConsolidatedSoccerGames(todayScheduleContent, formattedGames, today);
             })
             .catch(error => {
-                console.error('Error loading soccer games:', error);
-                todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading soccer games.</p>';
+                console.error('[Soccer] Error loading soccer games:', error);
+                console.error('[Soccer] Error details:', error.message, error.stack);
+                todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading soccer games: ' + error.message + '</p>';
             });
         
         // Load standings (use a generic soccer standings or hide it)
@@ -46178,19 +46196,29 @@ async function fetchFeaturedGames() {
                         const { DateTime } = luxon;
                         try {
                             // Parse string time and convert to timestamp for comparison
-                            let timeStr = a['Start Time'].replace(/:\d{2}(?=\s*[AP]M)/, ''); // Remove seconds if present
-                            const gameDate = a.gameDate || new Date().toISOString().split('T')[0];
+                            let timeStr = String(a['Start Time'] || '').replace(/:\d{2}(?=\s*[AP]M)/, ''); // Remove seconds if present
+                            if (!timeStr || !timeStr.includes(':')) {
+                                timeA = 0;
+                            } else {
+                                const gameDate = a.gameDate || new Date().toISOString().split('T')[0];
+                                
+                                // Convert 12-hour format to 24-hour format for proper parsing
+                                const timeParts = timeStr.split(':');
+                                if (timeParts.length < 2) {
+                                    timeA = 0;
+                                } else {
+                                    let hour = parseInt(timeParts[0]);
+                                    const minuteParts = timeParts[1].split(' ');
+                                    const minute = minuteParts[0];
+                                    const ampm = minuteParts[1];
                             
-                            // Convert 12-hour format to 24-hour format for proper parsing
-                            let hour = parseInt(timeStr.split(':')[0]);
-                            const minute = timeStr.split(':')[1].split(' ')[0];
-                            const ampm = timeStr.split(' ')[1];
-                            
-                            if (ampm === 'PM' && hour !== 12) hour += 12;
-                            if (ampm === 'AM' && hour === 12) hour = 0;
-                            
-                            const dateTime = DateTime.fromISO(`${gameDate}T${hour.toString().padStart(2, '0')}:${minute}`).setZone('local');
-                            timeA = dateTime.toMillis();
+                                    if (ampm === 'PM' && hour !== 12) hour += 12;
+                                    if (ampm === 'AM' && hour === 12) hour = 0;
+                                    
+                                    const dateTime = DateTime.fromISO(`${gameDate}T${hour.toString().padStart(2, '0')}:${minute}`).setZone('local');
+                                    timeA = dateTime.toMillis();
+                                }
+                            }
                         } catch (e) {
                             timeA = 0; // Fallback if parsing fails
                         }
@@ -46205,19 +46233,29 @@ async function fetchFeaturedGames() {
                         const { DateTime } = luxon;
                         try {
                             // Parse string time and convert to timestamp for comparison
-                            let timeStr = b['Start Time'].replace(/:\d{2}(?=\s*[AP]M)/, ''); // Remove seconds if present
-                            const gameDate = b.gameDate || new Date().toISOString().split('T')[0];
-                            
-                            // Convert 12-hour format to 24-hour format for proper parsing
-                            let hour = parseInt(timeStr.split(':')[0]);
-                            const minute = timeStr.split(':')[1].split(' ')[0];
-                            const ampm = timeStr.split(' ')[1];
-                            
-                            if (ampm === 'PM' && hour !== 12) hour += 12;
-                            if (ampm === 'AM' && hour === 12) hour = 0;
-                            
-                            const dateTime = DateTime.fromISO(`${gameDate}T${hour.toString().padStart(2, '0')}:${minute}`).setZone('local');
-                            timeB = dateTime.toMillis();
+                            let timeStr = String(b['Start Time'] || '').replace(/:\d{2}(?=\s*[AP]M)/, ''); // Remove seconds if present
+                            if (!timeStr || !timeStr.includes(':')) {
+                                timeB = 0;
+                            } else {
+                                const gameDate = b.gameDate || new Date().toISOString().split('T')[0];
+                                
+                                // Convert 12-hour format to 24-hour format for proper parsing
+                                const timeParts = timeStr.split(':');
+                                if (timeParts.length < 2) {
+                                    timeB = 0;
+                                } else {
+                                    let hour = parseInt(timeParts[0]);
+                                    const minuteParts = timeParts[1].split(' ');
+                                    const minute = minuteParts[0];
+                                    const ampm = minuteParts[1];
+                                    
+                                    if (ampm === 'PM' && hour !== 12) hour += 12;
+                                    if (ampm === 'AM' && hour === 12) hour = 0;
+                                    
+                                    const dateTime = DateTime.fromISO(`${gameDate}T${hour.toString().padStart(2, '0')}:${minute}`).setZone('local');
+                                    timeB = dateTime.toMillis();
+                                }
+                            }
                         } catch (e) {
                             timeB = 0; // Fallback if parsing fails
                         }
@@ -46288,7 +46326,7 @@ async function fetchFeaturedGames() {
                             timeDisplay = gameTime.toFormat('h:mm a');
                         } else {
                             // Handle string time from upcoming collections - use same logic as LigaMX league page
-                            const timeStr = game['Start Time'] || '';
+                            const timeStr = String(game['Start Time'] || '');
                             if (timeStr && timeStr.includes(':')) {
                                 const { DateTime } = luxon;
                                 try {
@@ -46418,7 +46456,7 @@ async function fetchFeaturedGames() {
                                 const gameTime = DateTime.fromSeconds(nextGame['Start Time'].seconds).setZone('local');
                                 nextRawTimeDisplay = gameTime.toFormat('h:mm a');
                             } else {
-                                const timeStr = nextGame['Start Time'] || '';
+                                const timeStr = String(nextGame['Start Time'] || '');
                                 if (timeStr && timeStr.includes(':')) {
                                     const { DateTime } = luxon;
                                     try {
@@ -49311,8 +49349,17 @@ window.updateStandingsTabText = function(leagueName) {
     const worldLeadsLeagues = ['TrackAndField'];
     
     if (soccerLeagues.includes(leagueName)) {
-        standingsTab.innerText = 'TABLE';
-    } else if (rankingsLeagues.includes(leagueName)) {
+        // Hide the standings/tab (TABLE) for Soccer pages per request
+        standingsTab.style.display = 'none';
+        const standingsContentEl = document.getElementById('standings-tab-content');
+        if (standingsContentEl) standingsContentEl.style.display = 'none';
+        return;
+    } else {
+        // Ensure the tab is visible for non-soccer leagues
+        standingsTab.style.display = '';
+    }
+
+    if (rankingsLeagues.includes(leagueName)) {
         standingsTab.innerText = 'RANKINGS';
     } else if (worldLeadsLeagues.includes(leagueName)) {
         standingsTab.innerText = 'WORLD LEADS';
