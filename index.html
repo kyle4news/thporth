@@ -46189,8 +46189,19 @@ async function fetchFeaturedGames() {
                     // Convert to comparable timestamps
                     if (typeof a['Start Time'] === 'number') {
                         timeA = a['Start Time'];
-                    } else if (a['Start Time'] && typeof a['Start Time'] === 'object' && a['Start Time'].seconds) {
-                        timeA = a['Start Time'].seconds * 1000;
+                    } else if (a['Start Time'] && typeof a['Start Time'] === 'object') {
+                        // Handle Firestore Timestamp objects
+                        if (a['Start Time'].seconds) {
+                            timeA = a['Start Time'].seconds * 1000;
+                        } else if (a['Start Time']._seconds) {
+                            // Serialized Firestore Timestamp from JSON
+                            timeA = a['Start Time']._seconds * 1000;
+                        } else if (typeof a['Start Time'].toDate === 'function') {
+                            // Firestore Timestamp with toDate() method
+                            timeA = a['Start Time'].toDate().getTime();
+                        } else {
+                            timeA = 0;
+                        }
                     } else if (typeof a['Start Time'] === 'string' && a['Start Time']) {
                         // Handle string times like "9:30 AM" - convert to comparable timestamp
                         const { DateTime } = luxon;
@@ -46226,8 +46237,19 @@ async function fetchFeaturedGames() {
                     
                     if (typeof b['Start Time'] === 'number') {
                         timeB = b['Start Time'];
-                    } else if (b['Start Time'] && typeof b['Start Time'] === 'object' && b['Start Time'].seconds) {
-                        timeB = b['Start Time'].seconds * 1000;
+                    } else if (b['Start Time'] && typeof b['Start Time'] === 'object') {
+                        // Handle Firestore Timestamp objects
+                        if (b['Start Time'].seconds) {
+                            timeB = b['Start Time'].seconds * 1000;
+                        } else if (b['Start Time']._seconds) {
+                            // Serialized Firestore Timestamp from JSON
+                            timeB = b['Start Time']._seconds * 1000;
+                        } else if (typeof b['Start Time'].toDate === 'function') {
+                            // Firestore Timestamp with toDate() method
+                            timeB = b['Start Time'].toDate().getTime();
+                        } else {
+                            timeB = 0;
+                        }
                     } else if (typeof b['Start Time'] === 'string' && b['Start Time']) {
                         // Handle string times like "9:30 AM" - convert to comparable timestamp
                         const { DateTime } = luxon;
