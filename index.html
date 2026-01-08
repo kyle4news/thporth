@@ -46319,15 +46319,34 @@ async function fetchFeaturedGames() {
                             const { DateTime } = luxon;
                             const gameTime = DateTime.fromMillis(game['Start Time']).setZone('local');
                             timeDisplay = gameTime.toFormat('h:mm a');
-                        } else if (game['Start Time'] && typeof game['Start Time'] === 'object' && game['Start Time'].seconds) {
+                        } else if (game['Start Time'] && typeof game['Start Time'] === 'object') {
                             // Handle Firestore Timestamp object - convert to user's local time
                             const { DateTime } = luxon;
-                            const gameTime = DateTime.fromSeconds(game['Start Time'].seconds).setZone('local');
-                            timeDisplay = gameTime.toFormat('h:mm a');
-                        } else {
+                            let gameTime = null;
+                            
+                            // Check for Firestore Timestamp with .seconds property
+                            if (game['Start Time'].seconds) {
+                                gameTime = DateTime.fromSeconds(game['Start Time'].seconds).setZone('local');
+                            }
+                            // Check for serialized Firestore Timestamp with ._seconds property (from JSON)
+                            else if (game['Start Time']._seconds) {
+                                gameTime = DateTime.fromSeconds(game['Start Time']._seconds).setZone('local');
+                            }
+                            // Check for .toDate() method (Firestore Timestamp object)
+                            else if (typeof game['Start Time'].toDate === 'function') {
+                                gameTime = DateTime.fromJSDate(game['Start Time'].toDate()).setZone('local');
+                            }
+                            
+                            if (gameTime && gameTime.isValid) {
+                                timeDisplay = gameTime.toFormat('h:mm a');
+                            } else {
+                                // If object doesn't match expected format, show TBD
+                                timeDisplay = 'TBD';
+                            }
+                        } else if (typeof game['Start Time'] === 'string' || game['Start Time'] === null || game['Start Time'] === undefined) {
                             // Handle string time from upcoming collections - use same logic as LigaMX league page
                             const timeStr = String(game['Start Time'] || '');
-                            if (timeStr && timeStr.includes(':')) {
+                            if (timeStr && timeStr !== '' && timeStr !== 'null' && timeStr !== 'undefined' && timeStr.includes(':')) {
                                 const { DateTime } = luxon;
                                 try {
                                     // Parse as Eastern time with seconds format, then convert to local (same as LigaMX)
@@ -46351,6 +46370,9 @@ async function fetchFeaturedGames() {
                             } else {
                                 timeDisplay = timeStr || 'TBD';
                             }
+                        } else {
+                            // Unknown type - show TBD instead of [object Object]
+                            timeDisplay = 'TBD';
                         }
                     }
                     
