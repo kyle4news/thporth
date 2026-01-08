@@ -2929,7 +2929,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="main-tab active" data-main-tab="schedule" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #fff; color: #000; font-weight: bold;">SCHEDULE</div>
                 <div class="main-tab" data-main-tab="standings" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">STANDINGS</div>
                 <!-- Stats tab hidden for now - keeping functionality intact -->
+                <!-- Removed STATS tab for MLB per request
                 <div class="main-tab" data-main-tab="stats" style="display: none; flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;">STATS</div>
+                -->
             </div>
 
     <!-- Schedule Tab Content (active by default) -->
@@ -45429,7 +45431,13 @@ async function fetchFeaturedGames() {
             }
             if (todayScheduleContent) todayScheduleContent.style.display = 'none';
             if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'block';
-            activateMainTab('standings');
+            // Default to Standings for most leagues when there are no today games,
+            // but keep Schedule open by default for NFL.
+            if (leagueKey === 'NFL') {
+                activateMainTab('schedule');
+            } else {
+                activateMainTab('standings');
+            }
             
             // For NCAA leagues, load Top 25 data when switching to Standings tab
             const isNCALeague = ['NCAAF', 'NCAAM', 'NCAAW'].includes(leagueKey);
