@@ -43494,7 +43494,7 @@ document.addEventListener('DOMContentLoaded', function () {
             { Rank: 8, Team: 'Chicago', MP: 34, Wins: 15, Draws: 8, Losses: 11, Points: 53 },
             { Rank: 9, Team: 'Orlando City', MP: 34, Wins: 14, Draws: 11, Losses: 9, Points: 53 },
             { Rank: 10, Team: 'NY Red Bulls', MP: 34, Wins: 12, Draws: 7, Losses: 15, Points: 43 },
-            { Rank: 11, Team: 'New England', MP: 34, Wins: 9, Draws: 9, Losses: 16, Points: 36 },
+            { Rank: 11, Team: 'Revolution', MP: 34, Wins: 9, Draws: 9, Losses: 16, Points: 36 },
             { Rank: 12, Team: 'Toronto', MP: 34, Wins: 6, Draws: 14, Losses: 14, Points: 32 },
             { Rank: 13, Team: 'Montréal', MP: 34, Wins: 6, Draws: 10, Losses: 18, Points: 28 },
             { Rank: 14, Team: 'Atlanta United', MP: 34, Wins: 5, Draws: 13, Losses: 16, Points: 28 },
@@ -46952,6 +46952,38 @@ async function fetchFeaturedGames() {
             defaultContent.innerHTML = '<p style="color: #9ca3af;">Loading upcoming schedule...</p>';
         }
 
+        // Helper function to extract mascot name only (used by both hardcoded and Firestore schedules)
+        function getMascotName(fullTeamName) {
+                // List of city/state prefixes to remove
+                const prefixes = [
+                    'New York', 'Los Angeles', 'San Francisco', 'San Diego', 'San Antonio', 'San Jose',
+                    'Las Vegas', 'New England', 'New Orleans', 'Tampa Bay', 'Green Bay',
+                  'Indianapolis',
+                    'Kansas City', 'Oklahoma City', 'Golden State', 'Portland Trail',
+                    'Minnesota', 'Indiana', 'Tennessee', 'Carolina', 'Arizona', 'Jacksonville',
+                    'Philadelphia', 'Pittsburgh', 'Baltimore', 'Cleveland', 'Cincinnati',
+                    'Houston', 'Dallas', 'Washington', 'Chicago', 'Detroit', 'Milwaukee',
+                    'Denver', 'Seattle', 'Atlanta', 'Miami', 'Charlotte', 'Orlando',
+                    'Brooklyn', 'Toronto', 'Boston', 'Buffalo', 'Memphis',
+                    // NHL-specific cities
+                    'Winnipeg', 'Utah', 'Colorado', 'St. Louis', 'Nashville', 'Columbus',
+                    'Florida', 'New Jersey', 'Anaheim', 'Calgary', 'Edmonton', 'Vancouver',
+                    'Ottawa', 'Montreal', 'Tampa Bay'
+                ];
+                
+                let mascot = fullTeamName.trim();
+                
+                // Remove prefix if found
+                for (const prefix of prefixes) {
+                    if (mascot.startsWith(prefix + ' ')) {
+                        mascot = mascot.substring(prefix.length + 1);
+                        break;
+                    }
+                }
+                
+                return mascot;
+        }
+        
         // Check for hardcoded schedule first
         if (HARDCODED_UPCOMING_SCHEDULES[leagueKey]) {
             const todayStr = luxon.DateTime.now().setZone('America/New_York').toISODate();
@@ -46970,34 +47002,6 @@ async function fetchFeaturedGames() {
                     defaultContent.innerHTML = '<p style="color: #9ca3af;">No upcoming games scheduled.</p>';
                 }
                 return;
-            }
-            
-            // Helper function to extract mascot name only
-            function getMascotName(fullTeamName) {
-                // List of city/state prefixes to remove
-                const prefixes = [
-                    'New York', 'Los Angeles', 'San Francisco', 'San Diego', 'San Antonio', 'San Jose',
-                    'Las Vegas', 'New England', 'New Orleans', 'Tampa Bay', 'Green Bay',
-                  'Indianapolis',
-                    'Kansas City', 'Oklahoma City', 'Golden State', 'Portland Trail',
-                    'Minnesota', 'Indiana', 'Tennessee', 'Carolina', 'Arizona', 'Jacksonville',
-                    'Philadelphia', 'Pittsburgh', 'Baltimore', 'Cleveland', 'Cincinnati',
-                    'Houston', 'Dallas', 'Washington', 'Chicago', 'Detroit', 'Milwaukee',
-                    'Denver', 'Seattle', 'Atlanta', 'Miami', 'Charlotte', 'Orlando',
-                    'Brooklyn', 'Toronto', 'Boston', 'Buffalo', 'Memphis'
-                ];
-                
-                let mascot = fullTeamName.trim();
-                
-                // Remove prefix if found
-                for (const prefix of prefixes) {
-                    if (mascot.startsWith(prefix + ' ')) {
-                        mascot = mascot.substring(prefix.length + 1);
-                        break;
-                    }
-                }
-                
-                return mascot;
             }
             
             // Check if this league uses the Featured Only / Expand All toggle
@@ -47563,8 +47567,15 @@ async function fetchFeaturedGames() {
                     if (!gameLeagueKey) {
                         gameLeagueKey = leagueKey;
                     }
-                    const awayDisplay = getTeamDisplayName(game.away || '', displayLeague);
-                    const homeDisplay = getTeamDisplayName(game.home || '', displayLeague);
+                    // For NHL upcoming schedule, show mascot names only
+                    let awayDisplay, homeDisplay;
+                    if (leagueKey === 'NHL') {
+                        awayDisplay = getMascotName(game.away || '');
+                        homeDisplay = getMascotName(game.home || '');
+                    } else {
+                        awayDisplay = getTeamDisplayName(game.away || '', displayLeague);
+                        homeDisplay = getTeamDisplayName(game.home || '', displayLeague);
+                    }
                     let awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey);
                     let homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey);
                     
