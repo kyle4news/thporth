@@ -43370,22 +43370,57 @@ document.addEventListener('DOMContentLoaded', function () {
         return html;
     }
 
-    // NBA Standings: East/West tabs
-    function createNBAStandings(teams) {
-        const eastTeams = teams.filter(team => team.Conference === 'Eastern Conference');
-        const westTeams = teams.filter(team => team.Conference === 'Western Conference');
-        
+    // MLS Standings: East/West tabs (hardcoded for MLS > Table per request)
+    function createMLSStandings(teams) {
+        // Hardcoded Eastern Conference data (preserve exact team names and styling)
+        const eastTeams = [
+            { Rank: 1, Team: 'Philadelphia', MP: 34, Wins: 20, Draws: 6, Losses: 8, GF: 57, GA: 35, GD: 22, Points: 66 },
+            { Rank: 2, Team: 'Cincinnati', MP: 34, Wins: 20, Draws: 5, Losses: 9, GF: 52, GA: 40, GD: 12, Points: 65 },
+            { Rank: 3, Team: 'Inter Miami', MP: 34, Wins: 19, Draws: 8, Losses: 7, GF: 81, GA: 55, GD: 26, Points: 65 },
+            { Rank: 4, Team: 'Charlotte', MP: 34, Wins: 19, Draws: 2, Losses: 13, GF: 55, GA: 46, GD: 9, Points: 59 },
+            { Rank: 5, Team: 'New York City', MP: 34, Wins: 17, Draws: 5, Losses: 12, GF: 50, GA: 44, GD: 6, Points: 56 },
+            { Rank: 6, Team: 'Nashville', MP: 34, Wins: 16, Draws: 6, Losses: 12, GF: 58, GA: 45, GD: 13, Points: 54 },
+            { Rank: 7, Team: 'Columbus', MP: 34, Wins: 14, Draws: 12, Losses: 8, GF: 55, GA: 51, GD: 4, Points: 54 },
+            { Rank: 8, Team: 'Chicago', MP: 34, Wins: 15, Draws: 8, Losses: 11, GF: 68, GA: 60, GD: 8, Points: 53 },
+            { Rank: 9, Team: 'Orlando City', MP: 34, Wins: 14, Draws: 11, Losses: 9, GF: 63, GA: 51, GD: 12, Points: 53 },
+            { Rank: 10, Team: 'NY Red Bulls', MP: 34, Wins: 12, Draws: 7, Losses: 15, GF: 48, GA: 47, GD: 1, Points: 43 },
+            { Rank: 11, Team: 'New England', MP: 34, Wins: 9, Draws: 9, Losses: 16, GF: 44, GA: 51, GD: -7, Points: 36 },
+            { Rank: 12, Team: 'Toronto', MP: 34, Wins: 6, Draws: 14, Losses: 14, GF: 37, GA: 44, GD: -7, Points: 32 },
+            { Rank: 13, Team: 'Montréal', MP: 34, Wins: 6, Draws: 10, Losses: 18, GF: 34, GA: 60, GD: -26, Points: 28 },
+            { Rank: 14, Team: 'Atlanta United', MP: 34, Wins: 5, Draws: 13, Losses: 16, GF: 38, GA: 63, GD: -25, Points: 28 },
+            { Rank: 15, Team: 'D.C. United', MP: 34, Wins: 5, Draws: 11, Losses: 18, GF: 30, GA: 66, GD: -36, Points: 26 }
+        ];
+
+        // Hardcoded Western Conference data
+        const westTeams = [
+            { Rank: 1, Team: 'San Diego FC', MP: 34, Wins: 19, Draws: 6, Losses: 9, GF: 64, GA: 41, GD: 23, Points: 63 },
+            { Rank: 2, Team: 'Vancouver', MP: 34, Wins: 18, Draws: 9, Losses: 7, GF: 66, GA: 38, GD: 28, Points: 63 },
+            { Rank: 3, Team: 'LAFC', MP: 34, Wins: 17, Draws: 9, Losses: 8, GF: 65, GA: 40, GD: 25, Points: 60 },
+            { Rank: 4, Team: 'Minnesota', MP: 34, Wins: 16, Draws: 10, Losses: 8, GF: 56, GA: 39, GD: 17, Points: 58 },
+            { Rank: 5, Team: 'Seattle Sounders', MP: 34, Wins: 15, Draws: 10, Losses: 9, GF: 58, GA: 48, GD: 10, Points: 55 },
+            { Rank: 6, Team: 'Austin', MP: 34, Wins: 13, Draws: 8, Losses: 13, GF: 37, GA: 45, GD: -8, Points: 47 },
+            { Rank: 7, Team: 'FC Dallas', MP: 34, Wins: 11, Draws: 11, Losses: 12, GF: 52, GA: 55, GD: -3, Points: 44 },
+            { Rank: 8, Team: 'Portland', MP: 34, Wins: 11, Draws: 11, Losses: 12, GF: 41, GA: 48, GD: -7, Points: 44 },
+            { Rank: 9, Team: 'Real Salt Lake', MP: 34, Wins: 12, Draws: 5, Losses: 17, GF: 38, GA: 49, GD: -11, Points: 41 },
+            { Rank: 10, Team: 'San Jose', MP: 34, Wins: 11, Draws: 8, Losses: 15, GF: 60, GA: 63, GD: -3, Points: 41 },
+            { Rank: 11, Team: 'Colorado', MP: 34, Wins: 11, Draws: 8, Losses: 15, GF: 44, GA: 56, GD: -12, Points: 41 },
+            { Rank: 12, Team: 'Houston Dynamo', MP: 34, Wins: 9, Draws: 10, Losses: 15, GF: 43, GA: 56, GD: -13, Points: 37 },
+            { Rank: 13, Team: 'St. Louis', MP: 34, Wins: 8, Draws: 8, Losses: 18, GF: 44, GA: 58, GD: -14, Points: 32 },
+            { Rank: 14, Team: 'LA Galaxy', MP: 34, Wins: 7, Draws: 9, Losses: 18, GF: 46, GA: 66, GD: -20, Points: 30 },
+            { Rank: 15, Team: 'Sporting KC', MP: 34, Wins: 7, Draws: 7, Losses: 20, GF: 46, GA: 70, GD: -24, Points: 28 }
+        ];
+
         let html = '<div class="standings-tabs">';
-        html += '<button class="tab-button active" onclick="showNBATab(\'east\')" id="nba-east-tab">Eastern Conference</button>';
-        html += '<button class="tab-button" onclick="showNBATab(\'west\')" id="nba-west-tab">Western Conference</button>';
+        html += '<button class="tab-button active" onclick="showMLSTab(\'east\')" id="mls-east-tab">Eastern Conference</button>';
+        html += '<button class="tab-button" onclick="showMLSTab(\'west\')" id="mls-west-tab">Western Conference</button>';
         html += '</div>';
-        html += '<div id="nba-east-content" class="tab-content active">';
-        html += createNBAConferenceStandings(eastTeams, 'Eastern Conference');
+        html += '<div id="mls-east-content" class="tab-content active">';
+        html += createMLSConferenceStandings(eastTeams, 'Eastern Conference');
         html += '</div>';
-        html += '<div id="nba-west-content" class="tab-content">';
-        html += createNBAConferenceStandings(westTeams, 'Western Conference');
+        html += '<div id="mls-west-content" class="tab-content">';
+        html += createMLSConferenceStandings(westTeams, 'Western Conference');
         html += '</div>';
-        
+
         return html;
     }
     
@@ -43447,13 +43482,45 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     function createMLSConferenceStandings(teams, conference) {
-        // Sort teams by rank (which is based on points)
-        teams.sort((a, b) => {
-            const rankA = parseInt(a.Rank) || 0;
-            const rankB = parseInt(b.Rank) || 0;
-            return rankA - rankB;
-        });
-        
+        // Use hardcoded MLS data for the Table to avoid dynamic overwrites
+        const hardcodedEast = [
+            { Rank: 1, Team: 'Philadelphia', MP: 34, Wins: 20, Draws: 6, Losses: 8, Points: 66 },
+            { Rank: 2, Team: 'Cincinnati', MP: 34, Wins: 20, Draws: 5, Losses: 9, Points: 65 },
+            { Rank: 3, Team: 'Inter Miami', MP: 34, Wins: 19, Draws: 8, Losses: 7, Points: 65 },
+            { Rank: 4, Team: 'Charlotte', MP: 34, Wins: 19, Draws: 2, Losses: 13, Points: 59 },
+            { Rank: 5, Team: 'New York City', MP: 34, Wins: 17, Draws: 5, Losses: 12, Points: 56 },
+            { Rank: 6, Team: 'Nashville', MP: 34, Wins: 16, Draws: 6, Losses: 12, Points: 54 },
+            { Rank: 7, Team: 'Columbus', MP: 34, Wins: 14, Draws: 12, Losses: 8, Points: 54 },
+            { Rank: 8, Team: 'Chicago', MP: 34, Wins: 15, Draws: 8, Losses: 11, Points: 53 },
+            { Rank: 9, Team: 'Orlando City', MP: 34, Wins: 14, Draws: 11, Losses: 9, Points: 53 },
+            { Rank: 10, Team: 'NY Red Bulls', MP: 34, Wins: 12, Draws: 7, Losses: 15, Points: 43 },
+            { Rank: 11, Team: 'New England', MP: 34, Wins: 9, Draws: 9, Losses: 16, Points: 36 },
+            { Rank: 12, Team: 'Toronto', MP: 34, Wins: 6, Draws: 14, Losses: 14, Points: 32 },
+            { Rank: 13, Team: 'Montréal', MP: 34, Wins: 6, Draws: 10, Losses: 18, Points: 28 },
+            { Rank: 14, Team: 'Atlanta United', MP: 34, Wins: 5, Draws: 13, Losses: 16, Points: 28 },
+            { Rank: 15, Team: 'D.C. United', MP: 34, Wins: 5, Draws: 11, Losses: 18, Points: 26 }
+        ];
+
+        const hardcodedWest = [
+            { Rank: 1, Team: 'San Diego FC', MP: 34, Wins: 19, Draws: 6, Losses: 9, Points: 63 },
+            { Rank: 2, Team: 'Vancouver', MP: 34, Wins: 18, Draws: 9, Losses: 7, Points: 63 },
+            { Rank: 3, Team: 'LAFC', MP: 34, Wins: 17, Draws: 9, Losses: 8, Points: 60 },
+            { Rank: 4, Team: 'Minnesota', MP: 34, Wins: 16, Draws: 10, Losses: 8, Points: 58 },
+            { Rank: 5, Team: 'Seattle Sounders', MP: 34, Wins: 15, Draws: 10, Losses: 9, Points: 55 },
+            { Rank: 6, Team: 'Austin', MP: 34, Wins: 13, Draws: 8, Losses: 13, Points: 47 },
+            { Rank: 7, Team: 'FC Dallas', MP: 34, Wins: 11, Draws: 11, Losses: 12, Points: 44 },
+            { Rank: 8, Team: 'Portland', MP: 34, Wins: 11, Draws: 11, Losses: 12, Points: 44 },
+            { Rank: 9, Team: 'Real Salt Lake', MP: 34, Wins: 12, Draws: 5, Losses: 17, Points: 41 },
+            { Rank: 10, Team: 'San Jose', MP: 34, Wins: 11, Draws: 8, Losses: 15, Points: 41 },
+            { Rank: 11, Team: 'Colorado', MP: 34, Wins: 11, Draws: 8, Losses: 15, Points: 41 },
+            { Rank: 12, Team: 'Houston Dynamo', MP: 34, Wins: 9, Draws: 10, Losses: 15, Points: 37 },
+            { Rank: 13, Team: 'St. Louis', MP: 34, Wins: 8, Draws: 8, Losses: 18, Points: 32 },
+            { Rank: 14, Team: 'LA Galaxy', MP: 34, Wins: 7, Draws: 9, Losses: 18, Points: 30 },
+            { Rank: 15, Team: 'Sporting KC', MP: 34, Wins: 7, Draws: 7, Losses: 20, Points: 28 }
+        ];
+
+        const useTeams = conference === 'Eastern Conference' ? hardcodedEast : hardcodedWest;
+
         let html = '<div class="conference-section">';
         html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
         html += '<thead>';
@@ -43468,8 +43535,8 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '</tr>';
         html += '</thead>';
         html += '<tbody>';
-        
-        teams.forEach((team, index) => {
+
+        useTeams.forEach((team, index) => {
             const rank = team.Rank || (index + 1);
             const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
             const displayTeamName = getTeamDisplayName(team.Team, 'MLS');
@@ -43483,7 +43550,7 @@ document.addEventListener('DOMContentLoaded', function () {
             html += '<td style="padding: 8px; text-align: center; font-size: 10px;">' + (team.Losses || 0) + '</td>';
             html += '</tr>';
         });
-        
+
         html += '</tbody></table></div>';
         return html;
     }
@@ -45456,8 +45523,8 @@ async function fetchFeaturedGames() {
             const statsMainTab = mainTabsContainer.querySelector('.main-tab[data-main-tab=\"stats\"]');
             
             if (standingsMainTab) {
-                const soccerLeagues = ['Soccer','PremierLeague','MLS','LaLiga','SerieA','Bundesliga','Ligue1','LigaMX','NWSL','UEFAChampionsLeague','UEFAEuropaLeague','UEFAConferenceLeague','EFLCup','CopaDelRey','DFBPokal','BelgianProLeague','Brasileirão','LigaPortugal','Eredivisie','CopaLibertadores','CopaSudamericana','CFL',"Women's UCL"];
-                if (leagueKey === 'FACup' || soccerLeagues.includes(leagueKey)) {
+                // Only hide the standings/tab for the generic Soccer page; keep it for league-specific soccer pages
+                if (leagueKey === 'Soccer') {
                     standingsMainTab.style.display = 'none';
                     if (standingsTabContentEl) {
                         standingsTabContentEl.style.display = 'none';
@@ -49392,18 +49459,20 @@ window.updateStandingsTabText = function(leagueName) {
     // Track & Field uses "WORLD LEADS"
     const worldLeadsLeagues = ['TrackAndField'];
     
-    if (soccerLeagues.includes(leagueName)) {
-        // Hide the standings/tab (TABLE) for Soccer pages per request
+    // Only hide the Table for the generic Soccer page; other soccer leagues should show TABLE
+    if (leagueName === 'Soccer') {
         standingsTab.style.display = 'none';
         const standingsContentEl = document.getElementById('standings-tab-content');
         if (standingsContentEl) standingsContentEl.style.display = 'none';
         return;
-    } else {
-        // Ensure the tab is visible for non-soccer leagues
-        standingsTab.style.display = '';
     }
 
-    if (rankingsLeagues.includes(leagueName)) {
+    // Ensure the tab is visible for all other leagues
+    standingsTab.style.display = '';
+
+    if (soccerLeagues.includes(leagueName)) {
+        standingsTab.innerText = 'TABLE';
+    } else if (rankingsLeagues.includes(leagueName)) {
         standingsTab.innerText = 'RANKINGS';
     } else if (worldLeadsLeagues.includes(leagueName)) {
         standingsTab.innerText = 'WORLD LEADS';
