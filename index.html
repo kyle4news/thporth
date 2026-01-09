@@ -2903,33 +2903,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           
           <!-- Standings Content Panes -->
           <div id="f1-driver-standings-content" class="f1-standings-content-pane" style="display: block; flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 150px;">
-            <div id="driver-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading driver standings...</div>
-            <div id="driver-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
-            <table id="driver-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
-              <thead>
-                <tr style="text-align: left;">
-                  <th style="padding: 6px 4px; width: 25px;">#</th>
-                  <th style="padding: 6px 4px;">Driver</th>
-                  <th style="padding: 6px 4px; text-align: right;">Pts</th>
+              <div id="driver-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading driver standings...</div>
+              <div id="driver-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
+              <table id="driver-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
+                <thead>
+                  <tr style="text-align: left;">
+                    <th style="padding: 6px 4px; width: 25px;">#</th>
+                    <th style="padding: 6px 4px;">Driver</th>
+                    <th style="padding: 6px 4px; text-align: right;">Pts</th>
                   <th style="padding: 6px 4px; text-align: center; padding-right: 9px;">Wins</th>
-                </tr>
-              </thead>
-              <tbody id="driver-tbody"></tbody>
-            </table>
-          </div>
+                  </tr>
+                </thead>
+                <tbody id="driver-tbody"></tbody>
+              </table>
+            </div>
           <div id="f1-constructor-standings-content" class="f1-standings-content-pane" style="display: none; flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 150px;">
-            <div id="constructor-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading constructor standings...</div>
-            <div id="constructor-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
-            <table id="constructor-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
-              <thead>
-                <tr style="text-align: left;">
-                  <th style="padding: 6px 4px; width: 25px;">#</th>
-                  <th style="padding: 6px 4px;">Constructor</th>
+              <div id="constructor-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading constructor standings...</div>
+              <div id="constructor-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
+              <table id="constructor-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
+                <thead>
+                  <tr style="text-align: left;">
+                    <th style="padding: 6px 4px; width: 25px;">#</th>
+                              <th style="padding: 6px 4px;">Constructor</th>
                   <th style="padding: 6px 4px; text-align: center; padding-right: 14px;">Pts</th>
-                </tr>
-              </thead>
-              <tbody id="constructor-tbody"></tbody>
-            </table>
+                  </tr>
+                </thead>
+                <tbody id="constructor-tbody"></tbody>
+              </table>
           </div>
       </div>
   </div>
@@ -5088,30 +5088,48 @@ function loadCustomRSSFeed(feedUrl, container) {
          */
         async function loadGameContent(gameId, contentType, container) {
             try {
-                // Ensure Firebase is initialized
-                if (!firebase.apps.length) {
-                    const firebaseConfig = {
-                        apiKey: "AIzaSyD3bw8d4q2oO2qpbgGiUG6Qnlf4aABK3Bc",
-                        authDomain: "flashlive-daily-scraper.firebaseapp.com",
-                        projectId: "flashlive-daily-scraper",
-                        storageBucket: "flashlive-daily-scraper.appspot.com",
-                        messagingSenderId: "124291936014",
-                        appId: "1:124291936014:web:acadcaa791d6046849315f"
-                    };
-                    firebase.initializeApp(firebaseConfig);
+                // 1. Try to get game data from cache (populated from today.json/yesterday.json)
+                let gameData = window.getGameDataFromCache ? window.getGameDataFromCache(gameId) : null;
+                
+                // 2. If not in cache, try fetching from today.json/yesterday.json as fallback
+                if (!gameData) {
+                    try {
+                        const { DateTime } = luxon;
+                        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+                        const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
+                        
+                        // Try today.json first
+                        const todayResponse = await fetch('https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json', { cache: 'no-store' });
+                        if (todayResponse.ok) {
+                            const todayData = await todayResponse.json();
+                            if (window.updateGameDataCache) {
+                                window.updateGameDataCache(todayData.games || []);
+                                gameData = window.getGameDataFromCache(gameId);
+                            }
+                        }
+                        
+                        // If still not found, try yesterday.json
+                        if (!gameData) {
+                            const yesterdayResponse = await fetch('https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json', { cache: 'no-store' });
+                            if (yesterdayResponse.ok) {
+                                const yesterdayData = await yesterdayResponse.json();
+                                if (window.updateGameDataCache) {
+                                    window.updateGameDataCache(yesterdayData.games || []);
+                                    gameData = window.getGameDataFromCache(gameId);
+                                }
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('[loadGameContent] Error fetching game from JSON fallback:', err);
+                    }
                 }
-                const db = firebase.firestore();
                 
-                // 1. Fetch game document to get teams and league
-                const gameDocRef = db.collection("artifacts/flashlive-daily-scraper/public/data/sportsGames").doc(gameId);
-                const gameDoc = await gameDocRef.get();
-                
-                if (!gameDoc.exists) {
-                    container.innerHTML = `<div style="padding: 20px; color: #ff6b6b;">Game not found: ${gameId}</div>`;
+                // 3. If still not found, show error (no Firestore fallback - this avoids per-click reads)
+                if (!gameData) {
+                    container.innerHTML = `<div style="padding: 20px; color: #ff6b6b;">Game not found: ${gameId}<br/><small>Game may have expired or not be available yet.</small></div>`;
                     return;
                 }
                 
-                const gameData = gameDoc.data();
                 const homeTeam = gameData['Home Team'] || '';
                 const awayTeam = gameData['Away Team'] || '';
                 const league = gameData['League'] || '';
@@ -8606,12 +8624,12 @@ function getTeamNameFromDriver(driver) {
 // Function to load driver standings from Firestore
 // Using hard-coded data for off-season
 async function loadDriverStandings() {
-        const loadingDiv = document.getElementById('driver-loading');
-        const errorDiv = document.getElementById('driver-error');
-        const table = document.getElementById('driver-table');
-        const tbody = document.getElementById('driver-tbody');
+    const loadingDiv = document.getElementById('driver-loading');
+    const errorDiv = document.getElementById('driver-error');
+    const table = document.getElementById('driver-table');
+    const tbody = document.getElementById('driver-tbody');
         
-        try {
+    try {
         loadingDiv.style.display = 'block';
         errorDiv.style.display = 'none';
         table.style.display = 'none';
@@ -37200,6 +37218,24 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
+    // --- GAME ID TO GAME DATA LOOKUP CACHE ---
+    // This cache is populated from today.json/yesterday.json to avoid per-click Firestore reads
+    window.gameDataCache = new Map(); // gameId -> gameData object
+    
+    window.updateGameDataCache = function(gamesArray) {
+        if (!Array.isArray(gamesArray)) return;
+        gamesArray.forEach(game => {
+            const gameId = game['Game ID'] || game.gameId || game.id;
+            if (gameId) {
+                window.gameDataCache.set(String(gameId), game);
+            }
+        });
+    };
+    
+    window.getGameDataFromCache = function(gameId) {
+        return window.gameDataCache.get(String(gameId)) || null;
+    };
+
 
     // --- PERIODIC REFRESH SYSTEM ---
     // Refresh data every 3 minutes instead of real-time listeners
@@ -37274,38 +37310,43 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error(`HTTP ${response.status}`);
             }
             
-            const jsonData = await response.json();
-            const allGames = jsonData.games || [];
-            
-            // Filter by gameDate first
-            let filteredGames = allGames.filter(game => {
-                return game.gameDate === gameDate || game.scheduledDate === gameDate;
-            });
-            
+                const jsonData = await response.json();
+                const allGames = jsonData.games || [];
+                
+                // Update game data cache with all games from JSON (for per-click lookups)
+                if (window.updateGameDataCache) {
+                    window.updateGameDataCache(allGames);
+                }
+                
+                // Filter by gameDate first
+                let filteredGames = allGames.filter(game => {
+                    return game.gameDate === gameDate || game.scheduledDate === gameDate;
+                });
+                
             const leagueIdLower = (leagueId || '').toLowerCase();
-            
+                
             // Try exact match first
-            let gamesData = filteredGames.filter(game => {
-                return game.League === leagueId;
-            });
+                let gamesData = filteredGames.filter(game => {
+                    return game.League === leagueId;
+                });
             
             // If no exact match, try case-insensitive search
-            if (gamesData.length === 0) {
+                if (gamesData.length === 0) {
                 console.log(`No exact match for leagueId: ${leagueId}, trying case-insensitive search...`);
-                gamesData = filteredGames.filter(game => {
+                    gamesData = filteredGames.filter(game => {
                     if (leagueIdLower.includes('formula one') || leagueIdLower.includes('formula 1') || leagueIdLower === 'formulaone') {
                         return isFormulaOneGame(game);
                     }
                     const gameLeague = (game.League || '').toLowerCase();
                     return gameLeague.includes(leagueIdLower) || leagueIdLower.includes(gameLeague);
-                });
+                    });
             }
             
-            // Filter Formula One games if needed
-            if (leagueIdLower.includes('formula one') || leagueIdLower.includes('formula 1') || leagueIdLower === 'formulaone') {
-                gamesData = gamesData.filter(isFormulaOneGame);
-            }
-            
+                // Filter Formula One games if needed
+        if (leagueIdLower.includes('formula one') || leagueIdLower.includes('formula 1') || leagueIdLower === 'formulaone') {
+                    gamesData = gamesData.filter(isFormulaOneGame);
+        }
+                
             cache.set(cacheKey, gamesData);
             return gamesData;
         } catch (error) {
@@ -44993,13 +45034,19 @@ async function fetchFeaturedGames() {
             }
             
             const jsonData = await response.json();
+            const allFeaturedGames = jsonData.games || [];
             
-            if (!jsonData.games || jsonData.games.length === 0) {
+            // Update game data cache with featured games (for per-click lookups)
+            if (window.updateGameDataCache) {
+                window.updateGameDataCache(allFeaturedGames);
+            }
+            
+            if (allFeaturedGames.length === 0) {
                 return [];
             }
             
             // Filter by date (featured.json should only have today, but filter anyway)
-            const featuredGamesForDate = jsonData.games.filter(game => {
+            const featuredGamesForDate = allFeaturedGames.filter(game => {
                 return game.gameDate === dateStr || game.scheduledDate === dateStr;
             });
             
@@ -45015,7 +45062,14 @@ async function fetchFeaturedGames() {
             }
             
             const liveGamesJsonData = await liveGamesResponse.json();
-            const allGamesFromJSON = (liveGamesJsonData.games || []).filter(game => {
+            const allLiveGamesFromJSON = liveGamesJsonData.games || [];
+            
+            // Update game data cache with all games from JSON (for per-click lookups)
+            if (window.updateGameDataCache) {
+                window.updateGameDataCache(allLiveGamesFromJSON);
+            }
+            
+            const allGamesFromJSON = allLiveGamesFromJSON.filter(game => {
                 return game.gameDate === dateStr || game.scheduledDate === dateStr;
             });
             
@@ -45077,18 +45131,18 @@ async function fetchFeaturedGames() {
                 liveFeaturedGames = allGamesFromJSON.filter(game => {
                     return nonMlbGameIds.includes(game['Game ID']);
                 }).map(gameData => {
-                    const featuredGame = nonMlbFeaturedGames.find(fg => fg['Game ID'] === gameData['Game ID']);
-                    // Add title, yesterdayTitle, order, and channel from Featured collection
-                    gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
-                    gameData.yesterdayTitle = gameIdToYesterdayTitleMap[gameData['Game ID']] || '';
-                    gameData.order = gameIdToOrderMap[gameData['Game ID']];
-                    // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
-                    if (featuredGame && (!gameData.channel && !gameData.Channel)) {
-                        gameData.channel = featuredGame.channel || featuredGame.Channel || '';
-                        gameData.Channel = featuredGame.channel || featuredGame.Channel || '';
-                    }
-                    return gameData;
-                });
+                        const featuredGame = nonMlbFeaturedGames.find(fg => fg['Game ID'] === gameData['Game ID']);
+                        // Add title, yesterdayTitle, order, and channel from Featured collection
+                        gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
+                        gameData.yesterdayTitle = gameIdToYesterdayTitleMap[gameData['Game ID']] || '';
+                        gameData.order = gameIdToOrderMap[gameData['Game ID']];
+                        // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
+                        if (featuredGame && (!gameData.channel && !gameData.Channel)) {
+                            gameData.channel = featuredGame.channel || featuredGame.Channel || '';
+                            gameData.Channel = featuredGame.channel || featuredGame.Channel || '';
+                        }
+                        return gameData;
+                    });
             }
             
             // Handle MLB games by fuzzy matching team names
@@ -45214,37 +45268,37 @@ async function fetchFeaturedGames() {
                     if (slate) {
                         const newActiveDate = slate.activeTodayDate;
                         const newHoldUntil = slate.holdUntil || null;
-                        
-                        // Only update if state changed (avoid infinite loops)
-                        if (newActiveDate !== activeTodayDate || newHoldUntil !== holdUntil) {
+                    
+                    // Only update if state changed (avoid infinite loops)
+                    if (newActiveDate !== activeTodayDate || newHoldUntil !== holdUntil) {
                             console.log('🔄 TODAY latch state updated from JSON:', newActiveDate);
-                            
-                            activeTodayDate = newActiveDate;
-                            holdUntil = newHoldUntil;
-                            
-                            // Clear existing timer
-                            if (holdTimer) {
-                                clearTimeout(holdTimer);
-                                holdTimer = null;
-                            }
-                            
-                            // Restore timer if hold is active
-                            if (holdUntil && Date.now() < holdUntil) {
-                                const delay = holdUntil - Date.now();
-                                holdTimer = setTimeout(() => {
-                                    advanceTodayDate();
-                                }, delay);
-                            } else if (holdUntil && Date.now() >= holdUntil) {
-                                // Hold expired, advance immediately
+                        
+                        activeTodayDate = newActiveDate;
+                        holdUntil = newHoldUntil;
+                        
+                        // Clear existing timer
+                        if (holdTimer) {
+                            clearTimeout(holdTimer);
+                            holdTimer = null;
+                        }
+                        
+                        // Restore timer if hold is active
+                        if (holdUntil && Date.now() < holdUntil) {
+                            const delay = holdUntil - Date.now();
+                            holdTimer = setTimeout(() => {
                                 advanceTodayDate();
-                            }
-                            
-                            // Reload games if date changed
-                            if (typeof fetchTodayGames === 'function') {
-                                fetchTodayGames(() => {});
-                            }
+                            }, delay);
+                        } else if (holdUntil && Date.now() >= holdUntil) {
+                            // Hold expired, advance immediately
+                            advanceTodayDate();
+                        }
+                        
+                        // Reload games if date changed
+                        if (typeof fetchTodayGames === 'function') {
+                            fetchTodayGames(() => {});
                         }
                     }
+                }
                 } catch (error) {
                     console.error('❌ Error polling TODAY latch state:', error);
                 }
@@ -45688,22 +45742,22 @@ async function fetchFeaturedGames() {
                 featuredGamesData = jsonData.games
                     .filter(game => game.gameDate === todayStr || game.scheduledDate === todayStr)
                     .map(data => {
-                        if (data.order !== undefined && data.order !== null) {
-                            data.order = Number(data.order);
-                        }
-                        // Ensure channel is preserved (sync channel and Channel fields)
-                        const channel = data.channel || data.Channel || '';
-                        if (channel) {
-                            data.channel = channel;
-                            data.Channel = channel;
-                        }
-                        return data;
+                    if (data.order !== undefined && data.order !== null) {
+                        data.order = Number(data.order);
+                    }
+                    // Ensure channel is preserved (sync channel and Channel fields)
+                    const channel = data.channel || data.Channel || '';
+                    if (channel) {
+                        data.channel = channel;
+                        data.Channel = channel;
+                    }
+                    return data;
                     })
                     .sort((a, b) => {
-                        const orderA = (a && a.order !== undefined) ? a.order : 999;
-                        const orderB = (b && b.order !== undefined) ? b.order : 999;
-                        return orderA - orderB;
-                    });
+                    const orderA = (a && a.order !== undefined) ? a.order : 999;
+                    const orderB = (b && b.order !== undefined) ? b.order : 999;
+                    return orderA - orderB;
+                });
                 
                 mergeFeaturedWithLive();
             } catch (err) {
@@ -45726,7 +45780,7 @@ async function fetchFeaturedGames() {
         };
         
         // Track unsubscribe
-        window.activeTodayUnsubscribes.push(featuredGamesUnsubscribe);
+              window.activeTodayUnsubscribes.push(featuredGamesUnsubscribe);
         
         // Fetch live games from JSON endpoint (replaces Firestore .onSnapshot listener)
         let liveGamesPollInterval = null;
@@ -45742,9 +45796,15 @@ async function fetchFeaturedGames() {
                 
                 const jsonData = await response.json();
                 const previousCount = liveGamesData.length;
+                const allGamesFromJSON = jsonData.games || [];
+                
+                // Update game data cache with all games from JSON (for per-click lookups)
+                if (window.updateGameDataCache) {
+                    window.updateGameDataCache(allGamesFromJSON);
+                }
                 
                 // Filter games by today's date
-                liveGamesData = (jsonData.games || []).filter(game => {
+                liveGamesData = allGamesFromJSON.filter(game => {
                     return game.gameDate === todayStr || game.scheduledDate === todayStr;
                 });
                 
@@ -45772,7 +45832,7 @@ async function fetchFeaturedGames() {
         };
         
         // Track unsubscribe
-        window.activeTodayUnsubscribes.push(liveGamesUnsubscribe);
+              window.activeTodayUnsubscribes.push(liveGamesUnsubscribe);
 
         function updateDisplay() {
             // CRITICAL: Check LIVE filter state directly AND activeTab variable
@@ -48007,9 +48067,9 @@ async function fetchFeaturedGames() {
             .then(jsonData => {
                 const upcomingGames = jsonData.games || jsonData.upcoming || [];
                 
-                const now = luxon.DateTime.now().toMillis();
-                let games = [];
-                
+            const now = luxon.DateTime.now().toMillis();
+            let games = [];
+        
                 // Process each upcoming game (same structure as before, but iterate over array directly)
                 upcomingGames.forEach((data, index) => {
             
