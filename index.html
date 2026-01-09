@@ -3836,7 +3836,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             <!-- Videos tabs (only shown for pages with two tabs) -->
             <div id="videos-tabs" style="display: none; height: 18px; background-color: #2a2a2a; position: sticky; top: 18px; z-index: 10;">
-          <div class="videos-tab active" data-tab="highlights">HIGHLIGHTS</div>
+                    <div class="videos-tab active" data-tab="highlights">PREVIEWS</div>
           <div class="videos-tab" data-tab="all-videos">ALL VIDEOS</div>
         </div>
 
@@ -45114,46 +45114,73 @@ async function fetchFeaturedGames() {
                 console.log('✨ Initialized TODAY latch state:', activeTodayDate);
             }
             
-            // Set up real-time listener for TODAY latch state (syncs across all users/devices)
-            todaySlateUnsubscribe = todaySlateRef.onSnapshot((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    const newActiveDate = data.activeTodayDate;
-                    const newHoldUntil = data.holdUntil || null;
+            // Poll TODAY latch state periodically using JSON endpoint (replaces .onSnapshot listener)
+            let todaySlatePollInterval = null;
+            
+            async function pollTodaySlate() {
+                try {
+                    const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today-slate.json';
+                    const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
                     
-                    // Only update if state changed (avoid infinite loops)
-                    if (newActiveDate !== activeTodayDate || newHoldUntil !== holdUntil) {
-                        console.log('🔄 TODAY latch state updated from Firestore:', newActiveDate);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    const jsonData = await response.json();
+                    const slate = jsonData.slate;
+                    
+                    if (slate) {
+                        const newActiveDate = slate.activeTodayDate;
+                        const newHoldUntil = slate.holdUntil || null;
                         
-                        activeTodayDate = newActiveDate;
-                        holdUntil = newHoldUntil;
-                        
-                        // Clear existing timer
-                        if (holdTimer) {
-                            clearTimeout(holdTimer);
-                            holdTimer = null;
-                        }
-                        
-                        // Restore timer if hold is active
-                        if (holdUntil && Date.now() < holdUntil) {
-                            const delay = holdUntil - Date.now();
-                            holdTimer = setTimeout(() => {
+                        // Only update if state changed (avoid infinite loops)
+                        if (newActiveDate !== activeTodayDate || newHoldUntil !== holdUntil) {
+                            console.log('🔄 TODAY latch state updated from JSON:', newActiveDate);
+                            
+                            activeTodayDate = newActiveDate;
+                            holdUntil = newHoldUntil;
+                            
+                            // Clear existing timer
+                            if (holdTimer) {
+                                clearTimeout(holdTimer);
+                                holdTimer = null;
+                            }
+                            
+                            // Restore timer if hold is active
+                            if (holdUntil && Date.now() < holdUntil) {
+                                const delay = holdUntil - Date.now();
+                                holdTimer = setTimeout(() => {
+                                    advanceTodayDate();
+                                }, delay);
+                            } else if (holdUntil && Date.now() >= holdUntil) {
+                                // Hold expired, advance immediately
                                 advanceTodayDate();
-                            }, delay);
-                        } else if (holdUntil && Date.now() >= holdUntil) {
-                            // Hold expired, advance immediately
-                            advanceTodayDate();
-                        }
-                        
-                        // Reload games if date changed
-                        if (typeof fetchTodayGames === 'function') {
-                            fetchTodayGames(() => {});
+                            }
+                            
+                            // Reload games if date changed
+                            if (typeof fetchTodayGames === 'function') {
+                                fetchTodayGames(() => {});
+                            }
                         }
                     }
+                } catch (error) {
+                    console.error('❌ Error polling TODAY latch state:', error);
                 }
-            }, (error) => {
-                console.error('❌ Error listening to TODAY latch state:', error);
-            });
+            }
+            
+            // Poll every 2 minutes (matches backend update frequency and game data polling)
+            todaySlatePollInterval = setInterval(pollTodaySlate, 120000);
+            
+            // Create unsubscribe function for todaySlate polling
+            todaySlateUnsubscribe = () => {
+                if (todaySlatePollInterval) {
+                    clearInterval(todaySlatePollInterval);
+                    todaySlatePollInterval = null;
+                }
+            };
+            
+            // Initial poll
+            pollTodaySlate();
             
         } catch (error) {
             console.error('❌ Error initializing TODAY latch state:', error);
@@ -45555,39 +45582,69 @@ async function fetchFeaturedGames() {
             updateDisplay();
         }
         
-        // Set up real-time listener for Featured games
-        const featuredRef = firebase.firestore().collection("artifacts/flashlive-daily-scraper/public/data/Featured");
-        const featuredGamesUnsubscribe = featuredRef.where('gameDate', '==', todayStr)
-            .onSnapshot(snapshot => {
-                if (snapshot.empty) {
+        // Fetch featured games periodically from JSON endpoint (replaces .onSnapshot listener)
+        let featuredGamesPollInterval = null;
+        
+        async function fetchFeaturedGamesFromJSON() {
+            try {
+                const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/featured.json';
+                const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const jsonData = await response.json();
+                
+                if (!jsonData.games || jsonData.games.length === 0) {
                     featuredGamesData = [];
                     mergeFeaturedWithLive();
                     return;
                 }
                 
-                featuredGamesData = snapshot.docs.map(doc => {
-                    const data = doc.data() || {};
-                    if (data.order !== undefined && data.order !== null) {
-                        data.order = Number(data.order);
-                    }
-                    // Ensure channel is preserved (sync channel and Channel fields)
-                    const channel = data.channel || data.Channel || '';
-                    if (channel) {
-                        data.channel = channel;
-                        data.Channel = channel;
-                    }
-                    return data;
-                }).sort((a, b) => {
-                    const orderA = (a && a.order !== undefined) ? a.order : 999;
-                    const orderB = (b && b.order !== undefined) ? b.order : 999;
-                    return orderA - orderB;
-                });
+                // Filter by today's date (in case endpoint returns multiple dates)
+                featuredGamesData = jsonData.games
+                    .filter(game => game.gameDate === todayStr || game.scheduledDate === todayStr)
+                    .map(data => {
+                        if (data.order !== undefined && data.order !== null) {
+                            data.order = Number(data.order);
+                        }
+                        // Ensure channel is preserved (sync channel and Channel fields)
+                        const channel = data.channel || data.Channel || '';
+                        if (channel) {
+                            data.channel = channel;
+                            data.Channel = channel;
+                        }
+                        return data;
+                    })
+                    .sort((a, b) => {
+                        const orderA = (a && a.order !== undefined) ? a.order : 999;
+                        const orderB = (b && b.order !== undefined) ? b.order : 999;
+                        return orderA - orderB;
+                    });
+                
                 mergeFeaturedWithLive();
-            }, err => { 
-                console.error("Error fetching featured games: ", err);
-            });
-              // track unsubscribe
-              window.activeTodayUnsubscribes.push(featuredGamesUnsubscribe);
+            } catch (err) {
+                console.error("Error fetching featured games from JSON: ", err);
+            }
+        }
+        
+        // Initial fetch
+        fetchFeaturedGamesFromJSON();
+        
+        // Poll every 2 minutes (matches backend update frequency and game data polling)
+        featuredGamesPollInterval = setInterval(fetchFeaturedGamesFromJSON, 120000);
+        
+        // Create unsubscribe function for featured games polling
+        const featuredGamesUnsubscribe = () => {
+            if (featuredGamesPollInterval) {
+                clearInterval(featuredGamesPollInterval);
+                featuredGamesPollInterval = null;
+            }
+        };
+        
+        // Track unsubscribe
+        window.activeTodayUnsubscribes.push(featuredGamesUnsubscribe);
         
         // Fetch live games from JSON endpoint (replaces Firestore .onSnapshot listener)
         let liveGamesPollInterval = null;
@@ -52361,7 +52418,7 @@ const VIDEOS_CONFIG = {
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
                 'NFL': {
-                    highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gmf9GXquXmWjML4mY428WSR.xml',
+                    highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gmGc6Uthg45BDyOXG4VnN1g.xml',
                         allVideos: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-nfl.xml'
                 },
         'MLB': {
@@ -52446,7 +52503,7 @@ function loadVideosWithTabs(section) {
         }
     } else if (section === 'NFL') {
         if (highlightsTab) {
-            highlightsTab.textContent = 'HIGHLIGHTS';
+            highlightsTab.textContent = 'PREVIEWS';
         }
         if (allVideosTab) {
             allVideosTab.textContent = 'ALL VIDEOS';
