@@ -8729,14 +8729,55 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     const scheduleContainer = document.getElementById('f1-schedule-container');
 
-    // Fetches F1 schedule data from Firestore.
-    // PAUSED: F1 is out of season - uncomment when F1 season resumes
+    // Fetches F1 schedule data - using hard-coded data for off-season
     async function fetchF1ScheduleData() {
         try {
-            // PAUSED: F1 is out of season - return early to prevent Firestore reads
+            // Hard-coded F1 schedule data
+            const scheduleData = [
+                { name: 'Australian Grand Prix', date: 'March 6-8' },
+                { name: 'Chinese Grand Prix', date: 'March 13-15' },
+                { name: 'Japanese Grand Prix', date: 'April 27-29' },
+                { name: 'Bahrain Grand Prix', date: 'April 10-12' },
+                { name: 'Saudi Arabian Grand Prix', date: 'April 17-19' },
+                { name: 'Miami Grand Prix', date: 'May 1-3' },
+                { name: 'Grand Prix Du Canada', date: 'May 22-24' },
+                { name: 'Grand Prix De Monaco', date: 'June 5-7' },
+                { name: 'Barcelona Grand Prix', date: 'June 12-14' },
+                { name: 'Cruises Austrian Grand Prix', date: 'June 26-28' },
+                { name: 'British Grand Prix', date: 'July 3-5' },
+                { name: 'Belgian Grand Prix', date: 'July 17-19' },
+                { name: 'Hungarian Grand Prix', date: 'July 24-26' },
+                { name: 'Dutch Grand Prix', date: 'August 21-23' },
+                { name: "Gran Premio D'Italia", date: 'September 4-6' },
+                { name: 'Tag Heuer Spanish Grand Prix', date: 'September 11-13' },
+                { name: 'Azerbaijan Grand Prix', date: 'September 25-27' },
+                { name: 'Singapore Grand Prix', date: 'October 9-11' },
+                { name: 'United States Grand Prix', date: 'October 23-25' },
+                { name: 'Gran Premio De La Ciudad De México', date: 'October 30 - November 1' },
+                { name: 'Grande Prêmio De São Paulo', date: 'November 6-8' },
+                { name: 'Las Vegas Grand Prix', date: 'November 19-21' },
+                { name: 'Qatar Grand Prix', date: 'November 27-29' },
+                { name: 'Abu Dhabi Grand Prix', date: 'December 4-6' }
+            ];
+            
+            // Render the schedule
             if (scheduleContainer) {
-                scheduleContainer.innerHTML = `<p style="color: #9ca3af;">F1 is currently out of season. Schedule will return when the season resumes.</p>`;
+                let html = '';
+                scheduleData.forEach((race, index) => {
+                    html += `
+                        <div style="padding: 8px 0;">
+                            <div style="font-weight: bold; color: #fff; margin-bottom: 4px; font-size: 0.75rem;">${race.name}</div>
+                            <div style="color: #9ca3af; font-weight: normal; font-size: 0.75rem;">${race.date}</div>
+                        </div>
+                    `;
+                    // Add separator line between races (not after the last one)
+                    if (index < scheduleData.length - 1) {
+                        html += `<div style="border-bottom: 1px solid #374151; margin: 8px 0;"></div>`;
+                    }
+                });
+                scheduleContainer.innerHTML = html;
             }
+            
             return [];
             
             // Ensure Firebase is initialized - try to use global db first, otherwise initialize Firebase
@@ -9018,8 +9059,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Main function to update the schedule
     async function updateSchedule() {
-        const events = await fetchF1ScheduleData();
-        renderF1Schedule(events);
+        // fetchF1ScheduleData now directly renders the hard-coded schedule
+        await fetchF1ScheduleData();
+        // Don't call renderF1Schedule since we're using hard-coded data
     }
     
     // Make updateSchedule available globally
@@ -47679,6 +47721,51 @@ async function fetchFeaturedGames() {
             defaultContent.style.display = 'block';
             // Clear any old content first
             defaultContent.innerHTML = '<p style="color: #9ca3af;">Loading upcoming schedule...</p>';
+        }
+        
+        // Special handling for IndyCar - hard-coded schedule with channel
+        if (normalizedLeagueKey === 'IndyCar' || leagueKey === 'IndyCar') {
+            const scheduleData = [
+                { date: 'March 1', time: 'Noon ET', race: 'Grand Prix of St. Petersburg', location: 'Streets Of St. Petersburg', channel: 'FOX' },
+                { date: 'March 7', time: '3:00 PM ET', race: 'Grand Prix of Phoenix', location: 'Phoenix Raceway', channel: 'FOX' },
+                { date: 'March 15', time: '12:30 PM ET', race: 'Grand Prix of Arlington', location: 'Streets Of Arlington', channel: 'FOX' },
+                { date: 'March 29', time: '1:00 PM ET', race: 'Grand Prix of Alabama', location: 'Barber Motorsports Park', channel: 'FOX' },
+                { date: 'April 19', time: '5:30 PM ET', race: 'Grand Prix of Long Beach', location: 'Streets Of Long Beach', channel: 'FOX' },
+                { date: 'May 9', time: '4:30 PM ET', race: 'Grand Prix of Indianapolis (Road Course)', location: 'Indianapolis Motor Speedway Road Course', channel: 'FOX' },
+                { date: 'May 24', time: 'Noon ET', race: 'Indianapolis 500', location: 'Indianapolis Motor Speedway', channel: 'FOX' },
+                { date: 'May 31', time: '12:30 PM ET', race: 'Grand Prix of Detroit', location: 'Streets Of Detroit', channel: 'FOX' },
+                { date: 'June 7', time: '9:00 PM ET', race: 'Grand Prix of Illinois', location: 'World Wide Technology Raceway', channel: 'FOX' },
+                { date: 'June 21', time: '2:00 PM ET', race: 'Grand Prix of Road America', location: 'Road America', channel: 'FOX' },
+                { date: 'July 5', time: '12:30 PM ET', race: 'Grand Prix of Mid-Ohio', location: 'Mid-Ohio Sports Car Course', channel: 'FOX' },
+                { date: 'July 19', time: 'TBD', race: 'Grand Prix of Nashville', location: 'Nashville Superspeedway', channel: 'FOX' },
+                { date: 'August 9', time: '4:00 PM ET', race: 'Grand Prix of Portland', location: 'Portland International Raceway', channel: 'FOX' },
+                { date: 'August 16', time: 'Noon ET', race: 'Grand Prix of Ontario', location: 'Streets Of Markham', channel: 'FOX' },
+                { date: 'August 29', time: '2:30 PM ET', race: 'Grand Prix of Milwaukee Race 1', location: 'The Milwaukee Mile', channel: 'FOX' },
+                { date: 'August 30', time: '1:00 PM ET', race: 'Grand Prix of Milwaukee Race 2', location: 'The Milwaukee Mile', channel: 'FOX' },
+                { date: 'September 6', time: '2:30 PM ET', race: 'Grand Prix of Monterey', location: 'Weathertech Raceway Laguna Seca', channel: 'FOX' }
+            ];
+            
+            if (defaultContent) {
+                let html = '';
+                scheduleData.forEach((race, index) => {
+                    html += `
+                        <div style="padding: 8px 0;">
+                            <div style="font-weight: bold; color: #fff; margin-bottom: 4px; font-size: 0.75rem;">${race.race}</div>
+                            <div style="color: #9ca3af; font-weight: normal; font-size: 0.75rem; display: flex; gap: 12px;">
+                                <span>${race.date}</span>
+                                <span>${race.time}</span>
+                                <span>${race.channel}</span>
+                            </div>
+                        </div>
+                    `;
+                    // Add separator line between races (not after the last one)
+                    if (index < scheduleData.length - 1) {
+                        html += `<div style="border-bottom: 1px solid #374151; margin: 8px 0;"></div>`;
+                    }
+                });
+                defaultContent.innerHTML = html;
+            }
+            return;
         }
 
         // Helper function to extract mascot name only (used by both hardcoded and Firestore schedules)
