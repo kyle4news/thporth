@@ -50934,22 +50934,18 @@ function getTop25DisplayName(teamName, leagueKey) {
 // Load Top 25 rankings into cache (keyed by display name)
 async function loadTop25RankingsCache(leagueKey) {
     try {
-        const collectionMap = {
-            'NCAAF': 'NCAAFStandings',
-            'NCAAM': 'NCAAMStandings',
-            'NCAAW': 'NCAAWStandings'
-        };
+        // Fetch from JSON endpoint instead of Firestore
+        const JSON_ENDPOINT = `https://flashlive-scraper-124291936014.us-central1.run.app/data/top25/${leagueKey}.json`;
+        const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
         
-        const collectionName = collectionMap[leagueKey];
-        if (!collectionName) {
-            console.warn(`No collection mapping for league key: ${leagueKey}`);
-            return;
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
         
-        // Get all documents and filter for Top 25 teams client-side
-        const snapshot = await db.collection(collectionName).get();
+        const jsonData = await response.json();
+        const teams = jsonData.teams || [];
         
-        if (snapshot.empty) {
+        if (teams.length === 0) {
             top25RankingsCache[leagueKey] = {};
             return;
         }
@@ -50966,13 +50962,12 @@ async function loadTop25RankingsCache(leagueKey) {
             ncaaToEspnMap[ncaaName] = espnName;
         }
         
-        snapshot.docs.forEach(doc => {
-            const teamData = doc.data();
+        teams.forEach(teamData => {
             if (teamData.Top25Rank !== null && teamData.Top25Rank !== undefined && teamData.Team) {
                 const ncaaTeamName = teamData.Team; // e.g., "Duke" or "Michigan St" or "Michigan State"
                 const rank = parseInt(teamData.Top25Rank) || null;
                 
-                // Store NCAA name from Firestore: "Michigan St" or "Michigan State"
+                // Store NCAA name from JSON: "Michigan St" or "Michigan State"
                     rankingsMap[ncaaTeamName] = rank;
                     
                 // Find the ESPN name for this NCAA name (reverse lookup)
@@ -51043,7 +51038,7 @@ async function loadTop25RankingsCache(leagueKey) {
         });
         
         top25RankingsCache[leagueKey] = rankingsMap;
-        console.log(`✅ Loaded Top 25 rankings for ${leagueKey}`);
+        console.log(`✅ Loaded Top 25 rankings for ${leagueKey} from JSON`);
     } catch (error) {
         console.error(`Error loading Top 25 rankings cache for ${leagueKey}:`, error);
         top25RankingsCache[leagueKey] = {};
@@ -51064,9 +51059,18 @@ function getTop25Rank(displayName, leagueKey) {
 // Load CFP rankings into cache (keyed by ESPN display name)
 async function loadCFPRankingsCache() {
     try {
-        const snapshot = await db.collection('CFP').get();
+        // Fetch from JSON endpoint instead of Firestore
+        const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/cfp-standings.json';
+        const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
         
-        if (snapshot.empty) {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const jsonData = await response.json();
+        const standings = jsonData.standings || [];
+        
+        if (standings.length === 0) {
             cfpRankingsCache = {};
             return;
         }
@@ -51086,8 +51090,7 @@ async function loadCFPRankingsCache() {
                            'Demon Deacons', 'Yellow Jackets', 'Commodores', 'Razorbacks',
                            'Mountaineers', 'Aggies', 'Gamecocks', 'Seminoles', 'Gators', 'Tide'];
         
-        snapshot.docs.forEach(doc => {
-            const teamData = doc.data();
+        standings.forEach(teamData => {
             if (teamData.Rk !== null && teamData.Rk !== undefined && teamData.Team) {
                 const ncaaTeamName = teamData.Team; // e.g., "Alabama"
                 const rank = parseInt(teamData.Rk) || null;
@@ -51121,7 +51124,7 @@ async function loadCFPRankingsCache() {
         });
         
         cfpRankingsCache = rankingsMap;
-        console.log(`✅ Loaded CFP rankings`);
+        console.log(`✅ Loaded CFP rankings from JSON`);
     } catch (error) {
         console.error(`Error loading CFP rankings cache:`, error);
         cfpRankingsCache = {};
@@ -51291,23 +51294,18 @@ async function loadTop25Data(leagueKey) {
             return;
         }
         
-        const collectionMap = {
-            'NCAAF': 'NCAAFStandings',
-            'NCAAM': 'NCAAMStandings',
-            'NCAAW': 'NCAAWStandings'
-        };
+        // Fetch from JSON endpoint instead of Firestore
+        const JSON_ENDPOINT = `https://flashlive-scraper-124291936014.us-central1.run.app/data/top25/${leagueKey}.json`;
+        const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
         
-        const collectionName = collectionMap[leagueKey];
-        if (!collectionName) {
-            top25Content.innerHTML = '<p style="color: #ef4444;">Invalid league key.</p>';
-            return;
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
         
-        // Get all documents and filter for Top 25 teams client-side
-        // Firestore doesn't support != null queries well
-        const snapshot = await db.collection(collectionName).get();
+        const jsonData = await response.json();
+        const allTeams = jsonData.teams || [];
         
-        if (snapshot.empty) {
+        if (allTeams.length === 0) {
             top25Content.innerHTML = '<p style="color: #9ca3af;">No Top 25 rankings available.</p>';
             return;
         }
@@ -51315,8 +51313,7 @@ async function loadTop25Data(leagueKey) {
         // Filter for teams with Top25Rank and sort by rank
         const teamsMap = new Map(); // Use Map to deduplicate by team name and rank
         
-        snapshot.docs.forEach(doc => {
-            const team = doc.data();
+        allTeams.forEach(team => {
             if (team.Top25Rank === null || team.Top25Rank === undefined) return;
             
             // Get display name for team
@@ -51468,27 +51465,28 @@ async function loadCFPData() {
     cfpContent.innerHTML = '<p style="color: #9ca3af;">Loading CFP rankings...</p>';
     
     try {
-        // Get all documents from CFP collection
-        const snapshot = await db.collection('CFP').get();
+        // Fetch from JSON endpoint instead of Firestore
+        const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/cfp-standings.json';
+        const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
         
-        if (snapshot.empty) {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const jsonData = await response.json();
+        const standings = jsonData.standings || [];
+        
+        if (standings.length === 0) {
             cfpContent.innerHTML = '<p style="color: #9ca3af;">No CFP rankings available.</p>';
             return;
         }
         
-        // Convert to array and sort by Rk
-        const rankings = snapshot.docs
-            .map(doc => doc.data())
-            .sort((a, b) => {
-                const rankA = parseInt(a.Rk) || 999;
-                const rankB = parseInt(b.Rk) || 999;
-                return rankA - rankB;
-            });
-        
-        if (rankings.length === 0) {
-            cfpContent.innerHTML = '<p style="color: #9ca3af;">No CFP rankings available.</p>';
-            return;
-        }
+        // Sort by Rk
+        const rankings = standings.sort((a, b) => {
+            const rankA = parseInt(a.Rk) || 999;
+            const rankB = parseInt(b.Rk) || 999;
+            return rankA - rankB;
+        });
         
         const html = createCFPTable(rankings);
         cfpContent.innerHTML = html;
