@@ -44905,35 +44905,51 @@ async function fetchFeaturedGames() {
 }
     async function fetchFeaturedGamesForDate(dateStr) {
         try {
-            const db = firebase.firestore();
-            const featuredRef = db.collection("artifacts/flashlive-daily-scraper/public/data/Featured");
-            
-            // Query only featured games for the specific date
-            const snapshot = await featuredRef.where('gameDate', '==', dateStr).get();
-            
-            if (snapshot.empty) {
-                return [];
-            }
-            
-            const featuredGamesForDate = snapshot.docs.map(doc => doc.data());
-            
-            // Now fetch the LIVE data from JSON endpoint instead of Firestore
             const { DateTime } = luxon;
             const todayStr = DateTime.now().setZone('America/New_York').toISODate();
             const isToday = dateStr === todayStr;
             
-            // Use today.json for today, yesterday.json for yesterday
-            const JSON_ENDPOINT = isToday 
-                ? 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json'
-                : 'https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json';
+            // Use featured.json endpoint (currently only serves today's games)
+            // For yesterday, we'll need to handle differently or use a fallback
+            if (!isToday) {
+                // For non-today dates, return empty array (featured.json only has today)
+                // TODO: Add yesterday-featured.json endpoint if needed
+                console.log(`⚠️ Featured games for ${dateStr} not available via JSON endpoint (only today supported)`);
+                return [];
+            }
             
+            // Fetch from JSON endpoint
+            const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/featured.json';
             const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+            
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             
             const jsonData = await response.json();
-            const allGamesFromJSON = (jsonData.games || []).filter(game => {
+            
+            if (!jsonData.games || jsonData.games.length === 0) {
+                return [];
+            }
+            
+            // Filter by date (featured.json should only have today, but filter anyway)
+            const featuredGamesForDate = jsonData.games.filter(game => {
+                return game.gameDate === dateStr || game.scheduledDate === dateStr;
+            });
+            
+            // Now fetch the LIVE data from JSON endpoint instead of Firestore
+            // Use today.json for today, yesterday.json for yesterday
+            const liveGamesJSON_ENDPOINT = isToday 
+                ? 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json'
+                : 'https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json';
+            
+            const liveGamesResponse = await fetch(liveGamesJSON_ENDPOINT, { cache: 'no-store' });
+            if (!liveGamesResponse.ok) {
+                throw new Error(`HTTP ${liveGamesResponse.status}`);
+            }
+            
+            const liveGamesJsonData = await liveGamesResponse.json();
+            const allGamesFromJSON = (liveGamesJsonData.games || []).filter(game => {
                 return game.gameDate === dateStr || game.scheduledDate === dateStr;
             });
             
