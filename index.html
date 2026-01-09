@@ -1008,15 +1008,34 @@ table.game-table .game-row.game-separator.selected .team-cell,
     overflow-x: hidden !important;
   }
   
+  /* When F1 content is shown, prevent parent column from scrolling */
+  #league-specific-column.f1-active {
+    overflow: hidden !important;
+  }
+  
   #f1-column-content {
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow: hidden !important;
+    min-height: 0;
   }
   
   #f1-column-content > div[style*="overflow-y"] {
     overflow-y: auto !important;
+  }
+  
+  .f1-main-tab-content {
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .f1-main-tab-content > div[style*="overflow-y"] {
+    overflow-y: auto !important;
+    flex: 1;
+    min-height: 0;
   }
 
   /* ────────────────────────────────────────────────────────── */
@@ -2837,7 +2856,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     </div>
 
-  <div id="f1-column-content" style="display: none; height: 100%; flex-direction: column; background-color: #1f1f1f; color: #ffffff;">
+  <div id="f1-column-content" style="display: none; height: 100%; min-height: 0; overflow: hidden; flex-direction: column; background-color: #1f1f1f; color: #ffffff;">
       <!-- League Header -->
       <div id="f1-league-header" style="position: sticky; top: 0; width: 100%; height: 18px; background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif; font-size: 10px; display: flex; align-items: center; padding-left: 10px; z-index: 11; border-bottom: 1px solid #1f1f1f; font-weight: bold;">
           Formula One
@@ -2875,7 +2894,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
   
       <!-- Standings Tab Content (active by default) -->
-      <div id="f1-standings-tab-content" class="f1-main-tab-content" style="display: block; height: calc(100% - 36px); flex-direction: column;">
+      <div id="f1-standings-tab-content" class="f1-main-tab-content" style="display: flex; flex-direction: column; height: calc(100% - 36px); min-height: 0; overflow: hidden;">
           <!-- Standings Sub-Tabs (Driver, Constructor) -->
           <div id="f1-standings-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; margin-top: 2px; margin-bottom: 1px; overflow: hidden; flex-shrink: 0; width: 100%; gap: 2px;">
               <div class="f1-standings-tab active" data-f1-standings-tab="driver" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #fff; border-bottom: 2px solid #fff;">Driver</div>
@@ -2883,37 +2902,34 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
           
           <!-- Standings Content Panes -->
-          <div style="flex: 1; overflow-y: auto; padding: 0.5rem;">
-              <div id="f1-driver-standings-content" class="f1-standings-content-pane">
-              <div id="driver-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading driver standings...</div>
-              <div id="driver-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
-              <table id="driver-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
-                <thead>
-                  <tr style="text-align: left;">
-                    <th style="padding: 6px 4px; width: 25px;">#</th>
-                    <th style="padding: 6px 4px;">Driver</th>
-                    <th style="padding: 6px 4px; text-align: right;">Pts</th>
-                              <th style="padding: 6px 4px; text-align: right;">Wins</th>
-                  </tr>
-                </thead>
-                <tbody id="driver-tbody"></tbody>
-              </table>
-            </div>
-              <div id="f1-constructor-standings-content" class="f1-standings-content-pane" style="display: none;">
-              <div id="constructor-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading constructor standings...</div>
-              <div id="constructor-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
-              <table id="constructor-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
-                <thead>
-                  <tr style="text-align: left;">
-                    <th style="padding: 6px 4px; width: 25px;">#</th>
-                              <th style="padding: 6px 4px;">Constructor</th>
-                    <th style="padding: 6px 4px; text-align: right;">Pts</th>
-                              <th style="padding: 6px 4px; text-align: right;">Wins</th>
-                  </tr>
-                </thead>
-                <tbody id="constructor-tbody"></tbody>
-              </table>
-            </div>
+          <div id="f1-driver-standings-content" class="f1-standings-content-pane" style="display: block; flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 150px;">
+            <div id="driver-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading driver standings...</div>
+            <div id="driver-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
+            <table id="driver-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
+              <thead>
+                <tr style="text-align: left;">
+                  <th style="padding: 6px 4px; width: 25px;">#</th>
+                  <th style="padding: 6px 4px;">Driver</th>
+                  <th style="padding: 6px 4px; text-align: right;">Pts</th>
+                  <th style="padding: 6px 4px; text-align: center; padding-right: 9px;">Wins</th>
+                </tr>
+              </thead>
+              <tbody id="driver-tbody"></tbody>
+            </table>
+          </div>
+          <div id="f1-constructor-standings-content" class="f1-standings-content-pane" style="display: none; flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 150px;">
+            <div id="constructor-loading" style="text-align: center; padding: 20px; color: #9ca3af;">Loading constructor standings...</div>
+            <div id="constructor-error" style="display: none; color: #ef4444; text-align: center; padding: 20px;"></div>
+            <table id="constructor-table" style="width: 100%; border-collapse: collapse; font-size: 11px; display: none;">
+              <thead>
+                <tr style="text-align: left;">
+                  <th style="padding: 6px 4px; width: 25px;">#</th>
+                  <th style="padding: 6px 4px;">Constructor</th>
+                  <th style="padding: 6px 4px; text-align: center; padding-right: 14px;">Pts</th>
+                </tr>
+              </thead>
+              <tbody id="constructor-tbody"></tbody>
+            </table>
           </div>
       </div>
   </div>
@@ -7775,6 +7791,10 @@ function loadCustomRSSFeed(feedUrl, container) {
                     leagueSpecificColumn.style.display = 'none';
                     gamesContent.style.display = 'flex';
                     f1Content.style.display = 'none';
+                    // Re-enable parent column scrolling when returning to Home
+                    if (leagueSpecificColumn) {
+                        leagueSpecificColumn.classList.remove('f1-active');
+                    }
 
                     // Ensure TODAY tab reloads (and resets Live filter) when returning to Home
                   // Unsubscribe any existing TODAY listeners to avoid stale state
@@ -7837,10 +7857,18 @@ function loadCustomRSSFeed(feedUrl, container) {
                     leagueSpecificColumn.style.display = 'none';
                     f1Content.style.display = 'flex';
                     gamesContent.style.display = 'none';
+                    // Disable parent column scrolling so F1 content can scroll independently
+                    if (leagueSpecificColumn) {
+                        leagueSpecificColumn.classList.add('f1-active');
+                    }
                 } else {
                     gamesColumn.style.display = 'none';
                     leagueSpecificColumn.style.display = 'block';
                     f1Content.style.display = 'none';
+                    // Re-enable parent column scrolling for other leagues
+                    if (leagueSpecificColumn) {
+                        leagueSpecificColumn.classList.remove('f1-active');
+                    }
                     loadLeagueSpecificData(section);
                     
                     // Update the standings tab text based on the league
@@ -8576,47 +8604,42 @@ function getTeamNameFromDriver(driver) {
 }
 
 // Function to load driver standings from Firestore
+// Using hard-coded data for off-season
 async function loadDriverStandings() {
-    const loadingDiv = document.getElementById('driver-loading');
-    const errorDiv = document.getElementById('driver-error');
-    const table = document.getElementById('driver-table');
-    const tbody = document.getElementById('driver-tbody');
-    try {
+        const loadingDiv = document.getElementById('driver-loading');
+        const errorDiv = document.getElementById('driver-error');
+        const table = document.getElementById('driver-table');
+        const tbody = document.getElementById('driver-tbody');
+        
+        try {
         loadingDiv.style.display = 'block';
         errorDiv.style.display = 'none';
         table.style.display = 'none';
         
-        // Get Firestore db instance
-        let firestoreDb;
-        if (typeof db !== 'undefined' && db) {
-            firestoreDb = db;
-        } else if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firestoreDb = firebase.firestore();
-        } else {
-            throw new Error('Firestore database not initialized');
-        }
-        
-        // Fetch from Firestore
-        const snapshot = await firestoreDb.collection('F1DriverStandings').get();
-        
-        if (snapshot.empty) {
-            throw new Error('No driver standings found in Firestore');
-        }
-        
-        const drivers = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            drivers.push({
-                Rank: data.Rank || 0,
-                Driver: data.Driver || '',
-                Points: data.Points || '0',
-                Wins: data.Wins || '0',
-                Team: data.Team || '' // We need to add team to scraper or get from API
-            });
-        });
-        
-        // Sort by rank
-        drivers.sort((a, b) => parseInt(a.Rank) - parseInt(b.Rank));
+        // Hard-coded F1 Driver Standings (off-season data)
+        const drivers = [
+            { Rank: 1, Driver: 'L. Norris', Team: 'McLaren', Points: '423', Wins: '7' },
+            { Rank: 2, Driver: 'M. Verstappen', Team: 'Red Bull', Points: '421', Wins: '8' },
+            { Rank: 3, Driver: 'O. Piastri', Team: 'McLaren', Points: '410', Wins: '7' },
+            { Rank: 4, Driver: 'G. Russell', Team: 'Mercedes', Points: '319', Wins: '2' },
+            { Rank: 5, Driver: 'C. Leclerc', Team: 'Ferrari', Points: '242', Wins: '0' },
+            { Rank: 6, Driver: 'L. Hamilton', Team: 'Ferrari', Points: '156', Wins: '0' },
+            { Rank: 7, Driver: 'A.K. Antonelli', Team: 'Mercedes', Points: '150', Wins: '0' },
+            { Rank: 8, Driver: 'A. Albon', Team: 'Williams', Points: '73', Wins: '0' },
+            { Rank: 9, Driver: 'C. Sainz Jr.', Team: 'Williams', Points: '64', Wins: '0' },
+            { Rank: 10, Driver: 'F. Alonso', Team: 'Aston Martin', Points: '56', Wins: '0' },
+            { Rank: 11, Driver: 'N. Hülkenberg', Team: 'Sauber', Points: '51', Wins: '0' },
+            { Rank: 12, Driver: 'I. Hadjar', Team: 'RB', Points: '51', Wins: '0' },
+            { Rank: 13, Driver: 'O. Bearman', Team: 'Haas', Points: '41', Wins: '0' },
+            { Rank: 14, Driver: 'L. Lawson', Team: 'RB', Points: '38', Wins: '0' },
+            { Rank: 15, Driver: 'E. Ocon', Team: 'Haas', Points: '38', Wins: '0' },
+            { Rank: 16, Driver: 'L. Stroll', Team: 'Aston Martin', Points: '33', Wins: '0' },
+            { Rank: 17, Driver: 'Y. Tsunoda', Team: 'Red Bull', Points: '33', Wins: '0' },
+            { Rank: 18, Driver: 'P. Gasly', Team: 'Alpine', Points: '22', Wins: '0' },
+            { Rank: 19, Driver: 'G. Bortoleto', Team: 'Sauber', Points: '19', Wins: '0' },
+            { Rank: 20, Driver: 'F. Colapinto', Team: 'Alpine', Points: '0', Wins: '0' },
+            { Rank: 21, Driver: 'J. Doohan', Team: 'Alpine', Points: '0', Wins: '0' }
+        ];
         
         tbody.innerHTML = '';
         drivers.forEach(driver => {
@@ -8632,7 +8655,7 @@ async function loadDriverStandings() {
                     ${teamName ? `<div style="color: #9ca3af; font-size: 10px; margin-top: 2px;">${teamName}</div>` : ''}
                 </td>
                 <td style="padding: 6px 4px; text-align: right; font-weight: bold;">${driver.Points}</td>
-                <td style="padding: 6px 4px; text-align: right;">${driver.Wins}</td>
+                <td style="padding: 6px 4px; text-align: center; padding-right: 9px;">${driver.Wins}</td>
                 `;
                 tbody.appendChild(tr);
         });
@@ -8648,6 +8671,7 @@ async function loadDriverStandings() {
 }
 
 // Function to load constructor standings from Firestore
+// Using hard-coded data for off-season
 async function loadConstructorStandings() {
     const loadingDiv = document.getElementById('constructor-loading');
     const errorDiv = document.getElementById('constructor-error');
@@ -8658,36 +8682,19 @@ async function loadConstructorStandings() {
         errorDiv.style.display = 'none';
         table.style.display = 'none';
         
-        // Get Firestore db instance
-        let firestoreDb;
-        if (typeof db !== 'undefined' && db) {
-            firestoreDb = db;
-        } else if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firestoreDb = firebase.firestore();
-        } else {
-            throw new Error('Firestore database not initialized');
-        }
-        
-        // Fetch from Firestore
-        const snapshot = await firestoreDb.collection('F1ConstructorStandings').get();
-        
-        if (snapshot.empty) {
-            throw new Error('No constructor standings found in Firestore');
-        }
-        
-        const constructors = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            constructors.push({
-                Rank: data.Rank || 0,
-                Constructor: data.Constructor || '',
-                Points: data.Points || '0',
-                Wins: data.Wins || '0'
-            });
-        });
-        
-        // Sort by rank
-        constructors.sort((a, b) => parseInt(a.Rank) - parseInt(b.Rank));
+        // Hard-coded F1 Constructor Standings (off-season data)
+        const constructors = [
+            { Rank: 1, Constructor: 'McLaren', Points: '833', Wins: '0' },
+            { Rank: 2, Constructor: 'Mercedes', Points: '469', Wins: '0' },
+            { Rank: 3, Constructor: 'Red Bull Racing', Points: '451', Wins: '0' },
+            { Rank: 4, Constructor: 'Ferrari', Points: '398', Wins: '0' },
+            { Rank: 5, Constructor: 'Williams', Points: '137', Wins: '0' },
+            { Rank: 6, Constructor: 'Racing Bulls', Points: '92', Wins: '0' },
+            { Rank: 7, Constructor: 'Aston Martin', Points: '89', Wins: '0' },
+            { Rank: 8, Constructor: 'Haas F1 Team', Points: '79', Wins: '0' },
+            { Rank: 9, Constructor: 'Kick Sauber', Points: '70', Wins: '0' },
+            { Rank: 10, Constructor: 'Alpine', Points: '22', Wins: '0' }
+        ];
         
         tbody.innerHTML = '';
         constructors.forEach(constructor => {
@@ -8697,8 +8704,7 @@ async function loadConstructorStandings() {
                 tr.innerHTML = `
                 <td style="padding: 6px 4px;">${constructor.Rank}</td>
                 <td style="padding: 6px 4px;">${constructor.Constructor}</td>
-                <td style="padding: 6px 4px; text-align: right; font-weight: bold;">${constructor.Points}</td>
-                <td style="padding: 6px 4px; text-align: right;">${constructor.Wins}</td>
+                <td style="padding: 6px 4px; text-align: center; font-weight: bold; padding-right: 14px;">${constructor.Points}</td>
                 `;
                 tbody.appendChild(tr);
         });
@@ -8724,8 +8730,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const scheduleContainer = document.getElementById('f1-schedule-container');
 
     // Fetches F1 schedule data from Firestore.
+    // PAUSED: F1 is out of season - uncomment when F1 season resumes
     async function fetchF1ScheduleData() {
         try {
+            // PAUSED: F1 is out of season - return early to prevent Firestore reads
+            if (scheduleContainer) {
+                scheduleContainer.innerHTML = `<p style="color: #9ca3af;">F1 is currently out of season. Schedule will return when the season resumes.</p>`;
+            }
+            return [];
+            
             // Ensure Firebase is initialized - try to use global db first, otherwise initialize Firebase
             let firestoreDb = typeof db !== 'undefined' ? db : null;
             if (!firestoreDb && typeof firebase !== 'undefined') {
