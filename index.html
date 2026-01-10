@@ -44027,17 +44027,18 @@ document.addEventListener('DOMContentLoaded', function () {
             if (divisionTeams.length === 0) return;
             
             // Sort teams by wins (descending), then by losses (ascending), then by ties (descending)
+            // Support both W/L/T and Wins/Losses/Ties formats
             divisionTeams.sort((a, b) => {
-                const winsA = parseInt(a.Wins) || 0;
-                const winsB = parseInt(b.Wins) || 0;
+                const winsA = parseInt(a.Wins || a.W) || 0;
+                const winsB = parseInt(b.Wins || b.W) || 0;
                 if (winsA !== winsB) return winsB - winsA; // Higher wins first
                 
-                const lossesA = parseInt(a.Losses) || 0;
-                const lossesB = parseInt(b.Losses) || 0;
+                const lossesA = parseInt(a.Losses || a.L) || 0;
+                const lossesB = parseInt(b.Losses || b.L) || 0;
                 if (lossesA !== lossesB) return lossesA - lossesB; // Lower losses first
                 
-                const tiesA = parseInt(a.Ties) || 0;
-                const tiesB = parseInt(b.Ties) || 0;
+                const tiesA = parseInt(a.Ties || a.T) || 0;
+                const tiesB = parseInt(b.Ties || b.T) || 0;
                 return tiesB - tiesA; // Higher ties first
             });
             
@@ -44057,11 +44058,15 @@ document.addEventListener('DOMContentLoaded', function () {
             divisionTeams.forEach((team, index) => {
                 const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
             const displayName = getMascotName(team.Team);
+                // Support both W/L/T and Wins/Losses/Ties formats
+                const wins = team.Wins !== undefined ? team.Wins : (team.W !== undefined ? team.W : 0);
+                const losses = team.Losses !== undefined ? team.Losses : (team.L !== undefined ? team.L : 0);
+                const ties = team.Ties !== undefined ? team.Ties : (team.T !== undefined ? team.T : 0);
                 html += '<tr style="' + rowStyle + '">';
             html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + displayName + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Wins + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.Losses + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + (team.Ties || 0) + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + wins + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + losses + '</td>';
+                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + ties + '</td>';
                 html += '</tr>';
             });
             
