@@ -45425,37 +45425,51 @@ async function fetchFeaturedGames() {
         return db.collection('system').doc('todaySlate');
     }
     
-    // Initialize TODAY latch state from Firestore (shared state)
+    // Initialize TODAY latch state from JSON endpoint (replaces Firestore read to avoid per-user reads)
     async function initTodayLatch() {
         const { DateTime } = luxon;
         
         try {
-            // Try to read from Firestore first (shared state)
-            const todaySlateRef = getTodaySlateRef();
-            const doc = await todaySlateRef.get();
+            // Try to read from JSON endpoint first (replaces Firestore read to avoid per-user reads)
+            const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today-slate.json';
+            const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
             
-            if (doc.exists) {
-                const data = doc.data();
-                activeTodayDate = data.activeTodayDate;
-                holdUntil = data.holdUntil || null;
+            if (response.ok) {
+                const jsonData = await response.json();
+                const slate = jsonData.slate;
                 
-                console.log('📡 Loaded TODAY latch state from Firestore:', activeTodayDate);
-                
-                // If hold expired while page was closed, advance immediately
-                if (holdUntil && Date.now() >= holdUntil) {
-                    await advanceTodayDate();
-                } else if (holdUntil) {
-                    // Restore timer if still in hold period
-                    const delay = holdUntil - Date.now();
-                    if (delay > 0) {
-                        holdTimer = setTimeout(() => {
-                            advanceTodayDate();
-                        }, delay);
-                        console.log(`🔒 TODAY tab held until ${new Date(holdUntil).toLocaleString()}`);
+                if (slate && slate.activeTodayDate) {
+                    activeTodayDate = slate.activeTodayDate;
+                    holdUntil = slate.holdUntil || null;
+                    
+                    console.log('📡 Loaded TODAY latch state from JSON:', activeTodayDate);
+                    
+                    // If hold expired while page was closed, advance immediately
+                    if (holdUntil && Date.now() >= holdUntil) {
+                        await advanceTodayDate();
+                    } else if (holdUntil) {
+                        // Restore timer if still in hold period
+                        const delay = holdUntil - Date.now();
+                        if (delay > 0) {
+                            holdTimer = setTimeout(() => {
+                                advanceTodayDate();
+                            }, delay);
+                            console.log(`🔒 TODAY tab held until ${new Date(holdUntil).toLocaleString()}`);
+                        }
                     }
+                } else {
+                    // No JSON state - initialize with current date
+                    activeTodayDate = DateTime
+                        .now()
+                        .setZone('America/New_York')
+                        .toISODate();
+                    
+                    // Write initial state to Firestore
+                    await persistTodayLatch();
+                    console.log('✨ Initialized TODAY latch state:', activeTodayDate);
                 }
             } else {
-                // No Firestore state - initialize with current date
+                // JSON fetch failed - initialize with current date
                 activeTodayDate = DateTime
                     .now()
                     .setZone('America/New_York')
@@ -45463,7 +45477,7 @@ async function fetchFeaturedGames() {
                 
                 // Write initial state to Firestore
                 await persistTodayLatch();
-                console.log('✨ Initialized TODAY latch state:', activeTodayDate);
+                console.log('✨ Initialized TODAY latch state (JSON fetch failed):', activeTodayDate);
             }
             
             // Poll TODAY latch state periodically using JSON endpoint (replaces .onSnapshot listener)
