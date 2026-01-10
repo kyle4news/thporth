@@ -44702,6 +44702,241 @@ document.addEventListener('DOMContentLoaded', function () {
         const standingsContent = document.getElementById('league-standings-content');
         if (!standingsContent) return;
         
+        // Boxing is hardcoded - handle it FIRST before any Firestore or CSV checks
+        if (leagueKey === 'Boxing') {
+            standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
+            
+            // Hardcoded Boxing Men's Standings
+            const boxingMenData = {
+                'Pound-for-pound': [
+                    { Rank: '1', Fighter: 'Terence Crawford', Record: '42–0 (31 KO)' },
+                    { Rank: '2', Fighter: 'Oleksandr Usyk', Record: '24–0 (15 KO)' },
+                    { Rank: '3', Fighter: 'Naoya Inoue', Record: '31–0 (27 KO)' },
+                    { Rank: '4', Fighter: 'Dmitry Bivol', Record: '25–1 (12 KO)' },
+                    { Rank: '5', Fighter: 'Artur Beterbiev', Record: '21–1 (20 KO)' },
+                    { Rank: '6', Fighter: 'Jesse Rodriguez', Record: '22–0 (15 KO)' },
+                    { Rank: '7', Fighter: 'Junto Nakatani', Record: '31–0 (24 KO)' },
+                    { Rank: '8', Fighter: 'Shakur Stevenson', Record: '24–0 (11 KO)' },
+                    { Rank: '9', Fighter: 'David Benavidez', Record: '30–0 (24 KO)' },
+                    { Rank: '10', Fighter: 'Canelo Álvarez', Record: '63–3–2 (39 KO)' },
+                    { Rank: '11', Fighter: 'Teófimo López', Record: '22–1 (13 KO)' },
+                    { Rank: '12', Fighter: 'Jaron Ennis', Record: '34–0 (1) (30 KO)' },
+                    { Rank: '13', Fighter: 'Gervonta Davis', Record: '30–0–1 (28 KO)' }
+                ],
+                'Heavyweight': [
+                    { Rank: 'C', Fighter: 'Oleksandr Usyk', Record: '24-0 (15 KOs)' },
+                    { Rank: '1', Fighter: 'Tyson Fury', Record: '34-2-1 (24 KOs)' },
+                    { Rank: '2', Fighter: 'Daniel Dubois', Record: '22-3 (21 KOs)' },
+                    { Rank: '3', Fighter: 'Fabio Wardley', Record: '20-0-1 (19 KOs)' },
+                    { Rank: '4', Fighter: 'Joseph Parker', Record: '36-4 (24 KOs)' },
+                    { Rank: '5', Fighter: 'Agit Kabayel', Record: '26-0 (18 KOs)' },
+                    { Rank: '6', Fighter: 'Filip Hrgovic', Record: '19-1 (14 KOs)' },
+                    { Rank: '7', Fighter: 'Moses Itauma', Record: '14-0 (12 KOs)' },
+                    { Rank: '8', Fighter: 'Zhilei Zhang', Record: '27-3-1 (22 KOs)' },
+                    { Rank: '9', Fighter: 'Martin Bakole', Record: '21-2-1 (16 KOs)' }
+                ],
+                'Light Heavyweight': [
+                    { Rank: 'C', Fighter: 'Dmitry Bivol', Record: '24-1 (12 KOs)' },
+                    { Rank: '1', Fighter: 'Artur Beterbiev', Record: '21-1 (20 KOs)' },
+                    { Rank: '2', Fighter: 'David Benavidez', Record: '30-0 (24 KOs)' },
+                    { Rank: '3', Fighter: 'Callum Smith', Record: '31-2 (22 KOs)' },
+                    { Rank: '4', Fighter: 'David Morrell Jr.', Record: '12-1 (9 KOs)' },
+                    { Rank: '5', Fighter: 'Imam Khataev', Record: '10-1 (9 KOs)' },
+                    { Rank: '6', Fighter: 'Anthony Yarde', Record: '27-3 (24 KOs)' },
+                    { Rank: '7', Fighter: 'Oleksandr Gvozdyk', Record: '21-2 (17 KOs)' },
+                    { Rank: '8', Fighter: 'Albert Ramirez', Record: '22-0 (19 KOs)' },
+                    { Rank: '9', Fighter: 'Joshua Buatsi', Record: '20-1 (13 KOs)' }
+                ],
+                'Middleweight': [
+                    { Rank: 'C', Fighter: 'Janibek Alimkhanuly', Record: '17-0 (12 KOs)' },
+                    { Rank: '1', Fighter: 'Carlos Adames', Record: '24-1-1 (18 KOs)' },
+                    { Rank: '2', Fighter: 'Chris Eubank Jr.', Record: '35-3 (25 KOs)' },
+                    { Rank: '3', Fighter: 'Conor Benn', Record: '23-1 (14 KOs)' },
+                    { Rank: '4', Fighter: 'Anauel Ngamissengue', Record: '14-1 (9 KOs)' },
+                    { Rank: '5', Fighter: 'Etinosa Oliha', Record: '22-0 (10 KOs)' },
+                    { Rank: '6', Fighter: 'Fiodor Czerkaszyn', Record: '26-1 (16 KOs)' },
+                    { Rank: '7', Fighter: 'Yoenli Hernandez', Record: '8-0 (7 KOs)' },
+                    { Rank: '8', Fighter: 'Troy Isley', Record: '15-0 (5 KOs)' },
+                    { Rank: '9', Fighter: 'Austin Williams', Record: '19-1 (13 KOs)' }
+                ],
+                'Welterweight': [
+                    { Rank: 'C', Fighter: 'Brian Norman Jr.', Record: '28-0 (22 KOs)' },
+                    { Rank: '1', Fighter: 'Mario Barrios', Record: '29-2-2 (18 KOs)' },
+                    { Rank: '2', Fighter: 'Devin Haney', Record: '32-0-1 NC (15 KOs)' },
+                    { Rank: '3', Fighter: 'Manny Pacquiao', Record: '62-8-3 (39 KOs)' },
+                    { Rank: '4', Fighter: 'Liam Paro', Record: '27-1 (16 KOs)' },
+                    { Rank: '5', Fighter: 'Shakhram Giyasov', Record: '17-0 (10 KOs)' },
+                    { Rank: '6', Fighter: 'Giovani Santillan', Record: '34-1 (18 KOs)' },
+                    { Rank: '7', Fighter: 'Rolando Romero', Record: '17-2 (13 KOs)' },
+                    { Rank: '8', Fighter: 'Souleymane Cissokho', Record: '18-0 (9 KOs)' },
+                    { Rank: '9', Fighter: 'Lewis Crocker', Record: '22-0 (11 KOs)' }
+                ],
+                'Lightweight': [
+                    { Rank: 'C', Fighter: 'Shakur Stevenson', Record: '24-0 (11 KOs)' },
+                    { Rank: '1', Fighter: 'Gervonta Davis', Record: '30-0-1 (28 KOs)' },
+                    { Rank: '2', Fighter: 'Keyshawn Davis', Record: '13-0 (9 KOs)' },
+                    { Rank: '3', Fighter: 'William Zepeda', Record: '33-1 (27 KOs)' },
+                    { Rank: '4', Fighter: 'Lamont Roach', Record: '25-1-2 (10 KOs)' },
+                    { Rank: '5', Fighter: 'Andy Cruz', Record: '6-0 (3 KOs)' },
+                    { Rank: '6', Fighter: 'Raymond Muratalla', Record: '23-0 (17 KOs)' },
+                    { Rank: '7', Fighter: 'Frank Martin', Record: '18-1 (12 KOs)' },
+                    { Rank: '8', Fighter: 'Floyd Schofield', Record: '19-0 (13 KOs)' },
+                    { Rank: '9', Fighter: 'Denys Berinchyk', Record: '19-1 (9 KOs)' }
+                ],
+                'Featherweight': [
+                    { Rank: 'C', Fighter: 'Nick Ball', Record: '23-0-1 (13 KOs)' },
+                    { Rank: '1', Fighter: 'Rafael Espinoza', Record: '27-0 (23 KOs)' },
+                    { Rank: '2', Fighter: 'Stephen Fulton', Record: '23-1 (8 KOs)' },
+                    { Rank: '3', Fighter: 'Angelo Leo', Record: '26-1 (12 KOs)' },
+                    { Rank: '4', Fighter: 'Bruce Carrington', Record: '16-0 (9 KOs)' },
+                    { Rank: '5', Fighter: 'Luis Alberto Lopez', Record: '31-3 (18 KOs)' },
+                    { Rank: '6', Fighter: 'Brandon Figueroa', Record: '26-2-1 (19 KOs)' },
+                    { Rank: '7', Fighter: 'Tomoki Kameda', Record: '42-5 (23 KOs)' },
+                    { Rank: '8', Fighter: 'Robeisy Ramirez', Record: '14-3 (9 KOs)' },
+                    { Rank: '9', Fighter: 'Mirco Cuello', Record: '16-0 (13 KOs)' }
+                ],
+                'Bantamweight': [
+                    { Rank: 'C', Fighter: 'Junto Nakatani', Record: '31-0 (24 KOs)' },
+                    { Rank: '1', Fighter: 'Ryosuke Nishida', Record: '10-1 (2 KO)' },
+                    { Rank: '2', Fighter: 'Christian Medina', Record: '26-4 (19 KOs)' },
+                    { Rank: '3', Fighter: 'Yoshiki Takei', Record: '11-1 (9 KOs)' },
+                    { Rank: '4', Fighter: 'Seiya Tsutsumi', Record: '12-0-3 (8 KOs)' },
+                    { Rank: '5', Fighter: 'Takuma Inoue', Record: '20-2 (5 KOs)' },
+                    { Rank: '6', Fighter: 'Daigo Higa', Record: '21-3-3 (19 KOs)' },
+                    { Rank: '7', Fighter: 'Antonio Vargas', Record: '19-1-1 (11 KOs)' },
+                    { Rank: '8', Fighter: 'Tenshin Nasukawa', Record: '7-0 (2 KOs)' },
+                    { Rank: '9', Fighter: 'Jason Moloney', Record: '27-4 (19 KOs)' }
+                ],
+                'Flyweight': [
+                    { Rank: '1', Fighter: 'Ricardo Sandoval', Record: '27-2 (18 KOs)' },
+                    { Rank: '2', Fighter: 'Kenshiro Teraji', Record: '25-2 (16 KOs)' },
+                    { Rank: '3', Fighter: 'Seigo Yuri Akui', Record: '21-3-1 (11 KOs)' },
+                    { Rank: '4', Fighter: 'Francisco Rodriguez Jr.', Record: '40-6 (27 KOs)' },
+                    { Rank: '5', Fighter: 'Masamichi Yabuki', Record: '18-4 (17 KOs)' }
+                ],
+                'Strawweight': [
+                    { Rank: 'C', Fighter: 'Oscar Collazo', Record: '13-0 (10 KOs)' },
+                    { Rank: '1', Fighter: 'Pedro Taduran', Record: '19-4-1 (13 KOs)' },
+                    { Rank: '2', Fighter: 'Melvin Jerusalem', Record: '25-3 (12 KOs)' },
+                    { Rank: '3', Fighter: 'Knockout CP Freshmart', Record: '28-1 (11 KOs)' },
+                    { Rank: '4', Fighter: 'Yudai Shigeoka', Record: '9-2 (5 KOs)' }
+                ]
+            };
+
+            // Hardcoded Boxing Women's Standings
+            const boxingWomenData = {
+                'Pound-for-Pound': [
+                    { Rank: '1', Fighter: 'Katie Taylor', Record: '25–1 (6 KO)' },
+                    { Rank: '2', Fighter: 'Claressa Shields', Record: '17–0 (3 KO)' },
+                    { Rank: '3', Fighter: 'Chantelle Cameron', Record: '21–1 (8 KO)' },
+                    { Rank: '4', Fighter: 'Amanda Serrano', Record: '47–4–1 (31 KO)' },
+                    { Rank: '5', Fighter: 'Dina Thorslund', Record: '23–0 (9 KO)' },
+                    { Rank: '6', Fighter: 'Gabriela Fundora', Record: '15–0 (1) (7 KO)' },
+                    { Rank: '7', Fighter: 'Lauren Price', Record: '9–0 (2 KO)' },
+                    { Rank: '8', Fighter: 'Yokasta Valle', Record: '33–3 (10 KO)' },
+                    { Rank: '9', Fighter: 'Mikaela Mayer', Record: '20–2 (5 KO)' },
+                    { Rank: '10', Fighter: 'Ellie Scotney', Record: '11–0' },
+                    { Rank: '11', Fighter: 'Alycia Baumgardner', Record: '16–1 (1) (7 KO)' },
+                    { Rank: '12', Fighter: 'Evelyn Nazarena Bermúdez', Record: '20–1–1 (7 KO)' }
+                ],
+                'Bantamweight': [
+                    { Rank: '1', Fighter: 'Cherneka Johnson', Record: '18-2 (8 KOs)' },
+                    { Rank: '2', Fighter: 'Dina Thorslund', Record: '23-0 (9 KOs)' },
+                    { Rank: '3', Fighter: 'Florencia Ayelen Juarez', Record: '13-1 (1 KO)' },
+                    { Rank: '4', Fighter: 'Shurretta Metcalf', Record: '15-5-1 (2 KOs)' },
+                    { Rank: '5', Fighter: 'Miyo Yoshida', Record: '18-5 (0 KOs)' }
+                ],
+                'Flyweight': [
+                    { Rank: '1', Fighter: 'Gabriela Fundora', Record: '17-0 (9 KOs)' },
+                    { Rank: '2', Fighter: 'Kenia Enriquez', Record: '28-1 (11 KOs)' },
+                    { Rank: '3', Fighter: 'Marilyn Badillo Amaya', Record: '19-1-1 (3 KOs)' },
+                    { Rank: '4', Fighter: 'Gabriela Sanchez Saavedra', Record: '12-6 (1 KOs)' },
+                    { Rank: '5', Fighter: 'Laura Wollenmann', Record: '11-1 (3 KOs)' }
+                ],
+                'Strawweight': [
+                    { Rank: '1', Fighter: 'Yokasta Valle', Record: '33-3 (10 KOs)' },
+                    { Rank: '2', Fighter: 'Sarah Bormann', Record: '21-1 (7 KOs)' },
+                    { Rank: '3', Fighter: 'Kim Clavel', Record: '22-2 (3 KOs)' },
+                    { Rank: '4', Fighter: 'Yuko Kuroki', Record: '25-9-2 (10 KOs)' },
+                    { Rank: '5', Fighter: 'Sol Cudos', Record: '10-1-2 (3 KOs)' }
+                ]
+            };
+
+            // Build HTML for boxing standings - ORDER MATTERS: iterate in specified order
+            const buildBoxingStandingsHtml = (data, order) => {
+                let html = '';
+                // Use the order array to ensure correct sequence (NOT alphabetical)
+                order.forEach(division => {
+                    if (!data[division] || data[division].length === 0) return;
+                    html += `<div style="margin-bottom: 20px;">`;
+                    html += `<h3 style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #4a4a4a;">${division}</h3>`;
+                    html += `<table style="width: 100%; border-collapse: collapse; color: #ffffff; font-size: 11px;">`;
+                    html += `<thead><tr style="background-color: #4a4a4a; font-size: 10px; font-weight: 600;">`;
+                    html += `<th style="padding: 6px; text-align: left; width: 50px;">Rank</th>`;
+                    html += `<th style="padding: 6px; text-align: left;">Fighter</th>`;
+                    html += `<th style="padding: 6px; text-align: left; width: 150px;">Record</th>`;
+                    html += `</tr></thead><tbody>`;
+                    
+                    // Sort: C first, then numeric ranks
+                    const sorted = [...data[division]].sort((a, b) => {
+                        if (a.Rank === 'C') return -1;
+                        if (b.Rank === 'C') return 1;
+                        return parseInt(a.Rank) - parseInt(b.Rank);
+                    });
+                    
+                    sorted.forEach((fighter, index) => {
+                        const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
+                        html += `<tr style="${rowStyle}">`;
+                        html += `<td style="padding: 6px; text-align: left; font-weight: ${fighter.Rank === 'C' ? '600' : '500'}; color: ${fighter.Rank === 'C' ? '#fff' : '#ccc'};">
+                            ${fighter.Rank === 'C' ? 'C' : fighter.Rank}</td>`;
+                        html += `<td style="padding: 6px; text-align: left; color: #fff; font-weight: 500;">${fighter.Fighter}</td>`;
+                        html += `<td style="padding: 6px; text-align: left; color: #ccc;">${fighter.Record}</td>`;
+                        html += `</tr>`;
+                    });
+                    html += `</tbody></table></div>`;
+                });
+                return html;
+            };
+
+            // SPECIFIED ORDER (not alphabetical)
+            const menOrder = ['Pound-for-pound', 'Heavyweight', 'Light Heavyweight', 'Middleweight', 'Welterweight', 'Lightweight', 'Featherweight', 'Bantamweight', 'Flyweight', 'Strawweight'];
+            const womenOrder = ['Pound-for-Pound', 'Bantamweight', 'Flyweight', 'Strawweight'];
+            
+            const menHtml = buildBoxingStandingsHtml(boxingMenData, menOrder);
+            const womenHtml = buildBoxingStandingsHtml(boxingWomenData, womenOrder);
+            
+            standingsContent.innerHTML = `
+                <div class="boxing-subtabs" style="display: flex; background-color: #2a2a2a; margin-bottom: 6px;">
+                    <div class="boxing-subtab active" data-boxing-tab="men" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">Men's</div>
+                    <div class="boxing-subtab" data-boxing-tab="women" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">Women's</div>
+                </div>
+                <div class="boxing-subcontent" data-boxing-content="men">${menHtml}</div>
+                <div class="boxing-subcontent" data-boxing-content="women" style="display: none;">${womenHtml}</div>
+            `;
+
+            const subTabs = standingsContent.querySelectorAll('.boxing-subtab');
+            const subContents = standingsContent.querySelectorAll('.boxing-subcontent');
+            subTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.boxingTab;
+                    subTabs.forEach(t => {
+                        t.classList.remove('active');
+                        t.style.color = '#ccc';
+                        t.style.borderBottom = 'none';
+                    });
+                    tab.classList.add('active');
+                    tab.style.color = '#fff';
+                    tab.style.borderBottom = '2px solid #fff';
+
+                    subContents.forEach(content => {
+                        content.style.display = content.dataset.boxingContent === target ? 'block' : 'none';
+                    });
+                });
+            });
+
+            return;
+        }
+        
         // First try to load from Firestore (FlashLive API data)
         const loadedFromFirestore = await fetchLeagueStandingsFromFirestore(leagueKey);
         if (loadedFromFirestore) {
@@ -44913,72 +45148,53 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
             
+            // Boxing is already handled above - skip if we somehow reach here
             if (leagueKey === 'Boxing') {
-                const menHtml = buildGroupedStandingsHtml(rows) || buildStandardStandingsTable(rows);
-                let womenHtml = '<p style="color: #9ca3af;">Loading women\'s rankings...</p>';
-                try {
-                    // Try to fetch women's data from Firestore first
-                    const collectionName = collectionMap[leagueKey] || 'standings';
-                    const womenDataDoc = await db.collection(collectionName).doc('data-women').get();
-                    if (womenDataDoc.exists) {
-                        const womenCsvData = womenDataDoc.data();
-                        if (womenCsvData.headers && womenCsvData.rows) {
-                            // Convert row objects back to arrays (Firestore doesn't allow nested arrays)
-                            const convertedWomenRows = womenCsvData.rows.map(rowObj => {
-                                const numKeys = Object.keys(rowObj).map(k => parseInt(k)).sort((a, b) => a - b);
-                                return numKeys.map(key => rowObj[key.toString()] || '');
-                            });
-                            const womenRows = [womenCsvData.headers, ...convertedWomenRows];
-                            womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
-                        } else {
-                            throw new Error('Invalid women\'s data format in Firestore');
-                        }
-                    } else {
-                        // Fallback to Google Sheets if not in Firestore
-                        const womenUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb/pub?gid=0&single=true&output=csv';
-                        const womenRows = await fetchFromGoogleSheetsCSV(womenUrl);
-                        womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
-                    }
-                } catch (womenError) {
-                    console.error('Error loading Boxing women rankings:', womenError);
-                    womenHtml = '<p style="color: #ef4444;">Error loading women\'s rankings.</p>';
-                }
-                standingsContent.innerHTML = `
-                    <div class="boxing-subtabs" style="display: flex; background-color: #2a2a2a; margin-bottom: 6px;">
-                        <div class="boxing-subtab active" data-boxing-tab="men" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">Men's</div>
-                        <div class="boxing-subtab" data-boxing-tab="women" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">Women's</div>
-                    </div>
-                    <div class="boxing-subcontent" data-boxing-content="men">${menHtml}</div>
-                    <div class="boxing-subcontent" data-boxing-content="women" style="display: none;">${womenHtml}</div>
-                `;
-
-                const subTabs = standingsContent.querySelectorAll('.boxing-subtab');
-                const subContents = standingsContent.querySelectorAll('.boxing-subcontent');
-                subTabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        const target = tab.dataset.boxingTab;
-                        subTabs.forEach(t => {
-                            t.classList.remove('active');
-                            t.style.color = '#ccc';
-                            t.style.borderBottom = 'none';
-                        });
-                        tab.classList.add('active');
-                        tab.style.color = '#fff';
-                        tab.style.borderBottom = '2px solid #fff';
-
-                        subContents.forEach(content => {
-                            content.style.display = content.dataset.boxingContent === target ? 'block' : 'none';
-                        });
-                    });
-                });
-
                 return;
             }
             
-            // Special handling for UFC/Boxing - group by classification (detect from URL)
+            if (leagueKey === 'WNBA') {
+                const teams = [];
+                let currentConference = '';
+                
+                rows.forEach(row => {
+                    if (row.length === 0) return;
+                    const label = (row[0] || '').toLowerCase();
+                    if (!label) return;
+                    
+                    if (label.includes('eastern conference')) {
+                        currentConference = 'Eastern Conference';
+                        return;
+                    }
+                    if (label.includes('western conference')) {
+                        currentConference = 'Western Conference';
+                        return;
+                    }
+                    if (label === 'rank' || label === 'team' || !currentConference) {
+                        return;
+                    }
+                    const rank = row[0];
+                    const teamName = row[1];
+                    const wins = row[2];
+                    const losses = row[3];
+                    if (!rank || !teamName) return;
+                    teams.push({
+                        Rank: rank,
+                        Team: teamName,
+                        Wins: wins || '0',
+                        Losses: losses || '0',
+                        Conference: currentConference
+                    });
+                });
+                
+                standingsContent.innerHTML = createWNBAStandings(teams);
+                return;
+            }
+            
+            // Special handling for UFC - group by classification (detect from URL)
+            // Boxing is now hardcoded, so skip URL detection for Boxing
             const isUFC = url.includes('2PACX-1vS2Z0QfXw34ib6V0gmcdqVvu6gwy8vHnD6cF3xMhJGZJHpU_s0vwC0h7phvbV0joe4tdVDGHiJ1kBfX');
-            const isBoxing = url.includes('2PACX-1vRthmvN_N-bKFQdsc5V_Otx92FF5qwjYkI9YXHoKgKyV5jvfmb6skABo0Ncbh1x0ehEU-4Je3w_KPmb');
-            if (isUFC || isBoxing) {
+            if (isUFC) {
                 const groupedHtml = buildGroupedStandingsHtml(rows);
                 if (groupedHtml) {
                     standingsContent.innerHTML = groupedHtml;
