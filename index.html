@@ -43884,14 +43884,58 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     // New function to load standings from Firestore (FlashLive API data)
     async function fetchLeagueStandingsFromFirestore(leagueKey) {
+        console.log(`🔍 fetchLeagueStandingsFromFirestore called with leagueKey: "${leagueKey}"`);
         const standingsContent = document.getElementById('league-standings-content');
-        if (!standingsContent) return;
+        if (!standingsContent) {
+            console.error(`❌ standingsContent element not found`);
+            return;
+        }
         
         standingsContent.innerHTML = '<p style="color: #9ca3af;">Loading standings...</p>';
         
         // ============================================
+        // NBA: Fetch from JSON endpoint (scraper data, not hardcoded)
+        // ============================================
+        if (leagueKey === 'NBA') {
+            try {
+                console.log(`📡 Fetching NBA standings from JSON endpoint...`);
+                const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/standings.json';
+                const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+                console.log(`📡 Fetch completed, status: ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log(`📦 Received standings data:`, Object.keys(data.standings || {}));
+                
+                const standingsData = data.standings || {};
+                const teams = standingsData.NBAStandings || [];
+                
+                console.log(`🔍 NBAStandings array length:`, teams.length);
+                
+                if (!Array.isArray(teams) || teams.length === 0) {
+                    console.warn(`⚠️ No teams found in NBAStandings data. Available keys:`, Object.keys(standingsData));
+                    standingsContent.innerHTML = '<p style="color: #ef4444;">Standings data not available. Please check back later.</p>';
+                    return false;
+                }
+                
+                console.log(`✅ Loaded ${teams.length} NBA teams from JSON endpoint`);
+                cacheStandings(leagueKey, teams);
+                displayStandingsTable(leagueKey, teams, standingsContent);
+                return true;
+            } catch (error) {
+                console.error(`❌ Error fetching NBA standings from JSON endpoint:`, error);
+                standingsContent.innerHTML = `<p style="color: #ef4444;">Error loading standings: ${error.message}. Please try again later.</p>`;
+                return false;
+            }
+        }
+        
+        // ============================================
         // CHECK HARDCODED STANDINGS FIRST (No Firestore reads)
         // ============================================
+        console.log(`📊 Checking hardcoded standings for ${leagueKey}...`);
         if (typeof HARDCODED_STANDINGS !== 'undefined' && HARDCODED_STANDINGS && HARDCODED_STANDINGS[leagueKey]) {
             const hardcodedTeams = HARDCODED_STANDINGS[leagueKey];
             if (Array.isArray(hardcodedTeams) && hardcodedTeams.length > 0) {
@@ -44147,6 +44191,25 @@ document.addEventListener('DOMContentLoaded', function () {
         return html;
     }
     
+    // NBA Standings: East/West tabs
+    function createNBAStandings(teams) {
+        const eastTeams = teams.filter(team => team.Conference === 'Eastern Conference' || team.Conference === 'East');
+        const westTeams = teams.filter(team => team.Conference === 'Western Conference' || team.Conference === 'West');
+        
+        let html = '<div class="standings-tabs">';
+        html += '<button class="tab-button active" onclick="showNBATab(\'east\')" id="nba-east-tab">Eastern Conference</button>';
+        html += '<button class="tab-button" onclick="showNBATab(\'west\')" id="nba-west-tab">Western Conference</button>';
+        html += '</div>';
+        html += '<div id="nba-east-content" class="tab-content active">';
+        html += createNBAConferenceStandings(eastTeams, 'Eastern Conference');
+        html += '</div>';
+        html += '<div id="nba-west-content" class="tab-content">';
+        html += createNBAConferenceStandings(westTeams, 'Western Conference');
+        html += '</div>';
+        
+        return html;
+    }
+    
     function createNBAConferenceStandings(teams, conference) {
         // Sort teams by wins (descending), then by losses (ascending)
         teams.sort((a, b) => {
@@ -44184,6 +44247,30 @@ document.addEventListener('DOMContentLoaded', function () {
         
         html += '</tbody></table></div>';
         return html;
+    }
+    
+    // Tab switching function for NBA
+    function showNBATab(conference) {
+        // Hide all tab contents
+        document.getElementById('nba-east-content').classList.remove('active');
+        document.getElementById('nba-west-content').classList.remove('active');
+        document.getElementById('nba-east-content').style.display = 'none';
+        document.getElementById('nba-west-content').style.display = 'none';
+        
+        // Remove active class from all tabs
+        document.getElementById('nba-east-tab').classList.remove('active');
+        document.getElementById('nba-west-tab').classList.remove('active');
+        
+        // Show selected tab content
+        if (conference === 'east') {
+            document.getElementById('nba-east-content').classList.add('active');
+            document.getElementById('nba-east-content').style.display = 'block';
+            document.getElementById('nba-east-tab').classList.add('active');
+        } else {
+            document.getElementById('nba-west-content').classList.add('active');
+            document.getElementById('nba-west-content').style.display = 'block';
+            document.getElementById('nba-west-tab').classList.add('active');
+        }
     }
     // MLS Standings: East/West tabs
     function createMLSStandings(teams) {
