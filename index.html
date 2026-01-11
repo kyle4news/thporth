@@ -5095,7 +5095,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (!gameData) {
                     try {
                         const { DateTime } = luxon;
-                        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+                        const todayStr = getTodayDisplayDate();
                         const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
                         
                         // Try today.json first
@@ -37255,8 +37255,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (currentLeague && currentLeague !== 'Home') {
                     const leagueInfo = LEAGUE_DATA_CONFIG[currentLeague];
                     if (leagueInfo) {
-                        const { DateTime } = luxon;
-                        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+                        const todayStr = getTodayDisplayDate();
                         getCachedGames(leagueInfo.leagueId, todayStr); // Pre-cache fresh data
                     }
                 }
@@ -37297,7 +37296,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         try {
             const { DateTime } = luxon;
-            const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+            const todayStr = getTodayDisplayDate();
             const isToday = gameDate === todayStr;
             
             // Use today.json for today, yesterday.json for yesterday
@@ -42971,8 +42970,8 @@ document.addEventListener('DOMContentLoaded', function () {
      async function fetchLeagueSchedule(leagueId, leagueName) {
         scheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading schedule...</p>';
         const { DateTime } = luxon;
-         // Match home column logic (Denver) for gameDate equality
-         const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+         // Use 2 AM EST cutoff: if before 2 AM EST, show yesterday's games in today tab
+         const todayStr = getTodayDisplayDate();
          
          // Use JSON endpoint instead of direct Firestore access
          const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json';
@@ -45309,7 +45308,7 @@ let featuredGamesCache = {
 async function fetchFeaturedGames() {
     try {
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+        const todayStr = getTodayDisplayDate();
         
         // fetchFeaturedGamesForDate already handles MLB matching and live data merging
         return await fetchFeaturedGamesForDate(todayStr);
@@ -45321,7 +45320,7 @@ async function fetchFeaturedGames() {
     async function fetchFeaturedGamesForDate(dateStr) {
         try {
             const { DateTime } = luxon;
-            const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+            const todayStr = getTodayDisplayDate();
             const isToday = dateStr === todayStr;
             
             // Use featured.json endpoint (currently only serves today's games)
@@ -45502,6 +45501,21 @@ async function fetchFeaturedGames() {
     
     // Track active tab globally - 'ALL' or 'LIVE'
     let activeTab = 'ALL';
+    
+    // Helper function to get the display date for "today" tab
+    // Returns yesterday's date if before 2 AM EST, otherwise today's date
+    function getTodayDisplayDate() {
+        const { DateTime } = luxon;
+        const nowInEastern = DateTime.now().setZone('America/New_York');
+        const hour = nowInEastern.hour;
+        
+        // If before 2 AM EST, use yesterday's date
+        if (hour < 2) {
+            return nowInEastern.minus({ days: 1 }).toISODate();
+        }
+        // Otherwise use today's date
+        return nowInEastern.toISODate();
+    }
     
     // TODAY tab lifecycle state (FSM-based, prevents midnight flip until games finish + 2 hours)
     let activeTodayDate = null; // The date currently shown in TODAY tab (YYYY-MM-DD)
@@ -45776,10 +45790,10 @@ async function fetchFeaturedGames() {
         errorDiv.textContent = "";
         const { DateTime } = luxon;
         
-        // Use activeTodayDate (which may be held from previous day) instead of current calendar date
-        // Fallback to actual today if activeTodayDate is not set
-        const todayStr = activeTodayDate || DateTime.now().setZone('America/New_York').toISODate();
-        console.log(`[fetchTodayGames] Using date: ${todayStr} (activeTodayDate: ${activeTodayDate || 'null'})`);
+        // Use 2 AM EST cutoff: if before 2 AM EST, show yesterday's games in today tab
+        // Otherwise show today's games
+        const todayStr = getTodayDisplayDate();
+        console.log(`[fetchTodayGames] Using date: ${todayStr} (2 AM EST cutoff applied)`);
 
         let regularGames = [];
         let featuredGames = [];
@@ -46269,8 +46283,7 @@ async function fetchFeaturedGames() {
         // Attach manual refresh function for debugging
         window.manualRefreshGames = async () => {
             console.log('🔄 Manual refresh triggered...');
-            const { DateTime } = luxon;
-            const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+            const todayStr = getTodayDisplayDate();
             console.log(`📅 Today's date string: ${todayStr}`);
             
             // Force re-fetch from JSON endpoint instead of Firestore
@@ -46786,7 +46799,7 @@ async function fetchFeaturedGames() {
         todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
         }
         const { DateTime } = luxon;
-        const todayStr = DateTime.now().setZone('America/New_York').toISODate();
+        const todayStr = getTodayDisplayDate();
         
         // Use JSON endpoint instead of direct Firestore access
         const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json';
@@ -47106,8 +47119,7 @@ async function fetchFeaturedGames() {
         
         // Get only today's soccer games using the consolidated approach
         const { DateTime } = luxon;
-        const today = DateTime.now().setZone('America/Denver');
-        const todayStr = today.toISODate();
+        const todayStr = getTodayDisplayDate();
         
         // Get only today's games from JSON endpoint
         console.log('Fetching soccer games for date =', todayStr);
@@ -48192,7 +48204,7 @@ async function fetchFeaturedGames() {
         
         // Check for hardcoded schedule first
         if (HARDCODED_UPCOMING_SCHEDULES[leagueKey]) {
-            const todayStr = luxon.DateTime.now().setZone('America/New_York').toISODate();
+            const todayStr = getTodayDisplayDate();
             // Keep canonical normalized names here; display names are derived later so rankings work
             const allGames = HARDCODED_UPCOMING_SCHEDULES[leagueKey].map(g => ({
               ...g,
