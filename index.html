@@ -174,13 +174,16 @@ table.game-table td:nth-child(1) {
         width: 20% !important;
     }
     .column.tv-listings .game-table col:nth-child(2) {
-        width: 50% !important;
+        width: 49% !important; /* Reduced by 1% to make room for indicator */
     }
     .column.tv-listings .game-table col:nth-child(3) {
-        width: 7% !important;
+        width: 6% !important; /* Reduced by 1% to make room for indicator */
     }
     .column.tv-listings .game-table col:nth-child(4) {
-        width: 33% !important;
+        width: 20% !important; /* Reduced by 13% to make room for indicator */
+    }
+    .column.tv-listings .game-table col:nth-child(5) {
+        width: 5px !important; /* Clickable indicator column */
     }
 .column.tv-listings .game-table td {
     padding: 4px 10px !important;
@@ -201,6 +204,7 @@ table.game-table td:nth-child(1) {
     text-overflow: unset !important;
     word-break: break-word !important;
     line-height: 1.3 !important;
+    padding-right: 1px !important; /* Reduced by 1px to make room for indicator */
 }
 .column.tv-listings .game-table .team-cell {
     white-space: normal !important;
@@ -212,17 +216,36 @@ table.game-table td:nth-child(1) {
 .column.tv-listings .game-table td:nth-child(3) { /* Score column */
     width: auto !important;
     text-align: right !important;
-    padding-left: 6px !important;
-    padding-right: 6px !important;
+    padding-left: 4px !important; /* Reduced by 2px to make room for indicator */
+    padding-right: 4px !important; /* Reduced by 2px to make room for indicator */
     font-size: 11px !important;
 }
 .column.tv-listings .game-table td:nth-child(4) { /* Channel column */
     width: auto !important;
     text-align: center !important;
-    padding-right: 10px !important;
+    padding-right: 8px !important; /* Reduced by 2px to make room for indicator */
     white-space: normal !important;
     overflow: visible !important;
     word-break: break-word !important;
+}
+.column.tv-listings .game-table td:nth-child(5) { /* Clickable indicator column */
+    width: 5px !important;
+    padding: 0 !important;
+    background-color: #4a4a4a !important;
+    position: relative !important;
+    vertical-align: middle !important;
+}
+.column.tv-listings .game-table td:nth-child(5)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid #000000;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
 }
 .column.tv-listings .game-table td:nth-child(4) > div {
     position: static !important;
@@ -314,6 +337,25 @@ table.game-table .game-row.game-separator.selected .team-cell,
 }
 .game-separator.live-filter-hidden {
     display: none !important;
+}
+.game-click-indicator {
+    width: 5px !important;
+    padding: 0 !important;
+    background-color: #4a4a4a !important;
+    position: relative !important;
+    vertical-align: middle !important;
+}
+.game-click-indicator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid #000000;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
 }
 .game-separator::after {
     content: "\A";
@@ -41411,12 +41453,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     subTable.style.tableLayout = "fixed";
                     
                     const subColgroup = document.createElement("colgroup");
-                    // Normal leagues: 4 columns
+                    // Normal leagues: 5 columns (added clickable indicator)
                     subColgroup.innerHTML = `
                         <col style="width: 32%;">
-                        <col style="width: 32%;">
-                        <col style="width: 10%;">
-                        <col style="width: 26%;">
+                        <col style="width: 31%;">
+                        <col style="width: 9%;">
+                        <col style="width: 23%;">
+                        <col style="width: 5px;">
                     `;
                     subTable.appendChild(subColgroup);
                     
@@ -41768,13 +41811,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (isSoccerLeague) {
                         // Soccer: home team on top, away team on bottom (opposite of non-soccer)
                         // Time on top line (same as other leagues)
-                        row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td>`;
+                        row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td><td rowspan="2" class="game-click-indicator"></td>`;
                         row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                     } else {
                         // All other leagues: away team on top, home team on bottom
                         // Period/quarter goes in time column top row (same line as top team), time remaining goes in time column bottom row (same line as bottom team)
                         // Remove rowspan="2" from time column to allow separate content in each row
-                        row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td>`;
+                        row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td><td rowspan="2" class="game-click-indicator"></td>`;
                         row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                     }
 
@@ -41907,9 +41950,10 @@ document.addEventListener('DOMContentLoaded', function () {
             // Normal leagues: 4 columns
             colgroup.innerHTML = `
                 <col style="width: 32%;">   <!-- time -->
-                <col style="width: 32%;">  <!-- team -->
-                <col style="width: 10%;">   <!-- score -->
-                <col style="width: 26%;">   <!-- channel -->
+                <col style="width: 31%;">  <!-- team -->
+                <col style="width: 9%;">   <!-- score -->
+                <col style="width: 23%;">   <!-- channel -->
+                <col style="width: 5px;">   <!-- clickable indicator -->
             `;
             table.appendChild(colgroup);
             
@@ -42296,13 +42340,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom (opposite of non-soccer)
                     // Time on top line (same as other leagues)
-                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td>`;
+                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td><td rowspan="2" class="game-click-indicator"></td>`;
                     row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
                     // Period/quarter goes in time column top row (same line as top team), time remaining goes in time column bottom row (same line as bottom team)
                     // Remove rowspan="2" from time column to allow separate content in each row
-                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td>`;
+                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td><td rowspan="2" class="game-click-indicator"></td>`;
                     row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                 }
 
@@ -47384,9 +47428,10 @@ async function fetchFeaturedGames() {
                 // Add colgroup for consistent column widths (same as individual league pages)
                 html += `<colgroup>`;
                 html += `<col style="width: 32%;">`;  // Time column
-                html += `<col style="width: 32%;">`;  // Team column
-                html += `<col style="width: 10%;">`;  // Score column
-                html += `<col style="width: 26%;">`;  // Channel column
+                html += `<col style="width: 31%;">`;  // Team column
+                html += `<col style="width: 9%;">`;  // Score column
+                html += `<col style="width: 23%;">`;  // Channel column
+                html += `<col style="width: 5px;">`;  // Clickable indicator column
                 html += `</colgroup>`;
                 
                 // Sort games by time chronologically (handle both timestamp and string formats)
@@ -47670,6 +47715,7 @@ async function fetchFeaturedGames() {
                     html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${homeTeam}</td>`;
                     html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${homeScoreDisplay}</td>`;
                     html += `<td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
+                    html += `<td rowspan="2" class="game-click-indicator"></td>`;
                     html += `</tr>`;
                     
                     html += `<tr class="game-row game-separator">`;
@@ -48699,9 +48745,10 @@ async function fetchFeaturedGames() {
             html += `
                 <colgroup>
                     <col style="width: 32%;">   <!-- time -->
-                    <col style="width: 32%;">  <!-- team -->
-                    <col style="width: 10%;">   <!-- score -->
-                    <col style="width: 26%;">   <!-- channel -->
+                    <col style="width: 31%;">  <!-- team -->
+                    <col style="width: 9%;">   <!-- score -->
+                    <col style="width: 23%;">   <!-- channel -->
+                    <col style="width: 5px;">   <!-- clickable indicator -->
                 </colgroup>
             `;
             
@@ -48799,6 +48846,7 @@ async function fetchFeaturedGames() {
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0; ${awayColor}">${awayTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                             <td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
+                            <td rowspan="2" class="game-click-indicator"></td>
                         </tr>
                         <tr class="game-row game-separator scheduled-game">
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0; ${homeColor}">${homeTeam}</td>
@@ -48865,6 +48913,7 @@ async function fetchFeaturedGames() {
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${homeTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                             <td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
+                            <td rowspan="2" class="game-click-indicator"></td>
                         </tr>
                         <tr class="game-row game-separator scheduled-game">
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${awayTeam}</td>
