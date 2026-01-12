@@ -5163,13 +5163,34 @@ function loadCustomRSSFeed(feedUrl, container) {
                     leagueName = sportToLeague[sport] || sport;
                 }
                 
-                console.log(`[loadGameContent] Game: ${awayTeam} vs ${homeTeam} (${leagueName})`);
+                // Check if this is a soccer league
+                // Use leagueName (already extracted) and check against soccer league patterns
+                const sport = gameData['Sport'] || '';
+                const isSoccer = sport === 'Soccer' || 
+                    leagueName.includes('Champions League') || 
+                    leagueName.includes('Europa League') || 
+                    leagueName.includes('Conference League') ||
+                    ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'USL Championship', "Women's UCL", 'Campeones Cup'].includes(leagueName) ||
+                    league.includes('Champions League') ||
+                    league.includes('Europa League') ||
+                    league.includes('Conference League') ||
+                    league.includes('Premier League') ||
+                    league.includes('LaLiga') ||
+                    league.includes('Serie A') ||
+                    league.includes('Bundesliga') ||
+                    league.includes('Ligue 1') ||
+                    league.includes('MLS') ||
+                    league.includes('NWSL') ||
+                    league.includes('FA Cup') ||
+                    league.includes('Liga MX');
+                
+                console.log(`[loadGameContent] Game: ${awayTeam} vs ${homeTeam} (${leagueName}) - Soccer: ${isSoccer}`);
                 
                 // For news content, render team tabs with vertical split (50% top, 50% bottom)
                 if (contentType === 'news') {
                     console.log(`[loadGameContent] Rendering news team tabs for ${awayTeam} vs ${homeTeam}`);
                     try {
-                        renderNewsWithTeamTabs(homeTeam, awayTeam, container);
+                        renderNewsWithTeamTabs(homeTeam, awayTeam, container, isSoccer);
                     } catch (error) {
                         console.error('[loadGameContent] Error in renderNewsWithTeamTabs:', error);
                         container.innerHTML = `
@@ -5186,7 +5207,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (contentType === 'social') {
                     console.log(`[loadGameContent] Rendering social team tabs for ${awayTeam} vs ${homeTeam}`);
                     try {
-                        renderSocialWithTeamTabs(homeTeam, awayTeam, container);
+                        renderSocialWithTeamTabs(homeTeam, awayTeam, container, isSoccer);
                     } catch (error) {
                         console.error('[loadGameContent] Error in renderSocialWithTeamTabs:', error);
                         container.innerHTML = `
@@ -5203,7 +5224,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (contentType === 'media') {
                     console.log(`[loadGameContent] Rendering media team tabs for ${awayTeam} vs ${homeTeam}`);
                     try {
-                        renderMediaWithTeamTabs(homeTeam, awayTeam, container);
+                        renderMediaWithTeamTabs(homeTeam, awayTeam, container, isSoccer);
                     } catch (error) {
                         console.error('[loadGameContent] Error in renderMediaWithTeamTabs:', error);
                         container.innerHTML = `
@@ -6330,8 +6351,8 @@ function loadCustomRSSFeed(feedUrl, container) {
         }
         
         // Helper function to render news with team tabs (side by side, matching social/media columns)
-        function renderNewsWithTeamTabs(homeTeam, awayTeam, container) {
-            console.log('[renderNewsWithTeamTabs] Called with:', { homeTeam, awayTeam, container });
+        function renderNewsWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false) {
+            console.log('[renderNewsWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer });
             
             if (!container) {
                 console.error('[renderNewsWithTeamTabs] Container is null/undefined!');
@@ -6343,8 +6364,19 @@ function loadCustomRSSFeed(feedUrl, container) {
             const homeFeedUrls = getTeamNewsFeeds(homeTeam);
             const awayFeedUrls = getTeamNewsFeeds(awayTeam);
             
-            // Build tabs array - always include both teams, even if no feed yet
-            const tabs = [
+            // Build tabs array - for soccer, home team first; for others, away team first
+            const tabs = isSoccer ? [
+                {
+                    name: homeShort,
+                    team: homeTeam,
+                    feedUrls: homeFeedUrls
+                },
+                {
+                    name: awayShort,
+                    team: awayTeam,
+                    feedUrls: awayFeedUrls
+                }
+            ] : [
                 {
                     name: awayShort,
                     team: awayTeam,
@@ -6739,8 +6771,8 @@ function loadCustomRSSFeed(feedUrl, container) {
         };
         
         // Helper function to render social with team tabs
-        function renderSocialWithTeamTabs(homeTeam, awayTeam, container) {
-            console.log('[renderSocialWithTeamTabs] Called with:', { homeTeam, awayTeam, container });
+        function renderSocialWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false) {
+            console.log('[renderSocialWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer });
             
             if (!container) {
                 console.error('[renderSocialWithTeamTabs] Container is null/undefined!');
@@ -6754,8 +6786,21 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             console.log('[renderSocialWithTeamTabs] Feed URLs:', { homeFeedUrl, awayFeedUrl, homeShort, awayShort });
             
-            // Build tabs array - always include both teams, even if no feed yet
-            const tabs = [
+            // Build tabs array - for soccer, home team first; for others, away team first
+            const tabs = isSoccer ? [
+                {
+                    name: homeShort,
+                    feedUrl: homeFeedUrl,
+                    team: homeTeam,
+                    originalUrl: homeFeedUrl // Store original URL for reset
+                },
+                {
+                    name: awayShort,
+                    feedUrl: awayFeedUrl,
+                    team: awayTeam,
+                    originalUrl: awayFeedUrl // Store original URL for reset
+                }
+            ] : [
                 {
                     name: awayShort,
                     feedUrl: awayFeedUrl,
@@ -7182,8 +7227,8 @@ function loadCustomRSSFeed(feedUrl, container) {
         }
         
         // Helper function to render media with team tabs (similar to renderSocialWithTeamTabs)
-        function renderMediaWithTeamTabs(homeTeam, awayTeam, container) {
-            console.log('[renderMediaWithTeamTabs] Called with:', { homeTeam, awayTeam, container });
+        function renderMediaWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false) {
+            console.log('[renderMediaWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer });
             
             if (!container) {
                 console.error('[renderMediaWithTeamTabs] Container is null/undefined!');
@@ -7197,8 +7242,19 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             console.log('[renderMediaWithTeamTabs] Feed URLs:', { homeFeedUrl, awayFeedUrl, homeShort, awayShort });
             
-            // Build tabs array - always include both teams, even if no feed yet
-            const tabs = [
+            // Build tabs array - for soccer, home team first; for others, away team first
+            const tabs = isSoccer ? [
+                {
+                    name: homeShort,
+                    feedUrl: homeFeedUrl,
+                    team: homeTeam
+                },
+                {
+                    name: awayShort,
+                    feedUrl: awayFeedUrl,
+                    team: awayTeam
+                }
+            ] : [
                 {
                     name: awayShort,
                     feedUrl: awayFeedUrl,
@@ -47038,6 +47094,7 @@ async function fetchFeaturedGames() {
         
         // Get only today's soccer games using the consolidated approach
         const { DateTime } = luxon;
+        const today = DateTime.now().setZone('America/New_York');
         const todayStr = getTodayDisplayDate();
         
         // Get only today's games from JSON endpoint
