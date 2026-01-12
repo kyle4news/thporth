@@ -44882,9 +44882,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += `<h3 style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #4a4a4a;">${division}</h3>`;
                     html += `<table style="width: 100%; border-collapse: collapse; color: #ffffff; font-size: 11px;">`;
                     html += `<thead><tr style="background-color: #4a4a4a; font-size: 10px; font-weight: 600;">`;
-                    html += `<th style="padding: 6px; text-align: left; width: 50px;">Rank</th>`;
+                    html += `<th style="padding: 6px; text-align: left; width: 25px;"></th>`;
                     html += `<th style="padding: 6px; text-align: left;">Fighter</th>`;
-                    html += `<th style="padding: 6px; text-align: left; width: 150px;">Record</th>`;
+                    html += `<th style="padding: 6px; text-align: left; width: 70px;">Record (KOs)</th>`;
                     html += `</tr></thead><tbody>`;
                     
                     // Sort: C first, then numeric ranks
@@ -44900,7 +44900,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         html += `<td style="padding: 6px; text-align: left; font-weight: ${fighter.Rank === 'C' ? '600' : '500'}; color: ${fighter.Rank === 'C' ? '#fff' : '#ccc'};">
                             ${fighter.Rank === 'C' ? 'C' : fighter.Rank}</td>`;
                         html += `<td style="padding: 6px; text-align: left; color: #fff; font-weight: 500;">${fighter.Fighter}</td>`;
-                        html += `<td style="padding: 6px; text-align: left; color: #ccc;">${fighter.Record}</td>`;
+                        html += `<td style="padding: 6px; text-align: left; color: #ccc;">${(fighter.Record || '').replace(/\s*KO\s*/gi, '')}</td>`;
                         html += `</tr>`;
                     });
                     html += `</tbody></table></div>`;
@@ -52293,16 +52293,33 @@ document.addEventListener('DOMContentLoaded', function() {
         return r.text();
       })
       .then(str => {
+        if (!str || str.trim() === '') {
+          throw new Error('Empty response from feed');
+        }
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(str, "text/xml");
-        const items = xmlDoc.querySelectorAll("item");
-        let html = '<ul>';
+        
+        // Check for parse errors
+        const parseError = xmlDoc.querySelector('parsererror');
+        if (parseError) {
+          throw new Error('XML parse error');
+        }
+        
+        // Handle both RSS (item) and Atom (entry) formats
+        const items = xmlDoc.querySelectorAll("item, entry");
+        if (items.length === 0) {
+          contentPane.innerHTML = '<p>No items found in feed.</p>';
+          return;
+        }
+        
+        let html = '<ul style="margin:0; padding:0 10px; list-style:none;">';
         items.forEach(el => {
           const title = el.querySelector("title")?.textContent || 'No title';
-          const link = el.querySelector("link")?.textContent || '#';
+          // Handle both RSS and Atom link formats
+          const link = el.querySelector("link")?.textContent || el.querySelector("link")?.getAttribute('href') || '#';
           html += `
-            <li>
-              <a href="${link}" target="_blank">
+            <li style="margin-bottom:0.5em; padding:4px 0; border-bottom:1px solid #C9C8C7;">
+              <a href="${link}" target="_blank" style="text-decoration:none; color:inherit;">
                 ${title}
               </a>
             </li>`;
@@ -52313,7 +52330,8 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .catch(err => {
         console.error("Error fetching RSS feed:", err);
-        contentPane.innerHTML = `<p>Failed to load news. Please try again later.</p>`;
+        console.error("Feed URL:", url);
+        contentPane.innerHTML = `<p>Failed to load news: ${err.message || 'Unknown error'}</p>`;
       });
   }
 
@@ -52324,7 +52342,7 @@ document.addEventListener('DOMContentLoaded', function() {
       mutations.forEach(function(mutation) {
         if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
           if (uefaChampionsLeagueSection.style.display !== 'none' && !uefaChampionsLeagueFeedLoaded) {
-            const feedUrl = 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/bundle/uefa-championsleague-news.xml';
+            const feedUrl = 'https://rss-feed-service-124291936014.us-central1.run.app/proxy/rss?url=' + encodeURIComponent('https://rss.app/feeds/22rliX949NIoE2OI.xml');
             fetchFeedUEFAChampionsLeague(feedUrl, 'headlines-feed-UEFAChampionsLeague');
           }
         }
@@ -52337,7 +52355,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (e.target.closest('[data-section="UEFAChampionsLeague"]')) {
         setTimeout(() => {
           if (uefaChampionsLeagueSection.style.display !== 'none' && !uefaChampionsLeagueFeedLoaded) {
-            const feedUrl = 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/bundle/uefa-championsleague-news.xml';
+            const feedUrl = 'https://rss-feed-service-124291936014.us-central1.run.app/proxy/rss?url=' + encodeURIComponent('https://rss.app/feeds/22rliX949NIoE2OI.xml');
             fetchFeedUEFAChampionsLeague(feedUrl, 'headlines-feed-UEFAChampionsLeague');
           }
         }, 100);
