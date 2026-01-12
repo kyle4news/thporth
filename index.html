@@ -5098,8 +5098,8 @@ function loadCustomRSSFeed(feedUrl, container) {
                         const todayStr = getTodayDisplayDate();
                         const yesterdayStr = DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate();
                         
-                        // Try today.json first
-                        const todayResponse = await fetch('https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json', { cache: 'no-store' });
+                        // Try today.json first (cached for 2 minutes by backend)
+                        const todayResponse = await fetch('https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json');
                         if (todayResponse.ok) {
                             const todayData = await todayResponse.json();
                             if (window.updateGameDataCache) {
@@ -5108,9 +5108,9 @@ function loadCustomRSSFeed(feedUrl, container) {
                             }
                         }
                         
-                        // If still not found, try yesterday.json
+                        // If still not found, try yesterday.json (cached for 20 hours by backend)
                         if (!gameData) {
-                            const yesterdayResponse = await fetch('https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json', { cache: 'no-store' });
+                            const yesterdayResponse = await fetch('https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json');
                             if (yesterdayResponse.ok) {
                                 const yesterdayData = await yesterdayResponse.json();
                                 if (window.updateGameDataCache) {
@@ -37279,7 +37279,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 ? 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json'
                 : 'https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json';
             
-            const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+            const response = await fetch(JSON_ENDPOINT);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
@@ -37341,7 +37341,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             // Fetch from JSON endpoint instead of Firestore
             const JSON_ENDPOINT = `https://flashlive-scraper-124291936014.us-central1.run.app/data/${collectionName.toLowerCase()}-upcoming.json`;
-            const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+            const response = await fetch(JSON_ENDPOINT);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
@@ -42952,7 +42952,7 @@ document.addEventListener('DOMContentLoaded', function () {
          const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json';
          
          try {
-             const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+             const response = await fetch(JSON_ENDPOINT);
              if (!response.ok) {
                  throw new Error(`HTTP ${response.status}`);
              }
@@ -43060,7 +43060,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const YESTERDAY_JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json';
         
         try {
-            const response = await fetch(YESTERDAY_JSON_ENDPOINT, { cache: 'no-store' });
+            const response = await fetch(YESTERDAY_JSON_ENDPOINT);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
@@ -43162,7 +43162,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Fast path: use JSON endpoint, then client-filter by league (fallback if try block fails)
-        fetch(YESTERDAY_JSON_ENDPOINT, { cache: 'no-store' })
+        fetch(YESTERDAY_JSON_ENDPOINT)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -43317,7 +43317,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Otherwise load from JSON endpoint and refresh caches
         const YESTERDAY_JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json';
         
-        fetch(YESTERDAY_JSON_ENDPOINT, { cache: 'no-store' })
+        fetch(YESTERDAY_JSON_ENDPOINT)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -43874,7 +43874,7 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 console.log(`📡 Fetching NBA standings from JSON endpoint...`);
                 const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/standings.json';
-                const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+                const response = await fetch(JSON_ENDPOINT);
                 console.log(`📡 Fetch completed, status: ${response.status}`);
                 
                 if (!response.ok) {
@@ -45309,7 +45309,7 @@ async function fetchFeaturedGames() {
             
             // Fetch from JSON endpoint
             const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/featured.json';
-            const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+            const response = await fetch(JSON_ENDPOINT);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
@@ -45513,7 +45513,7 @@ async function fetchFeaturedGames() {
         try {
             // Try to read from JSON endpoint first (replaces Firestore read to avoid per-user reads)
             const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today-slate.json';
-            const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+            const response = await fetch(JSON_ENDPOINT);
             
             if (response.ok) {
                 const jsonData = await response.json();
@@ -45567,7 +45567,7 @@ async function fetchFeaturedGames() {
             async function pollTodaySlate() {
                 try {
                     const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today-slate.json';
-                    const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+                    const response = await fetch(JSON_ENDPOINT);
                     
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}`);
@@ -46035,7 +46035,7 @@ async function fetchFeaturedGames() {
         async function fetchFeaturedGamesFromJSON() {
             try {
                 const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/featured.json';
-                const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+                const response = await fetch(JSON_ENDPOINT);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -46099,7 +46099,7 @@ async function fetchFeaturedGames() {
         async function fetchLiveGamesFromJSON() {
             try {
                 const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json';
-                const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+                const response = await fetch(JSON_ENDPOINT);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -46264,7 +46264,7 @@ async function fetchFeaturedGames() {
             // Force re-fetch from JSON endpoint instead of Firestore
             const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json';
             try {
-                const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+                const response = await fetch(JSON_ENDPOINT);
                 if (response.ok) {
                     const jsonData = await response.json();
                     const filteredGames = jsonData.games.filter(game => game.gameDate === todayStr || game.scheduledDate === todayStr);
@@ -46340,7 +46340,7 @@ async function fetchFeaturedGames() {
         console.log('[SCORES] Current time (Eastern):', now.toISO());
         console.log('[SCORES] Yesterday date string:', yesterdayStr);
         
-        fetch(YESTERDAY_JSON_ENDPOINT, { cache: 'no-store' })
+        fetch(YESTERDAY_JSON_ENDPOINT)
             .then(async response => {
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -46782,7 +46782,7 @@ async function fetchFeaturedGames() {
         // Function to fetch and process games from JSON endpoint
         async function fetchAndProcessTodayGames() {
             try {
-                const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+                const response = await fetch(JSON_ENDPOINT);
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
@@ -47101,7 +47101,7 @@ async function fetchFeaturedGames() {
         console.log('Fetching soccer games for date =', todayStr);
         const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json';
         
-        fetch(JSON_ENDPOINT, { cache: 'no-store' })
+        fetch(JSON_ENDPOINT)
             .then(response => {
                 console.log('[Soccer] Fetch response status:', response.status, response.statusText);
                 if (!response.ok) {
@@ -51254,7 +51254,7 @@ async function loadTop25RankingsCache(leagueKey) {
     try {
         // Fetch from JSON endpoint instead of Firestore
         const JSON_ENDPOINT = `https://flashlive-scraper-124291936014.us-central1.run.app/data/top25/${leagueKey}.json`;
-        const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+             const response = await fetch(JSON_ENDPOINT);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -51379,7 +51379,7 @@ async function loadCFPRankingsCache() {
     try {
         // Fetch from JSON endpoint instead of Firestore
         const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/cfp-standings.json';
-        const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+             const response = await fetch(JSON_ENDPOINT);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -51614,7 +51614,7 @@ async function loadTop25Data(leagueKey) {
         
         // Fetch from JSON endpoint instead of Firestore
         const JSON_ENDPOINT = `https://flashlive-scraper-124291936014.us-central1.run.app/data/top25/${leagueKey}.json`;
-        const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+             const response = await fetch(JSON_ENDPOINT);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -51785,7 +51785,7 @@ async function loadCFPData() {
     try {
         // Fetch from JSON endpoint instead of Firestore
         const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/cfp-standings.json';
-        const response = await fetch(JSON_ENDPOINT, { cache: 'no-store' });
+             const response = await fetch(JSON_ENDPOINT);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
