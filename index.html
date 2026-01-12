@@ -5653,6 +5653,46 @@ function loadCustomRSSFeed(feedUrl, container) {
             'Washington Wizards': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-washingtonwizards.xml'
         };
         
+        // Function to check if a game is clickable (has at least one team with feed mappings)
+        // Must be defined after TEAM_TO_RSS_FEED and TEAM_TO_MEDIA_FEED are defined
+        // Define as regular function (hoisted) and also attach to window for cross-script access
+        function isGameClickable(homeTeamName, awayTeamName) {
+            if (!homeTeamName && !awayTeamName) return false;
+            
+            // Helper function to check if a team name exists in any feed mapping
+            function teamHasFeedMapping(teamName) {
+                if (!teamName) return false;
+                
+                // Check global TEAM_TO_RSS_FEED
+                if (typeof TEAM_TO_RSS_FEED !== 'undefined' && TEAM_TO_RSS_FEED && TEAM_TO_RSS_FEED[teamName]) return true;
+                
+                // Check global TEAM_TO_MEDIA_FEED
+                if (typeof TEAM_TO_MEDIA_FEED !== 'undefined' && TEAM_TO_MEDIA_FEED && TEAM_TO_MEDIA_FEED[teamName]) return true;
+                
+                // Check sportspyder mappings via getSportspyderFeedUrl (which has access to all scoped constants)
+                // This checks: PREMIER_LEAGUE_TO_SPORTSPYDER_URL, MLB_TO_SPORTSPYDER_URL, 
+                // NCAAF_TO_SPORTSPYDER_URL, NCAAM_TO_SPORTSPYDER_URL, etc.
+                // Use lazy evaluation - check if function exists at call time
+                try {
+                    if (typeof getSportspyderFeedUrl === 'function') {
+                        const sportspyderUrl = getSportspyderFeedUrl(teamName);
+                        if (sportspyderUrl) return true;
+                    }
+                } catch (e) {
+                    // If getSportspyderFeedUrl is not yet defined, skip this check
+                    // This can happen during initial page load
+                }
+                
+                return false;
+            }
+            
+            // Check if either team has a feed mapping
+            return teamHasFeedMapping(homeTeamName) || teamHasFeedMapping(awayTeamName);
+        }
+        
+        // Also attach to window for cross-script access
+        window.isGameClickable = isGameClickable;
+        
         // Get short team name for display (e.g., "Buffalo Sabres" -> "Sabres")
         function getShortTeamName(fullTeamName) {
             const TEAM_SHORT_NAMES = {
@@ -41808,16 +41848,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                     
+                    // Check if game is clickable (has at least one team with feed mappings)
+                    const originalHomeTeam = data["Home Team"] || "";
+                    const originalAwayTeam = data["Away Team"] || "";
+                    const isClickable = isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay);
+                    const clickIndicatorHtml = isClickable ? '<td rowspan="2" class="game-click-indicator"></td>' : '<td rowspan="2"></td>';
+                    
                     if (isSoccerLeague) {
                         // Soccer: home team on top, away team on bottom (opposite of non-soccer)
                         // Time on top line (same as other leagues)
-                        row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td><td rowspan="2" class="game-click-indicator"></td>`;
+                        row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td>${clickIndicatorHtml}`;
                         row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                     } else {
                         // All other leagues: away team on top, home team on bottom
                         // Period/quarter goes in time column top row (same line as top team), time remaining goes in time column bottom row (same line as bottom team)
                         // Remove rowspan="2" from time column to allow separate content in each row
-                        row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td><td rowspan="2" class="game-click-indicator"></td>`;
+                        row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${featuredChannelDisplay}</div></td>${clickIndicatorHtml}`;
                         row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                     }
 
@@ -41841,9 +41887,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         row2.dataset.matchStatus = matchStatusValue;
                     }
 
-                    // Add click handlers for game selection (News column only)
+                    // Add click handlers for game selection (News column only) - only if game is clickable
                     // Note: gameId and gameIdString already extracted above
-                    if (gameIdString) {
+                    if (gameIdString && isClickable) {
                         row1.setAttribute('data-game-id', gameIdString);
                         row2.setAttribute('data-game-id', gameIdString);
                         row1.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)`);
@@ -42337,16 +42383,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
                 
+                // Check if game is clickable (has at least one team with feed mappings)
+                const originalHomeTeam = data["Home Team"] || "";
+                const originalAwayTeam = data["Away Team"] || "";
+                const isClickable = isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay);
+                const clickIndicatorHtml = isClickable ? '<td rowspan="2" class="game-click-indicator"></td>' : '<td rowspan="2"></td>';
+                
                 if (isSoccerLeague) {
                     // Soccer: home team on top, away team on bottom (opposite of non-soccer)
                     // Time on top line (same as other leagues)
-                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td><td rowspan="2" class="game-click-indicator"></td>`;
+                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td>${clickIndicatorHtml}`;
                     row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td>`;
                 } else {
                     // All other leagues: away team on top, home team on bottom
                     // Period/quarter goes in time column top row (same line as top team), time remaining goes in time column bottom row (same line as bottom team)
                     // Remove rowspan="2" from time column to allow separate content in each row
-                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td><td rowspan="2" class="game-click-indicator"></td>`;
+                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${displayAwayScore}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td>${clickIndicatorHtml}`;
                     row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${displayHomeScore}</td>`;
                 }
 
@@ -42385,9 +42437,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     row2.dataset.matchStatus = matchStatusValue;
                 }
 
-                // Add click handlers for game selection (News column only)
+                // Add click handlers for game selection (News column only) - only if game is clickable
                 // Note: gameId and gameIdString already extracted above
-                if (gameIdString) {
+                if (gameIdString && isClickable) {
                     row1.setAttribute('data-game-id', gameIdString);
                     row2.setAttribute('data-game-id', gameIdString);
                     row1.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)`);
@@ -47710,15 +47762,25 @@ async function fetchFeaturedGames() {
                     }
                     const channelDisplay = normalizeChannel((channelToDisplay && !isFinal) ? channelToDisplay : '');
                     
-                    html += `<tr class="game-row">`;
+                    // Check if game is clickable (has at least one team with feed mappings)
+                    const originalHomeTeam = game['Home Team'] || '';
+                    const originalAwayTeam = game['Away Team'] || '';
+                    const isClickable = isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay);
+                    const gameId = game['Game ID'] || game.gameId || game['GameID'] || null;
+                    const gameIdString = gameId ? String(gameId) : null;
+                    const clickIndicatorHtml = isClickable ? '<td rowspan="2" class="game-click-indicator"></td>' : '<td rowspan="2"></td>';
+                    const onclickAttr = (isClickable && gameIdString) ? ` onclick="handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)" style="cursor: pointer;"` : '';
+                    const dataGameIdAttr = (isClickable && gameIdString) ? ` data-game-id="${gameIdString}"` : '';
+                    
+                    html += `<tr class="game-row"${onclickAttr}${dataGameIdAttr}>`;
                     html += `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>`;
                     html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${homeTeam}</td>`;
                     html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${homeScoreDisplay}</td>`;
                     html += `<td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
-                    html += `<td rowspan="2" class="game-click-indicator"></td>`;
+                    html += clickIndicatorHtml;
                     html += `</tr>`;
                     
-                    html += `<tr class="game-row game-separator">`;
+                    html += `<tr class="game-row game-separator"${onclickAttr}${dataGameIdAttr}>`;
                     html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${awayTeam}</td>`;
                     html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${awayScoreDisplay}</td>`;
                     html += `</tr>`;
@@ -48819,13 +48881,15 @@ async function fetchFeaturedGames() {
                         gameLeagueKey = leagueKey;
                     }
                     // For NHL upcoming schedule, show mascot names only
+                    const originalAwayTeam = game.away || '';
+                    const originalHomeTeam = game.home || '';
                     let awayDisplay, homeDisplay;
                     if (leagueKey === 'NHL') {
-                        awayDisplay = getMascotName(game.away || '');
-                        homeDisplay = getMascotName(game.home || '');
+                        awayDisplay = getMascotName(originalAwayTeam);
+                        homeDisplay = getMascotName(originalHomeTeam);
                     } else {
-                        awayDisplay = getTeamDisplayName(game.away || '', displayLeague);
-                        homeDisplay = getTeamDisplayName(game.home || '', displayLeague);
+                        awayDisplay = getTeamDisplayName(originalAwayTeam, displayLeague);
+                        homeDisplay = getTeamDisplayName(originalHomeTeam, displayLeague);
                     }
                     let awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey);
                     let homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey);
@@ -48839,16 +48903,24 @@ async function fetchFeaturedGames() {
                         homeColor = 'color: #C0C0C0;';
                     }
                     
+                    // Check if game is clickable (has at least one team with feed mappings)
+                    const isClickable = isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay);
+                    const gameId = game['Game ID'] || game.gameId || game['GameID'] || null;
+                    const gameIdString = gameId ? String(gameId) : null;
+                    const clickIndicatorHtml = isClickable ? '<td rowspan="2" class="game-click-indicator"></td>' : '<td rowspan="2"></td>';
+                    const onclickAttr = (isClickable && gameIdString) ? ` onclick="handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)" style="cursor: pointer;"` : '';
+                    const dataGameIdAttr = (isClickable && gameIdString) ? ` data-game-id="${gameIdString}"` : '';
+                    
                     // Use EXACT same table format as renderGames function (10px font for time column in league-specific column)
                     html += `
-                        <tr class="game-row scheduled-game">
+                        <tr class="game-row scheduled-game"${onclickAttr}${dataGameIdAttr}>
                             <td rowspan="2" style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0; ${awayColor}">${awayTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                             <td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
-                            <td rowspan="2" class="game-click-indicator"></td>
+                            ${clickIndicatorHtml}
                         </tr>
-                        <tr class="game-row game-separator scheduled-game">
+                        <tr class="game-row game-separator scheduled-game"${onclickAttr}${dataGameIdAttr}>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0; ${homeColor}">${homeTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                         </tr>
@@ -48901,21 +48973,31 @@ async function fetchFeaturedGames() {
                     if (!gameLeagueKey) {
                         gameLeagueKey = leagueKey;
                     }
-                    const homeDisplay = getTeamDisplayName(game.home || '', displayLeague);
-                    const awayDisplay = getTeamDisplayName(game.away || '', displayLeague);
+                    const originalHomeTeam = game.home || '';
+                    const originalAwayTeam = game.away || '';
+                    const homeDisplay = getTeamDisplayName(originalHomeTeam, displayLeague);
+                    const awayDisplay = getTeamDisplayName(originalAwayTeam, displayLeague);
                     const homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey);
                     const awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey);
                     
+                    // Check if game is clickable (has at least one team with feed mappings)
+                    const isClickable = isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay);
+                    const gameId = game['Game ID'] || game.gameId || game['GameID'] || null;
+                    const gameIdString = gameId ? String(gameId) : null;
+                    const clickIndicatorHtml = isClickable ? '<td rowspan="2" class="game-click-indicator"></td>' : '<td rowspan="2"></td>';
+                    const onclickAttr = (isClickable && gameIdString) ? ` onclick="handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)" style="cursor: pointer;"` : '';
+                    const dataGameIdAttr = (isClickable && gameIdString) ? ` data-game-id="${gameIdString}"` : '';
+                    
                     // Use EXACT same table format as renderGames function for soccer (10px font for time column in league-specific column)
                     html += `
-                        <tr class="game-row scheduled-game">
+                        <tr class="game-row scheduled-game"${onclickAttr}${dataGameIdAttr}>
                             <td rowspan="2" style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${homeTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                             <td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
-                            <td rowspan="2" class="game-click-indicator"></td>
+                            ${clickIndicatorHtml}
                         </tr>
-                        <tr class="game-row game-separator scheduled-game">
+                        <tr class="game-row game-separator scheduled-game"${onclickAttr}${dataGameIdAttr}>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${awayTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                         </tr>
