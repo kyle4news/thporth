@@ -41816,10 +41816,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
+                    // Check if game is clickable (has at least one team with feed mappings)
+                    const originalHomeTeam = data["Home Team"] || "";
+                    const originalAwayTeam = data["Away Team"] || "";
+                    const isClickable = isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay);
+                    const gameId = data["Game ID"] || data.gameId || data["GameID"] || null;
+                    const gameIdString = gameId ? String(gameId) : null;
+                    const isSelected = gameIdString && window.currentSelectedGameId === gameIdString;
+                    
                     const row1 = currentTable.insertRow();
-                    row1.className = "game-row";
+                    row1.className = "game-row" + (isSelected ? " selected" : "");
                     const row2 = currentTable.insertRow();
-                    row2.className = "game-row game-separator";
+                    row2.className = "game-row game-separator" + (isSelected ? " selected" : "");
                     
                     // Add special class for ATP Finals (Doubles) to add extra spacing
                     const isAtpDoubles = displayLeagueForCheck === "ATP Finals (Doubles)";
@@ -41847,11 +41855,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         }
                     }
-                    
-                    // Check if game is clickable (has at least one team with feed mappings)
-                    const originalHomeTeam = data["Home Team"] || "";
-                    const originalAwayTeam = data["Away Team"] || "";
-                    const isClickable = isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay);
                     const clickIndicatorHtml = isClickable ? '<td rowspan="2" class="game-click-indicator"></td>' : '<td rowspan="2"></td>';
                     
                     if (isSoccerLeague) {
