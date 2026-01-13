@@ -37344,6 +37344,186 @@ document.addEventListener('DOMContentLoaded', function () {
     // Start periodic refresh
     startPeriodicRefresh();
 
+    // --- TEAM ALIAS MAPPING SYSTEM ---
+    // Loads team name aliases from Firestore (populated from Google Sheets)
+    // Format: { league: { variation: displayName, _equivalents_variation: [otherVariations] } }
+    window.teamAliasMappings = {};
+    window.teamAliasMappingsCache = null;
+    window.teamAliasMappingsCacheTime = null;
+    const TEAM_ALIAS_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+
+    /**
+     * Load team alias mappings from Firestore
+     * Mappings are stored at: artifacts/flashlive-daily-scraper/public/data/supplementalTeamMappings
+     */
+    async function loadTeamAliasMappings() {
+        // Check cache first
+        if (window.teamAliasMappingsCache && window.teamAliasMappingsCacheTime) {
+            const cacheAge = Date.now() - window.teamAliasMappingsCacheTime;
+            if (cacheAge < TEAM_ALIAS_CACHE_DURATION) {
+                return window.teamAliasMappingsCache;
+            }
+        }
+
+        try {
+            const mappingsRef = db.collection('artifacts/flashlive-daily-scraper/public/data/supplementalTeamMappings');
+            const snapshot = await mappingsRef.get();
+            
+            const mappings = {};
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const league = data.league;
+                if (league && data.mappings) {
+                    mappings[league] = data.mappings;
+                }
+            });
+            
+            window.teamAliasMappingsCache = mappings;
+            window.teamAliasMappingsCacheTime = Date.now();
+            window.teamAliasMappings = mappings;
+            
+            console.log(`[Team Aliases] Loaded mappings for ${Object.keys(mappings).length} leagues`);
+            return mappings;
+        } catch (error) {
+            console.warn('[Team Aliases] Error loading mappings from Firestore:', error);
+            // Return cached data if available, or empty object
+            return window.teamAliasMappingsCache || {};
+        }
+    }
+
+    /**
+     * Normalize team name for matching (removes special chars, normalizes whitespace)
+     */
+    function normalizeTeamNameForMatching(name) {
+        if (!name) return '';
+        return name
+            .toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    /**
+     * Get the canonical display name for a team using alias mappings
+     * @param {string} teamName - The team name variation to look up
+     * @param {string} league - The league key (e.g., 'NCAAM', 'NCAAW', 'NCAAF', 'NBA')
+     * @returns {string} The canonical display name, or original name if no mapping found
+     */
+    async function getCanonicalTeamName(teamName, league) {
+        if (!teamName || !league) return teamName;
+        
+        // Ensure mappings are loaded
+        const mappings = await loadTeamAliasMappings();
+        const leagueMappings = mappings[league];
+        if (!leagueMappings) return teamName;
+        
+        // Try exact match first
+        if (leagueMappings[teamName]) {
+            return leagueMappings[teamName];
+        }
+        
+        // Try case-insensitive match
+        const teamNameLower = teamName.toLowerCase();
+        for (const [variation, displayName] of Object.entries(leagueMappings)) {
+            if (!variation.startsWith('_equivalents_') && variation.toLowerCase() === teamNameLower) {
+                return displayName;
+            }
+        }
+        
+        // Try normalized match (remove special chars, normalize whitespace)
+        const normalized = normalizeTeamNameForMatching(teamName);
+        for (const [variation, displayName] of Object.entries(leagueMappings)) {
+            if (!variation.startsWith('_equivalents_')) {
+                const normalizedVariation = normalizeTeamNameForMatching(variation);
+                if (normalizedVariation === normalized) {
+                    return displayName;
+                }
+            }
+        }
+        
+        return teamName;
+    }
+
+    /**
+     * Check if two team names match using alias mappings
+     * @param {string} teamName1 - First team name
+     * @param {string} teamName2 - Second team name
+     * @param {string} league - The league key
+     * @returns {boolean} True if the names match (are aliases of the same team)
+     */
+    async function doTeamNamesMatch(teamName1, teamName2, league) {
+        if (!teamName1 || !teamName2 || !league) return false;
+        if (teamName1 === teamName2) return true;
+        
+        const mappings = await loadTeamAliasMappings();
+        const leagueMappings = mappings[league];
+        if (!leagueMappings) {
+            // Fallback to normalized comparison
+            return normalizeTeamNameForMatching(teamName1) === normalizeTeamNameForMatching(teamName2);
+        }
+        
+        // Get canonical names for both
+        const canonical1 = await getCanonicalTeamName(teamName1, league);
+        const canonical2 = await getCanonicalTeamName(teamName2, league);
+        
+        // If they map to the same canonical name, they match
+        if (canonical1 === canonical2 && canonical1 !== teamName1 && canonical2 !== teamName2) {
+            return true;
+        }
+        
+        // Check if teamName1 is in teamName2's equivalents
+        const equivalents1 = leagueMappings[`_equivalents_${teamName1}`] || [];
+        if (equivalents1.includes(teamName2)) return true;
+        
+        const equivalents2 = leagueMappings[`_equivalents_${teamName2}`] || [];
+        if (equivalents2.includes(teamName1)) return true;
+        
+        // Check normalized match as fallback
+        return normalizeTeamNameForMatching(teamName1) === normalizeTeamNameForMatching(teamName2);
+    }
+
+    /**
+     * Get all variations/aliases for a team name
+     * @param {string} teamName - The team name to get variations for
+     * @param {string} league - The league key
+     * @returns {Promise<string[]>} Array of all variations including the canonical name
+     */
+    async function getAllTeamNameVariations(teamName, league) {
+        if (!teamName || !league) return [teamName];
+        
+        const mappings = await loadTeamAliasMappings();
+        const leagueMappings = mappings[league];
+        if (!leagueMappings) return [teamName];
+        
+        const canonical = await getCanonicalTeamName(teamName, league);
+        const variations = new Set([canonical, teamName]);
+        
+        // Add all variations that map to the same canonical name
+        for (const [variation, displayName] of Object.entries(leagueMappings)) {
+            if (!variation.startsWith('_equivalents_') && displayName === canonical) {
+                variations.add(variation);
+            }
+        }
+        
+        // Add equivalents
+        const equivalents = leagueMappings[`_equivalents_${teamName}`] || [];
+        equivalents.forEach(eq => variations.add(eq));
+        
+        return Array.from(variations);
+    }
+
+    // Make functions globally accessible
+    window.getCanonicalTeamName = getCanonicalTeamName;
+    window.doTeamNamesMatch = doTeamNamesMatch;
+    window.getAllTeamNameVariations = getAllTeamNameVariations;
+    window.loadTeamAliasMappings = loadTeamAliasMappings;
+
+    // Pre-load mappings on page load
+    loadTeamAliasMappings().catch(err => {
+        console.warn('[Team Aliases] Failed to pre-load mappings:', err);
+    });
+
     // --- 3. ELEMENT REFERENCES ---
     const leagueHeader = document.getElementById('league-specific-header');
     const scheduleContent = document.getElementById('league-schedule-content');
@@ -39380,6 +39560,51 @@ document.addEventListener('DOMContentLoaded', function () {
             p = p.replace(/\s*U17\b/gi, '').trim();
         }
         
+        // PRIORITY 1: Use alias mappings from Google Sheet (Column B = Display Name)
+        // Convert league to league key (e.g., "USA: NCAA" -> "NCAAM")
+        let leagueKey = null;
+        if (league) {
+            if (league === 'USA: NCAA' || (league.includes('NCAA') && league.includes('Men'))) {
+                leagueKey = 'NCAAM';
+            } else if (league === 'USA: NCAA Women' || (league.includes('NCAA') && league.includes('Women'))) {
+                leagueKey = 'NCAAW';
+            } else if (league === 'NCAAF' || (league.includes('NCAA') && league.includes('Football'))) {
+                leagueKey = 'NCAAF';
+            } else {
+                // Try direct match
+                leagueKey = league;
+            }
+        }
+        
+        // Check alias mappings (Column B = Display Name)
+        if (leagueKey && window.teamAliasMappings) {
+            const leagueMappings = window.teamAliasMappings[leagueKey];
+            if (leagueMappings) {
+                // Try exact match first
+                if (leagueMappings[p]) {
+                    return leagueMappings[p]; // Return Column B display name
+                }
+                // Try case-insensitive match
+                const pLower = p.toLowerCase();
+                for (const [variation, displayName] of Object.entries(leagueMappings)) {
+                    if (!variation.startsWith('_equivalents_') && variation.toLowerCase() === pLower) {
+                        return displayName; // Return Column B display name
+                    }
+                }
+                // Try normalized match
+                const normalized = normalizeTeamNameForMatching(p);
+                for (const [variation, displayName] of Object.entries(leagueMappings)) {
+                    if (!variation.startsWith('_equivalents_')) {
+                        const normalizedVariation = normalizeTeamNameForMatching(variation);
+                        if (normalizedVariation === normalized) {
+                            return displayName; // Return Column B display name
+                        }
+                    }
+                }
+            }
+        }
+        
+        // PRIORITY 2: Fallback to hardcoded mappings (for backward compatibility)
         // If league is specified and has mappings, use league-specific mapping
         // Note: For doubles with <br>, we need to check if the original name (before processing) has a mapping
         if (league && TEAM_DISPLAY_MAP[league]) {
@@ -39935,9 +40160,39 @@ document.addEventListener('DOMContentLoaded', function () {
       return trimmed.replace(/USA Network/g, 'USA');
     }
 
+    // Synchronous version that uses cached mappings (for backward compatibility)
     function normalizeTeamName(leagueKey, name) {
       if (!name) return name;
       const trimmed = name.trim();
+      
+      // Try to use cached alias mappings synchronously
+      const mappings = window.teamAliasMappings || {};
+      const leagueMappings = mappings[leagueKey];
+      if (leagueMappings) {
+        // Try exact match
+        if (leagueMappings[trimmed]) {
+          return leagueMappings[trimmed];
+        }
+        // Try case-insensitive match
+        const trimmedLower = trimmed.toLowerCase();
+        for (const [variation, displayName] of Object.entries(leagueMappings)) {
+          if (!variation.startsWith('_equivalents_') && variation.toLowerCase() === trimmedLower) {
+            return displayName;
+          }
+        }
+        // Try normalized match
+        const normalized = normalizeTeamNameForMatching(trimmed);
+        for (const [variation, displayName] of Object.entries(leagueMappings)) {
+          if (!variation.startsWith('_equivalents_')) {
+            const normalizedVariation = normalizeTeamNameForMatching(variation);
+            if (normalizedVariation === normalized) {
+              return displayName;
+            }
+          }
+        }
+      }
+      
+      // Fallback to hardcoded mappings for specific leagues
       const premier = {
         'Manchester City': 'Man City',
         'Man City': 'Man City',
@@ -41625,8 +41880,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         const leagueKey = getLeagueKeyFromGame(data);
                         const homeDisplay = getTeamDisplayName(data["Home Team"] || "", displayLeague);
                         const awayDisplay = getTeamDisplayName(data["Away Team"] || "", displayLeague);
-                        const home = formatTeamNameWithRanking(homeDisplay, leagueKey);
-                        const away = formatTeamNameWithRanking(awayDisplay, leagueKey);
+                        const home = formatTeamNameWithRanking(homeDisplay, leagueKey, data, true);
+                        const away = formatTeamNameWithRanking(awayDisplay, leagueKey, data, false);
                         // Check if names contain <br> (doubles tennis) to adjust styling
                         const isHomeDoubles = homeDisplay.includes('<br>');
                         const isAwayDoubles = awayDisplay.includes('<br>');
@@ -42125,8 +42380,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (shouldPrioritizeImportant && !isImportantGame) {
                     hasHiddenGames = true;
                 }
-                const home = formatTeamNameWithRanking(homeDisplay, leagueKey);
-                const away = formatTeamNameWithRanking(awayDisplay, leagueKey);
+                const home = formatTeamNameWithRanking(homeDisplay, leagueKey, data, true);
+                const away = formatTeamNameWithRanking(awayDisplay, leagueKey, data, false);
                 // Check if names contain <br> (doubles tennis) to adjust styling
                 const isHomeDoubles = homeDisplay.includes('<br>');
                 const isAwayDoubles = awayDisplay.includes('<br>');
@@ -47810,8 +48065,8 @@ async function fetchFeaturedGames() {
                     const leagueKey = getLeagueKeyFromGame(game);
                     const homeDisplay = getTeamDisplayName(game['Home Team'] || '', displayLeague);
                     const awayDisplay = getTeamDisplayName(game['Away Team'] || '', displayLeague);
-                    const homeTeam = formatTeamNameWithRanking(homeDisplay, leagueKey);
-                    const awayTeam = formatTeamNameWithRanking(awayDisplay, leagueKey);
+                    const homeTeam = formatTeamNameWithRanking(homeDisplay, leagueKey, game, true);
+                    const awayTeam = formatTeamNameWithRanking(awayDisplay, leagueKey, game, false);
                     const homeScore = game['Home Score'] || '';
                     const awayScore = game['Away Score'] || '';
                     const status = game['Match Status'] || '';
@@ -49103,8 +49358,8 @@ async function fetchFeaturedGames() {
                         awayDisplay = getTeamDisplayName(originalAwayTeam, displayLeague);
                         homeDisplay = getTeamDisplayName(originalHomeTeam, displayLeague);
                     }
-                    let awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey);
-                    let homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey);
+                    let awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey, game, false);
+                    let homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey, game, true);
                     
                     // For UFC and Boxing: handle sub-items (gray text) vs main items (white text)
                     let awayColor = '';
@@ -49189,8 +49444,8 @@ async function fetchFeaturedGames() {
                     const originalAwayTeam = game.away || '';
                     const homeDisplay = getTeamDisplayName(originalHomeTeam, displayLeague);
                     const awayDisplay = getTeamDisplayName(originalAwayTeam, displayLeague);
-                    const homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey);
-                    const awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey);
+                    const homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey, game, true);
+                    const awayTeam = formatTeamNameWithRanking(awayDisplay, gameLeagueKey, game, false);
                     
                     // Check if game is clickable (has at least one team with feed mappings)
                     const isClickable = isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay);
@@ -51822,15 +52077,10 @@ function getRankingForDisplayName(displayName, leagueKey) {
       }
     }
 
-    // Case-insensitive direct match
+    // Case-insensitive exact match only (no fuzzy/substring matching)
     if (cfpRankingsCache) {
       for (const [k, v] of Object.entries(cfpRankingsCache)) {
         if (k.toString().toLowerCase() === nameLower) return v;
-      }
-      // Fuzzy contains match
-      for (const [k, v] of Object.entries(cfpRankingsCache)) {
-        const kLower = k.toString().toLowerCase();
-        if (kLower.includes(nameLower) || nameLower.includes(kLower)) return v;
       }
     }
 
@@ -51838,9 +52088,13 @@ function getRankingForDisplayName(displayName, leagueKey) {
   }
 
   // For NCAAM/NCAAW use top25RankingsCache
+  // STRICT MATCHING ONLY - no fuzzy/substring matching to prevent false matches
   const topCache = top25RankingsCache[leagueKey] || {};
+  
+  // Exact match first
   if (topCache[nameStr]) return topCache[nameStr];
 
+  // Check TEAM_DISPLAY_MAP for mapped names (exact match only)
   if (TEAM_DISPLAY_MAP && TEAM_DISPLAY_MAP[leagueKey]) {
     for (const [fullName, shortName] of Object.entries(TEAM_DISPLAY_MAP[leagueKey])) {
       if ((shortName || '').toString() === nameStr) {
@@ -51851,15 +52105,12 @@ function getRankingForDisplayName(displayName, leagueKey) {
     }
   }
 
-  // Case-insensitive direct and fuzzy matches
+  // Case-insensitive exact match only (no substring/fuzzy matching)
   for (const [k, v] of Object.entries(topCache)) {
     if (k.toString().toLowerCase() === nameLower) return v;
   }
-  for (const [k, v] of Object.entries(topCache)) {
-    const kLower = k.toString().toLowerCase();
-    if (kLower.includes(nameLower) || nameLower.includes(kLower)) return v;
-  }
 
+  // No match found - return null (strict matching prevents false matches)
   return null;
 }
 
@@ -51887,17 +52138,35 @@ function getLeagueKeyFromGame(game) {
 }
 
 // Format team name with Top 25 ranking (if ranked)
-function formatTeamNameWithRanking(displayName, leagueKey) {
+function formatTeamNameWithRanking(displayName, leagueKey, gameData = null, isHomeTeam = false) {
     if (!leagueKey || !['NCAAF', 'NCAAM', 'NCAAW'].includes(leagueKey)) {
         return displayName;
     }
     
-      
-  const rank = getRankingForDisplayName(displayName, leagueKey);
-  if (rank !== null && rank !== undefined) {
-    return `<span style="font-size: 0.75em;">${rank}</span> ${displayName}`;
-  }
-  return displayName;
+    // First, check if ranking is stored directly in game data (set by sync-top25-to-games.cjs)
+    if (gameData) {
+        let rank = null;
+        if (isHomeTeam) {
+            rank = gameData['Home Team Ranking'] || gameData['Home Team Rank'] || gameData['HomeTeamRank'] || null;
+        } else {
+            rank = gameData['Away Team Ranking'] || gameData['Away Team Rank'] || gameData['AwayTeamRank'] || null;
+        }
+        
+        // Convert to number if it's a string
+        if (rank !== null && rank !== undefined) {
+            rank = typeof rank === 'string' ? parseInt(rank, 10) : rank;
+            if (!isNaN(rank) && rank > 0 && rank <= 25) {
+                return `<span style="font-size: 0.75em;">#${rank}</span> ${displayName}`;
+            }
+        }
+    }
+    
+    // Fallback to cache lookup if game data doesn't have ranking
+    const rank = getRankingForDisplayName(displayName, leagueKey);
+    if (rank !== null && rank !== undefined) {
+        return `<span style="font-size: 0.75em;">#${rank}</span> ${displayName}`;
+    }
+    return displayName;
 }
 
 // Format a display name with ranking using the canonical team name for lookups
