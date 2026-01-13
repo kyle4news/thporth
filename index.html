@@ -7419,12 +7419,21 @@ function loadCustomRSSFeed(feedUrl, container) {
                     </div>
                 `;
                 
+                // Use RSS feed service proxy to bypass CORS (same as news feeds)
+                const RSS_FEED_SERVICE_URL = 'https://rss-feed-service-124291936014.us-central1.run.app';
+                const proxyUrl = `${RSS_FEED_SERVICE_URL}/proxy/rss?url=${encodeURIComponent(feedUrl)}`;
+                console.log(`[loadTeamMediaFeed] Fetching via proxy: ${proxyUrl}`);
+                
                 // Fetch RSS feed and parse XML
-                const response = await fetch(feedUrl);
+                const response = await fetch(proxyUrl);
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 const xmlText = await response.text();
+                
+                if (!xmlText || xmlText.length < 100) {
+                    throw new Error(`Feed returned empty or too short content (${xmlText?.length || 0} chars)`);
+                }
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
                 
@@ -41446,19 +41455,98 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             // Special handling for FEATURED section - group by title or league
             if (leagueNameKey === 'FEATURED' && isGroupedByLeague) {
-                // Sort all games by order to preserve Google Sheets row order
-                // This ensures that games appear in the exact order they were in the Google Sheets document
+                // Sort all games by leagueImportance first (ascending, nulls last), then by start time within each league
                 const sortedFeaturedGames = [...games].sort((a, b) => {
-                    // Primary sort: by order (preserves Google Sheets row order)
+                    // Get leagueImportance (check multiple field names)
+                    const importanceA = a.leagueImportance !== null && a.leagueImportance !== undefined 
+                        ? Number(a.leagueImportance) 
+                        : (a['League Importance'] !== null && a['League Importance'] !== undefined ? Number(a['League Importance']) : 999999);
+                    const importanceB = b.leagueImportance !== null && b.leagueImportance !== undefined 
+                        ? Number(b.leagueImportance) 
+                        : (b['League Importance'] !== null && b['League Importance'] !== undefined ? Number(b['League Importance']) : 999999);
+                    
+                    // Debug logging for sorting
+                    if (importanceA !== 999999 || importanceB !== 999999) {
+                        console.log(`[Featured Sort] ${a['Away Team']} vs ${a['Home Team']} (${a.League}): importance=${importanceA}`);
+                        console.log(`[Featured Sort] ${b['Away Team']} vs ${b['Home Team']} (${b.League}): importance=${importanceB}`);
+                    }
+                    
+                    // Primary sort: by leagueImportance (ascending)
+                    if (importanceA !== importanceB) {
+                        return importanceA - importanceB;
+                    }
+                    
+                    // Secondary sort: by start time (earlier first)
+                    const startTimeA = a['Start Time'];
+                    const startTimeB = b['Start Time'];
+                    
+                    if (startTimeA && startTimeB) {
+                        // Handle Firestore Timestamp objects
+                        let timeA, timeB;
+                        if (startTimeA._seconds !== undefined) {
+                            timeA = startTimeA._seconds * 1000;
+                        } else if (startTimeA.toDate && typeof startTimeA.toDate === 'function') {
+                            timeA = startTimeA.toDate().getTime();
+                        } else if (typeof startTimeA === 'string') {
+                            timeA = new Date(startTimeA).getTime();
+                        } else {
+                            timeA = 0;
+                        }
+                        
+                        if (startTimeB._seconds !== undefined) {
+                            timeB = startTimeB._seconds * 1000;
+                        } else if (startTimeB.toDate && typeof startTimeB.toDate === 'function') {
+                            timeB = startTimeB.toDate().getTime();
+                        } else if (typeof startTimeB === 'string') {
+                            timeB = new Date(startTimeB).getTime();
+                        } else {
+                            timeB = 0;
+                        }
+                        
+                        if (timeA !== timeB) {
+                            return timeA - timeB;
+                        }
+                    }
+                    
+                    // Tertiary sort: by order (fallback)
                     const orderA = (a && a.order !== undefined) ? a.order : 999999;
                     const orderB = (b && b.order !== undefined) ? b.order : 999999;
-                    if (orderA !== orderB) {
-                        return orderA - orderB;
+                    return orderA - orderB;
+                });
+                
+                // Group games by headerText/titleText first, preserving sort order
+                const gamesByTitle = new Map();
+                sortedFeaturedGames.forEach(game => {
+                    const headerText = game.headerText || game['Header Text'] || '';
+                    const titleText = isYesterdayScores 
+                        ? (headerText || game.yesterdayTitle || game.title || getLeagueDisplayName(game.League, game.Sport) || "Other")
+                        : (headerText || game.title || getLeagueDisplayName(game.League, game.Sport) || "Other");
+                    
+                    if (!gamesByTitle.has(titleText)) {
+                        gamesByTitle.set(titleText, []);
                     }
-                    // Secondary sort: by displayOrder (fallback for games without order)
-                    const fallbackOrderA = (a && a.displayOrder !== undefined) ? a.displayOrder : 999999;
-                    const fallbackOrderB = (b && b.displayOrder !== undefined) ? b.displayOrder : 999999;
-                    return fallbackOrderA - fallbackOrderB;
+                    gamesByTitle.get(titleText).push(game);
+                });
+                
+                // Sort title groups by the leagueImportance of the first game in each group
+                const sortedTitleGroups = Array.from(gamesByTitle.entries()).sort(([titleA, gamesA], [titleB, gamesB]) => {
+                    const importanceA = gamesA[0].leagueImportance !== null && gamesA[0].leagueImportance !== undefined 
+                        ? Number(gamesA[0].leagueImportance) 
+                        : (gamesA[0]['League Importance'] !== null && gamesA[0]['League Importance'] !== undefined ? Number(gamesA[0]['League Importance']) : 999999);
+                    const importanceB = gamesB[0].leagueImportance !== null && gamesB[0].leagueImportance !== undefined 
+                        ? Number(gamesB[0].leagueImportance) 
+                        : (gamesB[0]['League Importance'] !== null && gamesB[0]['League Importance'] !== undefined ? Number(gamesB[0]['League Importance']) : 999999);
+                    
+                    if (importanceA !== importanceB) {
+                        return importanceA - importanceB;
+                    }
+                    return 0;
+                });
+                
+                // Flatten back to sorted array, preserving order within each group
+                const finalSortedGames = [];
+                sortedTitleGroups.forEach(([titleText, games]) => {
+                    finalSortedGames.push(...games);
                 });
                 
                 let currentTitle = null;
@@ -41510,8 +41598,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     return subTable;
                 };
                 
-                for (let i = 0; i < sortedFeaturedGames.length; i++) {
-                    const data = sortedFeaturedGames[i];
+                for (let i = 0; i < finalSortedGames.length; i++) {
+                    const data = finalSortedGames[i];
                     // Use headerText if available, otherwise fall back to title or league name
                     const headerText = data.headerText || data['Header Text'] || '';
                     const titleText = isYesterdayScores 
@@ -46049,6 +46137,13 @@ async function fetchFeaturedGames() {
                             yesterdayTitle: featuredGame.yesterdayTitle || liveGame.yesterdayTitle || '',
                             headerText: featuredGame.headerText || featuredGame['Header Text'] || liveGame.headerText || liveGame['Header Text'] || '',
                             applyToAllLeague: featuredGame.applyToAllLeague || featuredGame['Apply To All League'] || liveGame.applyToAllLeague || liveGame['Apply To All League'] || false,
+                            leagueImportance: featuredGame.leagueImportance !== null && featuredGame.leagueImportance !== undefined 
+                                ? featuredGame.leagueImportance 
+                                : (featuredGame['League Importance'] !== null && featuredGame['League Importance'] !== undefined 
+                                    ? featuredGame['League Importance'] 
+                                    : (liveGame.leagueImportance !== null && liveGame.leagueImportance !== undefined 
+                                        ? liveGame.leagueImportance 
+                                        : (liveGame['League Importance'] !== null && liveGame['League Importance'] !== undefined ? liveGame['League Importance'] : null))),
                             order: featuredGame.order,
                             isFeatured: true,
                             isFeaturedLive: isLive && !isFinal
@@ -46098,6 +46193,13 @@ async function fetchFeaturedGames() {
                             yesterdayTitle: featuredGame.yesterdayTitle || liveGame.yesterdayTitle || '',
                             headerText: featuredGame.headerText || featuredGame['Header Text'] || liveGame.headerText || liveGame['Header Text'] || '',
                             applyToAllLeague: featuredGame.applyToAllLeague || featuredGame['Apply To All League'] || liveGame.applyToAllLeague || liveGame['Apply To All League'] || false,
+                            leagueImportance: featuredGame.leagueImportance !== null && featuredGame.leagueImportance !== undefined 
+                                ? featuredGame.leagueImportance 
+                                : (featuredGame['League Importance'] !== null && featuredGame['League Importance'] !== undefined 
+                                    ? featuredGame['League Importance'] 
+                                    : (liveGame.leagueImportance !== null && liveGame.leagueImportance !== undefined 
+                                        ? liveGame.leagueImportance 
+                                        : (liveGame['League Importance'] !== null && liveGame['League Importance'] !== undefined ? liveGame['League Importance'] : null))),
                             order: featuredGame.order,
                             isFeatured: true,
                             isFeaturedLive: isLive && !isFinal
@@ -46124,20 +46226,89 @@ async function fetchFeaturedGames() {
                     yesterdayTitle: featuredGame.yesterdayTitle || featuredGame.GameYesterdayTitle || '',
                     headerText: featuredGame.headerText || featuredGame['Header Text'] || '',
                     applyToAllLeague: featuredGame.applyToAllLeague || featuredGame['Apply To All League'] || false,
+                    leagueImportance: featuredGame.leagueImportance !== null && featuredGame.leagueImportance !== undefined 
+                        ? featuredGame.leagueImportance 
+                        : (featuredGame['League Importance'] !== null && featuredGame['League Importance'] !== undefined ? featuredGame['League Importance'] : null),
                     order: featuredGame.order,
                     isFeatured: true,
                     isFeaturedLive: isLive && !isFinal
                 };
             }).filter(game => game !== null);
 
-            // Sort by order from Featured sheet (lower order first) - preserves Google Sheets row order
+            // Debug: Log all games before sorting
+            console.log(`[Featured Sort] Before sorting: ${mergedFeaturedGames.length} games`);
+            mergedFeaturedGames.forEach((game, idx) => {
+                const importance = game.leagueImportance !== null && game.leagueImportance !== undefined 
+                    ? game.leagueImportance 
+                    : (game['League Importance'] !== null && game['League Importance'] !== undefined ? game['League Importance'] : null);
+                console.log(`[Featured Sort] Game ${idx}: ${game['Away Team']} vs ${game['Home Team']}, League: ${game.League}, Importance: ${importance}, Raw: leagueImportance=${game.leagueImportance}, ["League Importance"]=${game['League Importance']}`);
+            });
+            
+            // Sort by leagueImportance first (ascending, nulls last), then by start time within each league
             mergedFeaturedGames.sort((a, b) => {
+                // Get leagueImportance (check multiple field names)
+                const importanceA = a.leagueImportance !== null && a.leagueImportance !== undefined 
+                    ? Number(a.leagueImportance) 
+                    : (a['League Importance'] !== null && a['League Importance'] !== undefined ? Number(a['League Importance']) : 999999);
+                const importanceB = b.leagueImportance !== null && b.leagueImportance !== undefined 
+                    ? Number(b.leagueImportance) 
+                    : (b['League Importance'] !== null && b['League Importance'] !== undefined ? Number(b['League Importance']) : 999999);
+                
+                // Primary sort: by leagueImportance (ascending)
+                if (importanceA !== importanceB) {
+                    console.log(`[Featured Sort] Sorting by importance: ${importanceA} vs ${importanceB} -> ${importanceA - importanceB}`);
+                    return importanceA - importanceB;
+                }
+                
+                // Secondary sort: by start time (earlier first)
+                const startTimeA = a['Start Time'];
+                const startTimeB = b['Start Time'];
+                
+                if (startTimeA && startTimeB) {
+                    // Handle Firestore Timestamp objects
+                    let timeA, timeB;
+                    if (startTimeA._seconds !== undefined) {
+                        timeA = startTimeA._seconds * 1000;
+                    } else if (startTimeA.toDate && typeof startTimeA.toDate === 'function') {
+                        timeA = startTimeA.toDate().getTime();
+                    } else if (typeof startTimeA === 'string') {
+                        timeA = new Date(startTimeA).getTime();
+                    } else {
+                        timeA = 0;
+                    }
+                    
+                    if (startTimeB._seconds !== undefined) {
+                        timeB = startTimeB._seconds * 1000;
+                    } else if (startTimeB.toDate && typeof startTimeB.toDate === 'function') {
+                        timeB = startTimeB.toDate().getTime();
+                    } else if (typeof startTimeB === 'string') {
+                        timeB = new Date(startTimeB).getTime();
+                    } else {
+                        timeB = 0;
+                    }
+                    
+                    if (timeA !== timeB) {
+                        return timeA - timeB;
+                    }
+                }
+                
+                // Tertiary sort: by order (fallback)
                 const orderA = (a && a.order !== undefined && a.order !== null) ? Number(a.order) : 999999;
                 const orderB = (b && b.order !== undefined && b.order !== null) ? Number(b.order) : 999999;
                 return orderA - orderB;
             });
 
             featuredGames = mergedFeaturedGames;
+            
+            // Debug: Log final order
+            console.log(`[Featured Sort] After sorting: ${featuredGames.length} games`);
+            featuredGames.forEach((game, idx) => {
+                const importance = game.leagueImportance !== null && game.leagueImportance !== undefined 
+                    ? game.leagueImportance 
+                    : (game['League Importance'] !== null && game['League Importance'] !== undefined ? game['League Importance'] : null);
+                console.log(`[Featured Sort] Final order ${idx}: ${game['Away Team']} vs ${game['Home Team']}, League: ${game.League}, Importance: ${importance}`);
+            });
+            
             updateDisplay();
         }
         
@@ -46184,6 +46355,21 @@ async function fetchFeaturedGames() {
                     const applyToAllLeague = data.applyToAllLeague || data['Apply To All League'] || false;
                     data.applyToAllLeague = applyToAllLeague;
                     data['Apply To All League'] = applyToAllLeague;
+                    // Ensure leagueImportance is preserved (check both field names)
+                    const leagueImportance = data.leagueImportance !== null && data.leagueImportance !== undefined 
+                        ? Number(data.leagueImportance) 
+                        : (data['League Importance'] !== null && data['League Importance'] !== undefined ? Number(data['League Importance']) : null);
+                    if (leagueImportance !== null && !isNaN(leagueImportance)) {
+                        data.leagueImportance = leagueImportance;
+                        data['League Importance'] = leagueImportance;
+                    } else {
+                        data.leagueImportance = null;
+                        data['League Importance'] = null;
+                    }
+                    // Debug logging
+                    if (leagueImportance !== null) {
+                        console.log(`[Featured JSON] Loaded game ${data['Game ID'] || data.gameId}, League: ${data.League || data.league}, Importance: ${leagueImportance}`);
+                    }
                     return data;
                     })
                     .sort((a, b) => {
