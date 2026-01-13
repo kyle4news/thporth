@@ -41512,9 +41512,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 for (let i = 0; i < sortedFeaturedGames.length; i++) {
                     const data = sortedFeaturedGames[i];
+                    // Use headerText if available, otherwise fall back to title or league name
+                    const headerText = data.headerText || data['Header Text'] || '';
                     const titleText = isYesterdayScores 
-                        ? (data.yesterdayTitle || data.title || getLeagueDisplayName(data.League, data.Sport) || "Other")
-                        : (data.title || getLeagueDisplayName(data.League, data.Sport) || "Other");
+                        ? (headerText || data.yesterdayTitle || data.title || getLeagueDisplayName(data.League, data.Sport) || "Other")
+                        : (headerText || data.title || getLeagueDisplayName(data.League, data.Sport) || "Other");
+                    
+                    // Debug logging for header text
+                    if (headerText) {
+                        console.log(`[Featured Games] Using headerText "${headerText}" for game ${data['Game ID']} (League: ${data.League})`);
+                    }
                     
                     if (titleText !== currentTitle) {
                         currentTitle = titleText;
@@ -46040,6 +46047,8 @@ async function fetchFeaturedGames() {
                             Channel: channel,
                             title: featuredGame.title || liveGame.title || '',
                             yesterdayTitle: featuredGame.yesterdayTitle || liveGame.yesterdayTitle || '',
+                            headerText: featuredGame.headerText || featuredGame['Header Text'] || liveGame.headerText || liveGame['Header Text'] || '',
+                            applyToAllLeague: featuredGame.applyToAllLeague || featuredGame['Apply To All League'] || liveGame.applyToAllLeague || liveGame['Apply To All League'] || false,
                             order: featuredGame.order,
                             isFeatured: true,
                             isFeaturedLive: isLive && !isFinal
@@ -46087,6 +46096,8 @@ async function fetchFeaturedGames() {
                             Channel: channel,
                             title: featuredGame.title || liveGame.title || '',
                             yesterdayTitle: featuredGame.yesterdayTitle || liveGame.yesterdayTitle || '',
+                            headerText: featuredGame.headerText || featuredGame['Header Text'] || liveGame.headerText || liveGame['Header Text'] || '',
+                            applyToAllLeague: featuredGame.applyToAllLeague || featuredGame['Apply To All League'] || liveGame.applyToAllLeague || liveGame['Apply To All League'] || false,
                             order: featuredGame.order,
                             isFeatured: true,
                             isFeaturedLive: isLive && !isFinal
@@ -46111,6 +46122,8 @@ async function fetchFeaturedGames() {
                     Channel: channel,
                     title: featuredGame.title || featuredGame.GameTitle || '',
                     yesterdayTitle: featuredGame.yesterdayTitle || featuredGame.GameYesterdayTitle || '',
+                    headerText: featuredGame.headerText || featuredGame['Header Text'] || '',
+                    applyToAllLeague: featuredGame.applyToAllLeague || featuredGame['Apply To All League'] || false,
                     order: featuredGame.order,
                     isFeatured: true,
                     isFeaturedLive: isLive && !isFinal
@@ -46161,6 +46174,16 @@ async function fetchFeaturedGames() {
                         data.channel = channel;
                         data.Channel = channel;
                     }
+                    // Ensure headerText is preserved (sync headerText and Header Text fields)
+                    const headerText = data.headerText || data['Header Text'] || '';
+                    if (headerText) {
+                        data.headerText = headerText;
+                        data['Header Text'] = headerText;
+                    }
+                    // Ensure applyToAllLeague is preserved
+                    const applyToAllLeague = data.applyToAllLeague || data['Apply To All League'] || false;
+                    data.applyToAllLeague = applyToAllLeague;
+                    data['Apply To All League'] = applyToAllLeague;
                     return data;
                     })
                     .sort((a, b) => {
