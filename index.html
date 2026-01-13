@@ -52156,7 +52156,7 @@ function formatTeamNameWithRanking(displayName, leagueKey, gameData = null, isHo
         if (rank !== null && rank !== undefined) {
             rank = typeof rank === 'string' ? parseInt(rank, 10) : rank;
             if (!isNaN(rank) && rank > 0 && rank <= 25) {
-                return `<span style="font-size: 0.75em;">#${rank}</span> ${displayName}`;
+                return `<span style="font-size: 0.75em;">${rank}</span> ${displayName}`;
             }
         }
     }
@@ -52164,7 +52164,7 @@ function formatTeamNameWithRanking(displayName, leagueKey, gameData = null, isHo
     // Fallback to cache lookup if game data doesn't have ranking
     const rank = getRankingForDisplayName(displayName, leagueKey);
     if (rank !== null && rank !== undefined) {
-        return `<span style="font-size: 0.75em;">#${rank}</span> ${displayName}`;
+        return `<span style="font-size: 0.75em;">${rank}</span> ${displayName}`;
     }
     return displayName;
 }
