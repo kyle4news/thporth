@@ -41772,10 +41772,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Group games by headerText/titleText first, preserving sort order
                 const gamesByTitle = new Map();
                 sortedFeaturedGames.forEach(game => {
-                    const headerText = game.headerText || game['Header Text'] || '';
-                    const titleText = isYesterdayScores 
-                        ? (headerText || game.yesterdayTitle || game.title || getLeagueDisplayName(game.League, game.Sport) || "Other")
-                        : (headerText || game.title || getLeagueDisplayName(game.League, game.Sport) || "Other");
+                    // Check if headerText property exists (even if empty), use it; otherwise use league name
+                    const hasHeaderText = 'headerText' in game || 'Header Text' in game;
+                    const headerText = hasHeaderText ? (game.headerText || game['Header Text'] || '') : '';
+                    const titleText = hasHeaderText ? headerText : (getLeagueDisplayName(game.League, game.Sport) || "Other");
+                    
+                    console.log(`[Featured Games Grouping] Game ${game['Game ID']}: hasHeaderText=${hasHeaderText}, headerText="${headerText}", titleText="${titleText}"`);
                     
                     if (!gamesByTitle.has(titleText)) {
                         gamesByTitle.set(titleText, []);
@@ -41855,16 +41857,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 for (let i = 0; i < finalSortedGames.length; i++) {
                     const data = finalSortedGames[i];
-                    // Use headerText if available, otherwise fall back to title or league name
-                    const headerText = data.headerText || data['Header Text'] || '';
-                    const titleText = isYesterdayScores 
-                        ? (headerText || data.yesterdayTitle || data.title || getLeagueDisplayName(data.League, data.Sport) || "Other")
-                        : (headerText || data.title || getLeagueDisplayName(data.League, data.Sport) || "Other");
+                    // Check if headerText property exists (even if empty), use it; otherwise use league name
+                    const hasHeaderText = 'headerText' in data || 'Header Text' in data;
+                    const headerText = hasHeaderText ? (data.headerText || data['Header Text'] || '') : '';
+                    const titleText = hasHeaderText ? headerText : (getLeagueDisplayName(data.League, data.Sport) || "Other");
                     
-                    // Debug logging for header text
-                    if (headerText) {
-                        console.log(`[Featured Games] Using headerText "${headerText}" for game ${data['Game ID']} (League: ${data.League})`);
-                    }
+                    console.log(`[Featured Games Display] Game ${data['Game ID']}: hasHeaderText=${hasHeaderText}, headerText="${headerText}", titleText="${titleText}", League="${data.League}"`);
                     
                     if (titleText !== currentTitle) {
                         currentTitle = titleText;
@@ -45463,18 +45461,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += `<thead>`;
                     html += `<tr><th colspan="3" style="padding: 8px 4px; text-align: left; background-color: #1f1f1f; color: #ffffff; font-size: 13px; font-weight: bold; border-bottom: 1px solid #4a4a4a;">${division.name}</th></tr>`;
                     html += `<tr>`;
-                    html += `<th style="padding: 6px 4px; text-align: left; border-bottom: 1px solid #4a4a4a; color: #ccc;">Rank</th>`;
-                    html += `<th style="padding: 6px 4px; text-align: left; border-bottom: 1px solid #4a4a4a; color: #ccc;">Fighter</th>`;
-                    html += `<th style="padding: 6px 4px; text-align: left; border-bottom: 1px solid #4a4a4a; color: #ccc;">Record</th>`;
+                    html += `<th style="width: 25px; padding: 6px 0; text-align: left; border-bottom: 1px solid #4a4a4a; color: #ccc;"></th>`;
+                    html += `<th style="padding: 6px 0 6px 3px; text-align: left; border-bottom: 1px solid #4a4a4a; color: #ccc;">Fighter</th>`;
+                    html += `<th style="width: 70px; padding: 6px 4px 6px 5px; text-align: left; border-bottom: 1px solid #4a4a4a; color: #ccc;">Record (NC)</th>`;
                     html += `</tr></thead><tbody>`;
                     
                     division.fighters.forEach((fighter, index) => {
                         const rowStyle = index % 2 === 0 ? 'background-color: #262626;' : 'background-color: #1b1b1b;';
+                        // Remove "NC" from record but keep the number in parentheses (e.g., "15–3 (1 NC)" becomes "15–3 (1)")
+                        const processedRecord = fighter.record.replace(/\s*NC\s*/gi, '');
                         html += `<tr style="${rowStyle}">`;
-                        html += `<td style="padding: 6px 4px; text-align: left; font-weight: ${fighter.rank === 'C' ? '600' : '500'}; color: ${fighter.rank === 'C' ? '#fff' : '#ccc'};">
+                        html += `<td style="width: 25px; padding: 6px 0; text-align: left; font-weight: ${fighter.rank === 'C' ? '600' : '500'}; color: ${fighter.rank === 'C' ? '#fff' : '#ccc'};">
                             ${fighter.rank}</td>`;
-                        html += `<td style="padding: 6px 4px; color: #ffffff;">${fighter.name}</td>`;
-                        html += `<td style="padding: 6px 4px; color: #ffffff;">${fighter.record}</td>`;
+                        html += `<td style="padding: 6px 0 6px 3px; color: #ffffff;">${fighter.name}</td>`;
+                        html += `<td style="width: 70px; padding: 6px 4px 6px 5px; color: #ffffff;">${processedRecord}</td>`;
                         html += `</tr>`;
                     });
                     html += `</tbody></table></div>`;
@@ -46140,9 +46140,10 @@ async function fetchFeaturedGames() {
             
             let liveFeaturedGames = [];
             
-            // Create a map of game IDs to their title, yesterdayTitle, and order from Featured collection
+            // Create a map of game IDs to their title, yesterdayTitle, headerText, and order from Featured collection
             const gameIdToTitleMap = {};
             const gameIdToYesterdayTitleMap = {};
+            const gameIdToHeaderTextMap = {};
             const gameIdToOrderMap = {};
             featuredGamesForDate.forEach(game => {
                 if (game['Game ID']) {
@@ -46151,6 +46152,9 @@ async function fetchFeaturedGames() {
                     }
                     if (game.yesterdayTitle) {
                         gameIdToYesterdayTitleMap[game['Game ID']] = game.yesterdayTitle;
+                    }
+                    if (game.headerText || game['Header Text']) {
+                        gameIdToHeaderTextMap[game['Game ID']] = game.headerText || game['Header Text'];
                     }
                     if (game.order !== undefined) {
                         gameIdToOrderMap[game['Game ID']] = game.order;
@@ -46166,9 +46170,11 @@ async function fetchFeaturedGames() {
                     return nonMlbGameIds.includes(game['Game ID']);
                 }).map(gameData => {
                         const featuredGame = nonMlbFeaturedGames.find(fg => fg['Game ID'] === gameData['Game ID']);
-                        // Add title, yesterdayTitle, order, and channel from Featured collection
+                        // Add title, yesterdayTitle, headerText, order, and channel from Featured collection
                         gameData.title = gameIdToTitleMap[gameData['Game ID']] || '';
                         gameData.yesterdayTitle = gameIdToYesterdayTitleMap[gameData['Game ID']] || '';
+                        gameData.headerText = gameIdToHeaderTextMap[gameData['Game ID']] || '';
+                        gameData['Header Text'] = gameIdToHeaderTextMap[gameData['Game ID']] || '';
                         gameData.order = gameIdToOrderMap[gameData['Game ID']];
                         // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
                         if (featuredGame && (!gameData.channel && !gameData.Channel)) {
@@ -46195,9 +46201,11 @@ async function fetchFeaturedGames() {
                 });
                 
                 if (matchingGame) {
-                    // Add title, yesterdayTitle, order, and channel from Featured collection
+                    // Add title, yesterdayTitle, headerText, order, and channel from Featured collection
                     matchingGame.title = featuredGame.title || '';
                     matchingGame.yesterdayTitle = featuredGame.yesterdayTitle || '';
+                    matchingGame.headerText = featuredGame.headerText || featuredGame['Header Text'] || '';
+                    matchingGame['Header Text'] = featuredGame.headerText || featuredGame['Header Text'] || '';
                     matchingGame.order = featuredGame.order;
                     // Preserve channel from featuredGame if liveGame doesn't have one (for manual games)
                     if (!matchingGame.channel && !matchingGame.Channel) {
