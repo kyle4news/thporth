@@ -5166,7 +5166,23 @@ function loadCustomRSSFeed(feedUrl, container) {
                     }
                 }
                 
-                // 3. If still not found, show error (no Firestore fallback - this avoids per-click reads)
+                // 3. If still not found, try direct API endpoint (checks both sportsGames and yesterdayScores)
+                if (!gameData) {
+                    try {
+                        const gameResponse = await fetch(`https://flashlive-scraper-124291936014.us-central1.run.app/data/game/${encodeURIComponent(gameId)}.json`);
+                        if (gameResponse.ok) {
+                            gameData = await gameResponse.json();
+                            // Update cache for future use
+                            if (window.updateGameDataCache && gameData) {
+                                window.updateGameDataCache([gameData]);
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('[loadGameContent] Error fetching game from API endpoint:', err);
+                    }
+                }
+                
+                // 4. If still not found, show error
                 if (!gameData) {
                     container.innerHTML = `<div style="padding: 20px; color: #ff6b6b;">Game not found: ${gameId}<br/><small>Game may have expired or not be available yet.</small></div>`;
                     return;
