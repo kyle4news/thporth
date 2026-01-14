@@ -45452,6 +45452,352 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         
+        // Hardcoded UFC Rankings (always use hardcoded data, skip Firestore/CSV)
+        if (leagueKey === 'UFC') {
+            // Hardcoded UFC Men's Rankings
+            const buildUFCRankingsHtml = (divisions) => {
+                let html = '';
+                divisions.forEach(division => {
+                    html += `<div style="margin-bottom: 25px;">`;
+                    html += `<table style="width: 100%; border-collapse: collapse; font-size: 11px;">`;
+                    html += `<thead>`;
+                    html += `<tr><th colspan="3" style="padding: 8px 4px; text-align: left; background-color: #1f1f1f; color: #ffffff; font-size: 13px; font-weight: bold; border-bottom: 1px solid #4a4a4a;">${division.name}</th></tr>`;
+                    html += `<tr>`;
+                    html += `<th style="padding: 6px 4px; text-align: left; border-bottom: 1px solid #4a4a4a; color: #ccc;">Rank</th>`;
+                    html += `<th style="padding: 6px 4px; text-align: left; border-bottom: 1px solid #4a4a4a; color: #ccc;">Fighter</th>`;
+                    html += `<th style="padding: 6px 4px; text-align: left; border-bottom: 1px solid #4a4a4a; color: #ccc;">Record</th>`;
+                    html += `</tr></thead><tbody>`;
+                    
+                    division.fighters.forEach((fighter, index) => {
+                        const rowStyle = index % 2 === 0 ? 'background-color: #262626;' : 'background-color: #1b1b1b;';
+                        html += `<tr style="${rowStyle}">`;
+                        html += `<td style="padding: 6px 4px; text-align: left; font-weight: ${fighter.rank === 'C' ? '600' : '500'}; color: ${fighter.rank === 'C' ? '#fff' : '#ccc'};">
+                            ${fighter.rank}</td>`;
+                        html += `<td style="padding: 6px 4px; color: #ffffff;">${fighter.name}</td>`;
+                        html += `<td style="padding: 6px 4px; color: #ffffff;">${fighter.record}</td>`;
+                        html += `</tr>`;
+                    });
+                    html += `</tbody></table></div>`;
+                });
+                return html;
+            };
+            
+            const menDivisions = [
+                {
+                    name: 'Pound-for-pound',
+                    fighters: [
+                        { rank: '1', name: 'Islam Makhachev', record: '28–1' },
+                        { rank: '2', name: 'Ilia Topuria', record: '17–0' },
+                        { rank: '3', name: 'Khamzat Chimaev', record: '15–0' },
+                        { rank: '4', name: 'Alex Pereira', record: '13–3' },
+                        { rank: '5', name: 'Alexander Volkanovski', record: '27–4' },
+                        { rank: '6', name: 'Petr Yan', record: '20–5' },
+                        { rank: '7', name: 'Merab Dvalishvili', record: '21–5' },
+                        { rank: '8', name: 'Tom Aspinall', record: '15–3 (1 NC)' },
+                        { rank: '9', name: 'Alexandre Pantoja', record: '30–6' },
+                        { rank: '10', name: 'Max Holloway', record: '27–8' },
+                        { rank: '11', name: 'Dricus du Plessis', record: '23–3' },
+                        { rank: '12', name: 'Joshua Van', record: '16–2' },
+                        { rank: '13', name: 'Magomed Ankalaev', record: '20–2–1 (1 NC)' },
+                        { rank: '14', name: 'Jack Della Maddalena', record: '18–3' },
+                        { rank: '15', name: 'Arman Tsarukyan', record: '23–3' }
+                    ]
+                },
+                {
+                    name: 'Heavyweight',
+                    fighters: [
+                        { rank: 'C', name: 'Tom Aspinall', record: '15–3 (1 NC)' },
+                        { rank: '1', name: 'Ciryl Gane', record: '13–2 (1 NC)' },
+                        { rank: '2', name: 'Alexander Volkov', record: '39–11' },
+                        { rank: '3', name: 'Sergei Pavlovich', record: '20–3' },
+                        { rank: '4', name: 'Curtis Blaydes', record: '19–5 (1 NC)' },
+                        { rank: '5', name: 'Waldo Cortes-Acosta', record: '16–2' },
+                        { rank: '6', name: 'Jailton Almeida', record: '22–4' },
+                        { rank: '7', name: 'Serghei Spivac', record: '17–6' },
+                        { rank: '8', name: 'Derrick Lewis', record: '29–12 (1 NC)' },
+                        { rank: '9', name: 'Marcin Tybura', record: '27–10' },
+                        { rank: '10', name: 'Ante Delija', record: '26–7' },
+                        { rank: '11', name: 'Shamil Gaziev', record: '14–2' },
+                        { rank: '12', name: 'Tai Tuivasa', record: '14–8' },
+                        { rank: '13', name: 'Mick Parkin', record: '10–1' },
+                        { rank: '14', name: 'Valter Walker', record: '15–1' },
+                        { rank: '15', name: 'Tallison Teixeira', record: '8–1' }
+                    ]
+                },
+                {
+                    name: 'Light Heavyweight',
+                    fighters: [
+                        { rank: 'C', name: 'Alex Pereira', record: '13–3' },
+                        { rank: '1', name: 'Magomed Ankalaev', record: '20–2–1 (1 NC)' },
+                        { rank: '1', name: 'Jiří Procházka', record: '32–5–1' },
+                        { rank: '3', name: 'Carlos Ulberg', record: '13–1' },
+                        { rank: '4', name: 'Khalil Rountree Jr.', record: '14–7 (1 NC)' },
+                        { rank: '5', name: 'Jan Błachowicz', record: '29–11–2' },
+                        { rank: '6', name: 'Azamat Murzakanov', record: '16–0' },
+                        { rank: '7', name: 'Jamahal Hill', record: '12–4 (1 NC)' },
+                        { rank: '8', name: 'Volkan Oezdemir', record: '21–8' },
+                        { rank: '9', name: 'Dominick Reyes', record: '15–5' },
+                        { rank: '10', name: 'Bogdan Guskov', record: '18–3–1' },
+                        { rank: '11', name: 'Aleksandar Rakić', record: '14–6' },
+                        { rank: '12', name: 'Johnny Walker', record: '22–9 (1 NC)' },
+                        { rank: '13', name: 'Nikita Krylov', record: '30–11' },
+                        { rank: '14', name: 'Zhang Mingyang', record: '19–7' },
+                        { rank: '15', name: 'Alonzo Menifield', record: '17–6–1' }
+                    ]
+                },
+                {
+                    name: 'Middleweight',
+                    fighters: [
+                        { rank: 'C', name: 'Khamzat Chimaev', record: '15–0' },
+                        { rank: '1', name: 'Dricus du Plessis', record: '23–3' },
+                        { rank: '2', name: 'Nassourdine Imavov', record: '17–4 (1 NC)' },
+                        { rank: '3', name: 'Sean Strickland', record: '29–7' },
+                        { rank: '4', name: 'Anthony Hernandez', record: '15–2 (1 NC)' },
+                        { rank: '5', name: 'Brendan Allen', record: '26–7' },
+                        { rank: '6', name: 'Israel Adesanya', record: '24–5' },
+                        { rank: '7', name: 'Caio Borralho', record: '17–2 (1 NC)' },
+                        { rank: '8', name: 'Reinier de Ridder', record: '21–3' },
+                        { rank: '9', name: 'Robert Whittaker', record: '26–9' },
+                        { rank: '10', name: 'Jared Cannonier', record: '18–9' },
+                        { rank: '10', name: 'Michael Page', record: '24–3' },
+                        { rank: '12', name: 'Roman Dolidze', record: '15–4' },
+                        { rank: '13', name: 'Paulo Costa', record: '15–4' },
+                        { rank: '14', name: 'Gregory Rodrigues', record: '18–6' },
+                        { rank: '15', name: 'Joe Pyfer', record: '15–3' }
+                    ]
+                },
+                {
+                    name: 'Welterweight',
+                    fighters: [
+                        { rank: 'C', name: 'Islam Makhachev', record: '28–1' },
+                        { rank: '1', name: 'Jack Della Maddalena', record: '18–3' },
+                        { rank: '2', name: 'Shavkat Rakhmonov', record: '19–0' },
+                        { rank: '3', name: 'Ian Machado Garry', record: '17–1' },
+                        { rank: '4', name: 'Michael Morales', record: '19–0' },
+                        { rank: '5', name: 'Belal Muhammad', record: '24–5 (1 NC)' },
+                        { rank: '6', name: 'Carlos Prates', record: '23–7' },
+                        { rank: '7', name: 'Sean Brady', record: '18–2' },
+                        { rank: '8', name: 'Kamaru Usman', record: '21–4' },
+                        { rank: '9', name: 'Leon Edwards', record: '22–6 (1 NC)' },
+                        { rank: '10', name: 'Joaquin Buckley', record: '21–7' },
+                        { rank: '11', name: 'Gabriel Bonfim', record: '19–1' },
+                        { rank: '12', name: 'Gilbert Burns', record: '22–9' },
+                        { rank: '13', name: 'Geoff Neal', record: '16–7' },
+                        { rank: '14', name: 'Colby Covington', record: '17–5' },
+                        { rank: '15', name: 'Daniel Rodriguez', record: '20–5' }
+                    ]
+                },
+                {
+                    name: 'Lightweight',
+                    fighters: [
+                        { rank: 'C', name: 'Ilia Topuria', record: '17–0' },
+                        { rank: '1', name: 'Arman Tsarukyan', record: '23–3' },
+                        { rank: '2', name: 'Charles Oliveira', record: '36–11 (1 NC)' },
+                        { rank: '3', name: 'Max Holloway', record: '27–8' },
+                        { rank: '4', name: 'Justin Gaethje', record: '26–5' },
+                        { rank: '5', name: 'Paddy Pimblett', record: '23–3' },
+                        { rank: '6', name: 'Dan Hooker', record: '24–13' },
+                        { rank: '7', name: 'Mateusz Gamrot', record: '25–4 (1 NC)' },
+                        { rank: '8', name: 'Benoît Saint Denis', record: '16–3 (1 NC)' },
+                        { rank: '9', name: 'Rafael Fiziev', record: '13–4' },
+                        { rank: '10', name: 'Renato Moicano', record: '20–7–1' },
+                        { rank: '11', name: 'Beneil Dariush', record: '23–7–1' },
+                        { rank: '12', name: 'Michael Chandler', record: '23–10' },
+                        { rank: '13', name: 'Manuel Torres', record: '17–3' },
+                        { rank: '14', name: 'Maurício Ruffy', record: '12–2' },
+                        { rank: '15', name: 'Farès Ziam', record: '18–4' }
+                    ]
+                },
+                {
+                    name: 'Featherweight',
+                    fighters: [
+                        { rank: 'C', name: 'Alexander Volkanovski', record: '27–4' },
+                        { rank: '1', name: 'Movsar Evloev', record: '19–0' },
+                        { rank: '2', name: 'Diego Lopes', record: '27–7' },
+                        { rank: '3', name: 'Yair Rodríguez', record: '20–5 (1 NC)' },
+                        { rank: '4', name: 'Lerone Murphy', record: '17–0–1' },
+                        { rank: '5', name: 'Aljamain Sterling', record: '25–5' },
+                        { rank: '6', name: 'Arnold Allen', record: '20–3' },
+                        { rank: '7', name: 'Youssef Zalal', record: '18–5–1' },
+                        { rank: '8', name: 'Steve Garcia', record: '19–5' },
+                        { rank: '9', name: 'Brian Ortega', record: '16–5 (1 NC)' },
+                        { rank: '10', name: 'Jean Silva', record: '16–3' },
+                        { rank: '11', name: 'Josh Emmett', record: '19–6' },
+                        { rank: '12', name: 'Patrício Pitbull', record: '37–8' },
+                        { rank: '13', name: 'Kevin Vallejos', record: '17–1' },
+                        { rank: '14', name: 'Dan Ige', record: '19–10' },
+                        { rank: '15', name: 'David Onama', record: '14–3' }
+                    ]
+                },
+                {
+                    name: 'Bantamweight',
+                    fighters: [
+                        { rank: 'C', name: 'Petr Yan', record: '20–5' },
+                        { rank: '1', name: 'Merab Dvalishvili', record: '21–5' },
+                        { rank: '2', name: 'Umar Nurmagomedov', record: '19–1' },
+                        { rank: '3', name: 'Sean O\'Malley', record: '18–3 (1 NC)' },
+                        { rank: '4', name: 'Cory Sandhagen', record: '18–6' },
+                        { rank: '5', name: 'Song Yadong', record: '22–7–1 (1 NC)' },
+                        { rank: '6', name: 'Deiveson Figueiredo', record: '25–5–1' },
+                        { rank: '7', name: 'Aiemann Zahabi', record: '14–2' },
+                        { rank: '8', name: 'Marlon Vera', record: '23–11–1' },
+                        { rank: '9', name: 'Mario Bautista', record: '16–3' },
+                        { rank: '10', name: 'David Martínez', record: '13–1' },
+                        { rank: '11', name: 'Payton Talbott', record: '11–1' },
+                        { rank: '12', name: 'Rob Font', record: '22–9' },
+                        { rank: '13', name: 'Vinicius Oliveira', record: '23–3' },
+                        { rank: '14', name: 'Kyler Phillips', record: '12–4' },
+                        { rank: '15', name: 'Montel Jackson', record: '15–3' }
+                    ]
+                },
+                {
+                    name: 'Flyweight',
+                    fighters: [
+                        { rank: 'C', name: 'Joshua Van', record: '16–2' },
+                        { rank: '1', name: 'Alexandre Pantoja', record: '30–6' },
+                        { rank: '2', name: 'Manel Kape', record: '22–7' },
+                        { rank: '3', name: 'Tatsuro Taira', record: '18–1' },
+                        { rank: '4', name: 'Brandon Royval', record: '17–9' },
+                        { rank: '5', name: 'Brandon Moreno', record: '23–9–2' },
+                        { rank: '6', name: 'Amir Albazi', record: '17–2' },
+                        { rank: '7', name: 'Asu Almabayev', record: '23–3' },
+                        { rank: '8', name: 'Kyoji Horiguchi', record: '35–5 (1 NC)' },
+                        { rank: '9', name: 'Tim Elliott', record: '21–13–1' },
+                        { rank: '10', name: 'Steve Erceg', record: '13–4' },
+                        { rank: '11', name: 'Alex Perez', record: '25–10' },
+                        { rank: '12', name: 'Tagir Ulanbekov', record: '17–3' },
+                        { rank: '13', name: 'Charles Johnson', record: '18–7' },
+                        { rank: '14', name: 'Bruno Gustavo da Silva', record: '15–7–2 (1 NC)' },
+                        { rank: '15', name: 'Lone\'er Kavanagh', record: '9–1' }
+                    ]
+                },
+                {
+                    name: 'Strawweight',
+                    fighters: []
+                }
+            ];
+            
+            const womenDivisions = [
+                {
+                    name: 'Pound-for-Pound',
+                    fighters: [
+                        { rank: '1', name: 'Valentina Shevchenko', record: '26–4–1' },
+                        { rank: '2', name: 'Kayla Harrison', record: '19–1' },
+                        { rank: '3', name: 'Zhang Weili', record: '26–4' },
+                        { rank: '4', name: 'Natália Silva', record: '19–5–1' },
+                        { rank: '5', name: 'Mackenzie Dern', record: '16–5' },
+                        { rank: '6', name: 'Manon Fiorot', record: '13–2' },
+                        { rank: '7', name: 'Erin Blanchfield', record: '14–2' },
+                        { rank: '8', name: 'Julianna Peña', record: '12–6' },
+                        { rank: '9', name: 'Alexa Grasso', record: '16–5–1' },
+                        { rank: '10', name: 'Virna Jandiroba', record: '22–4' },
+                        { rank: '11', name: 'Raquel Pennington', record: '16–9' },
+                        { rank: '12', name: 'Tatiana Suarez', record: '11–1' },
+                        { rank: '13', name: 'Rose Namajunas', record: '14–7' },
+                        { rank: '14', name: 'Yan Xiaonan', record: '18–5 (1 NC)' },
+                        { rank: '15', name: 'Maycee Barber', record: '15–2' }
+                    ]
+                },
+                {
+                    name: 'Bantamweight',
+                    fighters: [
+                        { rank: 'C', name: 'Kayla Harrison', record: '19–1' },
+                        { rank: '1', name: 'Julianna Peña', record: '12–6' },
+                        { rank: '2', name: 'Raquel Pennington', record: '16–9' },
+                        { rank: '3', name: 'Norma Dumont', record: '13–2' },
+                        { rank: '4', name: 'Ketlen Vieira', record: '15–5' },
+                        { rank: '5', name: 'Yana Santos', record: '17–8 (1 NC)' },
+                        { rank: '6', name: 'Irene Aldana', record: '15–8' },
+                        { rank: '7', name: 'Macy Chiasson', record: '11–5' },
+                        { rank: '8', name: 'Ailín Pérez', record: '12–2' },
+                        { rank: '9', name: 'Karol Rosa', record: '19–7' },
+                        { rank: '10', name: 'Jacqueline Cavalcanti', record: '10–1' },
+                        { rank: '11', name: 'Mayra Bueno Silva', record: '10–6–1 (1 NC)' },
+                        { rank: '12', name: 'Nora Cornolle', record: '9–3' },
+                        { rank: '13', name: 'Miesha Tate', record: '20–10' },
+                        { rank: '14', name: 'Joselyne Edwards', record: '16–6' },
+                        { rank: '15', name: 'Luana Santos', record: '10–2' }
+                    ]
+                },
+                {
+                    name: 'Flyweight',
+                    fighters: [
+                        { rank: 'C', name: 'Valentina Shevchenko', record: '26–4–1' },
+                        { rank: '1', name: 'Manon Fiorot', record: '13–2' },
+                        { rank: '2', name: 'Natália Silva', record: '19–5–1' },
+                        { rank: '3', name: 'Alexa Grasso', record: '16–5–1' },
+                        { rank: '3', name: 'Erin Blanchfield', record: '14–2' },
+                        { rank: '5', name: 'Maycee Barber', record: '15–2' },
+                        { rank: '6', name: 'Rose Namajunas', record: '14–7' },
+                        { rank: '7', name: 'Jasmine Jasudavicius', record: '14–4' },
+                        { rank: '8', name: 'Tracy Cortez', record: '12–3' },
+                        { rank: '9', name: 'Karine Silva', record: '19–6' },
+                        { rank: '9', name: 'Miranda Maverick', record: '15–6' },
+                        { rank: '11', name: 'Casey O\'Neill', record: '10–2' },
+                        { rank: '12', name: 'Wang Cong', record: '8–1' },
+                        { rank: '13', name: 'Eduarda Moura', record: '12–1' },
+                        { rank: '14', name: 'JJ Aldrich', record: '14–7' },
+                        { rank: '15', name: 'Gabriella Fernandes', record: '11–3' }
+                    ]
+                },
+                {
+                    name: 'Strawweight',
+                    fighters: [
+                        { rank: 'C', name: 'Mackenzie Dern', record: '16–5' },
+                        { rank: '1', name: 'Zhang Weili', record: '26–4' },
+                        { rank: '2', name: 'Tatiana Suarez', record: '11–1' },
+                        { rank: '3', name: 'Virna Jandiroba', record: '22–4' },
+                        { rank: '4', name: 'Yan Xiaonan', record: '18–5 (1 NC)' },
+                        { rank: '5', name: 'Amanda Lemos', record: '15–5–1' },
+                        { rank: '6', name: 'Loopy Godinez', record: '14–5' },
+                        { rank: '7', name: 'Iasmin Lucindo', record: '18–6' },
+                        { rank: '8', name: 'Tabatha Ricci', record: '12–3' },
+                        { rank: '9', name: 'Jéssica Andrade', record: '26–15' },
+                        { rank: '10', name: 'Gillian Robertson', record: '16–8' },
+                        { rank: '11', name: 'Amanda Ribas', record: '13–7' },
+                        { rank: '12', name: 'Fatima Kline', record: '9–1' },
+                        { rank: '13', name: 'Denise Gomes', record: '12–3' },
+                        { rank: '14', name: 'Angela Hill', record: '18–16' },
+                        { rank: '15', name: 'Alexia Thainara', record: '13–1' }
+                    ]
+                }
+            ];
+            
+            const menHtml = buildUFCRankingsHtml(menDivisions);
+            const womenHtml = buildUFCRankingsHtml(womenDivisions);
+            
+            standingsContent.innerHTML = `
+                <div class="ufc-subtabs" style="display: flex; background-color: #2a2a2a; margin-bottom: 6px;">
+                    <div class="ufc-subtab active" data-ufc-tab="men" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">Men's</div>
+                    <div class="ufc-subtab" data-ufc-tab="women" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">Women's</div>
+                </div>
+                <div class="ufc-subcontent" data-ufc-content="men">${menHtml}</div>
+                <div class="ufc-subcontent" data-ufc-content="women" style="display: none;">${womenHtml}</div>
+            `;
+
+            const subTabs = standingsContent.querySelectorAll('.ufc-subtab');
+            const subContents = standingsContent.querySelectorAll('.ufc-subcontent');
+            subTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.ufcTab;
+                    subTabs.forEach(t => {
+                        t.classList.remove('active');
+                        t.style.color = '#ccc';
+                        t.style.borderBottom = 'none';
+                    });
+                    tab.classList.add('active');
+                    tab.style.color = '#fff';
+                    tab.style.borderBottom = '2px solid #fff';
+
+                    subContents.forEach(content => {
+                        content.style.display = content.dataset.ufcContent === target ? 'block' : 'none';
+                    });
+                });
+            });
+
+            return;
+        }
+        
         // First try to load from Firestore (FlashLive API data)
         const loadedFromFirestore = await fetchLeagueStandingsFromFirestore(leagueKey);
         if (loadedFromFirestore) {
@@ -45551,49 +45897,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const rows = csvText.split(/\r?\n/).map(row => row.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
             if (rows.length < 2) {
                 standingsContent.innerHTML = '<p>No standings data available.</p>';
-                return;
-            }
-            
-            if (leagueKey === 'UFC') {
-                const menHtml = buildGroupedStandingsHtml(rows) || buildStandardStandingsTable(rows);
-                let womenHtml = '<p style="color: #9ca3af;">Loading women\'s rankings...</p>';
-                try {
-                    const womenUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS2Z0QfXw34ib6V0gmcdqVvu6gwy8vHnD6cF3xMhJGZJHpU_s0vwC0h7phvbV0joe4tdVDGHiJ1kBfX/pub?gid=591530521&single=true&output=csv';
-                    const womenRows = await fetchFromGoogleSheetsCSV(womenUrl);
-                    womenHtml = buildGroupedStandingsHtml(womenRows) || buildStandardStandingsTable(womenRows);
-                } catch (womenError) {
-                    console.error('Error loading UFC women rankings:', womenError);
-                    womenHtml = '<p style="color: #ef4444;">Error loading women\'s rankings.</p>';
-                }
-                standingsContent.innerHTML = `
-                    <div class="ufc-subtabs" style="display: flex; background-color: #2a2a2a; margin-bottom: 6px;">
-                        <div class="ufc-subtab active" data-ufc-tab="men" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #fff; border-bottom: 2px solid #fff;">Men's</div>
-                        <div class="ufc-subtab" data-ufc-tab="women" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; color: #ccc;">Women's</div>
-                    </div>
-                    <div class="ufc-subcontent" data-ufc-content="men">${menHtml}</div>
-                    <div class="ufc-subcontent" data-ufc-content="women" style="display: none;">${womenHtml}</div>
-                `;
-
-                const subTabs = standingsContent.querySelectorAll('.ufc-subtab');
-                const subContents = standingsContent.querySelectorAll('.ufc-subcontent');
-                subTabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        const target = tab.dataset.ufcTab;
-                        subTabs.forEach(t => {
-                            t.classList.remove('active');
-                            t.style.color = '#ccc';
-                            t.style.borderBottom = 'none';
-                        });
-                        tab.classList.add('active');
-                        tab.style.color = '#fff';
-                        tab.style.borderBottom = '2px solid #fff';
-
-                        subContents.forEach(content => {
-                            content.style.display = content.dataset.ufcContent === target ? 'block' : 'none';
-                        });
-                    });
-                });
-
                 return;
             }
             
