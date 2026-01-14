@@ -51616,59 +51616,29 @@ const gamesTabsContainer = document.getElementById('games-tabs');
             const todayTab = gamesTabsContainer.querySelector('.games-tab[data-tab="today"]');
             const scoresTab = gamesTabsContainer.querySelector('.games-tab[data-tab="scores"]');
             
-            // Ensure we're on TODAY tab content first
-            if (todayTab && !todayTab.classList.contains('active') && !clickedTab.classList.contains('active')) {
-                // Switch to TODAY tab only if LIVE filter is not already active
-                // CRASH-PROOF: check if it's a function before calling
-                if (activeListenerUnsubscribe && typeof activeListenerUnsubscribe === 'function') {
-                    activeListenerUnsubscribe();
-                    activeListenerUnsubscribe = null;
-                    window.activeListenerUnsubscribe = null;
-                } else if (activeListenerUnsubscribe) {
-                    // It's a Promise or something else, just clear it
-                    activeListenerUnsubscribe = null;
-                    window.activeListenerUnsubscribe = null;
-                }
-                
-                if (scoresTab) scoresTab.classList.remove('active');
-                todayTab.classList.add('active');
-                
-                const todayContainer = document.getElementById('tv-listings-today');
-                const scoresContainer = document.getElementById('tv-listings-scores');
-                
-                if (todayContainer) todayContainer.classList.add('active');
-                if (scoresContainer) scoresContainer.classList.remove('active');
-                
-                // Load today's games (fetchTodayGames is async, so it returns a Promise)
-                if (typeof fetchTodayGames === 'function') {
-                    fetchTodayGames(() => {
-                        // updateDisplay will be called by Firestore listeners
-                    }).then(cleanup => {
-                        // Store the cleanup function (not the Promise)
-                        window.activeListenerUnsubscribe = cleanup;
-                    }).catch(err => {
-                        console.error('❌ Error loading today games:', err);
-                        window.activeListenerUnsubscribe = null;
-                    });
-                }
+            // Always ensure TODAY tab is active when LIVE filter is engaged
+            if (todayTab && !todayTab.classList.contains('active')) {
+                console.log('🔄 Live filter clicked, but TODAY tab not active. Activating TODAY tab...');
+                // Simulate a click on the TODAY tab to ensure its content is loaded and active
+                // This triggers the TODAY tab's existing logic including fetchTodayGames
+                todayTab.click(); 
             }
-            
-            // Toggle LIVE filter state
+
+            // Now toggle LIVE filter state
             const willBeActive = !clickedTab.classList.contains('active');
             clickedTab.classList.toggle('active');
             
             // Set activeTab
             activeTab = clickedTab.classList.contains('active') ? 'LIVE' : 'ALL';
             
-            // Update active tab styling
-            if (willBeActive) {
-                if (scoresTab) scoresTab.classList.remove('active');
-                if (todayTab) todayTab.classList.remove('active');
-            } else {
-                if (scoresTab) scoresTab.classList.remove('active');
-                if (todayTab) todayTab.classList.add('active');
+            // Update active tab styling for consistency (ensure TODAY tab remains visually active)
+            if (todayTab) {
+                todayTab.classList.add('active');
             }
-            
+            if (scoresTab) {
+                scoresTab.classList.remove('active');
+            }
+
             // Force updateDisplay
             if (typeof window.triggerGamesUpdate === 'function') {
                 window.triggerGamesUpdate();
