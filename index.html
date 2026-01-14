@@ -36670,6 +36670,31 @@ document.addEventListener('DOMContentLoaded', function () {
             { date: '2026-01-25', time: 'TBD', home: 'Valencia', away: 'Espanyol', channel: 'ESPN+' },
             { date: '2026-01-25', time: 'TBD', home: 'Villarreal', away: 'Real Madrid', channel: 'ESPN+' }
         ],
+        'ScottishPremiership': [
+            { date: '2026-01-20', time: '3:45 PM', home: 'Livingston', away: 'St. Mirren', channel: '' },
+            { date: '2026-01-24', time: '11:00 AM', home: 'Aberdeen', away: 'Livingston', channel: '' },
+            { date: '2026-01-24', time: '11:00 AM', home: 'Dundee United', away: 'St. Mirren', channel: '' },
+            { date: '2026-01-24', time: '11:00 AM', home: 'Falkirk', away: 'Hibernian', channel: '' },
+            { date: '2026-01-25', time: '11:00 AM', home: 'Hearts', away: 'Celtic', channel: 'CBS Sports Network' },
+            { date: '2026-01-25', time: '11:00 AM', home: 'Rangers', away: 'Dundee', channel: '' },
+            { date: '2026-01-31', time: '11:00 AM', home: 'Kilmarnock', away: 'Aberdeen', channel: '' },
+            { date: '2026-01-31', time: '11:00 AM', home: 'Livingston', away: 'Motherwell', channel: '' },
+            { date: '2026-01-31', time: '11:00 AM', home: 'St. Mirren', away: 'Dundee', channel: 'Tenor Sports' },
+            { date: '2026-01-31', time: '4:00 PM', home: 'Dundee United', away: 'Hearts', channel: 'Sky Go UK' },
+            { date: '2026-02-01', time: '10:00 AM', home: 'Hibernian', away: 'Rangers', channel: '' },
+            { date: '2026-02-01', time: '11:00 AM', home: 'Celtic', away: 'Falkirk', channel: '' },
+            { date: '2026-02-03', time: '4:00 PM', home: 'St. Mirren', away: 'Hearts', channel: 'Sky Go UK' },
+            { date: '2026-02-04', time: '3:45 PM', home: 'Hibernian', away: 'Dundee United', channel: '' },
+            { date: '2026-02-04', time: '3:45 PM', home: 'Livingston', away: 'Falkirk', channel: '' },
+            { date: '2026-02-04', time: '3:45 PM', home: 'Rangers', away: 'Kilmarnock', channel: '' },
+            { date: '2026-02-04', time: '4:00 PM', home: 'Aberdeen', away: 'Celtic', channel: 'Sky Go UK' },
+            { date: '2026-02-10', time: '4:00 PM', home: 'Hearts', away: 'Hibernian', channel: '' },
+            { date: '2026-02-11', time: '3:45 PM', home: 'Celtic', away: 'Livingston', channel: '' },
+            { date: '2026-02-11', time: '3:45 PM', home: 'Dundee United', away: 'Aberdeen', channel: '' },
+            { date: '2026-02-11', time: '3:45 PM', home: 'Falkirk', away: 'Dundee', channel: '' },
+            { date: '2026-02-11', time: '3:45 PM', home: 'Kilmarnock', away: 'St. Mirren', channel: '' },
+            { date: '2026-02-11', time: '4:00 PM', home: 'Motherwell', away: 'Rangers', channel: 'Sky Go UK' },
+        ],
         'NFL': [
             { date: '2026-01-10', time: '3:30 PM', away: 'Los Angeles Rams', home: 'Carolina Panthers', channel: 'FOX' },
             { date: '2026-01-10', time: '7:00 PM', away: 'Green Bay Packers', home: 'Chicago Bears', channel: 'Prime Video' },
@@ -38603,9 +38628,25 @@ document.addEventListener('DOMContentLoaded', function () {
     async function getCanonicalTeamName(teamName, league) {
         if (!teamName || !league) return teamName;
         
+        // Convert league to league key (same logic as getTeamDisplayName)
+        let leagueKey = league;
+        if (league === 'USA: NCAA' || (league.includes('NCAA') && league.includes('Men'))) {
+            leagueKey = 'NCAAM';
+        } else if (league === 'USA: NCAA Women' || (league.includes('NCAA') && league.includes('Women'))) {
+            leagueKey = 'NCAAW';
+        } else if (league === 'NCAAF' || (league.includes('NCAA') && league.includes('Football'))) {
+            leagueKey = 'NCAAF';
+        } else if (league === 'Mexico: Liga MX' || league.includes('Liga MX')) {
+            leagueKey = 'LigaMX';
+        } else if (league === 'Saudi Arabia: Saudi Professional League' || league.includes('Saudi Professional League')) {
+            leagueKey = 'SaudiProLeague';
+        } else if (league === 'Scotland: Premiership' || league.includes('Scottish Premiership')) {
+            leagueKey = 'ScottishPremiership';
+        }
+        
         // Ensure mappings are loaded
         const mappings = await loadTeamAliasMappings();
-        const leagueMappings = mappings[league];
+        const leagueMappings = mappings[leagueKey];
         if (!leagueMappings) return teamName;
         
         // Try exact match first
@@ -39343,52 +39384,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Liga MX
         LigaMX: {
             "Cruz Azul": "Cruz Azúl",
-            "Cruz Azúl": "Cruz Azúl",
-            "Toluca": "Toluca",
-            "Club América": "Club América",
-            "Club America": "Club América",
-            "América": "Club América",
-            "America": "Club América",
-            "Tigres UANL": "Tigres UANL",
-            "Tigres": "Tigres UANL",
-            "Monterrey": "Monterrey",
-            "CF Monterrey": "Monterrey",
-            "Guadalajara": "Guadalajara",
-            "Guadalajara Chivas": "Guadalajara",
-            "Chivas Guadalajara": "Guadalajara",
-            "Juárez": "Juárez",
-            "Juarez": "Juárez",
-            "FC Juárez": "Juárez",
-            "FC Juarez": "Juárez",
-            "Pachuca": "Pachuca",
-            "Club Tijuana": "Club Tijuana",
-            "Tijuana": "Club Tijuana",
-            "Xolos Tijuana": "Club Tijuana",
-            "Santos Laguna": "Santos Laguna",
-            "Santos": "Santos Laguna",
-            "Atlas": "Atlas",
-            "San Luis": "San Luis",
-            "Atlético San Luis": "San Luis",
-            "Atl. San Luis": "San Luis",
-            "Atletico San Luis": "San Luis",
-            "Necaxa": "Necaxa",
-            "Club Necaxa": "Necaxa",
-            "Pumas UNAM": "Pumas UNAM",
-            "UNAM Pumas": "Pumas UNAM",
-            "Pumas": "Pumas UNAM",
-            "Querétaro": "Querétaro",
-            "Queretaro": "Querétaro",
-            "Gallos Blancos Querétaro": "Querétaro",
-            "Mazatlán": "Mazatlán",
-            "Mazatlan": "Mazatlán",
-            "Mazatlán FC": "Mazatlán",
-            "Mazatlan FC": "Mazatlán",
-            "León": "León",
-            "Leon": "León",
-            "Club León": "León",
-            "Club Leon": "León",
-            "Puebla": "Puebla",
-            "Puebla FC": "Puebla"
+           
         },
         // Argentine Primera
         ArgentinePrimeraDivision: {
@@ -40760,6 +40756,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 leagueKey = 'NCAAW';
             } else if (league === 'NCAAF' || (league.includes('NCAA') && league.includes('Football'))) {
                 leagueKey = 'NCAAF';
+            } else if (league === 'Mexico: Liga MX' || league.includes('Liga MX')) {
+                leagueKey = 'LigaMX';
+            } else if (league === 'Saudi Arabia: Saudi Professional League' || league.includes('Saudi Professional League')) {
+                leagueKey = 'SaudiProLeague';
+            } else if (league === 'Scotland: Premiership' || league.includes('Scottish Premiership')) {
+                leagueKey = 'ScottishPremiership';
             } else {
                 // Try direct match
                 leagueKey = league;
