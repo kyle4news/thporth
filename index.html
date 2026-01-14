@@ -38630,18 +38630,97 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Convert league to league key (same logic as getTeamDisplayName)
         let leagueKey = league;
+        // NCAA Leagues (from NCAA API)
         if (league === 'USA: NCAA' || (league.includes('NCAA') && league.includes('Men'))) {
             leagueKey = 'NCAAM';
         } else if (league === 'USA: NCAA Women' || (league.includes('NCAA') && league.includes('Women'))) {
             leagueKey = 'NCAAW';
         } else if (league === 'NCAAF' || (league.includes('NCAA') && league.includes('Football'))) {
             leagueKey = 'NCAAF';
+        }
+        // ESPN API - US Leagues
+        else if (league === 'USA: NFL' || league === 'NFL') {
+            leagueKey = 'NFL';
+        } else if (league === 'USA: NBA' || league === 'NBA') {
+            leagueKey = 'NBA';
+        } else if (league === 'USA: WNBA' || league === 'WNBA') {
+            leagueKey = 'WNBA';
+        } else if (league === 'USA: MLB' || league === 'MLB') {
+            leagueKey = 'MLB';
+        } else if (league === 'USA: NHL' || league === 'NHL') {
+            leagueKey = 'NHL';
+        } else if (league === 'USA: MLS' || league === 'MLS') {
+            leagueKey = 'MLS';
+        } else if (league === 'USA: NWSL Women' || league === 'NWSL' || league.includes('NWSL')) {
+            leagueKey = 'NWSL';
+        }
+        // ESPN API - Soccer Leagues
+        else if (league === 'England: Premier League' || league === 'Premier League' || league.includes('Premier League')) {
+            leagueKey = 'PremierLeague';
+        } else if (league === 'Spain: LaLiga' || league === 'La Liga' || league === 'LaLiga') {
+            leagueKey = 'LaLiga';
+        } else if (league === 'Germany: Bundesliga' || league === 'Bundesliga') {
+            leagueKey = 'Bundesliga';
+        } else if (league === 'Italy: Serie A' || league === 'Serie A' || league === 'SerieA') {
+            leagueKey = 'SerieA';
+        } else if (league === 'France: Ligue 1' || league === 'Ligue 1' || league === 'Ligue1') {
+            leagueKey = 'Ligue1';
         } else if (league === 'Mexico: Liga MX' || league.includes('Liga MX')) {
             leagueKey = 'LigaMX';
-        } else if (league === 'Saudi Arabia: Saudi Professional League' || league.includes('Saudi Professional League')) {
-            leagueKey = 'SaudiProLeague';
+        } else if (league === 'Netherlands: Eredivisie' || league === 'Eredivisie') {
+            leagueKey = 'Eredivisie';
+        } else if (league === 'Portugal: Liga Portugal' || league === 'Liga Portugal' || league === 'LigaPortugal') {
+            leagueKey = 'LigaPortugal';
+        } else if (league === 'Belgium: Jupiler Pro League' || league === 'Belgian Pro League' || league.includes('Belgian Pro League')) {
+            leagueKey = 'BelgianProLeague';
         } else if (league === 'Scotland: Premiership' || league.includes('Scottish Premiership')) {
             leagueKey = 'ScottishPremiership';
+        } else if (league === 'Saudi Arabia: Saudi Professional League' || league.includes('Saudi Professional League')) {
+            leagueKey = 'SaudiProLeague';
+        } else if (league === 'England: Championship' || league === 'EFL Championship' || league.includes('Championship')) {
+            leagueKey = 'EFLChampionship';
+        } else if (league === 'Turkey: Super Lig' || league === 'Turkish Super Lig' || league === 'SuperLig') {
+            leagueKey = 'SuperLig';
+        } else if (league === 'USA: USL Championship' || league === 'USL Championship' || league.includes('USL Championship')) {
+            leagueKey = 'USLChampionship';
+        } else if (league === 'Argentina: Torneo Betano - Apertura' || league === 'Argentina: Torneo Betano - Clausura' || league.includes('Argentine Primera') || league.includes('ArgentinePrimera')) {
+            leagueKey = 'ArgentinePrimeraDivision';
+        } else if (league === 'Brazil: Serie A Betano' || league === 'Brasileirao' || league.includes('Brasileirao')) {
+            leagueKey = 'Brasileirao';
+        } else if (league === 'England: WSL' || league === "Women's Super League" || league.includes("Women's Super League")) {
+            leagueKey = 'WomensSuperLeague';
+        }
+        // ESPN API - UEFA Competitions
+        else if (league === 'UEFA Champions League' || league.includes('Champions League') && !league.includes('Women')) {
+            leagueKey = 'UEFAChampionsLeague';
+        } else if (league === 'UEFA Europa League' || league === 'Europa League' || league.includes('Europa League')) {
+            leagueKey = 'UEFAEuropaLeague';
+        } else if (league === 'UEFA Conference League' || league === 'Conference League' || league.includes('Conference League')) {
+            leagueKey = 'UEFAConferenceLeague';
+        } else if (league === 'Europe: Champions League Women - League phase' || league.includes("Women's Champions League") || league.includes('Womens UCL')) {
+            leagueKey = 'WomensUCL';
+        }
+        // ESPN API - Cup Competitions
+        else if (league === 'England: FA Cup' || league === 'FA Cup' || league === 'FACup') {
+            leagueKey = 'FACup';
+        } else if (league === 'England: EFL Cup' || league === 'Carabao Cup' || league === 'EFLCup') {
+            leagueKey = 'EFLCup';
+        } else if (league === 'Spain: Copa del Rey' || league === 'Copa del Rey' || league === 'CopaDelRey') {
+            leagueKey = 'CopaDelRey';
+        } else if (league === 'Italy: Coppa Italia' || league === 'Coppa Italia' || league === 'CoppaItalia') {
+            leagueKey = 'CoppaItalia';
+        } else if (league === 'France: Coupe de France' || league === 'Coupe de France' || league === 'CoupeDeFrance') {
+            leagueKey = 'CoupeDeFrance';
+        } else if (league === 'Germany: DFB Pokal' || league === 'DFB-Pokal' || league === 'DFBPokal') {
+            leagueKey = 'DFBPokal';
+        } else if (league === 'Scotland: Scottish Cup' || league === 'Scottish Cup' || league === 'ScottishCup') {
+            leagueKey = 'ScottishCup';
+        }
+        // ESPN API - Other Competitions
+        else if (league === 'South America: Copa Libertadores' || league.includes('Copa Libertadores')) {
+            leagueKey = 'CopaLibertadores';
+        } else if (league === 'South America: Copa Sudamericana' || league.includes('Copa Sudamericana')) {
+            leagueKey = 'CopaSudamericana';
         }
         
         // Ensure mappings are loaded
@@ -40750,46 +40829,137 @@ document.addEventListener('DOMContentLoaded', function () {
         // Convert league to league key (e.g., "USA: NCAA" -> "NCAAM")
         let leagueKey = null;
         if (league) {
+            // NCAA Leagues (from NCAA API)
             if (league === 'USA: NCAA' || (league.includes('NCAA') && league.includes('Men'))) {
                 leagueKey = 'NCAAM';
             } else if (league === 'USA: NCAA Women' || (league.includes('NCAA') && league.includes('Women'))) {
                 leagueKey = 'NCAAW';
             } else if (league === 'NCAAF' || (league.includes('NCAA') && league.includes('Football'))) {
                 leagueKey = 'NCAAF';
+            }
+            // ESPN API - US Leagues
+            else if (league === 'USA: NFL' || league === 'NFL') {
+                leagueKey = 'NFL';
+            } else if (league === 'USA: NBA' || league === 'NBA') {
+                leagueKey = 'NBA';
+            } else if (league === 'USA: WNBA' || league === 'WNBA') {
+                leagueKey = 'WNBA';
+            } else if (league === 'USA: MLB' || league === 'MLB') {
+                leagueKey = 'MLB';
+            } else if (league === 'USA: NHL' || league === 'NHL') {
+                leagueKey = 'NHL';
+            } else if (league === 'USA: MLS' || league === 'MLS') {
+                leagueKey = 'MLS';
+            } else if (league === 'USA: NWSL Women' || league === 'NWSL' || league.includes('NWSL')) {
+                leagueKey = 'NWSL';
+            }
+            // ESPN API - Soccer Leagues
+            else if (league === 'England: Premier League' || league === 'Premier League' || league.includes('Premier League')) {
+                leagueKey = 'PremierLeague';
+            } else if (league === 'Spain: LaLiga' || league === 'La Liga' || league === 'LaLiga') {
+                leagueKey = 'LaLiga';
+            } else if (league === 'Germany: Bundesliga' || league === 'Bundesliga') {
+                leagueKey = 'Bundesliga';
+            } else if (league === 'Italy: Serie A' || league === 'Serie A' || league === 'SerieA') {
+                leagueKey = 'SerieA';
+            } else if (league === 'France: Ligue 1' || league === 'Ligue 1' || league === 'Ligue1') {
+                leagueKey = 'Ligue1';
             } else if (league === 'Mexico: Liga MX' || league.includes('Liga MX')) {
                 leagueKey = 'LigaMX';
-            } else if (league === 'Saudi Arabia: Saudi Professional League' || league.includes('Saudi Professional League')) {
-                leagueKey = 'SaudiProLeague';
+            } else if (league === 'Netherlands: Eredivisie' || league === 'Eredivisie') {
+                leagueKey = 'Eredivisie';
+            } else if (league === 'Portugal: Liga Portugal' || league === 'Liga Portugal' || league === 'LigaPortugal') {
+                leagueKey = 'LigaPortugal';
+            } else if (league === 'Belgium: Jupiler Pro League' || league === 'Belgian Pro League' || league.includes('Belgian Pro League')) {
+                leagueKey = 'BelgianProLeague';
             } else if (league === 'Scotland: Premiership' || league.includes('Scottish Premiership')) {
                 leagueKey = 'ScottishPremiership';
-            } else {
-                // Try direct match
+            } else if (league === 'Saudi Arabia: Saudi Professional League' || league.includes('Saudi Professional League')) {
+                leagueKey = 'SaudiProLeague';
+            } else if (league === 'England: Championship' || league === 'EFL Championship' || league.includes('Championship')) {
+                leagueKey = 'EFLChampionship';
+            } else if (league === 'Turkey: Super Lig' || league === 'Turkish Super Lig' || league === 'SuperLig') {
+                leagueKey = 'SuperLig';
+            } else if (league === 'USA: USL Championship' || league === 'USL Championship' || league.includes('USL Championship')) {
+                leagueKey = 'USLChampionship';
+            } else if (league === 'Argentina: Torneo Betano - Apertura' || league === 'Argentina: Torneo Betano - Clausura' || league.includes('Argentine Primera') || league.includes('ArgentinePrimera')) {
+                leagueKey = 'ArgentinePrimeraDivision';
+            } else if (league === 'Brazil: Serie A Betano' || league === 'Brasileirao' || league.includes('Brasileirao')) {
+                leagueKey = 'Brasileirao';
+            } else if (league === 'England: WSL' || league === "Women's Super League" || league.includes("Women's Super League")) {
+                leagueKey = 'WomensSuperLeague';
+            }
+            // ESPN API - UEFA Competitions
+            else if (league === 'UEFA Champions League' || league.includes('Champions League') && !league.includes('Women')) {
+                leagueKey = 'UEFAChampionsLeague';
+            } else if (league === 'UEFA Europa League' || league === 'Europa League' || league.includes('Europa League')) {
+                leagueKey = 'UEFAEuropaLeague';
+            } else if (league === 'UEFA Conference League' || league === 'Conference League' || league.includes('Conference League')) {
+                leagueKey = 'UEFAConferenceLeague';
+            } else if (league === 'Europe: Champions League Women - League phase' || league.includes("Women's Champions League") || league.includes('Womens UCL')) {
+                leagueKey = 'WomensUCL';
+            }
+            // ESPN API - Cup Competitions
+            else if (league === 'England: FA Cup' || league === 'FA Cup' || league === 'FACup') {
+                leagueKey = 'FACup';
+            } else if (league === 'England: EFL Cup' || league === 'Carabao Cup' || league === 'EFLCup') {
+                leagueKey = 'EFLCup';
+            } else if (league === 'Spain: Copa del Rey' || league === 'Copa del Rey' || league === 'CopaDelRey') {
+                leagueKey = 'CopaDelRey';
+            } else if (league === 'Italy: Coppa Italia' || league === 'Coppa Italia' || league === 'CoppaItalia') {
+                leagueKey = 'CoppaItalia';
+            } else if (league === 'France: Coupe de France' || league === 'Coupe de France' || league === 'CoupeDeFrance') {
+                leagueKey = 'CoupeDeFrance';
+            } else if (league === 'Germany: DFB Pokal' || league === 'DFB-Pokal' || league === 'DFBPokal') {
+                leagueKey = 'DFBPokal';
+            } else if (league === 'Scotland: Scottish Cup' || league === 'Scottish Cup' || league === 'ScottishCup') {
+                leagueKey = 'ScottishCup';
+            }
+            // ESPN API - Other Competitions
+            else if (league === 'South America: Copa Libertadores' || league.includes('Copa Libertadores')) {
+                leagueKey = 'CopaLibertadores';
+            } else if (league === 'South America: Copa Sudamericana' || league.includes('Copa Sudamericana')) {
+                leagueKey = 'CopaSudamericana';
+            }
+            // Try direct match as fallback
+            else {
                 leagueKey = league;
             }
         }
         
         // Check alias mappings (Column B = Display Name)
+        // Only check if mappings are actually loaded (not just the initial empty object)
         if (leagueKey && window.teamAliasMappings) {
-            const leagueMappings = window.teamAliasMappings[leagueKey];
-            if (leagueMappings) {
-                // Try exact match first
-                if (leagueMappings[p]) {
-                    return leagueMappings[p]; // Return Column B display name
-                }
-                // Try case-insensitive match
-                const pLower = p.toLowerCase();
-                for (const [variation, displayName] of Object.entries(leagueMappings)) {
-                    if (!variation.startsWith('_equivalents_') && variation.toLowerCase() === pLower) {
-                        return displayName; // Return Column B display name
+            // If mappings haven't loaded yet (empty object), try to load them synchronously
+            // This handles the race condition where games render before mappings load
+            if (Object.keys(window.teamAliasMappings).length === 0 && typeof loadTeamAliasMappings === 'function') {
+                // Trigger load (but don't await - will update window.teamAliasMappings when ready)
+                loadTeamAliasMappings().catch(() => {});
+            }
+            
+            // Only proceed if mappings are actually loaded
+            if (Object.keys(window.teamAliasMappings).length > 0) {
+                const leagueMappings = window.teamAliasMappings[leagueKey];
+                if (leagueMappings) {
+                    // Try exact match first
+                    if (leagueMappings[p]) {
+                        return leagueMappings[p]; // Return Column B display name
                     }
-                }
-                // Try normalized match
-                const normalized = normalizeTeamNameForMatching(p);
-                for (const [variation, displayName] of Object.entries(leagueMappings)) {
-                    if (!variation.startsWith('_equivalents_')) {
-                        const normalizedVariation = normalizeTeamNameForMatching(variation);
-                        if (normalizedVariation === normalized) {
+                    // Try case-insensitive match
+                    const pLower = p.toLowerCase();
+                    for (const [variation, displayName] of Object.entries(leagueMappings)) {
+                        if (!variation.startsWith('_equivalents_') && variation.toLowerCase() === pLower) {
                             return displayName; // Return Column B display name
+                        }
+                    }
+                    // Try normalized match
+                    const normalized = normalizeTeamNameForMatching(p);
+                    for (const [variation, displayName] of Object.entries(leagueMappings)) {
+                        if (!variation.startsWith('_equivalents_')) {
+                            const normalizedVariation = normalizeTeamNameForMatching(variation);
+                            if (normalizedVariation === normalized) {
+                                return displayName; // Return Column B display name
+                            }
                         }
                     }
                 }
@@ -40797,24 +40967,40 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         
         // PRIORITY 2: Fallback to hardcoded mappings (for backward compatibility)
-        // If league is specified and has mappings, use league-specific mapping
-        // Note: For doubles with <br>, we need to check if the original name (before processing) has a mapping
-        if (league && TEAM_DISPLAY_MAP[league]) {
-            const originalName = name.endsWith(" W") ? name.slice(0, -2) : name;
-            if (TEAM_DISPLAY_MAP[league][originalName]) {
-                return TEAM_DISPLAY_MAP[league][originalName];
-            }
-            return TEAM_DISPLAY_MAP[league][p] || p;
-        }
+        // BUT: Skip hardcoded mappings if this league should use Google Sheets mappings
+        // (prevents showing wrong names when mappings haven't loaded yet)
+        const leaguesThatUseGoogleSheets = ['NCAAM', 'NCAAW', 'NCAAF', 'NFL', 'NBA', 'WNBA', 'MLB', 'NHL', 'MLS', 'NWSL', 
+            'PremierLeague', 'LaLiga', 'Bundesliga', 'SerieA', 'Ligue1', 'LigaMX', 'Eredivisie', 'LigaPortugal', 
+            'BelgianProLeague', 'ScottishPremiership', 'SaudiProLeague', 'EFLChampionship', 'SuperLig', 'USLChampionship',
+            'ArgentinePrimeraDivision', 'Brasileirao', 'WomensSuperLeague', 'UEFAChampionsLeague', 'UEFAEuropaLeague',
+            'UEFAConferenceLeague', 'WomensUCL', 'FACup', 'EFLCup', 'CopaDelRey', 'CoppaItalia', 'CoupeDeFrance',
+            'DFBPokal', 'ScottishCup', 'CopaLibertadores', 'CopaSudamericana'];
         
-        // Otherwise, try all leagues (fallback for backward compatibility)
-        for (const leagueMap of Object.values(TEAM_DISPLAY_MAP)) {
-            const originalName = name.endsWith(" W") ? name.slice(0, -2) : name;
-            if (leagueMap[originalName]) {
-                return leagueMap[originalName];
+        const shouldUseGoogleSheets = leagueKey && leaguesThatUseGoogleSheets.includes(leagueKey);
+        
+        // Only use hardcoded mappings if:
+        // 1. This league doesn't use Google Sheets mappings, OR
+        // 2. Google Sheets mappings are already loaded (so we know they don't have this team)
+        if (!shouldUseGoogleSheets || (shouldUseGoogleSheets && Object.keys(window.teamAliasMappings || {}).length > 0)) {
+            // If league is specified and has mappings, use league-specific mapping
+            // Note: For doubles with <br>, we need to check if the original name (before processing) has a mapping
+            if (league && TEAM_DISPLAY_MAP[league]) {
+                const originalName = name.endsWith(" W") ? name.slice(0, -2) : name;
+                if (TEAM_DISPLAY_MAP[league][originalName]) {
+                    return TEAM_DISPLAY_MAP[league][originalName];
+                }
+                return TEAM_DISPLAY_MAP[league][p] || p;
             }
-            if (leagueMap[p]) {
-                return leagueMap[p];
+            
+            // Otherwise, try all leagues (fallback for backward compatibility)
+            for (const leagueMap of Object.values(TEAM_DISPLAY_MAP)) {
+                const originalName = name.endsWith(" W") ? name.slice(0, -2) : name;
+                if (leagueMap[originalName]) {
+                    return leagueMap[originalName];
+                }
+                if (leagueMap[p]) {
+                    return leagueMap[p];
+                }
             }
         }
         
