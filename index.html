@@ -39463,6 +39463,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Liga MX
         LigaMX: {
             "Cruz Azul": "Cruz Azúl",
+            "Atlético de San Luis": "San Luís",
            
         },
         // Argentine Primera
@@ -40638,17 +40639,6 @@ document.addEventListener('DOMContentLoaded', function () {
             "Go Ahead Eagles": "G.A. Eagles",
             "Nottingham Forest": "Forest"
         },
-        "UEFA Europa League": {
-            "Din. Zagreb": "D. Zagreb",
-            "Crvena zvezda": "Red Star",
-            "Maccabi Tel Aviv": "M. Tel Aviv",
-            "Dinamo Zagreb": "Din Zagreb",
-            "Sporting Braga": "Braga",
-            "Crvena Zvezda": "Red Star",
-            "Olympique Lyonnais": "Lyon",
-            "Go Ahead Eagles": "G.A. Eagles",
-            "Nottingham Forest": "Forest"
-        },
         // UEFA Conference League
         UEFAConferenceLeague: {
             "Shakhtar Donetsk": "Shaktar D.",
@@ -40754,6 +40744,11 @@ document.addEventListener('DOMContentLoaded', function () {
             "Texas A&M Aggies": "Texas A&M",
             "Kentucky Wildcats": "Kentucky"
         },
+        // Serie A 
+        SerieA: {
+            "Internazionale": "Inter Milan",
+
+        },
         // Germany: 2. Bundesliga
         Germany2Bundesliga: {
             "TSV Eintracht Braunschweig": "Braunschweig",
@@ -40823,6 +40818,60 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (league === 'FIFA U-17 World Cup') {
             p = p.replace(/\s*U17\b/gi, '').trim();
+        }
+        
+        // PRIORITY 0: Leagues that use TEAM_DISPLAY_MAP as source of truth (checked immediately on page load)
+        // These leagues should check hardcoded mappings FIRST, before Google Sheets
+        // Normalize league name to match TEAM_DISPLAY_MAP keys
+        let normalizedLeagueKey = null;
+        if (league) {
+            if (league === 'MLB' || league === 'USA: MLB') {
+                normalizedLeagueKey = 'MLB';
+            } else if (league === 'NFL' || league === 'USA: NFL') {
+                normalizedLeagueKey = 'NFL';
+            } else if (league === 'NBA' || league === 'USA: NBA') {
+                normalizedLeagueKey = 'NBA';
+            } else if (league === 'NHL' || league === 'USA: NHL') {
+                normalizedLeagueKey = 'NHL';
+            } else if (league === 'Premier League' || league === 'England: Premier League' || league.includes('Premier League')) {
+                normalizedLeagueKey = 'PremierLeague';
+            } else if (league === 'UEFA Champions League' || (league.includes('Champions League') && !league.includes('Women'))) {
+                normalizedLeagueKey = 'UEFAChampionsLeague';
+            } else if (league === 'MLS' || league === 'USA: MLS') {
+                normalizedLeagueKey = 'MLS';
+            } else if (league === 'La Liga' || league === 'LaLiga' || league === 'Spain: LaLiga') {
+                normalizedLeagueKey = 'LaLiga';
+            } else if (league === 'Bundesliga' || league === 'Germany: Bundesliga') {
+                normalizedLeagueKey = 'Bundesliga';
+            } else if (league === 'FA Cup' || league === 'England: FA Cup') {
+                normalizedLeagueKey = 'FACup';
+            } else if (league === 'NWSL' || league === 'USA: NWSL Women' || league.includes('NWSL')) {
+                normalizedLeagueKey = 'NWSL';
+            } else if (league === 'Ligue 1' || league === 'Ligue1' || league === 'France: Ligue 1') {
+                normalizedLeagueKey = 'Ligue1';
+            } else if (league === 'UEFA Conference League' || league === 'Conference League' || league.includes('Conference League')) {
+                normalizedLeagueKey = 'UEFAConferenceLeague';
+            } else if (league === 'UEFA Europa League' || league === 'Europa League' || league.includes('Europa League')) {
+                normalizedLeagueKey = 'UEFAEuropaLeague';
+            } else if (league === 'Serie A' || league === 'SerieA' || league === 'Italy: Serie A') {
+                normalizedLeagueKey = 'SerieA';
+            }
+        }
+        
+        // Check TEAM_DISPLAY_MAP FIRST for these leagues
+        // If normalizedLeagueKey is set, this league should ONLY use TEAM_DISPLAY_MAP (skip Google Sheets)
+        if (normalizedLeagueKey) {
+            if (TEAM_DISPLAY_MAP[normalizedLeagueKey]) {
+                const originalName = name.endsWith(" W") ? name.slice(0, -2) : name;
+                if (TEAM_DISPLAY_MAP[normalizedLeagueKey][originalName]) {
+                    return TEAM_DISPLAY_MAP[normalizedLeagueKey][originalName];
+                }
+                if (TEAM_DISPLAY_MAP[normalizedLeagueKey][p]) {
+                    return TEAM_DISPLAY_MAP[normalizedLeagueKey][p];
+                }
+            }
+            // If not found in TEAM_DISPLAY_MAP (or mapping doesn't exist), return original name (don't check Google Sheets)
+            return p;
         }
         
         // PRIORITY 1: Use alias mappings from Google Sheet (Column B = Display Name)
@@ -40967,8 +41016,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         
         // PRIORITY 2: Fallback to hardcoded mappings (for backward compatibility)
-        // BUT: Skip hardcoded mappings if this league should use Google Sheets mappings
-        // (prevents showing wrong names when mappings haven't loaded yet)
+        // Use hardcoded mappings ONLY for leagues NOT in the team aliases document
+        // Leagues in the team aliases document should ONLY use Google Sheets mappings
         const leaguesThatUseGoogleSheets = ['NCAAM', 'NCAAW', 'NCAAF', 'NFL', 'NBA', 'WNBA', 'MLB', 'NHL', 'MLS', 'NWSL', 
             'PremierLeague', 'LaLiga', 'Bundesliga', 'SerieA', 'Ligue1', 'LigaMX', 'Eredivisie', 'LigaPortugal', 
             'BelgianProLeague', 'ScottishPremiership', 'SaudiProLeague', 'EFLChampionship', 'SuperLig', 'USLChampionship',
@@ -40978,10 +41027,9 @@ document.addEventListener('DOMContentLoaded', function () {
         
         const shouldUseGoogleSheets = leagueKey && leaguesThatUseGoogleSheets.includes(leagueKey);
         
-        // Only use hardcoded mappings if:
-        // 1. This league doesn't use Google Sheets mappings, OR
-        // 2. Google Sheets mappings are already loaded (so we know they don't have this team)
-        if (!shouldUseGoogleSheets || (shouldUseGoogleSheets && Object.keys(window.teamAliasMappings || {}).length > 0)) {
+        // Only use hardcoded mappings if this league is NOT in the team aliases document
+        // Leagues in team aliases document should ONLY use Google Sheets (no hardcoded fallback)
+        if (!shouldUseGoogleSheets) {
             // If league is specified and has mappings, use league-specific mapping
             // Note: For doubles with <br>, we need to check if the original name (before processing) has a mapping
             if (league && TEAM_DISPLAY_MAP[league]) {
