@@ -43280,9 +43280,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (leagueKey === 'LIVGolf') {
                     // LIV Golf: Rank (blank header), Name, Pts
                     html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
-                    html += '<th style="padding: 8px; text-align: left; width: 40px;"></th>';
+                    html += '<th style="padding: 8px; text-align: left; width: 30px;"></th>';
                     html += '<th style="padding: 8px; text-align: left;">Name</th>';
-                    html += '<th style="padding: 8px; text-align: right; width: 80px;">Pts</th>';
+                    html += '<th style="padding: 8px; text-align: right; width: 50px;">Pts</th>';
                     html += '</tr></thead><tbody>';
                     
                     teams.sort((a, b) => {
@@ -43294,9 +43294,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     teams.forEach((team, index) => {
                         const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                         html += `<tr style="${rowStyle}">`;
-                        html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank || ''}</td>`;
+                        html += `<td style="padding: 8px; text-align: left; font-size: 12px; width: 30px;">${team.Rank || ''}</td>`;
                         html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team || team.Name || ''}</td>`;
-                        html += `<td style="padding: 8px; text-align: right; font-size: 12px;">${team.Points || team.Pts || ''}</td>`;
+                        html += `<td style="padding: 8px; text-align: right; font-size: 12px; width: 50px;">${team.Points || team.Pts || ''}</td>`;
                         html += '</tr>';
                     });
                     html += '</tbody></table>';
@@ -43342,9 +43342,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (leagueKey === 'IndyCar' || leagueKey === 'NASCARCupSeries' || leagueKey === 'FormulaOne') {
                     // IndyCar, NASCAR Cup Series, FormulaOne: Rank (blank header), Name, Pts
                     html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
-                    html += '<th style="padding: 8px; text-align: left; width: 40px;"></th>';
+                    html += '<th style="padding: 8px; text-align: left; width: 30px;"></th>';
                     html += '<th style="padding: 8px; text-align: left;">Name</th>';
-                    html += '<th style="padding: 8px; text-align: right; width: 80px;">Pts</th>';
+                    html += '<th style="padding: 8px; text-align: right; width: 50px;">Pts</th>';
                     html += '</tr></thead><tbody>';
                     
                     teams.sort((a, b) => {
@@ -43356,9 +43356,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     teams.forEach((team, index) => {
                         const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                         html += `<tr style="${rowStyle}">`;
-                        html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${team.Rank || ''}</td>`;
+                        html += `<td style="padding: 8px; text-align: left; font-size: 12px; width: 30px;">${team.Rank || ''}</td>`;
                         html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Team || team.Name || team.Driver || ''}</td>`;
-                        html += `<td style="padding: 8px; text-align: right; font-size: 12px;">${team.Points || team.Pts || ''}</td>`;
+                        html += `<td style="padding: 8px; text-align: right; font-size: 12px; width: 50px;">${team.Points || team.Pts || ''}</td>`;
                         html += '</tr>';
                     });
                     html += '</tbody></table>';
@@ -43370,9 +43370,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const buildTennisTable = (tennisTeams) => {
                         let tableHtml = '<table style="width: 100%; border-collapse: collapse; color: #ffffff; font-size: 12px;">';
                         tableHtml += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
-                        tableHtml += '<th style="padding: 8px; text-align: left; width: 50px;"></th>';
+                        tableHtml += '<th style="padding: 8px; text-align: left; width: 30px;"></th>';
                         tableHtml += '<th style="padding: 8px; text-align: left;">Name</th>';
-                        tableHtml += '<th style="padding: 8px; text-align: right; width: 80px;">Pts</th>';
+                        tableHtml += '<th style="padding: 8px; text-align: right; width: 50px;">Pts</th>';
                         tableHtml += '</tr></thead><tbody>';
                         
                         tennisTeams.sort((a, b) => {
@@ -43384,9 +43384,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         tennisTeams.forEach((team, index) => {
                             const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                             tableHtml += `<tr style="${rowStyle}">`;
-                            tableHtml += `<td style="padding: 8px; text-align: left;">${team.Rank || ''}</td>`;
+                            tableHtml += `<td style="padding: 8px; text-align: left; font-size: 12px; width: 30px;">${team.Rank || ''}</td>`;
                             tableHtml += `<td style="padding: 8px; text-align: left; font-weight: 500;">${team.Team || team.Name || ''}</td>`;
-                            tableHtml += `<td style="padding: 8px; text-align: right;">${team.Points || team.Pts || ''}</td>`;
+                            tableHtml += `<td style="padding: 8px; text-align: right; font-size: 12px; width: 50px;">${team.Points || team.Pts || ''}</td>`;
                             tableHtml += '</tr>';
                         });
                         tableHtml += '</tbody></table>';
@@ -50937,7 +50937,7 @@ window.updateStandingsTabText = function(leagueName) {
     ];
     
     // Combat sports and individual sports use "RANKINGS"
-    const rankingsLeagues = ['UFC', 'Boxing', 'PGATour', 'LPGATour', 'Tennis'];
+    const rankingsLeagues = ['UFC', 'Boxing', 'PGATour', 'LPGATour', 'Tennis', 'LIVGolf'];
     
     // Track & Field uses "WORLD LEADS"
     const worldLeadsLeagues = ['TrackAndField'];
