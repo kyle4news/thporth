@@ -43303,9 +43303,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (leagueKey === 'MotoGP') {
                     // MotoGP: Rank (blank header), Rider, Pts (T29 -> T-28 at bottom)
                     html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
-                    html += '<th style="padding: 8px; text-align: left; width: 40px;"></th>';
+                    html += '<th style="padding: 8px; text-align: left; width: 30px;"></th>';
                     html += '<th style="padding: 8px; text-align: left;">Rider</th>';
-                    html += '<th style="padding: 8px; text-align: right; width: 80px;">Pts</th>';
+                    html += '<th style="padding: 8px; text-align: right; width: 50px;">Pts</th>';
                     html += '</tr></thead><tbody>';
                     
                     // Sort: numeric ranks first, then T29 (convert to T-28) at bottom
@@ -43333,9 +43333,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Convert T29 to T-28
                         if (displayRank === 'T29') displayRank = 'T-28';
                         html += `<tr style="${rowStyle}">`;
-                        html += `<td style="padding: 8px; text-align: left; font-size: 12px;">${displayRank}</td>`;
+                        html += `<td style="padding: 8px; text-align: left; font-size: 12px; width: 30px;">${displayRank}</td>`;
                         html += `<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500;">${team.Rider || team.Team || team.Name || ''}</td>`;
-                        html += `<td style="padding: 8px; text-align: right; font-size: 12px;">${team.Points || team.Pts || ''}</td>`;
+                        html += `<td style="padding: 8px; text-align: right; font-size: 12px; width: 50px;">${team.Points || team.Pts || ''}</td>`;
                         html += '</tr>';
                     });
                     html += '</tbody></table>';
