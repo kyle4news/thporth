@@ -44909,12 +44909,17 @@ document.addEventListener('DOMContentLoaded', function () {
             
             html += '<div class="conference-section" style="margin-bottom: 30px;">';
             html += '<h3 class="conference-header" style="color: #ffffff; font-size: 16px; font-weight: 600; margin-bottom: 10px; padding: 8px; background-color: #3a3a3a; border-left: 4px solid #ef4444;">' + conferenceName + '</h3>';
-            html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff;">';
+            html += '<table class="standings-table" style="width: 100%; border-collapse: collapse; color: #ffffff; table-layout: fixed;">';
+            html += '<colgroup>';
+            html += '<col style="width: auto;">';
+            html += '<col style="width: 60px;">';
+            html += '<col style="width: 60px;">';
+            html += '</colgroup>';
             html += '<thead>';
             html += '<tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
             html += '<th style="padding: 8px; text-align: left; border-bottom: 1px solid #666;">Team</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 80px; border-bottom: 1px solid #666;">Overall</th>';
-            html += '<th style="padding: 8px; text-align: center; width: 80px; border-bottom: 1px solid #666;">Conf</th>';
+            html += '<th style="padding: 8px 5px 8px 0; text-align: right; border-bottom: 1px solid #666;">Conf.</th>';
+            html += '<th style="padding: 8px 8px 8px 5px; text-align: right; border-bottom: 1px solid #666;">Overall</th>';
             html += '</tr>';
             html += '</thead>';
             html += '<tbody>';
@@ -44923,8 +44928,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const rowStyle = index % 2 === 0 ? 'background-color: #2a2a2a;' : 'background-color: #1f1f1f;';
                 html += '<tr style="' + rowStyle + '">';
                 html += '<td style="padding: 8px; text-align: left; font-size: 12px; font-weight: 500; color: #ffffff;">' + team.Team + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.OverallRecord + '</td>';
-                html += '<td style="padding: 8px; text-align: center; font-size: 12px; color: #ffffff;">' + team.ConfRecord + '</td>';
+                html += '<td style="padding: 8px 5px 8px 0; text-align: right; font-size: 12px; color: #ffffff;">' + team.ConfRecord + '</td>';
+                html += '<td style="padding: 8px 8px 8px 5px; text-align: right; font-size: 12px; color: #ffffff;">' + team.OverallRecord + '</td>';
                 html += '</tr>';
             });
             
