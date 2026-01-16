@@ -37873,22 +37873,21 @@ document.addEventListener('DOMContentLoaded', function () {
             "Manchester City": "Man City",
             "Liverpool": "Liverpool",
             "AFC Bournemouth": "Bournemouth",
-            "Bournemouth": "Bournemouth",
-            "Tottenham": "Tottenham",
+            "Tottenham Hotspur": "Tottenham",
             "Chelsea": "Chelsea",
             "Sunderland": "Sunderland",
             "Manchester Utd": "Man United",
             "Crystal Palace": "Palace",
-            "Brighton": "Brighton",
+            "Brighton & Hove Albion": "Brighton",
             "Aston Villa": "Aston Villa",
             "Brentford": "Brentford",
-            "Newcastle": "Newcastle",
+            "Newcastle United": "Newcastle",
             "Fulham": "Fulham", 
             "Everton": "Everton",
-            "Leeds": "Leeds",
+            "Leeds United": "Leeds",
             "Burnley": "Burnley",
-            "West Ham": "West Ham",
-            "Nottingham": "Forest",
+            "West Ham United": "West Ham",
+            "Nottingham Forest": "Forest",
             "Wolverhampton Wanderers": "Wolves",
         },
         // EFL Championship
@@ -42198,61 +42197,55 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                     
-                // Add separator line between games (but not after the last game in the same table)
+                // Add separator line between games (but not after the last game) - SAME LOGIC AS REGULAR GAMES SECTION
                 if (i < sortedFeaturedGames.length - 1) {
                     const nextData = sortedFeaturedGames[i + 1];
-                    const nextTitleText = isYesterdayScores 
-                        ? (nextData.yesterdayTitle || nextData.title || getLeagueDisplayName(nextData.League, nextData.Sport) || "Other")
-                        : (nextData.title || getLeagueDisplayName(nextData.League, nextData.Sport) || "Other");
-                    // Only add separator if next game is in the same table (same title)
-                    if (nextTitleText === titleText) {
-                        // Get the NEXT game's time label to determine if the line above it should be full width
-                        const nextRawStart = nextData["Start Time"];
-                        const nextMatchStatus = (nextData["Match Status"] || "").toUpperCase();
-                        const nextStageValue = (nextData["Stage"] || "").toUpperCase();
-                        const nextStageTypeValue = (nextData["StageType"] || "").toUpperCase();
-                        const nextStatusValue = (nextData["Status"] || "").toUpperCase();
-                        // Check if POSTPONED is in any field (Stage, Status, StageType, or Match Status)
-                        const nextIsPostponed = nextStageValue.includes("POSTPONED") || nextStatusValue.includes("POSTPONED") || nextStageTypeValue.includes("POSTPONED") || nextMatchStatus.includes("POSTPONED");
-                        // Check if CANCELED is in any field (Stage, Status, StageType, or Match Status)
-                        const nextIsCanceled = nextStageValue.includes("CANCELED") || nextStatusValue.includes("CANCELED") || nextStageTypeValue.includes("CANCELED") || nextMatchStatus.includes("CANCELED");
-                        const nextIsLive = isYesterdayScores ? false : (nextMatchStatus.includes("IN PROGRESS") || nextMatchStatus.includes("LIVE"));
-                        const nextIsFinal = isYesterdayScores || nextMatchStatus.includes("FINISHED") || nextMatchStatus.includes("FINAL") || nextMatchStatus.includes("GAME OVER");
-                        const nextIsPostponedFinal = nextIsFinal && nextIsPostponed;
-                        const nextIsCanceledFinal = nextIsFinal && nextIsCanceled;
-                        let nextTimeLabel = "";
-                        
-                        if (nextData.timeString === '') {
-                            nextTimeLabel = "";
-                        } else if (nextIsLive) {
-                            nextTimeLabel = "Live";
-                        } else if (nextIsPostponed) {
-                            nextTimeLabel = '<span style="color: #545353;">PPD</span>';
-                        } else if (nextIsCanceled) {
-                            nextTimeLabel = '<span style="color: #545353;">Canceled</span>';
-                        } else if (nextIsFinal) {
-                            nextTimeLabel = "F";
-                        } else if (nextRawStart && nextRawStart.toDate) {
-                            nextTimeLabel = luxon.DateTime.fromJSDate(nextRawStart.toDate()).toFormat('h:mm a');
-                        } else {
-                            nextTimeLabel = "TBD";
-                        }
-                        
-                        const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
-                        const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabel;
-                        
-                        // Check if next game has a different start time from current game
-                        const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
-                        const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
-                        
-                        // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
-                        const colspan = isDifferentTime ? 4 : 3;
-                        const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
-                        
-                        const separatorRow = currentTable.insertRow();
-                        separatorRow.className = "game-separator-line";
-                        separatorRow.innerHTML = `${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
+                    // Get the NEXT game's time label to determine if the line above it should be full width
+                    const nextRawStart = nextData["Start Time"];
+                    const nextMatchStatus = (nextData["Match Status"] || "").toUpperCase();
+                    const nextStageValue = (nextData["Stage"] || "").toUpperCase();
+                    const nextStageTypeValue = (nextData["StageType"] || "").toUpperCase();
+                    const nextStatusValue = (nextData["Status"] || "").toUpperCase();
+                    // Check if POSTPONED is in any field (Stage, Status, StageType, or Match Status)
+                    const nextIsPostponed = nextStageValue.includes("POSTPONED") || nextStatusValue.includes("POSTPONED") || nextStageTypeValue.includes("POSTPONED") || nextMatchStatus.includes("POSTPONED");
+                    // Check if CANCELED is in any field (Stage, Status, StageType, or Match Status)
+                    const nextIsCanceled = nextStageValue.includes("CANCELED") || nextStatusValue.includes("CANCELED") || nextStageTypeValue.includes("CANCELED") || nextMatchStatus.includes("CANCELED");
+                    const nextIsLive = isYesterdayScores ? false : (nextMatchStatus.includes("IN PROGRESS") || nextMatchStatus.includes("LIVE"));
+                    const nextIsFinal = isYesterdayScores || nextMatchStatus.includes("FINISHED") || nextMatchStatus.includes("FINAL") || nextMatchStatus.includes("GAME OVER");
+                    const nextIsPostponedFinal = nextIsFinal && nextIsPostponed;
+                    const nextIsCanceledFinal = nextIsFinal && nextIsCanceled;
+                    let nextTimeLabel = "";
+                    
+                    if (nextData.timeString === '') {
+                        nextTimeLabel = "";
+                    } else if (nextIsLive) {
+                        nextTimeLabel = "Live";
+                    } else if (nextIsPostponed) {
+                        nextTimeLabel = '<span style="color: #545353;">PPD</span>';
+                    } else if (nextIsCanceled) {
+                        nextTimeLabel = '<span style="color: #545353;">Canceled</span>';
+                    } else if (nextIsFinal) {
+                        nextTimeLabel = "F";
+                    } else if (nextRawStart && nextRawStart.toDate) {
+                        nextTimeLabel = luxon.DateTime.fromJSDate(nextRawStart.toDate()).toFormat('h:mm a');
+                    } else {
+                        nextTimeLabel = "TBD";
                     }
+                    
+                    const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
+                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabel;
+                    
+                    // Check if next game has a different start time from current game
+                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
+                    const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
+                    
+                    // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
+                    const colspan = isDifferentTime ? 4 : 3;
+                    const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
+                    
+                    const separatorRow = currentTable.insertRow();
+                    separatorRow.className = "game-separator-line";
+                    separatorRow.innerHTML = `${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
                 }
                 
                 // Update previous game time label and increment game index for next iteration
