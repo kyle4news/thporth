@@ -782,25 +782,120 @@ table.game-table .game-row.game-separator.selected .team-cell,
     line-height: 1.25rem; /* leading-5 */
 }
 
-/* Custom scrollbar for overflow-y-auto */
+/* Hide scrollbars for all columns - Chrome, Safari, Opera */
 .column.tv-listings::-webkit-scrollbar,
 .games-content::-webkit-scrollbar,
 .game-entry-wrapper::-webkit-scrollbar,
-#league-specific-column::-webkit-scrollbar { /* Added new column */
-    width: 8px;
+#league-specific-column::-webkit-scrollbar,
+.column::-webkit-scrollbar,
+.news .content-section::-webkit-scrollbar,
+#social-feed-container::-webkit-scrollbar,
+.videos-content::-webkit-scrollbar,
+#menuList::-webkit-scrollbar,
+#f1-column-content > div::-webkit-scrollbar,
+.f1-main-tab-content > div::-webkit-scrollbar,
+.f1-main-tab-content::-webkit-scrollbar,
+.schedule-content::-webkit-scrollbar,
+.tennis-today-content::-webkit-scrollbar,
+.tennis-upcoming-content::-webkit-scrollbar,
+.f1-standings-content-pane::-webkit-scrollbar,
+.f1-schedule-content-pane::-webkit-scrollbar,
+.news-feed-content::-webkit-scrollbar,
+.news-content-pane::-webkit-scrollbar,
+.breaking-section::-webkit-scrollbar,
+.breaking-feed::-webkit-scrollbar,
+.social-team-content::-webkit-scrollbar,
+.media-team-content::-webkit-scrollbar,
+.main-tab-content::-webkit-scrollbar,
+.ncaa-standings-sub-content::-webkit-scrollbar,
+.stats-sub-content::-webkit-scrollbar,
+.stats-category-menu::-webkit-scrollbar,
+.stats-display::-webkit-scrollbar,
+[id*="headlines-feed-"]::-webkit-scrollbar,
+[id*="breaking-feed-"]::-webkit-scrollbar,
+[id*="headlines-content-"]::-webkit-scrollbar,
+[id*="league-schedule-today-default-content"]::-webkit-scrollbar,
+[id*="league-schedule-upcoming-default-content"]::-webkit-scrollbar,
+[id*="news-content-"]::-webkit-scrollbar,
+[id*="social-content-"]::-webkit-scrollbar,
+[id*="media-content-"]::-webkit-scrollbar {
+    display: none !important;
 }
-.column.tv-listings::-webkit-scrollbar-thumb,
-.games-content::-webkit-scrollbar-thumb,
-.game-entry-wrapper::-webkit-scrollbar-thumb,
-#league-specific-column::-webkit-scrollbar-thumb { /* Added new column */
-    background-color: #4a4a4a; /* Darker gray */
-    border-radius: 4px;
+
+/* Hide horizontal scrollbars - Chrome, Safari, Opera */
+.column.tv-listings::-webkit-scrollbar:horizontal,
+.games-content::-webkit-scrollbar:horizontal,
+.column::-webkit-scrollbar:horizontal,
+.news .content-section::-webkit-scrollbar:horizontal,
+#social-feed-container::-webkit-scrollbar:horizontal,
+.videos-content::-webkit-scrollbar:horizontal,
+#menuList::-webkit-scrollbar:horizontal,
+.main-tab-content::-webkit-scrollbar:horizontal,
+.ncaa-standings-sub-content::-webkit-scrollbar:horizontal,
+.stats-sub-content::-webkit-scrollbar:horizontal,
+.stats-category-menu::-webkit-scrollbar:horizontal,
+.stats-display::-webkit-scrollbar:horizontal,
+.news-feed-content::-webkit-scrollbar:horizontal,
+.news-content-pane::-webkit-scrollbar:horizontal,
+[id*="headlines-feed-"]::-webkit-scrollbar:horizontal,
+[id*="breaking-feed-"]::-webkit-scrollbar:horizontal,
+[id*="headlines-content-"]::-webkit-scrollbar:horizontal {
+    display: none !important;
 }
-.column.tv-listings::-webkit-scrollbar-track,
-.games-content::-webkit-scrollbar-track,
-.game-entry-wrapper::-webkit-scrollbar-track,
-#league-specific-column::-webkit-scrollbar-track { /* Added new column */
-    background-color: #2a2a2a; /* Even darker gray */
+
+/* Hide scrollbars for all columns - IE, Edge, Firefox */
+.column.tv-listings,
+.games-content,
+.game-entry-wrapper,
+#league-specific-column,
+.column,
+.news .content-section,
+#social-feed-container,
+.videos-content,
+#menuList,
+#f1-column-content > div,
+.f1-main-tab-content > div,
+.f1-main-tab-content,
+.schedule-content,
+.tennis-today-content,
+.tennis-upcoming-content,
+.f1-standings-content-pane,
+.f1-schedule-content-pane,
+.news-feed-content,
+.news-content-pane,
+.breaking-section,
+.breaking-feed,
+.social-team-content,
+.media-team-content,
+.main-tab-content,
+.ncaa-standings-sub-content,
+.stats-sub-content,
+.stats-category-menu,
+.stats-display,
+[id*="headlines-feed-"],
+[id*="breaking-feed-"],
+[id*="headlines-content-"],
+[id*="league-schedule-today-default-content"],
+[id*="league-schedule-upcoming-default-content"],
+[id*="news-content-"],
+[id*="social-content-"],
+[id*="media-content-"] {
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
+}
+
+/* Hide sitewide scrollbar (html/body) - Chrome, Safari, Opera */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none !important;
+    -webkit-appearance: none !important;
+}
+
+/* Hide sitewide scrollbar (html/body) - IE, Edge, Firefox */
+html,
+body {
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
 }
 
 /* ────── Today's MLB Games widget (scoped) ────── */
