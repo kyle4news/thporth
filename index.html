@@ -49217,7 +49217,8 @@ async function fetchFeaturedGames() {
             
             if (standingsMainTab) {
                 // Only hide the standings/tab for the generic Soccer page; keep it for league-specific soccer pages
-                if (leagueKey === 'Soccer') {
+                // Also hide for FA Cup (only show Schedule tab)
+                if (leagueKey === 'Soccer' || leagueKey === 'FACup') {
                     standingsMainTab.style.display = 'none';
                     if (standingsTabContentEl) {
                         standingsTabContentEl.style.display = 'none';
