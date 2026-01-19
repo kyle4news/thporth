@@ -48739,7 +48739,7 @@ async function fetchFeaturedGames() {
             // If there are no games, show an explicit "No games" message rather than leaving the area blank.
             if (!regularGames.length && !featuredGames.length) {
               try {
-                todayContainer.innerHTML = '<div class="info" style="padding:10px;color:#9ca3af">No games found for today.</div>';
+                todayContainer.innerHTML = '<div class="info" style="padding:10px;color:#9ca3af"></div>';
               } catch (e) { console.warn('Could not render no-games message', e); }
               // Run FSM with empty data to keep state in sync, then invoke callback
               try { handleTodayFSM([]).catch(() => {}); } catch (e) {}
