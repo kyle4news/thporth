@@ -35776,7 +35776,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // url: link to external site with live data (opens in new tab)
     const Hardcoded_Today_Schedules = {
         'Tennis': [
-            { date: '2026-01-20', away: 'Australian Open', home: '2nd Round', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-19', away: 'Australian Open', home: '2nd Round', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-20', away: 'Australian Open', home: '2nd Round', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
         ],
         // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf
     };
@@ -40900,19 +40901,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 hardcodedTable.style.borderCollapse = "collapse";
                 hardcodedTable.style.tableLayout = "fixed";
                 
-                // Colgroup for hardcoded today games: time (32%), teams (39.25% = 30.25% + 9%), channel (23.75%)
+                // Colgroup for hardcoded games: different layout for yesterday (no channel) vs today (with channel)
                 const hardcodedColgroup = document.createElement("colgroup");
-                hardcodedColgroup.innerHTML = `
-                    <col style="width: 32%;">   <!-- time/icon -->
-                    <col style="width: 39.25%;">  <!-- team (takes up team + score width) -->
-                    <col style="width: 23.75%;">   <!-- channel -->
-                    <col style="width: 5px;">   <!-- clickable indicator -->
-                `;
+                if (isYesterdayScores) {
+                    // Yesterday: no channel column - icon (32%), teams (68%)
+                    hardcodedColgroup.innerHTML = `
+                        <col style="width: 32%;">   <!-- time/icon -->
+                        <col style="width: 68%;">   <!-- team (takes up team + channel width) -->
+                    `;
+                } else {
+                    // Today: icon (32%), teams (39.25%), channel (23.75%)
+                    hardcodedColgroup.innerHTML = `
+                        <col style="width: 32%;">   <!-- time/icon -->
+                        <col style="width: 39.25%;">  <!-- team (takes up team + score width) -->
+                        <col style="width: 23.75%;">   <!-- channel -->
+                        <col style="width: 5px;">   <!-- clickable indicator -->
+                    `;
+                }
                 hardcodedTable.appendChild(hardcodedColgroup);
                 
                 // Add spacer row
                 const hardcodedSpacerRow = hardcodedTable.insertRow();
-                hardcodedSpacerRow.innerHTML = `<td colspan="3" style="height: 5px; padding: 0; border: none;"></td>`;
+                const spacerColspan = isYesterdayScores ? 2 : 3;
+                hardcodedSpacerRow.innerHTML = `<td colspan="${spacerColspan}" style="height: 5px; padding: 0; border: none;"></td>`;
                 
                 hardcodedTodayGames.forEach((data, idx) => {
                     const displayLeague = getLeagueDisplayName(data.League, data.Sport);
@@ -40943,8 +40954,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     row2.className = "game-row game-separator scheduled-game";
                     
                     // Away on top, home on bottom (non-soccer format)
-                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td><td rowspan="2"></td>`;
-                    row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;"></td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
+                    // For yesterday: no channel column; for today: include channel column
+                    if (isYesterdayScores) {
+                        row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td>`;
+                        row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;"></td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
+                    } else {
+                        row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td><td rowspan="2"></td>`;
+                        row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;"></td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
+                    }
                     
                     row1.dataset.matchStatus = 'SCHEDULED';
                     row2.dataset.matchStatus = 'SCHEDULED';
@@ -40953,7 +40970,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (idx < hardcodedTodayGames.length - 1) {
                         const separatorRow = hardcodedTable.insertRow();
                         separatorRow.className = "game-separator-line";
-                        separatorRow.innerHTML = `<td colspan="3" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
+                        const separatorColspan = isYesterdayScores ? 2 : 3;
+                        separatorRow.innerHTML = `<td colspan="${separatorColspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
                     }
                 });
                 
@@ -46110,8 +46128,49 @@ async function fetchFeaturedGames() {
                     console.error('Error fetching yesterday\'s featured games:', error);
                     // Continue without featured games if there's an error
                 }
-                // Combine games with yesterday's featured games first
-                const allGames = [...yesterdayFeaturedGames, ...gamesData];
+                
+                // Add hardcoded games from Hardcoded_Today_Schedules for yesterday's date
+                const hardcodedYesterdayGames = [];
+                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf'];
+                
+                leaguesWithHardcodedToday.forEach(leagueKey => {
+                    // Map league keys to display names (must match LEAGUE_DISPLAY_ORDER exactly)
+                    const leagueDisplayNameMap = {
+                        'Boxing': 'Boxing',
+                        'UFC': 'UFC',
+                        'PGATour': 'PGA Tour',
+                        'LPGATour': 'LPGA Tour',
+                        'Tennis': 'Tennis',
+                        'PGATourChampions': 'PGA Champions',
+                        'NASCARCupSeries': 'NASCAR Cup Series',
+                        'DPWorldTour': 'DP World Tour',
+                        'LIVGolf': 'LIV Golf'
+                    };
+                    
+                    const leagueDisplayName = leagueDisplayNameMap[leagueKey] || leagueKey;
+                    
+                    if (Hardcoded_Today_Schedules[leagueKey]) {
+                        const yesterdayGames = Hardcoded_Today_Schedules[leagueKey].filter(game => game.date === yesterdayStr);
+                        
+                        yesterdayGames.forEach(game => {
+                            // Create a game object compatible with renderGames format (no channel for yesterday)
+                            hardcodedYesterdayGames.push({
+                                'Game ID': `hardcoded-yesterday-${leagueKey}-${game.date}-${Date.now()}-${Math.random()}`,
+                                'Away Team': game.away,
+                                'Home Team': game.home,
+                                'League': leagueDisplayName,
+                                'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : 'Racing'))),
+                                'Match Status': 'SCHEDULED',
+                                'gameDate': game.date,
+                                'hardcodedTodayUrl': game.url || '',
+                                'isHardcodedToday': true // Flag to identify these games in renderGames
+                            });
+                        });
+                    }
+                });
+                
+                // Combine games with yesterday's featured games first, then hardcoded games, then regular games
+                const allGames = [...yesterdayFeaturedGames, ...hardcodedYesterdayGames, ...gamesData];
                 
                 // Cache the results until next 3:55 AM ET
                 yesterdayScoresCache = allGames;
