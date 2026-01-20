@@ -44708,17 +44708,11 @@ async function fetchFeaturedGames() {
             const todayStr = getTodayDisplayDate();
             const isToday = dateStr === todayStr;
             
-            // Use featured.json endpoint (currently only serves today's games)
-            // For yesterday, we'll need to handle differently or use a fallback
-            if (!isToday) {
-                // For non-today dates, return empty array (featured.json only has today)
-                // TODO: Add yesterday-featured.json endpoint if needed
-                console.log(`⚠️ Featured games for ${dateStr} not available via JSON endpoint (only today supported)`);
-                return [];
-            }
-            
-            // Fetch from JSON endpoint
-            const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/featured.json';
+            // Fetch from JSON endpoint with date parameter (supports both today and yesterday)
+            // Backend caches results, so this is cost-effective even with many visitors
+            const JSON_ENDPOINT = isToday 
+                ? 'https://flashlive-scraper-124291936014.us-central1.run.app/data/featured.json'
+                : `https://flashlive-scraper-124291936014.us-central1.run.app/data/featured.json?date=${dateStr}`;
             const response = await fetch(JSON_ENDPOINT);
             
             if (!response.ok) {
