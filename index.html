@@ -35771,7 +35771,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     };
 
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
+    // Hardcoded today schedules (for leagues without live data - displays in Home > Games > Today)
+    // Format: { date, away, home, channel, url }
+    // url: link to external site with live data (opens in new tab)
+    const Hardcoded_Today_Schedules = {
+        'Tennis': [
+            { date: '2026-01-20', away: 'Australian Open', home: '2nd Round', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        ],
+        // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf
+    };
+
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Tennis", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         // NFL: "https://www.nfl.com/scores",
@@ -39079,6 +39089,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     titleContent.appendChild(logo);
+                } else if (leagueNameKey === "Tennis") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://raw.githubusercontent.com/kyle4news/thporth/main/tennis-racket.png";
+                    logo.alt = "Tennis Logo";
+                        logo.width = 14;
+                        logo.height = 14;
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
                 } else if (leagueNameKey === "ATP" || leagueNameKey === "WTA" || leagueNameKey === "ATP Finals (Singles)" || leagueNameKey === "ATP Finals (Doubles)") {
                     const logo = document.createElement("img");
                     logo.src = "https://thporth.com/atp.png";
@@ -40862,6 +40887,85 @@ document.addEventListener('DOMContentLoaded', function () {
                 container.appendChild(leagueSection);
                 return; // Skip normal rendering for FEATURED
             }
+            // Separate hardcoded today games from regular games
+            const hardcodedTodayGames = games.filter(g => g.isHardcodedToday === true);
+            const regularGamesForLeague = games.filter(g => g.isHardcodedToday !== true);
+            
+            // Render hardcoded today games first (if any)
+            if (hardcodedTodayGames.length > 0) {
+                const hardcodedTable = document.createElement("table");
+                hardcodedTable.className = "game-table";
+                hardcodedTable.style.width = "100%";
+                hardcodedTable.style.maxWidth = "100%";
+                hardcodedTable.style.borderCollapse = "collapse";
+                hardcodedTable.style.tableLayout = "fixed";
+                
+                // Colgroup for hardcoded today games: time (32%), teams (39.25% = 30.25% + 9%), channel (23.75%)
+                const hardcodedColgroup = document.createElement("colgroup");
+                hardcodedColgroup.innerHTML = `
+                    <col style="width: 32%;">   <!-- time/icon -->
+                    <col style="width: 39.25%;">  <!-- team (takes up team + score width) -->
+                    <col style="width: 23.75%;">   <!-- channel -->
+                    <col style="width: 5px;">   <!-- clickable indicator -->
+                `;
+                hardcodedTable.appendChild(hardcodedColgroup);
+                
+                // Add spacer row
+                const hardcodedSpacerRow = hardcodedTable.insertRow();
+                hardcodedSpacerRow.innerHTML = `<td colspan="3" style="height: 5px; padding: 0; border: none;"></td>`;
+                
+                hardcodedTodayGames.forEach((data, idx) => {
+                    const displayLeague = getLeagueDisplayName(data.League, data.Sport);
+                    const leagueKey = getLeagueKeyFromGame(data);
+                    const homeDisplay = getTeamDisplayName(data["Home Team"] || "", displayLeague);
+                    const awayDisplay = getTeamDisplayName(data["Away Team"] || "", displayLeague);
+                    const home = formatTeamNameWithRanking(homeDisplay, leagueKey, data, true);
+                    const away = formatTeamNameWithRanking(awayDisplay, leagueKey, data, false);
+                    const isHomeDoubles = homeDisplay.includes('<br>');
+                    const isAwayDoubles = awayDisplay.includes('<br>');
+                    const homeWhiteSpace = isHomeDoubles ? 'white-space: normal;' : 'white-space: nowrap;';
+                    const awayWhiteSpace = isAwayDoubles ? 'white-space: normal;' : 'white-space: nowrap;';
+                    
+                    const hardcodedUrl = data.hardcodedTodayUrl || '';
+                    const iconHtml = hardcodedUrl 
+                        ? `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`
+                        : '';
+                    
+                    const channelDisplay = normalizeChannel(data.channel || data.Channel || '');
+                    const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
+                    const timeFontSize = isLeagueSpecificColumn ? '10px' : '11px';
+                    const isDoublesMatch = isHomeDoubles && isAwayDoubles;
+                    const row2TeamCellPadding = isDoublesMatch ? 'padding: 7px 1px 2px 1px;' : 'padding: 2px 1px;';
+                    
+                    const row1 = hardcodedTable.insertRow();
+                    row1.className = "game-row scheduled-game";
+                    const row2 = hardcodedTable.insertRow();
+                    row2.className = "game-row game-separator scheduled-game";
+                    
+                    // Away on top, home on bottom (non-soccer format)
+                    row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word;">${channelDisplay}</div></td><td rowspan="2"></td>`;
+                    row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;"></td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
+                    
+                    row1.dataset.matchStatus = 'SCHEDULED';
+                    row2.dataset.matchStatus = 'SCHEDULED';
+                    
+                    // Add separator line between games (but not after the last game)
+                    if (idx < hardcodedTodayGames.length - 1) {
+                        const separatorRow = hardcodedTable.insertRow();
+                        separatorRow.className = "game-separator-line";
+                        separatorRow.innerHTML = `<td colspan="3" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
+                    }
+                });
+                
+                leagueSection.appendChild(hardcodedTable);
+            }
+            
+            // Render regular games (if any)
+            if (regularGamesForLeague.length === 0) {
+                container.appendChild(leagueSection);
+                return;
+            }
+            
             const table = document.createElement("table");
             table.className = "game-table";
             table.style.width = "100%";
@@ -40892,9 +40996,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const spacerRow = table.insertRow();
             spacerRow.innerHTML = `<td colspan="4" style="height: 5px; padding: 0; border: none;"></td>`;
 
-            // Process games - handle Boxing separately if needed
-            for (let i = 0; i < games.length; i++) {
-                const data = games[i];
+            // Process regular games (hardcoded today games already rendered above)
+            for (let i = 0; i < regularGamesForLeague.length; i++) {
+                const data = regularGamesForLeague[i];
                 const displayLeague = getLeagueDisplayName(data.League, data.Sport);
                 const leagueKey = getLeagueKeyFromGame(data);
                 const homeDisplay = getTeamDisplayName(data["Home Team"] || "", displayLeague);
@@ -41342,8 +41446,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Add separator line between games (but not after the last game)
                 // USE EXACT SAME LOGIC AS LEAGUE-SPECIFIC SCHEDULE SECTION - NEVER SUPERSEDE THIS RULE
-                if (i < games.length - 1) {
-                    const nextData = games[i + 1];
+                if (i < regularGamesForLeague.length - 1) {
+                    const nextData = regularGamesForLeague[i + 1];
                     const nextRawStart = nextData["Start Time"];
                     const nextMatchStatus = (nextData["Match Status"] || "").toUpperCase();
                     const nextStageValue = (nextData["Stage"] || "").toUpperCase();
@@ -41451,7 +41555,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 // Add 12px spacer row after last game in each league
-                if (i === games.length - 1) {
+                if (i === regularGamesForLeague.length - 1) {
                     const spacerRow = table.insertRow();
                     spacerRow.innerHTML = '<td colspan="4" style="height: 12px; padding: 0; border: none;"></td>';
                     
@@ -45239,11 +45343,53 @@ async function fetchFeaturedGames() {
                     return false;
                 });
                 
+                // Add hardcoded today schedules for specified leagues
+                const hardcodedTodayGames = [];
+                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf'];
+                
+                leaguesWithHardcodedToday.forEach(leagueKey => {
+                    // Map league keys to display names (must match LEAGUE_DISPLAY_ORDER exactly)
+                    const leagueDisplayNameMap = {
+                        'Boxing': 'Boxing',
+                        'UFC': 'UFC',
+                        'PGATour': 'PGA Tour',
+                        'LPGATour': 'LPGA Tour',
+                        'Tennis': 'Tennis',
+                        'PGATourChampions': 'PGA Champions',
+                        'NASCARCupSeries': 'NASCAR Cup Series',
+                        'DPWorldTour': 'DP World Tour',
+                        'LIVGolf': 'LIV Golf'
+                    };
+                    
+                    const leagueDisplayName = leagueDisplayNameMap[leagueKey] || leagueKey;
+                    
+                    if (Hardcoded_Today_Schedules[leagueKey]) {
+                        const todayGames = Hardcoded_Today_Schedules[leagueKey].filter(game => game.date === todayStr);
+                        
+                        todayGames.forEach(game => {
+                            // Create a game object compatible with renderGames format
+                            hardcodedTodayGames.push({
+                                'Game ID': `hardcoded-today-${leagueKey}-${game.date}-${Date.now()}-${Math.random()}`,
+                                'Away Team': game.away,
+                                'Home Team': game.home,
+                                'League': leagueDisplayName,
+                                'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : 'Racing'))),
+                                'Match Status': 'SCHEDULED',
+                                'gameDate': game.date,
+                                'channel': game.channel || '',
+                                'Channel': game.channel || '',
+                                'hardcodedTodayUrl': game.url || '',
+                                'isHardcodedToday': true // Flag to identify these games in renderGames
+                            });
+                        });
+                    }
+                });
+                
                 const previousCount = regularGames.length;
-                regularGames = filteredGames.sort(sortGames);
+                regularGames = [...filteredGames, ...hardcodedTodayGames].sort(sortGames);
                 const newCount = regularGames.length;
                 
-                console.log(`🔄 [JSON Poll] Regular games updated: ${previousCount} → ${newCount} games (filtered from ${jsonData.gameCount} total games for date ${todayStr})`);
+                console.log(`🔄 [JSON Poll] Regular games updated: ${previousCount} → ${newCount} games (${filteredGames.length} from JSON, ${hardcodedTodayGames.length} hardcoded today schedules for date ${todayStr})`);
                 
                 // Debug: Log first few game dates if filtering seems wrong
                 if (newCount === 0 && jsonData.gameCount > 0) {
