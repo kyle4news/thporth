@@ -51711,19 +51711,34 @@ async function fetchFeaturedGames() {
                     // If the league has fewer than 10 upcoming games, always show all games and don't show the toggle
                     const datesToShow = (isNcaaLeague && futureGames.length < 10) ? gamesByDate[dateStr] : (isExpanded ? gamesByDate[dateStr] : gamesByDate[dateStr].filter(g => g.isImportant));
                     
-                    datesToShow.forEach(game => {
+                    // Track last displayed time label for this date
+                    let lastDisplayedTimeLabel = null;
+                    
+                    // Determine display order based on league type (same for all games in this date)
+                    const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia'].includes(leagueKey);
+                    
+                    datesToShow.forEach((game, gameIndex) => {
                     // Parse time as EST and convert to user's local time (or keep TBD)
-                    let displayTime = game.time;
+                    let currentTimeLabel = game.time;
                     if (game.time && game.time.toUpperCase() !== 'TBD') {
                         const estTime = luxon.DateTime.fromFormat(game.time, 'h:mm a', { zone: 'America/New_York' });
                         if (estTime.isValid) {
                             const localTime = estTime.setZone('local');
-                            displayTime = localTime.toFormat('h:mm a');
+                            currentTimeLabel = localTime.toFormat('h:mm a');
                         }
+                    } else {
+                        currentTimeLabel = 'TBD';
                     }
                     
-                    // Determine display order based on league type
-                    const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia'].includes(leagueKey);
+                    // Only display time label when it changes (or is first game)
+                    let displayTimeLabel = currentTimeLabel;
+                    if (currentTimeLabel !== 'TBD') {
+                        if (currentTimeLabel === lastDisplayedTimeLabel) {
+                            displayTimeLabel = '';
+                        } else {
+                            lastDisplayedTimeLabel = currentTimeLabel;
+                        }
+                    }
                     
                     let topTeam, bottomTeam;
                     if (isSoccerLeague) {
@@ -51744,19 +51759,46 @@ async function fetchFeaturedGames() {
                         topTeam = getMascotName(game.away);
                         bottomTeam = getMascotName(game.home);
                     }
-                        
-                        // Rankings and display mapping already applied above for NCAA leagues
+                    
+                    // Check if next game has a different time to determine separator style
+                    const nextGame = datesToShow[gameIndex + 1];
+                    let nextTimeLabel = null;
+                    if (nextGame) {
+                        nextTimeLabel = nextGame.time;
+                        if (nextGame.time && nextGame.time.toUpperCase() !== 'TBD') {
+                            const estTime = luxon.DateTime.fromFormat(nextGame.time, 'h:mm a', { zone: 'America/New_York' });
+                            if (estTime.isValid) {
+                                const localTime = estTime.setZone('local');
+                                nextTimeLabel = localTime.toFormat('h:mm a');
+                            }
+                        } else {
+                            nextTimeLabel = 'TBD';
+                        }
+                    }
+                    const isDifferentTime = nextGame && nextTimeLabel !== currentTimeLabel;
                     
                     html += `
-                        <div style="display: flex; align-items: center; padding: 8px 10px; border-bottom: 1px solid #2a2a2a; font-size: 11px;">
-                            <div style="width: 80px; flex-shrink: 0; color: #9ca3af;">${displayTime}</div>
-                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                        <div style="display: flex; align-items: center; padding: 8px 0; font-size: 11px;">
+                            <div style="width: 60px; flex-shrink: 0; color: #9ca3af; font-size: 11px; padding-left: 10px; box-sizing: border-box;">${displayTimeLabel}</div>
+                            <div style="width: 5px; flex-shrink: 0;"></div>
+                            <div style="width: 120px; flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; font-size: 11px;">
                                 <div>${topTeam}</div>
                                 <div>${bottomTeam}</div>
                             </div>
-                            ${game.channel ? `<div style="width: 80px; text-align: right; color: #9ca3af; flex-shrink: 0;">${game.channel}</div>` : ''}
+                            ${game.channel ? `<div style="width: 5px; flex-shrink: 0;"></div><div style="width: 60px; flex-shrink: 0; text-align: right; color: #9ca3af; font-size: 11px; padding-right: 10px; box-sizing: border-box;">${game.channel}</div>` : ''}
                         </div>
                     `;
+                    
+                    // Add separator line between games (but not after the last game)
+                    if (gameIndex < datesToShow.length - 1) {
+                        // If next game has different time, full-width separator
+                        // If next game has same time, separator doesn't extend into time column (starts after 60px time + 5px spacer = 65px)
+                        if (isDifferentTime) {
+                            html += `<div style="border-top: 1px solid #000000; margin: 0;"></div>`;
+                        } else {
+                            html += `<div style="display: flex; padding: 0;"><div style="width: 65px; flex-shrink: 0;"></div><div style="flex: 1; border-top: 1px solid #000000; margin: 0;"></div></div>`;
+                        }
+                    }
                 });
             });
             
