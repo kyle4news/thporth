@@ -50107,6 +50107,12 @@ async function fetchFeaturedGames() {
             // based on whether there are games today or not
         }
 
+        // Special handling for WNBA - show hardcoded message
+        if (leagueKey === 'WNBA') {
+            todayScheduleContent.innerHTML = '<p style="color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">2026 season starts in May</p>';
+            return;
+        }
+        
         // Load TODAY schedule - use JSON endpoint with polling for live score updates
         if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
             tennisTodayAtpContent.innerHTML = '<p style="color: #9ca3af;">Loading ATP schedule...</p>';
@@ -51495,6 +51501,14 @@ async function fetchFeaturedGames() {
                     }
                 });
                 defaultContent.innerHTML = html;
+            }
+            return;
+        }
+        
+        // Special handling for WNBA - show hardcoded message
+        if (normalizedLeagueKey === 'WNBA' || leagueKey === 'WNBA') {
+            if (defaultContent) {
+                defaultContent.innerHTML = '<p style="color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">2026 season starts in May</p>';
             }
             return;
         }
