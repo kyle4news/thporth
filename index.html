@@ -37706,6 +37706,32 @@ document.addEventListener('DOMContentLoaded', function () {
             { date: '2026-02-11', time: '3:45 PM', home: 'Kilmarnock', away: 'St. Mirren', channel: '' },
             { date: '2026-02-11', time: '4:00 PM', home: 'Motherwell', away: 'Rangers', channel: 'Sky Go UK' },
         ],
+
+        'MotoGP': [
+  { date: '2026-03-01', time: '', away: 'Thailand', home: '', channel: '' },
+  { date: '2026-03-22', time: '', away: 'Brazil', home: '', channel: '' },
+  { date: '2026-03-29', time: '', away: 'United States', home: '', channel: '' },
+  { date: '2026-04-12', time: '', away: 'Qatar', home: '', channel: '' },
+  { date: '2026-04-26', time: '', away: 'Spain', home: '', channel: '' },
+  { date: '2026-05-10', time: '', away: 'France', home: '', channel: '' },
+  { date: '2026-05-17', time: '', away: 'Catalonia', home: '', channel: '' },
+  { date: '2026-05-31', time: '', away: 'Italy', home: '', channel: '' },
+  { date: '2026-06-07', time: '', away: 'Hungary', home: '', channel: '' },
+  { date: '2026-06-21', time: '', away: 'Czechia', home: '', channel: '' },
+  { date: '2026-06-28', time: '', away: 'Netherlands', home: '', channel: '' },
+  { date: '2026-07-12', time: '', away: 'Germany', home: '', channel: '' },
+  { date: '2026-08-09', time: '', away: 'Great Britain', home: '', channel: '' },
+  { date: '2026-08-30', time: '', away: 'Aragon', home: '', channel: '' },
+  { date: '2026-09-13', time: '', away: 'San Marino', home: '', channel: '' },
+  { date: '2026-09-20', time: '', away: 'Austria', home: '', channel: '' },
+  { date: '2026-10-04', time: '', away: 'Japan', home: '', channel: '' },
+  { date: '2026-10-11', time: '', away: 'Indonesia', home: '', channel: '' },
+  { date: '2026-10-25', time: '', away: 'Australia', home: '', channel: '' },
+  { date: '2026-11-01', time: '', away: 'Malaysia', home: '', channel: '' },
+  { date: '2026-11-15', time: '', away: 'Portugal', home: '', channel: '' },
+  { date: '2026-11-22', time: '', away: 'Valencia', home: '', channel: '' },
+],
+
         'NFL': [
   { date: '2026-01-25', time: '2:00 PM', away: 'Denver Broncos', home: 'New England Patriots', channel: 'CBS' },
   { date: '2026-01-25', time: '5:30 PM', away: 'Seattle Seahawks', home: 'Los Angeles Rams', channel: 'FOX' }
@@ -51482,15 +51508,64 @@ async function fetchFeaturedGames() {
                 { date: 'September 6', time: '2:30 PM ET', race: 'Grand Prix of Monterey', location: 'Weathertech Raceway Laguna Seca', channel: 'FOX' }
             ];
             
+            // Helper function to convert EST time to local time
+            function convertESTToLocal(dateStr, timeStr) {
+                if (timeStr === 'TBD') return 'TBD';
+                
+                const { DateTime } = luxon;
+                const currentYear = new Date().getFullYear();
+                
+                // Parse date (e.g., "March 1" -> March 1, 2026)
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                const dateParts = dateStr.split(' ');
+                const monthName = dateParts[0];
+                const day = parseInt(dateParts[1]);
+                const month = monthNames.indexOf(monthName);
+                
+                // Parse time
+                let hour, minute;
+                if (timeStr.includes('Noon')) {
+                    hour = 12;
+                    minute = 0;
+                } else {
+                    const timeMatch = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+                    if (timeMatch) {
+                        hour = parseInt(timeMatch[1]);
+                        minute = parseInt(timeMatch[2]);
+                        const ampm = timeMatch[3].toUpperCase();
+                        if (ampm === 'PM' && hour !== 12) hour += 12;
+                        if (ampm === 'AM' && hour === 12) hour = 0;
+                    } else {
+                        return timeStr.replace(' ET', ''); // Fallback if parsing fails
+                    }
+                }
+                
+                // Create DateTime in Eastern Time
+                const estDateTime = DateTime.fromObject({
+                    year: currentYear,
+                    month: month + 1,
+                    day: day,
+                    hour: hour,
+                    minute: minute
+                }, { zone: 'America/New_York' });
+                
+                // Convert to local time
+                const localDateTime = estDateTime.setZone('local');
+                
+                // Format as "h:mm a" (e.g., "3:00 PM" or "12:00 PM" for noon)
+                return localDateTime.toFormat('h:mm a');
+            }
+            
             if (defaultContent) {
                 let html = '';
                 scheduleData.forEach((race, index) => {
+                    const localTime = convertESTToLocal(race.date, race.time);
                     html += `
                         <div style="padding: 8px 0;">
                             <div style="font-weight: bold; color: #fff; margin-bottom: 4px; font-size: 0.75rem;">${race.race}</div>
                             <div style="color: #9ca3af; font-weight: normal; font-size: 0.75rem; display: flex; gap: 12px;">
                                 <span>${race.date}</span>
-                                <span>${race.time}</span>
+                                <span>${localTime}</span>
                                 <span>${race.channel}</span>
                             </div>
                         </div>
