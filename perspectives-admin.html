@@ -347,22 +347,85 @@
        });
 
 
-       // ----- New: Load games from Firestore and render list with URL inputs -----
-       document.getElementById('loadGamesBtn').addEventListener('click', async () => {
-           const btn = document.getElementById('loadGamesBtn');
-           btn.disabled = true; btn.textContent = 'Loading...';
-           try {
-               await ensureFirebase();
-               const db = firebase.firestore();
-               const gamesRef = db.collection('artifacts/flashlive-daily-scraper/public/data/sportsGames');
+      // Hardcoded_Today_Schedules data structure (same as index.html)
+      const Hardcoded_Today_Schedules = {
+          'Tennis': [
+              { date: '2026-01-19', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-20', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-21', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-22', away: 'Australian Open', home: '2nd, 3rd Rd', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-23', away: 'Australian Open', home: '3rd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-24', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-25', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-26', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-27', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-28', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-29', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-30', away: 'Women\'s Final', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-31', away: 'Men\'s Final', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+          ],
+          // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf
+      };
+
+      // ----- New: Load games from Firestore and render list with URL inputs -----
+      document.getElementById('loadGamesBtn').addEventListener('click', async () => {
+          const btn = document.getElementById('loadGamesBtn');
+          btn.disabled = true; btn.textContent = 'Loading...';
+          try {
+              await ensureFirebase();
+              const db = firebase.firestore();
+              const gamesRef = db.collection('artifacts/flashlive-daily-scraper/public/data/sportsGames');
 
 
-               // Compute today's date in America/New_York as YYYY-MM-DD
-               const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+              // Compute today's date in America/New_York as YYYY-MM-DD
+              const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 
 
-               const snapshot = await gamesRef.where('gameDate', '==', todayStr).orderBy('Start Time').get();
-               const games = snapshot.empty ? [] : snapshot.docs.map(d => d.data());
+              const snapshot = await gamesRef.where('gameDate', '==', todayStr).orderBy('Start Time').get();
+              let games = snapshot.empty ? [] : snapshot.docs.map(d => d.data());
+              
+              // Add hardcoded games from Hardcoded_Today_Schedules
+              const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf'];
+              const leagueDisplayNameMap = {
+                  'Boxing': 'Boxing',
+                  'UFC': 'UFC',
+                  'PGATour': 'PGA Tour',
+                  'LPGATour': 'LPGA Tour',
+                  'Tennis': 'Tennis',
+                  'PGATourChampions': 'PGA Champions',
+                  'NASCARCupSeries': 'NASCAR Cup Series',
+                  'DPWorldTour': 'DP World Tour',
+                  'LIVGolf': 'LIV Golf'
+              };
+              
+              leaguesWithHardcodedToday.forEach((leagueKey, leagueIndex) => {
+                  const leagueDisplayName = leagueDisplayNameMap[leagueKey] || leagueKey;
+                  
+                  if (Hardcoded_Today_Schedules[leagueKey]) {
+                      const todayGames = Hardcoded_Today_Schedules[leagueKey].filter(game => game.date === todayStr);
+                      
+                      todayGames.forEach((game, gameIndex) => {
+                          // Create Game ID: hardcoded-{leagueKey}-{date}-{index}
+                          const gameId = `hardcoded-${leagueKey}-${game.date}-${gameIndex}`;
+                          
+                          // Convert to same format as regular games
+                          games.push({
+                              'Game ID': gameId,
+                              'Away Team': game.away,
+                              'Home Team': game.home,
+                              'League': leagueDisplayName,
+                              'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : 'Racing'))),
+                              'Match Status': 'SCHEDULED',
+                              'gameDate': game.date,
+                              'channel': game.channel || '',
+                              'Channel': game.channel || '',
+                              'hardcodedTodayUrl': game.url || '',
+                              'isHardcoded': true, // Flag to identify hardcoded games
+                              'Start Time': null // Hardcoded games don't have start times
+                          });
+                      });
+                  }
+              });
 
 
                // Load featured games to check which ones are already featured and get header text
@@ -669,7 +732,9 @@
 
                    const gameInfo = document.createElement('div');
                    const startTime = game['Start Time'] ? new Date(game['Start Time']).toLocaleString() : '';
-                   gameInfo.innerHTML = `<div style="font-size:13px;color:#9aa"><code style="color:#cfc">${escapeHtml(String(gameId))}</code></div><div style="margin-top:6px"><strong>${escapeHtml(game['Away Team'] || '')}</strong> @ <strong>${escapeHtml(game['Home Team'] || '')}</strong></div><div style="margin-top:6px;font-size:12px;color:#b0b0b0">${escapeHtml(startTime)}</div>`;
+                   const isHardcoded = game.isHardcoded === true;
+                   const hardcodedLabel = isHardcoded ? '<span style="color:#ffa500;font-size:11px;font-weight:600;">[Hardcoded]</span> ' : '';
+                   gameInfo.innerHTML = `<div style="font-size:13px;color:#9aa">${hardcodedLabel}<code style="color:#cfc">${escapeHtml(String(gameId))}</code></div><div style="margin-top:6px"><strong>${escapeHtml(game['Away Team'] || '')}</strong> @ <strong>${escapeHtml(game['Home Team'] || '')}</strong></div><div style="margin-top:6px;font-size:12px;color:#b0b0b0">${escapeHtml(startTime || 'No start time')}</div>`;
 
 
                    // Header Text input and checkbox
