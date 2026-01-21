@@ -2066,13 +2066,18 @@ div[id^="breaking-content-"] a:hover {
   }
   
   /* Logo aspect ratio preservation */
-  img[alt*="Logo"], img[alt*="NFL"], img[alt*="NBA"], img[alt*="MLB"], img[alt*="NHL"], img[alt*="Soccer"], img[alt*="Boxing"], img[alt*="Track"], img[alt*="Field"], img[alt*="UFC"], img[alt*="Tennis"], img[alt*="WNBA"], img[alt*="Formula"], img[alt*="NCAAF"], img[alt*="PGA"], img[alt*="NASCAR"], img[alt*="MotoGP"], img[alt*="LPGA"], img[alt*="LIV"], img[alt*="IndyCar"], img[alt*="NCAA"] {
+  img[alt*="Logo"], img[alt*="NFL"], img[alt*="NBA"], img[alt*="MLB"], img[alt*="NHL"], img[alt*="Soccer"], img[alt*="Boxing"], img[alt*="Track"], img[alt*="Field"], img[alt*="UFC"], img[alt*="Tennis"], img[alt*="WNBA"], img[alt*="Formula"], img[alt*="NCAAF"], img[alt*="PGA"], img[alt*="NASCAR"], img[alt*="MotoGP"], img[alt*="LPGA"], img[alt*="LIV"], img[alt*="IndyCar"], img[alt*="NCAA"], img[alt*="Cricket"] {
     object-fit: contain !important;
     width: 12px !important;
     height: 12px !important;
     margin-right: 6px !important;
     vertical-align: middle !important;
     display: inline-block !important;
+  }
+  
+  /* Cricket font color */
+  li[data-section="Cricket"] {
+    color: #9E9E9E !important;
   }
 </style>
 	  <style>
@@ -2696,6 +2701,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
            <!-- <li data-section="NCAASoftball"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png" alt="NCAA Softball" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">NCAA Softball</li> -->
             <li data-section="MotoGP"><img src="https://thporth.com/motogp.png" alt="MotoGP" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">MotoGP</li>
             <li data-section="LPGATour"><img src="https://thporth.com/LPGATour.png" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">LPGA Tour</li>
+            <li data-section="Cricket" style="color: #9E9E9E;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/cricket.png" alt="Cricket" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Cricket</li>
            <!-- <li data-section="TrackAndField"><img src="https://github.com/kyle4news/thporth/blob/main/Screenshot%202025-09-27%20at%2005,05,08-Picsart-BackgroundRemover.png?raw=true" alt="Track & Field" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Track & Field</li> -->
             <br><br><br><br><br><br><br><br>
           </ul>
@@ -2712,6 +2718,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li data-section="Boxing"><img src="https://thporth.com/Github%20boxing.png" alt="Boxing" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Boxing</li>
           <!--   <li data-section="Brasileirao">Brasileirão</li> -->
             <li data-section="Bundesliga"><img src="https://static.flashscore.com/res/image/data/fqltz6CO-4ATnefbq.png" alt="Bundesliga" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Bundesliga</li>
+            <li data-section="Cricket" style="color: #9E9E9E;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/cricket.png" alt="Cricket" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Cricket</li>
          <!--    <li data-section="CAFChampionsLeague">CAF Champions League</li>
             <li data-section="CanadianPremierLeague">Canadian Premier League</li>
             <li data-section="CarabaoCup">Carabao Cup</li>
@@ -2946,6 +2953,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <li data-section="XGames">XGames</li>
             -->
               <li data-section="Tennis"><img src="https://thporth.com/atp.png" alt="Tennis" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Tennis</li>
+              <li data-section="Cricket" style="color: #9E9E9E;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/cricket.png" alt="Cricket" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Cricket</li>
              <!-- <li data-section="TrackAndField">Track & Field</li> -->
               <li class="spacer-line"></li>
               <li class="spacer-line"></li>
@@ -7983,6 +7991,14 @@ function loadCustomRSSFeed(feedUrl, container) {
                 // Scroll the selected item into view in the menu
                 item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 const section = item.dataset.section;
+
+                // Special handling for Cricket - open both URLs in new tabs
+                if (section === 'Cricket') {
+                    e.preventDefault();
+                    window.open('https://espncricinfo.com', '_blank');
+                    window.open('https://cricbuzz.com', '_blank');
+                    return;
+                }
 
                 if (section === 'Home') {
                     gamesColumn.style.display = 'flex';
@@ -56334,7 +56350,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // { section: 'NCAABaseball', text: 'NCAA Baseball' },
             // { section: 'NCAASoftball', text: 'NCAA Softball' },
             { section: 'MotoGP', text: 'MotoGP' },
-            { section: 'LPGATour', text: 'LPGA Tour' }
+            { section: 'LPGATour', text: 'LPGA Tour' },
+            { section: 'Cricket', text: 'Cricket' }
             // { section: 'TrackAndField', text: 'Track & Field' }
         ];
         
