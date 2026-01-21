@@ -38699,19 +38699,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // url: link to external site with live data (opens in new tab)
     const Hardcoded_Today_Schedules = {
         'Tennis': [
-        { date: '2026-01-19', away: 'Australian Open', home: '2nd Round', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-20', away: 'Australian Open', home: '2nd Round', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-21', away: 'Australian Open', home: '2nd Round', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-22', away: 'Australian Open', home: '2nd, 3rd Rd', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-23', away: 'Australian Open', home: '3rd Round', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-24', away: 'Australian Open', home: '4th Round', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-25', away: 'Australian Open', home: '4th Round', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-26', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-27', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-28', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-29', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-30', away: 'Women\'s Final', home: 'Semifinals', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        { date: '2026-01-31', away: 'Men\'s Final', home: 'Semifinals', channel: 'ESPN family', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-19', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-20', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-21', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-22', away: 'Australian Open', home: '2nd, 3rd Rd', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-23', away: 'Australian Open', home: '3rd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-24', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-25', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-26', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-27', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-28', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-29', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-30', away: 'Women\'s Final', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-31', away: 'Men\'s Final', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
       ],
         // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf
     };
@@ -49488,15 +49488,68 @@ async function fetchFeaturedGames() {
             return;
         }
         
-        // Load TODAY schedule - use JSON endpoint with polling for live score updates
+        // Load TODAY schedule - use Hardcoded_Today_Schedules for Tennis, JSON endpoint for others
+        const { DateTime } = luxon;
+        const todayStr = getTodayDisplayDate();
+        
+        // Special handling for Tennis - use Hardcoded_Today_Schedules
         if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
-            tennisTodayAtpContent.innerHTML = '<p style="color: #9ca3af;">Loading ATP schedule...</p>';
-            tennisTodayWtaContent.innerHTML = '<p style="color: #9ca3af;">Loading WTA schedule...</p>';
+            if (Hardcoded_Today_Schedules && Hardcoded_Today_Schedules['Tennis']) {
+                const todayGames = Hardcoded_Today_Schedules['Tennis'].filter(game => game.date === todayStr);
+                
+                if (todayGames.length > 0) {
+                    // Convert hardcoded games to game format
+                    const formattedGames = todayGames.map((game, index) => ({
+                        'Game ID': `hardcoded-Tennis-${game.date}-${index}`,
+                        'Away Team': game.away,
+                        'Home Team': game.home,
+                        'League': 'Tennis',
+                        'Sport': 'Tennis',
+                        'Match Status': 'SCHEDULED',
+                        'gameDate': game.date,
+                        'channel': game.channel || '',
+                        'Channel': game.channel || '',
+                        'hardcodedTodayUrl': game.url || '',
+                        'isHardcodedToday': true,
+                        'Start Time': null
+                    }));
+                    
+                    // Activate Today tab
+                    const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
+                    const upcomingScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="upcoming"]');
+                    if (todayScheduleTab) {
+                        todayScheduleTab.classList.add('active');
+                        todayScheduleTab.style.backgroundColor = '#2a2a2a';
+                        todayScheduleTab.style.color = '#fff';
+                        todayScheduleTab.style.borderBottom = '2px solid #fff';
+                    }
+                    if (upcomingScheduleTab) {
+                        upcomingScheduleTab.classList.remove('active');
+                        upcomingScheduleTab.style.backgroundColor = '#2a2a2a';
+                        upcomingScheduleTab.style.color = '#ccc';
+                        upcomingScheduleTab.style.borderBottom = 'none';
+                    }
+                    if (todayScheduleContent) todayScheduleContent.style.display = 'block';
+                    if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
+                    activateMainTab('schedule');
+                    
+                    // Render games (Tennis doesn't use ATP/WTA separation for hardcoded games)
+                    renderGames(tennisTodayAtpContent, formattedGames, false);
+                    tennisTodayWtaContent.innerHTML = '';
+                } else {
+                    tennisTodayAtpContent.innerHTML = `<p>No Tennis games found for today.</p>`;
+                    tennisTodayWtaContent.innerHTML = '';
+                    handleNoTodayGames();
+                }
+                // Skip JSON endpoint fetch for Tennis
+                return;
+            } else {
+                tennisTodayAtpContent.innerHTML = '<p style="color: #9ca3af;">Loading ATP schedule...</p>';
+                tennisTodayWtaContent.innerHTML = '<p style="color: #9ca3af;">Loading WTA schedule...</p>';
+            }
         } else {
         todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
         }
-        const { DateTime } = luxon;
-        const todayStr = getTodayDisplayDate();
         
         // Use JSON endpoint instead of direct Firestore access
         const JSON_ENDPOINT = 'https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json';
@@ -50497,7 +50550,61 @@ async function fetchFeaturedGames() {
         
         container.innerHTML = '<p style="color: #9ca3af;">Loading ' + tourType + ' schedule...</p>';
         
-        // WTA loads from Google Sheets CSV
+        // Use Hardcoded_Today_Schedules for Tennis
+        if (Hardcoded_Today_Schedules && Hardcoded_Today_Schedules['Tennis']) {
+            const todayStr = getTodayDisplayDate();
+            const futureGames = Hardcoded_Today_Schedules['Tennis'].filter(game => game.date > todayStr);
+            
+            if (futureGames.length === 0) {
+                container.innerHTML = '<p style="color: #9ca3af;">No upcoming Tennis tournaments found.</p>';
+                return;
+            }
+            
+            // Group by date
+            const gamesByDate = {};
+            futureGames.forEach(game => {
+                if (!gamesByDate[game.date]) {
+                    gamesByDate[game.date] = [];
+                }
+                gamesByDate[game.date].push(game);
+            });
+            
+            // Sort dates
+            const sortedDates = Object.keys(gamesByDate).sort();
+            
+            let html = '';
+            sortedDates.forEach(dateStr => {
+                // Format date header
+                const dateObj = luxon.DateTime.fromISO(dateStr);
+                const formattedDate = dateObj.isValid ? dateObj.toFormat('MMMM d') : dateStr;
+                
+                // Date header
+                html += `<div class="date-header" style="background-color: #d1d5db; color: #000; padding: 0px 12px; margin: 8px 0 4px 0; font-weight: normal; font-size: 11px; line-height: 18px;">${formattedDate}</div>`;
+                
+                // Games for this date
+                gamesByDate[dateStr].forEach(game => {
+                    // Tournament name (using away field)
+                    html += `<div style="padding: 8px 12px; color: white; font-size: 11px; font-weight: bold; background-color: #1f2937;">${game.away}</div>`;
+                    
+                    // Round info (home field) and Channel on same line
+                    html += `<div style="padding: 6px 12px; display: flex; gap: 12px; background-color: #1f2937; border-bottom: 1px solid #374151;">`;
+                    if (game.home) {
+                        html += `<span style="color: #9ca3af; font-size: 10px;">${game.home}</span>`;
+                    }
+                    if (game.channel) {
+                        html += `<span style="color: #9ca3af; font-size: 10px;">${game.channel}</span>`;
+                    }
+                    html += `</div>`;
+                });
+                
+                html += `<div style="margin-bottom: 20px;"></div>`;
+            });
+            
+            container.innerHTML = html;
+            return;
+        }
+        
+        // WTA loads from Google Sheets CSV (fallback if Hardcoded_Today_Schedules not available)
         if (tourType === 'WTA') {
             const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSw4dh1Lx3leBYXjVjOsFfvM5CQ0KAy_hdSz0sezyDB8yUvF62FlJD65sbAOx_qZDU5F5wFrgMGBrIH/pub?gid=889186709&single=true&output=csv';
             
