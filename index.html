@@ -49460,12 +49460,27 @@ async function fetchFeaturedGames() {
                 }
             }
             
-            // Show stats tab for NBA and MLB
-            if (statsMainTab) {
-                if (leagueKey === 'NBA' || leagueKey === 'MLB') {
-                    statsMainTab.style.display = '';
+            // Create stats tab if it doesn't exist (for leagues that need it)
+            const leaguesWithStats = ['NHL', 'NBA', 'NFL', 'MLB', 'NCAAF', 'PremierLeague', 'SerieA'];
+            if (!statsMainTab && leaguesWithStats.includes(leagueKey)) {
+                const standingsTab = mainTabsContainer.querySelector('.main-tab[data-main-tab="standings"]');
+                if (standingsTab) {
+                    const newStatsTab = document.createElement('div');
+                    newStatsTab.className = 'main-tab';
+                    newStatsTab.setAttribute('data-main-tab', 'stats');
+                    newStatsTab.style.cssText = 'flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; background-color: #2a2a2a; color: #ccc;';
+                    newStatsTab.textContent = 'STATS';
+                    standingsTab.insertAdjacentElement('afterend', newStatsTab);
+                }
+            }
+            
+            // Show stats tab for leagues that have stats
+            const currentStatsTab = mainTabsContainer ? mainTabsContainer.querySelector('.main-tab[data-main-tab="stats"]') : null;
+            if (currentStatsTab) {
+                if (leaguesWithStats.includes(leagueKey)) {
+                    currentStatsTab.style.display = '';
                 } else {
-                    statsMainTab.style.display = 'none';
+                    currentStatsTab.style.display = 'none';
                 }
             }
         }
@@ -53797,6 +53812,28 @@ if (mainTabsContainer) {
         
         const tabType = clickedTab.dataset.mainTab;
         
+        // Special handling for STATS tab - open URL in new tab based on league
+        if (tabType === 'stats') {
+            const leagueHeader = document.getElementById('league-specific-header');
+            const leagueKey = leagueHeader ? leagueHeader.innerText : null;
+            
+            // Map league keys (as they appear in the header) to their stats URLs
+            const statsUrls = {
+                'NHL': 'https://www.nhl.com/stats/',
+                'NBA': 'https://www.nba.com/stats',
+                'NFL': 'https://www.espn.com/nfl/stats',
+                'MLB': 'https://www.mlb.com/stats/',
+                'NCAAF': 'https://sports.yahoo.com/ncaaf/stats/',
+                'PremierLeague': 'https://www.fotmob.com/leagues/47/stats/premier-league',
+                'SerieA': 'https://www.fotmob.com/leagues/87/stats/serie-a'
+            };
+            
+            if (leagueKey && statsUrls[leagueKey]) {
+                window.open(statsUrls[leagueKey], '_blank');
+                return; // Don't proceed with normal tab switching
+            }
+        }
+        
         // Update tab appearances
         mainTabsContainer.querySelectorAll('.main-tab').forEach(tab => {
             tab.classList.remove('active');
@@ -53813,7 +53850,10 @@ if (mainTabsContainer) {
         document.querySelectorAll('.main-tab-content').forEach(content => {
             content.style.display = 'none';
         });
-        document.getElementById(`${tabType}-tab-content`).style.display = 'block';
+        const tabContent = document.getElementById(`${tabType}-tab-content`);
+        if (tabContent) {
+            tabContent.style.display = 'block';
+        }
         
         // Load standings when Standings tab is clicked
         if (tabType === 'standings') {
