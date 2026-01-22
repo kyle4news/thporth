@@ -49041,30 +49041,24 @@ async function fetchFeaturedGames() {
             
             let gamesToRender = [];
             
-            // In Live tab, exclude featured games entirely
-            if (currentActiveTab === 'LIVE') {
-                // Only show regular games (no featured section)
-                gamesToRender = [...regularGames];
-            } else {
-                // In ALL tab, show both featured and regular games
-                // Deduplicate by Game ID, preferring featured games (they have headerText, order, etc.)
-                const gamesMap = new Map();
-                // First add regular games
-                regularGames.forEach(game => {
-                    const gameId = game['Game ID'];
-                    if (gameId) {
-                        gamesMap.set(gameId, game);
-                    }
-                });
-                // Then add featured games (will overwrite regular games with same Game ID, preserving featured properties)
-                featuredGames.forEach(game => {
-                    const gameId = game['Game ID'];
-                    if (gameId) {
-                        gamesMap.set(gameId, game);
-                    }
-                });
-                gamesToRender = Array.from(gamesMap.values());
-            }
+            // In both ALL and LIVE tabs, show both featured and regular games
+            // Deduplicate by Game ID, preferring featured games (they have headerText, order, etc.)
+            const gamesMap = new Map();
+            // First add regular games
+            regularGames.forEach(game => {
+                const gameId = game['Game ID'];
+                if (gameId) {
+                    gamesMap.set(gameId, game);
+                }
+            });
+            // Then add featured games (will overwrite regular games with same Game ID, preserving featured properties)
+            featuredGames.forEach(game => {
+                const gameId = game['Game ID'];
+                if (gameId) {
+                    gamesMap.set(gameId, game);
+                }
+            });
+            gamesToRender = Array.from(gamesMap.values());
             
             // Exclude old "Asia: AFC Elite" games from Google Sheets (source is not ESPN_LIVE) and any unmapped "AFC Champions League" games
             gamesToRender = gamesToRender.filter(game => {
@@ -52717,16 +52711,8 @@ const gamesTabsContainer = document.getElementById('games-tabs');
                 leagueSection.getAttribute('data-league') === 'FEATURED'
             );
             
-            // Hide entire FEATURED section when Live filter is active
-            if (isFilterActive && isFeaturedSection) {
-                table.style.display = 'none';
-                // Also hide the featured subheader
-                const header = table.previousElementSibling;
-                if (header && header.classList && header.classList.contains('featured-subheader')) {
-                    header.style.display = 'none';
-                }
-                return;
-            }
+            // FEATURED section is now shown in LIVE filter (with only live featured games)
+            // No need to hide it anymore
             
             const rows = table.querySelectorAll('.game-row');
             const hasVisible = !isFilterActive || Array.from(rows).some(row => row.style.display !== 'none');
@@ -52750,17 +52736,21 @@ const gamesTabsContainer = document.getElementById('games-tabs');
         });
 
         leagueSections.forEach(section => {
-            // Hide FEATURED section when Live filter is active
+            // FEATURED section is now shown in LIVE filter (with only live featured games)
+            // Check if section has any visible games
             const sectionTitle = section.querySelector('.league-title');
             const isFeaturedSection = sectionTitle && (
                 sectionTitle.textContent?.trim() === 'FEATURED' ||
                 section.getAttribute('data-league') === 'FEATURED'
             );
             
-            if (isFilterActive && isFeaturedSection) {
-                section.style.display = 'none';
-                if (sectionTitle) {
-                    sectionTitle.style.display = 'none';
+            // For FEATURED section, check if it has visible games (same as other sections)
+            if (isFeaturedSection) {
+                const visibleRows = section.querySelectorAll('.game-row:not([style*="display: none"])');
+                if (visibleRows.length === 0) {
+                    section.style.display = 'none';
+                } else {
+                    section.style.display = '';
                 }
                 return;
             }
