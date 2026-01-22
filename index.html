@@ -41883,14 +41883,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     leagueGroups['FEATURED'].push(game);
                 }
                 
-                // For featured hardcoded games, also add to their league section
-                // For non-featured games, add to their league section
-                const isHardcodedFeatured = isFeatured && game.isHardcodedToday === true;
-                if (!isFeatured || isHardcodedFeatured) {
-                    const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
-                    if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
-                    leagueGroups[leagueDisplayName].push(game);
-                }
+                // ALL games (featured and non-featured) must appear in their league section
+                // Featured games appear in BOTH Featured section AND their league section
+                const leagueDisplayName = getLeagueDisplayName(game.League, game.Sport) || "Other";
+                if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
+                leagueGroups[leagueDisplayName].push(game);
             });
         } else {
             leagueGroups['singleLeague'] = gamesData;
