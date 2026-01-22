@@ -49549,7 +49549,7 @@ async function fetchFeaturedGames() {
             }
             
             // Create stats tab if it doesn't exist (for leagues that need it)
-            const leaguesWithStats = ['NHL', 'NBA', 'NFL', 'MLB', 'NCAAF', 'PremierLeague', 'SerieA'];
+            const leaguesWithStats = ['NHL', 'NBA', 'NFL', 'MLB', 'NCAAF', 'PremierLeague', 'SerieA', 'MLS', 'Bundesliga', 'LaLiga', 'Ligue1', 'NWSL', 'UEFAChampionsLeague', 'UEFAEuropaLeague'];
             if (!statsMainTab && leaguesWithStats.includes(leagueKey)) {
                 const standingsTab = mainTabsContainer.querySelector('.main-tab[data-main-tab="standings"]');
                 if (standingsTab) {
@@ -53913,7 +53913,14 @@ if (mainTabsContainer) {
                 'MLB': 'https://www.mlb.com/stats/',
                 'NCAAF': 'https://sports.yahoo.com/ncaaf/stats/',
                 'PremierLeague': 'https://www.fotmob.com/leagues/47/stats/premier-league',
-                'SerieA': 'https://www.fotmob.com/leagues/87/stats/serie-a'
+                'SerieA': 'https://www.fotmob.com/leagues/55/stats/serie-a',
+                'MLS': 'https://www.fotmob.com/leagues/130/stats/mls',
+                'Bundesliga': 'https://www.fotmob.com/leagues/54/stats/bundesliga',
+                'LaLiga': 'https://www.fotmob.com/leagues/87/stats/laliga',
+                'Ligue1': 'https://www.fotmob.com/leagues/53/stats/ligue-1',
+                'NWSL': 'https://www.fotmob.com/leagues/9134/stats/nwsl',
+                'UEFAChampionsLeague': 'https://www.fotmob.com/leagues/42/stats/champions-league',
+                'UEFAEuropaLeague': 'https://www.fotmob.com/leagues/73/stats/europa-league'
             };
             
             if (leagueKey && statsUrls[leagueKey]) {
