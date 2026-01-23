@@ -49099,9 +49099,26 @@ async function fetchFeaturedGames() {
 
                 // Preserve channel from featuredGame (for manual games)
                 const channel = featuredGame.channel || featuredGame.Channel || '';
+                
+                // If this is a hardcoded game, enrich it with hardcoded data
+                let enrichedGame = { ...featuredGame };
+                if (featuredGameId && featuredGameId.startsWith('hardcoded-')) {
+                    const hardcodedData = getHardcodedGameData(featuredGameId, featuredGame.gameDate || todayStr);
+                    if (hardcodedData) {
+                        enrichedGame.hardcodedTime = hardcodedData.time || '';
+                        enrichedGame.hardcodedStartTime = hardcodedData.startTime || '';
+                        enrichedGame.hardcodedEndTime = hardcodedData.endTime || '';
+                        enrichedGame.hardcodedTodayUrl = hardcodedData.url || '';
+                        enrichedGame.isHardcodedToday = true;
+                        // Also ensure gameDate is set
+                        if (!enrichedGame.gameDate && hardcodedData.date) {
+                            enrichedGame.gameDate = hardcodedData.date;
+                        }
+                    }
+                }
 
                 return {
-                    ...featuredGame,
+                    ...enrichedGame,
                     channel: channel,
                     Channel: channel,
                     title: featuredGame.title || featuredGame.GameTitle || '',
