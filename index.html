@@ -43862,11 +43862,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             isFinal = true;
                         }
                         
-                        // Add icon above the time/F/LIVE if URL exists
-                        if (hardcodedUrl) {
-                            const iconHtml = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`;
-                            displayTimeLabel = displayTimeLabel ? `${iconHtml}<br>${displayTimeLabel}` : iconHtml;
-                        }
+                        // Store icon separately - it will be placed in top row, time/LIVE/F in bottom row
+                        // The icon will be handled in the rendering section below
                     } else if (isHardcodedToday && hardcodedUrl && (displayTimeLabel === 'TBD' || displayTimeLabel === '' || currentTimeLabelPlain === 'TBD')) {
                         // Fallback: show icon for hardcoded games without time data
                         displayTimeLabel = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`;
@@ -43880,6 +43877,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Skip granular time logic for hardcoded games that already have time status set
                     let timeColumnTop = displayTimeLabel; // Default: keep as-is
                     let timeColumnBottom = ''; // Default: empty
+                    
+                    // For hardcoded games, separate icon from time/LIVE/F
+                    let hardcodedIconForTop = '';
+                    if (isHardcodedToday && hardcodedUrl && !isYesterdayScores) {
+                        hardcodedIconForTop = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`;
+                        // Remove icon from displayTimeLabel if it's there (it shouldn't be after our fix, but just in case)
+                        if (displayTimeLabel && displayTimeLabel.includes('<img')) {
+                            const parts = displayTimeLabel.split('<br>');
+                            if (parts.length > 1) {
+                                displayTimeLabel = parts.slice(1).join('<br>').trim();
+                            } else {
+                                displayTimeLabel = displayTimeLabel.replace(/<a[^>]*>.*?<\/a>/g, '').trim();
+                            }
+                        }
+                        // Set timeColumnTop to icon, timeColumnBottom to the time/LIVE/F
+                        timeColumnTop = hardcodedIconForTop;
+                        timeColumnBottom = displayTimeLabel;
+                    }
                     
                     if (!isSoccerLeague && isLive && !(isHardcodedToday && hardcodedTimeStatus === 'live')) {
                         // RULE: For live games with quarters/halves/periods that have time remaining:
@@ -43995,16 +44010,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         
                         // Set time column values - STRICT: only period on top, only time on bottom
-                        if (periodQuarter === 'HALF') {
-                            // Already set above, do nothing
-                        } else if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT")) {
-                            timeColumnTop = `<span style="color: red;">${periodQuarter}</span>`;
-                        } else {
-                            // If we don't have a valid period/quarter, check if displayTimeLabel is "Half" and convert to "HALF"
-                            // But preserve hardcoded icon if present
-                            if (isHardcodedToday && hardcodedUrl && displayTimeLabel.includes('screen.png')) {
-                                // Preserve the icon for hardcoded games
-                                timeColumnTop = displayTimeLabel;
+                        // Skip this logic for hardcoded games - they already have icon/time separated above
+                        if (!(isHardcodedToday && hardcodedTimeStatus !== null)) {
+                            if (periodQuarter === 'HALF') {
+                                // Already set above, do nothing
+                            } else if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT")) {
+                                timeColumnTop = `<span style="color: red;">${periodQuarter}</span>`;
                             } else {
                                 const innerContent = displayTimeLabel ? displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '') : '';
                                 if (innerContent.toUpperCase() === "HALF" || innerContent.toUpperCase() === "HALFTIME") {
@@ -44014,10 +44025,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                     timeColumnTop = displayTimeLabel;
                                 }
                             }
-                        }
-                        
-                        if (timeRemaining && timeRemaining.match(/^\d+:\d+$/)) {
-                            timeColumnBottom = `<span style="color: red;">${timeRemaining}</span>`;
+                            
+                            if (timeRemaining && timeRemaining.match(/^\d+:\d+$/)) {
+                                timeColumnBottom = `<span style="color: red;">${timeRemaining}</span>`;
+                            }
                         }
                     }
                         
@@ -44101,15 +44112,38 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // Check if this is a hardcoded game - no scores column for hardcoded games
                     if (isHardcodedToday) {
+                        // For hardcoded games, extract icon from displayTimeLabel if present
+                        let iconForTopRow = '';
+                        let timeForBottomRow = timeColumnTop;
+                        
+                        // Check if displayTimeLabel contains icon (has <img> tag)
+                        if (displayTimeLabel && displayTimeLabel.includes('<img')) {
+                            // Extract icon HTML (everything before <br>)
+                            const iconMatch = displayTimeLabel.match(/(.*?)(<br>|$)/);
+                            if (iconMatch && iconMatch[1]) {
+                                iconForTopRow = iconMatch[1].trim();
+                            }
+                            // Extract time/LIVE/F (everything after <br>)
+                            const timeMatch = displayTimeLabel.split('<br>');
+                            if (timeMatch.length > 1) {
+                                timeForBottomRow = timeMatch.slice(1).join('<br>').trim();
+                            } else {
+                                timeForBottomRow = '';
+                            }
+                        } else {
+                            // No icon, just use timeColumnTop for bottom row
+                            timeForBottomRow = timeColumnTop;
+                        }
+                        
                         // Hardcoded games: no scores column - icon/time, teams, channel, clickable indicator
                         if (isSoccerLeague) {
                             // Soccer: home team on top, away team on bottom
-                            row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${featuredChannelDisplay}</div></td>${clickIndicatorHtml}`;
-                            row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td>`;
+                            row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconForTopRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${featuredChannelDisplay}</div></td>${clickIndicatorHtml}`;
+                            row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeForBottomRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td>`;
                         } else {
                             // All other leagues: away team on top, home team on bottom
-                            row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${featuredChannelDisplay}</div></td>${clickIndicatorHtml}`;
-                            row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td>`;
+                            row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconForTopRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${featuredChannelDisplay}</div></td>${clickIndicatorHtml}`;
+                            row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeForBottomRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td>`;
                         }
                     } else {
                         // Regular games: include scores column
@@ -44358,11 +44392,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         gameStatusClass = 'scheduled-game';
                     }
                     
-                    // Structure: icon on top, time/F/LIVE below
-                    const timeCellContent = iconHtml && timeDisplayText 
-                        ? `${iconHtml}<br>${timeDisplayText}`
-                        : (iconHtml || timeDisplayText);
-                    
+                    // Structure: icon on top row, time/F/LIVE on bottom row (separate rows like NCAAM)
                     const row1 = hardcodedTable.insertRow();
                     row1.className = `game-row ${gameStatusClass}`;
                     const row2 = hardcodedTable.insertRow();
@@ -44374,8 +44404,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td>`;
                         row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;"></td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
                     } else {
-                        row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeCellContent}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${channelDisplay}</div></td><td rowspan="2"></td>`;
-                        row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;"></td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
+                        // Top row: icon in time column, away team in team column
+                        row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml || ''}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${channelDisplay}</div></td><td rowspan="2"></td>`;
+                        // Bottom row: time/F/LIVE in time column, home team in team column
+                        row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;">${timeDisplayText}</td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
                     }
                     
                     row1.dataset.matchStatus = matchStatus;
