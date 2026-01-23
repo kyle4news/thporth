@@ -43894,6 +43894,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Set timeColumnTop to icon, timeColumnBottom to the time/LIVE/F
                         timeColumnTop = hardcodedIconForTop;
                         timeColumnBottom = displayTimeLabel;
+                    } else if (isHardcodedToday && !hardcodedUrl && !isYesterdayScores) {
+                        // Hardcoded game without URL - just show time/LIVE/F
+                        timeColumnTop = '';
+                        timeColumnBottom = displayTimeLabel;
+                    } else if (isHardcodedToday && hardcodedUrl && !isYesterdayScores) {
+                        // Fallback: if we have a URL but no time status logic ran, still show icon
+                        hardcodedIconForTop = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`;
+                        timeColumnTop = hardcodedIconForTop;
+                        timeColumnBottom = displayTimeLabel || '';
                     }
                     
                     if (!isSoccerLeague && isLive && !(isHardcodedToday && hardcodedTimeStatus === 'live')) {
@@ -44112,28 +44121,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // Check if this is a hardcoded game - no scores column for hardcoded games
                     if (isHardcodedToday) {
-                        // For hardcoded games, extract icon from displayTimeLabel if present
-                        let iconForTopRow = '';
-                        let timeForBottomRow = timeColumnTop;
-                        
-                        // Check if displayTimeLabel contains icon (has <img> tag)
-                        if (displayTimeLabel && displayTimeLabel.includes('<img')) {
-                            // Extract icon HTML (everything before <br>)
-                            const iconMatch = displayTimeLabel.match(/(.*?)(<br>|$)/);
-                            if (iconMatch && iconMatch[1]) {
-                                iconForTopRow = iconMatch[1].trim();
-                            }
-                            // Extract time/LIVE/F (everything after <br>)
-                            const timeMatch = displayTimeLabel.split('<br>');
-                            if (timeMatch.length > 1) {
-                                timeForBottomRow = timeMatch.slice(1).join('<br>').trim();
-                            } else {
-                                timeForBottomRow = '';
-                            }
-                        } else {
-                            // No icon, just use timeColumnTop for bottom row
-                            timeForBottomRow = timeColumnTop;
-                        }
+                        // For hardcoded games, use the already-separated icon and time
+                        // hardcodedIconForTop has the icon (if URL exists), timeColumnBottom has time/LIVE/F
+                        const iconForTopRow = hardcodedIconForTop || '';
+                        const timeForBottomRow = timeColumnBottom || displayTimeLabel || '';
                         
                         // Hardcoded games: no scores column - icon/time, teams, channel, clickable indicator
                         if (isSoccerLeague) {
