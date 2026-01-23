@@ -423,33 +423,175 @@
 
      // Hardcoded_Today_Schedules data structure (same as index.html)
      const Hardcoded_Today_Schedules = {
-       'Tennis': [
-             { date: '2026-01-19', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-20', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-21', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-22', away: 'Australian Open', home: '2nd, 3rd Rd', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-23', away: 'Australian Open', home: '3rd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-24', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-25', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-26', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-27', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-28', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-29', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-30', away: 'Australian Open', home: 'Women\'s Final', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-             { date: '2026-01-31', away: 'Australian Open', home: 'Men\'s Final', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-           ],
-           'PGATour': [
-             { date: '2026-01-22', away: 'The AMEX', home: '1st Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
-             { date: '2026-01-23', away: 'The AMEX', home: '2nd Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
-             { date: '2026-01-24', away: 'The AMEX', home: '3rd Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
-             { date: '2026-01-25', away: 'The AMEX', home: 'Final Round', channel: 'EESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
+        'Tennis': [
+              { date: '2026-01-19', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-20', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-21', away: 'Australian Open', home: '2nd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-22', away: 'Australian Open', home: '2nd, 3rd Rd', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-23', away: 'Australian Open', home: '3rd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-24', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-25', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-26', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-27', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-28', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-29', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-30', away: 'Australian Open', home: 'Women\'s Final', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+              { date: '2026-01-31', away: 'Australian Open', home: 'Men\'s Final', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
             ],
+
+    'PGATour': [
+    { date: '2026-01-22', time: '11:30 am', startTime: '11:30', endTime: '17:15', home: 'The AMEX', away: 'First Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-23', time: '11:30 am', startTime: '11:30', endTime: '17:15', home: 'The AMEX', away: 'Second Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-24', time: '11:30 am', startTime: '11:30', endTime: '17:30', home: 'The AMEX', away: 'Third Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-25', time: '11:30 am', startTime: '11:30', endTime: '17:30', home: 'The AMEX', away: 'Final Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
+
+  { date: '2026-01-29', time: '3:00 pm', startTime: '15:00', endTime: '20:45', home: 'Farmers', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-30', time: '3:00 pm', startTime: '15:00', endTime: '20:45', home: 'Farmers', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-31', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Farmers', away: 'Third Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-01', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Farmers', away: 'Final Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+
+  { date: '2026-02-05', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Phoenix Open', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-06', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Phoenix Open', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-07', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'Phoenix Open', away: 'Third Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-08', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'Phoenix Open', away: 'Final Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+
+  { date: '2026-02-12', time: '12:00 pm', startTime: '12:00', endTime: '17:45', home: 'Pebble Beach', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-13', time: '12:00 pm', startTime: '12:00', endTime: '17:45', home: 'Pebble Beach', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-14', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Pebble Beach', away: 'Third Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-15', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Pebble Beach', away: 'Final Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+
+  { date: '2026-02-19', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Genesis', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-20', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Genesis', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-21', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Genesis', away: 'Third Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-22', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Genesis', away: 'Final Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+
+  { date: '2026-02-26', time: '', startTime: '', endTime: '', home: 'Cognizant', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-27', time: '', startTime: '', endTime: '', home: 'Cognizant', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-28', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Cognizant', away: 'Third Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-01', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Cognizant', away: 'Final Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+
+  { date: '2026-03-05', time: '2:00 pm', startTime: '14:00', endTime: '19:45', home: 'Arnold Palmer', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-06', time: '2:00 pm', startTime: '14:00', endTime: '19:45', home: 'Arnold Palmer', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-07', time: '2:30 pm', startTime: '14:30', endTime: '20:30', home: 'Arnold Palmer', away: 'Third Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-08', time: '2:30 pm', startTime: '14:30', endTime: '20:30', home: 'Arnold Palmer', away: 'Final Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+
+  { date: '2026-03-12', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'THE PLAYERS', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-13', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'THE PLAYERS', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-14', time: '2:00 pm', startTime: '14:00', endTime: '20:00', home: 'THE PLAYERS', away: 'Third Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-15', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'THE PLAYERS', away: 'Final Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+],
+
+'UFC': [
+{ date: '2026-01-24', time: '5:00 PM', startTime: '17:00', endTime: '19:00', home: 'UFC 324 Early Prelims', away: 'Gaethje-Pimblett', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-324' },
+  { date: '2026-01-24', time: '7:00 PM', startTime: '19:00', endTime: '21:00', home: 'UFC 324 Prelims', away: 'Gaethje-Pimblett', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-324' },
+  { date: '2026-01-24', time: '9:00 PM', startTime: '21:00', endTime: '23:59', home: 'UFC 324 Main Card', away: 'Gaethje-Pimblett', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-324' },
+
+  { date: '2026-01-31', time: '5:00 PM', startTime: '17:00', endTime: '19:00', home: 'UFC 325 Early Prelims', away: 'Volkanovski-Lopes 2', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-325' },
+  { date: '2026-01-31', time: '7:00 PM', startTime: '19:00', endTime: '21:00', home: 'UFC 325 Prelims', away: 'Volkanovski-Lopes 2', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-325' },
+  { date: '2026-01-31', time: '9:00 PM', startTime: '21:00', endTime: '23:59', home: 'UFC 325 Main Card', away: 'Volkanovski-Lopes 2', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-325' },
+
+  { date: '2026-02-07', time: '6:00 PM', startTime: '18:00', endTime: '20:00', home: 'UFC Fight Night Prelims', away: 'Bautista-Oliveira', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-fight-night-february-07-2026' },
+  { date: '2026-02-07', time: '9:00 PM', startTime: '21:00', endTime: '23:59', home: 'UFC Fight Night Main Card', away: 'Bautista-Oliveira', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-fight-night-february-07-2026' },
+
+  { date: '2026-02-21', time: '5:00 PM', startTime: '17:00', endTime: '19:00', home: 'UFC Fight Night Prelims', away: 'Strickland-Hernandez', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-fight-night-february-21-2026' },
+  { date: '2026-02-21', time: '8:00 PM', startTime: '20:00', endTime: '23:30', home: 'UFC Fight Night Main Card', away: 'Strickland-Hernandez', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-fight-night-february-21-2026' },
+
+  { date: '2026-02-28', time: '6:00 PM', startTime: '18:00', endTime: '20:00', home: 'UFC Fight Night Prelims', away: 'Moreno-Almabayev', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-fight-night-february-28-2026' },
+  { date: '2026-02-28', time: '9:00 PM', startTime: '21:00', endTime: '23:59', home: 'UFC Fight Night Main Card', away: 'Moreno-Almabayev', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-fight-night-february-28-2026' },
+
+  { date: '2026-03-07', time: '5:00 PM', startTime: '17:00', endTime: '19:00', home: 'UFC 326 Early Prelims', away: 'Holloway-Oliveira 2', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-326' },
+  { date: '2026-03-07', time: '7:00 PM', startTime: '19:00', endTime: '21:00', home: 'UFC 326 Prelims', away: 'Holloway-Oliveira 2', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-326' },
+  { date: '2026-03-07', time: '9:00 PM', startTime: '21:00', endTime: '23:59', home: 'UFC 326 Main Card', away: 'Holloway-Oliveira 2', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-326' },
+
+  { date: '2026-03-14', time: '6:00 PM', startTime: '18:00', endTime: '20:00', home: 'UFC Fight Night Prelims', away: 'Emmett-Vallejos', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-fight-night-march-14-2026' },
+  { date: '2026-03-14', time: '9:00 PM', startTime: '21:00', endTime: '23:59', home: 'UFC Fight Night Main Card', away: 'Emmett-Vallejos', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-fight-night-march-14-2026' },
+
+  { date: '2026-03-21', time: '1:00 PM', startTime: '13:00', endTime: '15:00', home: 'UFC Fight Night Prelims', away: 'TBA-TBA', channel: 'Paramount+' },
+  { date: '2026-03-21', time: '4:00 PM', startTime: '16:00', endTime: '19:30', home: 'UFC Fight Night Main Card', away: 'TBA-TBA', channel: 'Paramount+' },
+
+  { date: '2026-03-28', time: '6:00 PM', startTime: '18:00', endTime: '20:00', home: 'UFC Fight Night Prelims', away: 'Adesanya-Pyfer', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-fight-night-march-28-2026' },
+  { date: '2026-03-28', time: '9:00 PM', startTime: '21:00', endTime: '23:59', home: 'UFC Fight Night Main Card', away: 'Adesanya-Pyfer', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-fight-night-march-28-2026' },
+],
+
+'Boxing': [
+{ date: '2026-01-23', time: '7:00 PM', home: 'Sanchez', away: 'Rubio', channel: 'DAZN', startTime: '19:00', endTime: '23:30' },
+  { date: '2026-01-23', time: '9:00 PM', home: 'Walsh', away: 'Ocampo', channel: 'Paramount+', startTime: '21:00', endTime: '23:59' },
+  { date: '2026-01-24', time: '8:00 PM', home: 'Muratalla', away: 'Cruz', channel: 'DAZN', startTime: '20:00', endTime: '23:59' },
+  { date: '2026-01-30', time: '6:00 PM', home: 'Flores', away: 'Castillo', channel: 'ProBox TV', startTime: '18:00', endTime: '22:30' },
+  { date: '2026-01-31', time: '12:00 AM', home: 'Zayas', away: 'Baraou', channel: '', startTime: '00:00', endTime: '23:59' },
+  { date: '2026-01-31', time: '1:00 PM', home: 'Murtazaliev', away: 'Kelly', channel: 'DAZN', startTime: '13:00', endTime: '17:30' },
+  { date: '2026-01-31', time: '8:00 PM', home: 'Lopez', away: 'Stevenson', channel: 'DAZN', startTime: '20:00', endTime: '23:59' },
+  { date: '2026-01-31', time: '12:00 AM', home: 'Azim', away: 'Lemos', channel: 'BBC Two', startTime: '00:00', endTime: '23:59' },
+  { date: '2026-01-31', time: '12:00 AM', home: 'Scull', away: 'Bank', channel: 'DAZN', startTime: '00:00', endTime: '23:59' },
+  { date: '2026-02-05', time: '6:30 PM', home: 'Ramirez', away: 'Richards', channel: 'Punchinggrace.com', startTime: '18:30', endTime: '23:00' },
+  { date: '2026-02-06', time: '9:00 PM', home: 'Medina', away: 'Curiel', channel: 'DAZN', startTime: '21:00', endTime: '23:59' },
+  { date: '2026-02-07', time: '2:00 PM', home: 'Ball', away: 'Figueroa', channel: 'DAZN', startTime: '14:00', endTime: '18:30' },
+  { date: '2026-02-10', time: '8:00 PM', home: 'Pagan', away: 'Jimenez', channel: 'DAZN', startTime: '20:00', endTime: '23:59' },
+  { date: '2026-02-14', time: '12:00 AM', home: 'Ajagba', away: 'Martin', channel: 'Paramount+', startTime: '00:00', endTime: '23:59' },
+  { date: '2026-02-15', time: '12:00 AM', home: 'Nishida', away: 'Mercado', channel: '', startTime: '00:00', endTime: '23:59' },
+  { date: '2026-02-15', time: '12:00 PM', home: 'Muxanga', away: 'Byfield', channel: 'DAZN', startTime: '12:00', endTime: '16:30' },
+  { date: '2026-02-21', time: '1:00 PM', home: 'Wood', away: 'Warrington', channel: 'DAZN', startTime: '13:00', endTime: '17:30' },
+  { date: '2026-02-21', time: '12:00 AM', home: 'Santillan', away: 'Cepeda', channel: '', startTime: '00:00', endTime: '23:59' },
+  { date: '2026-02-21', time: '7:00 PM', home: 'Barrios', away: 'Garcia', channel: 'DAZN', startTime: '19:00', endTime: '23:30' },
+  { date: '2026-02-22', time: '8:00 PM', home: 'Shields', away: 'Crews-Dezurn', channel: 'DAZN', startTime: '20:00', endTime: '23:59' },
+  { date: '2026-02-28', time: '4:00 PM', home: 'Nunez', away: 'Navarrete', channel: 'DAZN', startTime: '16:00', endTime: '20:30' },
+  { date: '2026-02-28', time: '5:00 PM', home: 'Pierce', away: 'Parra', channel: 'Amazon Prime', startTime: '17:00', endTime: '21:30' },
+  { date: '2026-02-28', time: '2:00 PM', home: 'Ursu', away: 'Cooper', channel: 'DAZN', startTime: '14:00', endTime: '18:30' },
+  { date: '2026-03-05', time: '12:00 AM', home: 'Butler', away: 'Hiseni', channel: 'Punchinggrace.com', startTime: '00:00', endTime: '23:59' },
+  { date: '2026-03-14', time: '3:00 PM', home: 'Dickens', away: 'Cacace', channel: 'DAZN', startTime: '15:00', endTime: '19:30' },
+  { date: '2026-03-28', time: '1:45 PM', home: 'Itauma', away: 'Franklin', channel: 'DAZN', startTime: '13:45', endTime: '18:15' },
+  { date: '2026-04-18', time: '12:00 AM', home: 'Adams', away: 'Agyarko', channel: '', startTime: '00:00', endTime: '23:59' }
+
+
+],
+
+'NASCARCupSeries': [
+
+{ date: "2026-02-01", time: "8:00 PM", home: "Clash at Bowman Gray", away: "Bowman Gray", channel: "FOX", startTime: "20:00", endTime: "23:59", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-02-12", time: "7:00 PM", home: "Duel #1", away: "Daytona", channel: "FS1", startTime: "19:00", endTime: "23:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-02-12", time: "8:45 PM", home: "Duel #2", away: "Daytona", channel: "FS1", startTime: "20:45", endTime: "23:59", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-02-15", time: "2:30 PM", home: "Daytona 500", away: "", channel: "FOX", startTime: "14:30", endTime: "19:00", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-02-22", time: "3:00 PM", home: "Atlanta", away: "", channel: "FOX", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-03-01", time: "3:30 PM", home: "Circuit of the Americas", away: "COTA", channel: "FOX", startTime: "15:30", endTime: "20:00", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-03-08", time: "3:30 PM", home: "Phoenix", away: "", channel: "FS1", startTime: "15:30", endTime: "20:00", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-03-15", time: "4:00 PM", home: "Las Vegas", away: "", channel: "FS1", startTime: "16:00", endTime: "20:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-03-22", time: "3:00 PM", home: "Darlington", away: "", channel: "FS1", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-03-29", time: "3:30 PM", home: "Martinsville", away: "", channel: "FS1", startTime: "15:30", endTime: "20:00", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-04-12", time: "3:00 PM", home: "Bristol", away: "", channel: "FS1", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-04-19", time: "2:00 PM", home: "Kansas", away: "", channel: "FOX", startTime: "14:00", endTime: "18:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-04-26", time: "3:00 PM", home: "Talladega", away: "", channel: "FOX", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-05-03", time: "3:30 PM", home: "Texas", away: "", channel: "FS1", startTime: "15:30", endTime: "20:00", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-05-10", time: "3:00 PM", home: "Watkins Glen", away: "", channel: "FS1", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-05-17", time: "3:00 PM", home: "All Star Race", away: "Dover", channel: "FS1", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-05-24", time: "6:00 PM", home: "Charlotte", away: "", channel: "Prime Video", startTime: "18:00", endTime: "22:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-05-31", time: "7:00 PM", home: "Nashville", away: "", channel: "Prime Video", startTime: "19:00", endTime: "23:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-06-07", time: "3:00 PM", home: "Michigan", away: "", channel: "Prime Video", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-06-14", time: "3:00 PM", home: "Pocono", away: "", channel: "Prime Video", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-06-28", time: "3:30 PM", home: "Sonoma", away: "Sonoma Raceway", channel: "TNT", startTime: "15:30", endTime: "20:00", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-07-05", time: "6:00 PM", home: "Chicago", away: "", channel: "TNT", startTime: "18:00", endTime: "22:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-07-12", time: "7:00 PM", home: "Atlanta", away: "", channel: "TNT", startTime: "19:00", endTime: "23:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-07-19", time: "7:00 PM", home: "North Wilkesboro", away: "", channel: "TNT", startTime: "19:00", endTime: "23:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-07-26", time: "2:00 PM", home: "Indianapolis", away: "", channel: "TNT", startTime: "14:00", endTime: "18:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-08-09", time: "3:30 PM", home: "Iowa", away: "", channel: "USA Net", startTime: "15:30", endTime: "20:00", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-08-15", time: "7:00 PM", home: "Richmond", away: "", channel: "USA Net", startTime: "19:00", endTime: "23:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-08-23", time: "3:00 PM", home: "New Hampshire", away: "", channel: "USA Net", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-08-29", time: "7:30 PM", home: "Daytona", away: "", channel: "NBC", startTime: "19:30", endTime: "23:59", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-09-06", time: "5:00 PM", home: "Darlington", away: "Playoffs", channel: "USA Net", startTime: "17:00", endTime: "21:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-09-13", time: "3:00 PM", home: "WWT", away: "Playoffs", channel: "USA Net", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-09-19", time: "7:30 PM", home: "Bristol", away: "Playoffs", channel: "USA Net", startTime: "19:30", endTime: "23:59", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-09-27", time: "3:00 PM", home: "Kansas", away: "Playoffs", channel: "USA Net", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-10-04", time: "5:30 PM", home: "Las Vegas", away: "Playoffs", channel: "USA Net", startTime: "17:30", endTime: "22:00", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-10-11", time: "3:00 PM", home: "Charlotte Road Course", away: "Playoffs", channel: "USA Net", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-10-18", time: "3:00 PM", home: "Phoenix", away: "Playoffs", channel: "USA Net", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-10-25", time: "2:00 PM", home: "Talladega", away: "Playoffs", channel: "NBC", startTime: "14:00", endTime: "18:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-11-01", time: "2:00 PM", home: "Martinsville", away: "Playoffs", channel: "NBC", startTime: "14:00", endTime: "18:30", url: "https://www.nascar.com/followlive/" },
+  { date: "2026-11-08", time: "3:00 PM", home: "Miami", away: "Championship", channel: "NBC", startTime: "15:00", endTime: "19:30", url: "https://www.nascar.com/followlive/" },
+],
+
            
 
-
-          
-         // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf
-     };
+        // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf
+    };
 
 
      // ----- New: Load games from Firestore and render list with URL inputs -----
@@ -1230,16 +1372,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
