@@ -38987,6 +38987,65 @@ document.addEventListener('DOMContentLoaded', function () {
         // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf
     };
 
+    // Helper function to get hardcoded game data from Hardcoded_Today_Schedules
+    function getHardcodedGameData(gameId, gameDate) {
+        if (!gameId || !gameId.startsWith('hardcoded-')) return null;
+        
+        // Parse Game ID: hardcoded-{leagueKey}-{date}-{index}
+        const parts = gameId.split('-');
+        if (parts.length < 6) return null;
+        
+        const leagueKey = parts[1]; // e.g., "Tennis"
+        const date = parts.slice(2, 5).join('-'); // e.g., "2026-01-23"
+        const index = parseInt(parts[5]) || 0;
+        
+        if (!Hardcoded_Today_Schedules[leagueKey]) return null;
+        
+        const leagueGames = Hardcoded_Today_Schedules[leagueKey].filter(game => game.date === date);
+        if (index >= leagueGames.length) return null;
+        
+        return leagueGames[index];
+    }
+
+    // Helper function to check hardcoded game time status
+    // Returns: 'before', 'live', or 'after'
+    function getHardcodedGameTimeStatus(startTime, endTime, gameDate) {
+        if (!startTime || !endTime || startTime === '' || endTime === '') {
+            return 'before'; // Default to before if times not set
+        }
+        
+        const { DateTime } = luxon;
+        const now = DateTime.now().setZone('local');
+        const todayStr = now.toISODate();
+        
+        // Only check status if game date matches today
+        if (gameDate !== todayStr) {
+            return 'before';
+        }
+        
+        // Parse startTime and endTime (format: 'HH:mm' in EST, e.g., '18:30', '23:59')
+        const [startHour, startMinute] = startTime.split(':').map(Number);
+        const [endHour, endMinute] = endTime.split(':').map(Number);
+        
+        // Create EST DateTime objects for today with the specified times
+        const estStart = DateTime.now().setZone('America/New_York').set({ hour: startHour, minute: startMinute, second: 0, millisecond: 0 });
+        const estEnd = DateTime.now().setZone('America/New_York').set({ hour: endHour, minute: endMinute, second: 0, millisecond: 0 });
+        
+        // Convert to user's local timezone
+        const localStart = estStart.setZone('local');
+        const localEnd = estEnd.setZone('local');
+        const localNow = now;
+        
+        // Compare current time with start and end times
+        if (localNow < localStart) {
+            return 'before';
+        } else if (localNow >= localStart && localNow <= localEnd) {
+            return 'live';
+        } else {
+            return 'after';
+        }
+    }
+
     const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Tennis", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
@@ -43687,11 +43746,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         const isCanceled = stageValue.includes("CANCELED") || statusValue.includes("CANCELED") || stageTypeValue.includes("CANCELED") || matchStatus.includes("CANCELED");
                         
                         // For yesterdayScores, never show live; always treat as final
-                        const isLive = isYesterdayScores ? false : (matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE"));
-                        const isFinal = isYesterdayScores || matchStatus.includes("FINISHED") || matchStatus.includes("FINAL") || matchStatus.includes("GAME OVER");
+                        let isLive = isYesterdayScores ? false : (matchStatus.includes("IN PROGRESS") || matchStatus.includes("LIVE"));
+                        let isFinal = isYesterdayScores || matchStatus.includes("FINISHED") || matchStatus.includes("FINAL") || matchStatus.includes("GAME OVER");
                         const isPostponedFinal = isFinal && isPostponed;
                         const isCanceledFinal = isFinal && isCanceled;
                         let currentTimeLabel = "";
+                        let hardcodedTimeStatus = null; // Track hardcoded game time status
 
                         // Check if timeString field exists and is empty (manual games with blank time)
                         if (data.timeString === '') {
@@ -43772,10 +43832,43 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                     
-                    // Check if this is a hardcoded game and replace "TBD" with icon
+                    // Check if this is a hardcoded game and handle time display
                     const isHardcodedToday = data.isHardcodedToday === true;
                     const hardcodedUrl = data.hardcodedTodayUrl || '';
-                    if (isHardcodedToday && hardcodedUrl && (displayTimeLabel === 'TBD' || displayTimeLabel === '' || currentTimeLabelPlain === 'TBD')) {
+                    
+                    if (isHardcodedToday && !isYesterdayScores && data.hardcodedStartTime && data.hardcodedEndTime && data.gameDate) {
+                        // For hardcoded games, determine time status and display accordingly
+                        hardcodedTimeStatus = getHardcodedGameTimeStatus(data.hardcodedStartTime, data.hardcodedEndTime, data.gameDate);
+                        const timeStatus = hardcodedTimeStatus;
+                        
+                        if (timeStatus === 'before') {
+                            // Show time field before startTime
+                            displayTimeLabel = data.hardcodedTime || '';
+                            currentTimeLabel = displayTimeLabel;
+                            // Update match status for live filter
+                            isLive = false;
+                            isFinal = false;
+                        } else if (hardcodedTimeStatus === 'live') {
+                            // Show LIVE in red between startTime and endTime
+                            displayTimeLabel = '<span style="color: red;">LIVE</span>';
+                            currentTimeLabel = displayTimeLabel;
+                            isLive = true;
+                            isFinal = false;
+                        } else if (hardcodedTimeStatus === 'after') {
+                            // Show F after endTime
+                            displayTimeLabel = 'F';
+                            currentTimeLabel = displayTimeLabel;
+                            isLive = false;
+                            isFinal = true;
+                        }
+                        
+                        // Add icon above the time/F/LIVE if URL exists
+                        if (hardcodedUrl) {
+                            const iconHtml = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`;
+                            displayTimeLabel = displayTimeLabel ? `${iconHtml}<br>${displayTimeLabel}` : iconHtml;
+                        }
+                    } else if (isHardcodedToday && hardcodedUrl && (displayTimeLabel === 'TBD' || displayTimeLabel === '' || currentTimeLabelPlain === 'TBD')) {
+                        // Fallback: show icon for hardcoded games without time data
                         displayTimeLabel = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`;
                     }
                     
@@ -43784,10 +43877,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'Club Friendly', 'International Friendly', 'AFCON'].includes(displayLeagueForCheck);
                     
                     // Apply granular time logic for featured games (same as regular games)
+                    // Skip granular time logic for hardcoded games that already have time status set
                     let timeColumnTop = displayTimeLabel; // Default: keep as-is
                     let timeColumnBottom = ''; // Default: empty
                     
-                    if (!isSoccerLeague && isLive) {
+                    if (!isSoccerLeague && isLive && !(isHardcodedToday && hardcodedTimeStatus === 'live')) {
                         // RULE: For live games with quarters/halves/periods that have time remaining:
                         // Top line: ONLY "1st", "2nd", "3rd", "4th", or "OT" (period/quarter only)
                         // Bottom line: ONLY time format like "9:59", "0:40" (numbers with colon)
@@ -44042,9 +44136,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Store match status in data attribute for filtering
                     // Check multiple possible field names for match status
                     // For ESPN API games, also check StageType if Match Status is empty
-                    let matchStatusValue = (data["Match Status"] || data.matchStatus || data["matchStatus"] || "").toUpperCase().trim();
-                    if (!matchStatusValue && (data["StageType"] || data.StageType)) {
-                        matchStatusValue = (data["StageType"] || data.StageType || "").toUpperCase().trim();
+                    // For hardcoded games, use the time status to determine match status
+                    let matchStatusValue = '';
+                    if (isHardcodedToday && !isYesterdayScores && data.hardcodedStartTime && data.hardcodedEndTime && data.gameDate) {
+                        const timeStatus = getHardcodedGameTimeStatus(data.hardcodedStartTime, data.hardcodedEndTime, data.gameDate);
+                        if (timeStatus === 'before') {
+                            matchStatusValue = 'SCHEDULED';
+                        } else if (timeStatus === 'live') {
+                            matchStatusValue = 'IN PROGRESS';
+                        } else if (timeStatus === 'after') {
+                            matchStatusValue = 'FINAL';
+                        } else {
+                            matchStatusValue = 'SCHEDULED';
+                        }
+                    } else {
+                        matchStatusValue = (data["Match Status"] || data.matchStatus || data["matchStatus"] || "").toUpperCase().trim();
+                        if (!matchStatusValue && (data["StageType"] || data.StageType)) {
+                            matchStatusValue = (data["StageType"] || data.StageType || "").toUpperCase().trim();
+                        }
                     }
                     if (row1) {
                         row1.dataset.matchStatus = matchStatusValue;
@@ -44218,10 +44327,46 @@ document.addEventListener('DOMContentLoaded', function () {
                     const isDoublesMatch = isHomeDoubles && isAwayDoubles;
                     const row2TeamCellPadding = isDoublesMatch ? 'padding: 7px 1px 2px 1px;' : 'padding: 2px 1px;';
                     
+                    // Determine time status and display text for hardcoded games (only for today, not yesterday)
+                    let timeDisplayText = '';
+                    let matchStatus = 'SCHEDULED';
+                    let gameStatusClass = 'scheduled-game';
+                    
+                    if (!isYesterdayScores && data.hardcodedStartTime && data.hardcodedEndTime && data.gameDate) {
+                        const timeStatus = getHardcodedGameTimeStatus(data.hardcodedStartTime, data.hardcodedEndTime, data.gameDate);
+                        
+                        if (timeStatus === 'before') {
+                            // Show time field before startTime
+                            timeDisplayText = data.hardcodedTime || '';
+                            matchStatus = 'SCHEDULED';
+                            gameStatusClass = 'scheduled-game';
+                        } else if (timeStatus === 'live') {
+                            // Show LIVE in red between startTime and endTime
+                            timeDisplayText = '<span style="color: red;">LIVE</span>';
+                            matchStatus = 'IN PROGRESS';
+                            gameStatusClass = 'live-game';
+                        } else if (timeStatus === 'after') {
+                            // Show F after endTime
+                            timeDisplayText = 'F';
+                            matchStatus = 'FINAL';
+                            gameStatusClass = 'final-game';
+                        }
+                    } else {
+                        // For yesterday or games without time data, use default behavior
+                        timeDisplayText = '';
+                        matchStatus = 'SCHEDULED';
+                        gameStatusClass = 'scheduled-game';
+                    }
+                    
+                    // Structure: icon on top, time/F/LIVE below
+                    const timeCellContent = iconHtml && timeDisplayText 
+                        ? `${iconHtml}<br>${timeDisplayText}`
+                        : (iconHtml || timeDisplayText);
+                    
                     const row1 = hardcodedTable.insertRow();
-                    row1.className = "game-row scheduled-game";
+                    row1.className = `game-row ${gameStatusClass}`;
                     const row2 = hardcodedTable.insertRow();
-                    row2.className = "game-row game-separator scheduled-game";
+                    row2.className = `game-row game-separator ${gameStatusClass}`;
                     
                     // Away on top, home on bottom (non-soccer format)
                     // For yesterday: no channel column; for today: include channel column
@@ -44229,12 +44374,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td>`;
                         row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;"></td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
                     } else {
-                        row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${channelDisplay}</div></td><td rowspan="2"></td>`;
+                        row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeCellContent}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${channelDisplay}</div></td><td rowspan="2"></td>`;
                         row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;"></td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
                     }
                     
-                    row1.dataset.matchStatus = 'SCHEDULED';
-                    row2.dataset.matchStatus = 'SCHEDULED';
+                    row1.dataset.matchStatus = matchStatus;
+                    row2.dataset.matchStatus = matchStatus;
                     
                     // Add separator line between games (but not after the last game)
                     if (idx < hardcodedTodayGames.length - 1) {
@@ -48706,6 +48851,9 @@ async function fetchFeaturedGames() {
                                 'channel': game.channel || '',
                                 'Channel': game.channel || '',
                                 'hardcodedTodayUrl': game.url || '',
+                                'hardcodedTime': game.time || '',
+                                'hardcodedStartTime': game.startTime || '',
+                                'hardcodedEndTime': game.endTime || '',
                                 'isHardcodedToday': true // Flag to identify these games in renderGames
                             });
                         });
@@ -49244,6 +49392,63 @@ async function fetchFeaturedGames() {
                            matchStatus.includes("IN_PROGRESS") ||
                            matchStatus.includes("LIVE");
                 });
+                
+                // Add hardcoded games that are currently live
+                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf'];
+                const leagueDisplayNameMap = {
+                    'Boxing': 'Boxing',
+                    'UFC': 'UFC',
+                    'PGATour': 'PGA Tour',
+                    'LPGATour': 'LPGA Tour',
+                    'Tennis': 'Tennis',
+                    'PGATourChampions': 'PGA Champions',
+                    'NASCARCupSeries': 'NASCAR Cup Series',
+                    'DPWorldTour': 'DP World Tour',
+                    'LIVGolf': 'LIV Golf'
+                };
+                
+                leaguesWithHardcodedToday.forEach(leagueKey => {
+                    if (Hardcoded_Today_Schedules[leagueKey]) {
+                        const todayGames = Hardcoded_Today_Schedules[leagueKey].filter(game => game.date === todayStr);
+                        
+                        todayGames.forEach((game, gameIndex) => {
+                            // Check if this game is currently live
+                            if (game.startTime && game.endTime && game.startTime !== '' && game.endTime !== '') {
+                                const timeStatus = getHardcodedGameTimeStatus(game.startTime, game.endTime, game.date);
+                                
+                                if (timeStatus === 'live') {
+                                    const gameId = `hardcoded-${leagueKey}-${game.date}-${gameIndex}`;
+                                    const leagueDisplayName = leagueDisplayNameMap[leagueKey] || leagueKey;
+                                    
+                                    // Check if this game is already in gamesToRender
+                                    const alreadyIncluded = gamesToRender.some(g => g['Game ID'] === gameId);
+                                    
+                                    if (!alreadyIncluded) {
+                                        // Create a game object for the live hardcoded game
+                                        const liveHardcodedGame = {
+                                            'Game ID': gameId,
+                                            'Away Team': game.away,
+                                            'Home Team': game.home,
+                                            'League': leagueDisplayName,
+                                            'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : 'Racing'))),
+                                            'Match Status': 'IN PROGRESS',
+                                            'gameDate': game.date,
+                                            'channel': game.channel || '',
+                                            'Channel': game.channel || '',
+                                            'hardcodedTodayUrl': game.url || '',
+                                            'hardcodedTime': game.time || '',
+                                            'hardcodedStartTime': game.startTime || '',
+                                            'hardcodedEndTime': game.endTime || '',
+                                            'isHardcodedToday': true
+                                        };
+                                        
+                                        gamesToRender.push(liveHardcodedGame);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
             }
             
             renderGames(todayContainer, gamesToRender, true);
@@ -49545,6 +49750,9 @@ async function fetchFeaturedGames() {
                                 'Match Status': 'SCHEDULED',
                                 'gameDate': game.date,
                                 'hardcodedTodayUrl': game.url || '',
+                                'hardcodedTime': game.time || '',
+                                'hardcodedStartTime': game.startTime || '',
+                                'hardcodedEndTime': game.endTime || '',
                                 'isHardcodedToday': true // Flag to identify these games in renderGames
                             });
                         });
@@ -49937,6 +50145,9 @@ async function fetchFeaturedGames() {
                         'channel': game.channel || '',
                         'Channel': game.channel || '',
                         'hardcodedTodayUrl': game.url || '',
+                        'hardcodedTime': game.time || '',
+                        'hardcodedStartTime': game.startTime || '',
+                        'hardcodedEndTime': game.endTime || '',
                         'isHardcodedToday': true,
                         'Start Time': null
                     }));
