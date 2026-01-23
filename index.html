@@ -43866,7 +43866,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         // The icon will be handled in the rendering section below
                     } else if (isHardcodedToday && hardcodedUrl && (displayTimeLabel === 'TBD' || displayTimeLabel === '' || currentTimeLabelPlain === 'TBD')) {
                         // Fallback: show icon for hardcoded games without time data
-                        displayTimeLabel = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`;
+                        displayTimeLabel = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 11px; height: 11px; vertical-align: middle;"></a>`;
                     }
                     
                     // Get displayLeagueForCheck early for use in granular time logic
@@ -43881,7 +43881,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // For hardcoded games, separate icon from time/LIVE/F
                     let hardcodedIconForTop = '';
                     if (isHardcodedToday && hardcodedUrl && !isYesterdayScores) {
-                        hardcodedIconForTop = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`;
+                        hardcodedIconForTop = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 11px; height: 11px; vertical-align: middle;"></a>`;
                         // Remove icon from displayTimeLabel if it's there (it shouldn't be after our fix, but just in case)
                         if (displayTimeLabel && displayTimeLabel.includes('<img')) {
                             const parts = displayTimeLabel.split('<br>');
@@ -43900,7 +43900,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         timeColumnBottom = displayTimeLabel;
                     } else if (isHardcodedToday && hardcodedUrl && !isYesterdayScores) {
                         // Fallback: if we have a URL but no time status logic ran, still show icon
-                        hardcodedIconForTop = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`;
+                        hardcodedIconForTop = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 11px; height: 11px; vertical-align: middle;"></a>`;
                         timeColumnTop = hardcodedIconForTop;
                         timeColumnBottom = displayTimeLabel || '';
                     }
@@ -44343,7 +44343,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     const hardcodedUrl = data.hardcodedTodayUrl || '';
                     const iconHtml = hardcodedUrl 
-                        ? `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 14px; height: 14px; vertical-align: middle;"></a>`
+                        ? `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 11px; height: 11px; vertical-align: middle;"></a>`
                         : '';
                     
                     const channelDisplay = normalizeChannel(data.channel || data.Channel || '');
