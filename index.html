@@ -43851,7 +43851,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         if (timeStatus === 'before') {
                             // Show time field before startTime
-                            displayTimeLabel = data.hardcodedTime || '';
+                            // Convert EST time to user's local timezone
+                            let timeToDisplay = data.hardcodedTime || '';
+                            if (timeToDisplay && timeToDisplay.toUpperCase() !== 'TBD') {
+                                try {
+                                    const estTime = luxon.DateTime.fromFormat(timeToDisplay, 'h:mm a', { zone: 'America/New_York' });
+                                    if (estTime.isValid) {
+                                        const localTime = estTime.setZone('local');
+                                        timeToDisplay = localTime.toFormat('h:mm a');
+                                    }
+                                } catch (e) {
+                                    // Fallback to original if parsing fails
+                                }
+                            }
+                            displayTimeLabel = timeToDisplay;
                             currentTimeLabel = displayTimeLabel;
                             // Update match status for live filter
                             isLive = false;
@@ -44370,7 +44383,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         if (timeStatus === 'before') {
                             // Show time field before startTime
-                            timeDisplayText = data.hardcodedTime || '';
+                            // Convert EST time to user's local timezone
+                            let timeToDisplay = data.hardcodedTime || '';
+                            if (timeToDisplay && timeToDisplay.toUpperCase() !== 'TBD') {
+                                try {
+                                    const estTime = luxon.DateTime.fromFormat(timeToDisplay, 'h:mm a', { zone: 'America/New_York' });
+                                    if (estTime.isValid) {
+                                        const localTime = estTime.setZone('local');
+                                        timeToDisplay = localTime.toFormat('h:mm a');
+                                    }
+                                } catch (e) {
+                                    // Fallback to original if parsing fails
+                                }
+                            }
+                            timeDisplayText = timeToDisplay;
                             matchStatus = 'SCHEDULED';
                             gameStatusClass = 'scheduled-game';
                         } else if (timeStatus === 'live') {
@@ -52445,7 +52471,20 @@ async function fetchFeaturedGames() {
                         // Sub-item: no time displayed
                         timeDisplayRaw = '';
                     } else {
-                        timeDisplayRaw = (game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : ''));
+                        let rawTime = (game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : ''));
+                        // Convert EST time to user's local timezone for hardcoded games
+                        if (rawTime && rawTime !== 'TBD' && game.isHardcodedToday) {
+                            try {
+                                const estTime = luxon.DateTime.fromFormat(rawTime, 'h:mm a', { zone: 'America/New_York' });
+                                if (estTime.isValid) {
+                                    const localTime = estTime.setZone('local');
+                                    rawTime = localTime.toFormat('h:mm a');
+                                }
+                            } catch (e) {
+                                // Fallback to original if parsing fails
+                            }
+                        }
+                        timeDisplayRaw = rawTime;
                     }
                     
                     let displayTimeLabel = timeDisplayRaw;
@@ -52540,7 +52579,19 @@ async function fetchFeaturedGames() {
                     previousGameTimeLabel = normalizedTimeLabel || timeDisplayRaw;
                 } else if (['Bundesliga', 'LaLiga', 'LigaMX', 'Ligue1', 'MLS', 'NWSL', 'PremierLeague', 'SerieA', 'UEFAEuropaLeague', 'UEFAChampionsLeague', 'UEFAConferenceLeague', 'AFCChampionsLeague', 'FIFAWorldCupAfricanQualifiers', 'FIFAWorldCupEuropeanQualifiers', '2027AFCAsianCupQualifiers', 'FIFAWorldCupAsianQualifiers', 'FIFAWorldCupCONCACAFQualifiers', 'ClubFriendly', 'FACup'].includes(leagueKey)) {
                     // Format for soccer leagues: Use same table format as home page (soccer shows home on top, away on bottom)
-                    const timeDisplayRaw = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
+                    let timeDisplayRaw = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
+                    // Convert EST time to user's local timezone for hardcoded games
+                    if (timeDisplayRaw && timeDisplayRaw !== 'TBD' && game.isHardcodedToday) {
+                        try {
+                            const estTime = luxon.DateTime.fromFormat(timeDisplayRaw, 'h:mm a', { zone: 'America/New_York' });
+                            if (estTime.isValid) {
+                                const localTime = estTime.setZone('local');
+                                timeDisplayRaw = localTime.toFormat('h:mm a');
+                            }
+                        } catch (e) {
+                            // Fallback to original if parsing fails
+                        }
+                    }
                     let displayTimeLabel = timeDisplayRaw;
                     const normalizedTimeLabel = normalizeDisplayTime(timeDisplayRaw);
                     if (normalizedTimeLabel && normalizedTimeLabel !== 'TBD') {
@@ -52627,7 +52678,19 @@ async function fetchFeaturedGames() {
                     }
                     
                     // Add boxer matchup
-                    const boxingTime = (game.time && game.time !== '12:00 AM') ? game.time : '';
+                    let boxingTime = (game.time && game.time !== '12:00 AM') ? game.time : '';
+                    // Convert EST time to user's local timezone for hardcoded games
+                    if (boxingTime && game.isHardcodedToday) {
+                        try {
+                            const estTime = luxon.DateTime.fromFormat(boxingTime, 'h:mm a', { zone: 'America/New_York' });
+                            if (estTime.isValid) {
+                                const localTime = estTime.setZone('local');
+                                boxingTime = localTime.toFormat('h:mm a');
+                            }
+                        } catch (e) {
+                            // Fallback to original if parsing fails
+                        }
+                    }
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1; margin-right: 8px;">
@@ -52655,7 +52718,19 @@ async function fetchFeaturedGames() {
                         channelToDisplay = 'Tennis Channel';
                     }
                     const channelDisplay = normalizeChannel(channelToDisplay);
-                    const timeDisplay = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
+                    let timeDisplay = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
+                    // Convert EST time to user's local timezone for hardcoded games
+                    if (timeDisplay && timeDisplay !== 'TBD' && game.isHardcodedToday) {
+                        try {
+                            const estTime = luxon.DateTime.fromFormat(timeDisplay, 'h:mm a', { zone: 'America/New_York' });
+                            if (estTime.isValid) {
+                                const localTime = estTime.setZone('local');
+                                timeDisplay = localTime.toFormat('h:mm a');
+                            }
+                        } catch (e) {
+                            // Fallback to original if parsing fails
+                        }
+                    }
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1; margin-right: 8px;">
@@ -52670,13 +52745,26 @@ async function fetchFeaturedGames() {
                     `;
                 } else if (leagueKey === 'MotoGP') {
                     // MotoGP: Grand Prix on top, Race type on bottom, time on right
+                    let motoGPTime = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
+                    // Convert EST time to user's local timezone for hardcoded games
+                    if (motoGPTime && motoGPTime !== 'TBD' && game.isHardcodedToday) {
+                        try {
+                            const estTime = luxon.DateTime.fromFormat(motoGPTime, 'h:mm a', { zone: 'America/New_York' });
+                            if (estTime.isValid) {
+                                const localTime = estTime.setZone('local');
+                                motoGPTime = localTime.toFormat('h:mm a');
+                            }
+                        } catch (e) {
+                            // Fallback to original if parsing fails
+                        }
+                    }
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1; margin-right: 8px;">
                                 <div class="event" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.home}</div>
                                 <div class="race-type" style="color: white; font-size: 11px; line-height: 1.4;">${game.away}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${motoGPTime}</div>
                         </div>
                     `;
                 } else if (['FormulaOne'].includes(leagueKey)) {
@@ -52706,13 +52794,26 @@ async function fetchFeaturedGames() {
                     }
                 } else if (['NASCARCupSeries'].includes(leagueKey)) {
                     // NASCARCupSeries: Race on top, Location on bottom, time on right
+                    let nascarCupTime = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
+                    // Convert EST time to user's local timezone for hardcoded games
+                    if (nascarCupTime && nascarCupTime !== 'TBD' && game.isHardcodedToday) {
+                        try {
+                            const estTime = luxon.DateTime.fromFormat(nascarCupTime, 'h:mm a', { zone: 'America/New_York' });
+                            if (estTime.isValid) {
+                                const localTime = estTime.setZone('local');
+                                nascarCupTime = localTime.toFormat('h:mm a');
+                            }
+                        } catch (e) {
+                            // Fallback to original if parsing fails
+                        }
+                    }
                     html += `
                         <div class="match-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 12px; border-bottom: none;">
                             <div class="teams" style="flex: 1; margin-right: 8px;">
                                 <div class="race" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.away}</div>
                                 <div class="location" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${nascarCupTime}</div>
                         </div>
                     `;
                 } else if (['TrackAndField'].includes(leagueKey)) {
@@ -52728,7 +52829,20 @@ async function fetchFeaturedGames() {
                     `;
                 } else {
                     // Default format for other leagues
-                    html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">at ${game.home}</span><span class="time">${game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '')}</span></div>`;
+                    let defaultTime = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
+                    // Convert EST time to user's local timezone for hardcoded games
+                    if (defaultTime && defaultTime !== 'TBD' && game.isHardcodedToday) {
+                        try {
+                            const estTime = luxon.DateTime.fromFormat(defaultTime, 'h:mm a', { zone: 'America/New_York' });
+                            if (estTime.isValid) {
+                                const localTime = estTime.setZone('local');
+                                defaultTime = localTime.toFormat('h:mm a');
+                            }
+                        } catch (e) {
+                            // Fallback to original if parsing fails
+                        }
+                    }
+                    html += `<div class="match-row"><span class="team">${game.away}</span><span class="team">at ${game.home}</span><span class="time">${defaultTime}</span></div>`;
                 }
                 });
             
