@@ -258,6 +258,33 @@ table.game-table td:nth-child(1) {
     white-space: normal !important;
     overflow-wrap: anywhere !important;
     }
+/* Hardcoded games: channel column (3rd column) should take up both score + channel space on mobile */
+.column.tv-listings .game-table.hardcoded-games-table col:nth-child(3),
+#league-specific-column .game-table.hardcoded-games-table col:nth-child(3) {
+    width: 26% !important; /* Combined: score (6%) + channel (20%) = 26% */
+}
+.column.tv-listings .game-table.hardcoded-games-table td:nth-child(3),
+#league-specific-column .game-table.hardcoded-games-table td:nth-child(3) {
+    width: auto !important;
+    text-align: center !important;
+    padding-left: 4px !important;
+    padding-right: 8px !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    word-break: break-word !important;
+}
+.column.tv-listings .game-table.hardcoded-games-table td:nth-child(3) > div,
+#league-specific-column .game-table.hardcoded-games-table td:nth-child(3) > div {
+    position: static !important;
+    transform: none !important;
+    left: auto !important;
+    top: auto !important;
+    display: inline-block !important;
+    width: auto !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+}
 }
 .game-table td:nth-child(3) { /* Override default padding for score column */
     padding-left: 4px;
@@ -43785,15 +43812,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     leagueSection.appendChild(subHeader);
                     
                     const subTable = document.createElement("table");
-                    subTable.className = "game-table";
+                    // Check if this title group has hardcoded games
+                    const hasHardcodedGames = gamesForTitle && gamesForTitle.some(g => g.isHardcodedToday === true);
+                    subTable.className = hasHardcodedGames ? "game-table hardcoded-games-table" : "game-table";
                     subTable.style.width = "100%";
                     subTable.style.maxWidth = "100%";
                     subTable.style.borderCollapse = "collapse";
                     subTable.style.tableLayout = "fixed";
                     
                     const subColgroup = document.createElement("colgroup");
-                    // Check if this title group has hardcoded games
-                    const hasHardcodedGames = gamesForTitle && gamesForTitle.some(g => g.isHardcodedToday === true);
                     
                     if (hasHardcodedGames) {
                         // Hardcoded games: no scores column - icon (32%), teams (39.25%), channel (23.75%), clickable (5px)
@@ -44439,7 +44466,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Render hardcoded today games first (if any)
             if (hardcodedTodayGames.length > 0) {
                 const hardcodedTable = document.createElement("table");
-                hardcodedTable.className = "game-table";
+                hardcodedTable.className = "game-table hardcoded-games-table";
                 hardcodedTable.style.width = "100%";
                 hardcodedTable.style.maxWidth = "100%";
                 hardcodedTable.style.borderCollapse = "collapse";
