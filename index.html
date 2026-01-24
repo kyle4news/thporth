@@ -40205,6 +40205,86 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
     
+    // External league URLs (leagues without their own page on the site)
+    // Maps league display names to external URLs that open in new tab
+    const EXTERNAL_LEAGUE_URLS = {
+        'Scottish Premiership': 'https://spfl.co.uk/match-day',
+        "Super Lig": 'https://www.fotmob.com/leagues/71/fixtures/super-lig?group=by-date',
+        "Belgian Pro League": 'https://www.fotmob.com/leagues/40/fixtures/first-division?group=by-date',
+        "Eredivisie": 'https://www.fotmob.com/leagues/57/fixtures/eredivisie?group=by-date',
+        "Liga Portugal": 'https://www.ligaportugal.pt/competition/618/liga-portugal-betclic/round/20252026?tab=general',
+        "EFL Championship": 'https://www.efl.com/match-centre?',
+        "Argentine Primera": 'https://www.fotmob.com/leagues/112/fixtures/liga-profesional?group=by-date',
+        "Saudi Pro League": 'https://www.spl.com.sa/en/',
+    
+        // Add more leagues here as needed:
+        // 'League Name': 'https://example.com/url'
+    };
+    
+    // Convert league display name to section key (for navigation)
+    function getSectionKeyFromLeagueDisplayName(displayName) {
+        if (!displayName) return null;
+        
+        // Direct mappings from display names to section keys (based on menu items)
+        const displayToSectionMap = {
+            'NBA': 'NBA',
+            'NFL': 'NFL',
+            'MLB': 'MLB',
+            'NHL': 'NHL',
+            'WNBA': 'WNBA',
+            'NCAAF': 'NCAAF',
+            'NCAAM': 'NCAAM',
+            'NCAAW': 'NCAAW',
+            'Premier League': 'PremierLeague',
+            'LaLiga': 'LaLiga',
+            'Serie A': 'SerieA',
+            'Bundesliga': 'Bundesliga',
+            'Ligue 1': 'Ligue1',
+            'MLS': 'MLS',
+            'NWSL': 'NWSL',
+            'UEFA Champions League': 'UEFAChampionsLeague',
+            'UEFA Europa League': 'UEFAEuropaLeague',
+            'UEFA Conference League': 'UEFAConferenceLeague',
+            'Liga MX': 'LigaMX',
+            'FA Cup': 'FACup',
+            'Formula 1': 'FormulaOne',
+            'PGA Tour': 'PGATour',
+            'UFC': 'UFC',
+            'Boxing': 'Boxing',
+            'Tennis': 'Tennis',
+            'Super Lig': 'SuperLig',
+            'EFL Championship': 'EFLChampionship',
+            'Saudi Pro League': 'SaudiProLeague',
+            'Scottish Premiership': 'ScottishPremiership',
+            'Brasileirão': 'Brasileirao',
+            'Belgian Pro League': 'BelgianProLeague',
+            'Liga Portugal': 'LigaPortugal',
+            "Women's Super League": 'WomensSuperLeague',
+            "Women's UCL": 'WomensUCL',
+            'Argentine Primera': 'ArgentinePrimeraDivision',
+            'USL Championship': 'USLChampionship',
+            'CFL': 'CFL',
+            'DFB-Pokal': 'DFBPokal',
+            'Coppa Italia': 'CoppaItalia',
+            'Carabao Cup': 'CarabaoCup',
+            'Copa del Rey': 'CopaDelRey',
+            'NASCAR Cup Series': 'NASCARCupSeries',
+            'MotoGP': 'MotoGP',
+            'IndyCar': 'IndyCar',
+            'LPGA Tour': 'LPGATour',
+            'LIV Golf': 'LIVGolf'
+        };
+        
+        // Check direct match first
+        if (displayToSectionMap[displayName]) {
+            return displayToSectionMap[displayName];
+        }
+        
+        // Fallback: remove spaces and special characters to create section key
+        // This handles cases not explicitly mapped
+        return displayName.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
+    }
+    
     // League-specific team name display mappings
     const TEAM_DISPLAY_MAP = {
     
@@ -43499,6 +43579,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 const titleText = document.createElement("span");
                 titleText.textContent = leagueNameKey;
                 titleContent.appendChild(titleText);
+                
+                // Make title clickable to navigate to league page
+                // Skip for FEATURED section
+                if (leagueNameKey !== 'FEATURED') {
+                    title.style.cursor = 'pointer';
+                    title.style.userSelect = 'none';
+                    title.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        
+                        // Check if this league has an external URL (not in main menu)
+                        if (EXTERNAL_LEAGUE_URLS[leagueNameKey]) {
+                            // Open external URL in new tab
+                            window.open(EXTERNAL_LEAGUE_URLS[leagueNameKey], '_blank', 'noopener,noreferrer');
+                            return;
+                        }
+                        
+                        // Otherwise, try to navigate to league page on site
+                        const sectionKey = getSectionKeyFromLeagueDisplayName(leagueNameKey);
+                        if (sectionKey) {
+                            // Find the corresponding menu item and click it
+                            const menuItem = document.querySelector(`#menuList li[data-section="${sectionKey}"]`);
+                            if (menuItem) {
+                                menuItem.click();
+                            } else {
+                                console.warn(`No menu item found for section: ${sectionKey} (from league: ${leagueNameKey})`);
+                            }
+                        }
+                    });
+                    // Add hover effect
+                    title.addEventListener('mouseenter', function() {
+                        title.style.opacity = '0.8';
+                    });
+                    title.addEventListener('mouseleave', function() {
+                        title.style.opacity = '1';
+                    });
+                }
                 
                 title.appendChild(titleContent);
 
