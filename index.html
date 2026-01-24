@@ -48451,6 +48451,43 @@ async function fetchFeaturedGames() {
                 // Do not include non-live featured games
             }
             
+            // Also include hardcoded featured games that don't have a matching live game
+            // Check all featured games to see if any are hardcoded and not yet included
+            const includedGameIds = new Set(liveFeaturedGames.map(g => g['Game ID']));
+            featuredGamesForDate.forEach(featuredGame => {
+                const featuredGameId = String(featuredGame['Game ID'] || '').trim();
+                // If this is a hardcoded game and not already included, add it
+                if (featuredGameId && featuredGameId.startsWith('hardcoded-') && !includedGameIds.has(featuredGameId)) {
+                    // Enrich with hardcoded data
+                    const hardcodedData = getHardcodedGameData(featuredGameId, featuredGame.gameDate || dateStr);
+                    if (hardcodedData) {
+                        const hardcodedFeaturedGame = {
+                            ...featuredGame,
+                            hardcodedTime: hardcodedData.time || '',
+                            hardcodedStartTime: hardcodedData.startTime || '',
+                            hardcodedEndTime: hardcodedData.endTime || '',
+                            hardcodedTodayUrl: hardcodedData.url || '',
+                            isHardcodedToday: true,
+                            gameDate: hardcodedData.date || featuredGame.gameDate || dateStr,
+                            // Ensure channel is set
+                            channel: featuredGame.channel || featuredGame.Channel || hardcodedData.channel || '',
+                            Channel: featuredGame.channel || featuredGame.Channel || hardcodedData.channel || '',
+                            // Preserve featured properties
+                            title: featuredGame.title || featuredGame.GameTitle || '',
+                            yesterdayTitle: featuredGame.yesterdayTitle || featuredGame.GameYesterdayTitle || '',
+                            headerText: featuredGame.headerText || featuredGame['Header Text'] || '',
+                            order: featuredGame.order,
+                            leagueImportance: featuredGame.leagueImportance !== null && featuredGame.leagueImportance !== undefined 
+                                ? featuredGame.leagueImportance 
+                                : (featuredGame['League Importance'] !== null && featuredGame['League Importance'] !== undefined ? featuredGame['League Importance'] : null),
+                            isFeatured: true
+                        };
+                        liveFeaturedGames.push(hardcodedFeaturedGame);
+                        includedGameIds.add(featuredGameId);
+                    }
+                }
+            });
+            
             // Sort by leagueImportance first (ascending, nulls last), then by order as fallback
             // This preserves the league importance order set in perspectives-admin
             liveFeaturedGames.sort((a, b) => {
@@ -49093,6 +49130,7 @@ async function fetchFeaturedGames() {
                 
                 // If this is a hardcoded game, enrich it with hardcoded data
                 let enrichedGame = { ...featuredGame };
+                let hardcodedIsLive = false;
                 if (featuredGameId && featuredGameId.startsWith('hardcoded-')) {
                     const hardcodedData = getHardcodedGameData(featuredGameId, featuredGame.gameDate || todayStr);
                     if (hardcodedData) {
@@ -49105,8 +49143,17 @@ async function fetchFeaturedGames() {
                         if (!enrichedGame.gameDate && hardcodedData.date) {
                             enrichedGame.gameDate = hardcodedData.date;
                         }
+                        // Check if hardcoded game is currently live
+                        if (hardcodedData.startTime && hardcodedData.endTime && hardcodedData.startTime !== '' && hardcodedData.endTime !== '') {
+                            const hardcodedTimeStatus = getHardcodedGameTimeStatus(hardcodedData.startTime, hardcodedData.endTime, hardcodedData.date);
+                            hardcodedIsLive = (hardcodedTimeStatus === 'live');
+                        }
                     }
                 }
+
+                // For hardcoded games, use hardcoded time status to determine if live
+                // For regular games, use Match Status
+                const finalIsLive = (enrichedGame.isHardcodedToday && hardcodedIsLive) ? true : (isLive && !isFinal);
 
                 return {
                     ...enrichedGame,
@@ -49121,7 +49168,7 @@ async function fetchFeaturedGames() {
                         : (featuredGame['League Importance'] !== null && featuredGame['League Importance'] !== undefined ? featuredGame['League Importance'] : null),
                     order: featuredGame.order,
                     isFeatured: true,
-                    isFeaturedLive: isLive && !isFinal
+                    isFeaturedLive: finalIsLive
                 };
             }).filter(game => game !== null);
 
@@ -49402,7 +49449,11 @@ async function fetchFeaturedGames() {
                 }
             });
             // Then add featured games (will overwrite regular games with same Game ID, preserving featured properties)
-            featuredGames.forEach(game => {
+            // When LIVE tab is active, only include featured games with isFeaturedLive: true
+            const featuredGamesToAdd = currentActiveTab === 'LIVE' 
+                ? featuredGames.filter(game => game.isFeaturedLive === true)
+                : featuredGames;
+            featuredGamesToAdd.forEach(game => {
                 const gameId = game['Game ID'];
                 if (gameId) {
                     gamesMap.set(gameId, game);
@@ -49428,9 +49479,24 @@ async function fetchFeaturedGames() {
                 gamesToRender = gamesToRender.filter(game => {
                     const matchStatus = (game["Match Status"] || game.matchStatus || game["matchStatus"] || "").toUpperCase().trim();
                     // Only include live/in-progress games
-                    return matchStatus.includes("IN PROGRESS") || 
-                           matchStatus.includes("IN_PROGRESS") ||
-                           matchStatus.includes("LIVE");
+                    const isLiveByStatus = matchStatus.includes("IN PROGRESS") || 
+                                          matchStatus.includes("IN_PROGRESS") ||
+                                          matchStatus.includes("LIVE");
+                    
+                    // Also check if this is a hardcoded game that is currently live based on time status
+                    if (game.isHardcodedToday === true && game.hardcodedStartTime && game.hardcodedEndTime && game.gameDate) {
+                        const hardcodedTimeStatus = getHardcodedGameTimeStatus(game.hardcodedStartTime, game.hardcodedEndTime, game.gameDate);
+                        if (hardcodedTimeStatus === 'live') {
+                            return true;
+                        }
+                    }
+                    
+                    // Also check if this is a featured hardcoded game that is live
+                    if (game.isFeatured === true && game.isFeaturedLive === true) {
+                        return true;
+                    }
+                    
+                    return isLiveByStatus;
                 });
                 
                 // Add hardcoded games that are currently live
