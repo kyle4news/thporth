@@ -614,9 +614,15 @@
 { date: '2026-04-17', time: '9:00 pm', startTime: '21:00', endTime: '23:00', away: 'Japan', home: 'United States', channel: 'TNT', url: 'https://www.fotmob.com/teams/5909/fixtures/usa' },
 ],
 
+'IMSASportsCar': [
+  { date: '2026-01-25', time: '1:00 am', startTime: '1:00', endTime: '14:00', away: '24 Hours of', home: 'Daytona', channel: 'Peacock, NBC', url: 'https://www.imsa.com/scoring/' }, // Add IMSA SportsCar Championship races here
+  // Example format:
+  // { date: '2026-01-24', time: '1:00 PM', startTime: '13:00', endTime: '18:00', home: 'Rolex 24 at Daytona', away: 'Daytona', channel: 'NBC', url: 'https://www.imsa.com/events/...' },
+],
+
            
 
-        // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf
+        // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf, IMSASportsCar
     };
 
 
@@ -649,7 +655,7 @@
              }
             
              // Add hardcoded games from Hardcoded_Today_Schedules
-             const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf'];
+             const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'IMSASportsCar'];
              const leagueDisplayNameMap = {
                  'Boxing': 'Boxing',
                  'UFC': 'UFC',
@@ -659,7 +665,8 @@
                  'PGATourChampions': 'PGA Champions',
                  'NASCARCupSeries': 'NASCAR Cup Series',
                  'DPWorldTour': 'DP World Tour',
-                 'LIVGolf': 'LIV Golf'
+                 'LIVGolf': 'LIV Golf',
+                 'IMSASportsCar': 'IMSA SportsCar'
              };
             
              leaguesWithHardcodedToday.forEach((leagueKey, leagueIndex) => {
