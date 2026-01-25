@@ -38846,14 +38846,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // url: link to external site with live data (opens in new tab)
     const Hardcoded_Today_Schedules = {
         'Tennis': [
-        { date: '2026-01-23', time: '6:30 pm', startTime: '18:30', endTime: '23:59', away: 'Australian Open', home: '3rd Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
 
-{ date: '2026-01-24', time: '7:30 pm', startTime: '19:30', endTime: '23:59', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+        { date: '2026-01-24', time: '7:30 pm', startTime: '19:30', endTime: '23:59', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
 
-{ date: '2026-01-25', time: '12:00 am', startTime: '00:00', endTime: '8:00', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-{ date: '2026-01-25', time: '', startTime: '', endTime: '23:59', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+{ date: '2026-01-25', time: '7:30 pm', startTime: '19:30', endTime: '23:59', away: 'Australian Open', home: '4th Round', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
 
-{ date: '2026-01-26', time: '', startTime: '', endTime: '', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+
+{ date: '2026-01-26', time: '12:00 am', startTime: '00:00', endTime: '8:00', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
 { date: '2026-01-26', time: '', startTime: '', endTime: '23:59', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
 
 { date: '2026-01-27', time: '', startTime: '', endTime: '', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
@@ -39019,9 +39018,25 @@ document.addEventListener('DOMContentLoaded', function () {
   { date: '2026-11-08', time: '3:00 PM', home: 'Miami', away: 'Championship', channel: 'NBC', startTime: '15:00', endTime: '19:30', url: 'https://www.nascar.com/followlive/' },
 ],
 
+'USWNT': [
+{ date: '2026-01-27', time: '10:00 pm', startTime: '22:00', endTime: '23:59', away: 'Chile', home: 'United States', channel: 'TBS', url: 'https://www.fotmob.com/matches/usa-vs-chile/4yz4r48f#5135650' },
+
+{ date: '2026-03-01', time: '5:00 pm', startTime: '17:00', endTime: '19:00', away: 'Argentina', home: 'United States', channel: 'TNT', url: 'https://www.fotmob.com/matches/usa-vs-argentina/1hyjta0#5135654' },
+
+{ date: '2026-03-04', time: '6:30 pm', startTime: '18:30', endTime: '20:30', away: 'Canada', home: 'United States', channel: 'TNT', url: 'https://www.fotmob.com/matches/usa-vs-canada/1hyp09u#5135656' },
+
+{ date: '2026-03-07', time: '3:30 pm', startTime: '15:30', endTime: '17:30', away: 'Colombia', home: 'United States', channel: 'TBS', url: 'https://www.fotmob.com/matches/usa-vs-colombia/duxxf56#5135658' },
+
+{ date: '2026-04-11', time: '5:30 pm', startTime: '17:30', endTime: '19:30', away: 'Japan', home: 'United States', channel: 'TNT', url: 'https://www.fotmob.com/teams/5909/fixtures/usa' },
+
+{ date: '2026-04-14', time: '10:00 pm', startTime: '22:00', endTime: '23:59', away: 'Japan', home: 'United States', channel: 'TNT', url: 'https://www.fotmob.com/teams/5909/fixtures/usa' },
+
+{ date: '2026-04-17', time: '9:00 pm', startTime: '21:00', endTime: '23:00', away: 'Japan', home: 'United States', channel: 'TNT', url: 'https://www.fotmob.com/teams/5909/fixtures/usa' },
+],
+
            
 
-        // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf
+        // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf, USWNT
     };
 
     // Helper function to get hardcoded game data from Hardcoded_Today_Schedules
@@ -49053,7 +49068,7 @@ async function fetchFeaturedGames() {
                 
                 // Add hardcoded today schedules for specified leagues
                 const hardcodedTodayGames = [];
-                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf'];
+                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'USWNT'];
                 
                 leaguesWithHardcodedToday.forEach((leagueKey, leagueIndex) => {
                     // Map league keys to display names (must match LEAGUE_DISPLAY_ORDER exactly)
@@ -49066,7 +49081,8 @@ async function fetchFeaturedGames() {
                         'PGATourChampions': 'PGA Champions',
                         'NASCARCupSeries': 'NASCAR Cup Series',
                         'DPWorldTour': 'DP World Tour',
-                        'LIVGolf': 'LIV Golf'
+                        'LIVGolf': 'LIV Golf',
+                        'USWNT': 'USWNT'
                     };
                     
                     const leagueDisplayName = leagueDisplayNameMap[leagueKey] || leagueKey;
@@ -49085,7 +49101,7 @@ async function fetchFeaturedGames() {
                                 'Away Team': game.away,
                                 'Home Team': game.home,
                                 'League': leagueDisplayName,
-                                'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : 'Racing'))),
+                                'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : (leagueKey === 'USWNT' ? 'Soccer' : 'Racing')))),
                                 'Match Status': 'SCHEDULED',
                                 'gameDate': game.date,
                                 'channel': game.channel || '',
@@ -49680,7 +49696,7 @@ async function fetchFeaturedGames() {
                 });
                 
                 // Add hardcoded games that are currently live
-                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf'];
+                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'USWNT'];
                 const leagueDisplayNameMap = {
                     'Boxing': 'Boxing',
                     'UFC': 'UFC',
@@ -49690,7 +49706,8 @@ async function fetchFeaturedGames() {
                     'PGATourChampions': 'PGA Champions',
                     'NASCARCupSeries': 'NASCAR Cup Series',
                     'DPWorldTour': 'DP World Tour',
-                    'LIVGolf': 'LIV Golf'
+                    'LIVGolf': 'LIV Golf',
+                    'USWNT': 'USWNT'
                 };
                 
                 leaguesWithHardcodedToday.forEach(leagueKey => {
@@ -49716,7 +49733,7 @@ async function fetchFeaturedGames() {
                                             'Away Team': game.away,
                                             'Home Team': game.home,
                                             'League': leagueDisplayName,
-                                            'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : 'Racing'))),
+                                            'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : (leagueKey === 'USWNT' ? 'Soccer' : 'Racing')))),
                                             'Match Status': 'IN PROGRESS',
                                             'gameDate': game.date,
                                             'channel': game.channel || '',
@@ -50004,7 +50021,7 @@ async function fetchFeaturedGames() {
                 
                 // Add hardcoded games from Hardcoded_Today_Schedules for yesterday's date
                 const hardcodedYesterdayGames = [];
-                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf'];
+                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'USWNT'];
                 
                 leaguesWithHardcodedToday.forEach(leagueKey => {
                     // Map league keys to display names (must match LEAGUE_DISPLAY_ORDER exactly)
@@ -50017,7 +50034,8 @@ async function fetchFeaturedGames() {
                         'PGATourChampions': 'PGA Champions',
                         'NASCARCupSeries': 'NASCAR Cup Series',
                         'DPWorldTour': 'DP World Tour',
-                        'LIVGolf': 'LIV Golf'
+                        'LIVGolf': 'LIV Golf',
+                        'USWNT': 'USWNT'
                     };
                     
                     const leagueDisplayName = leagueDisplayNameMap[leagueKey] || leagueKey;
@@ -50032,7 +50050,7 @@ async function fetchFeaturedGames() {
                                 'Away Team': game.away,
                                 'Home Team': game.home,
                                 'League': leagueDisplayName,
-                                'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : 'Racing'))),
+                                'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : (leagueKey === 'USWNT' ? 'Soccer' : 'Racing')))),
                                 'Match Status': 'SCHEDULED',
                                 'gameDate': game.date,
                                 'hardcodedTodayUrl': game.url || '',
