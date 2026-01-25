@@ -43964,8 +43964,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         let currentTimeLabel = "";
                         let hardcodedTimeStatus = null; // Track hardcoded game time status
 
-                        // Check if timeString field exists and is empty (manual games with blank time)
-                        if (data.timeString === '') {
+                        // For yesterday's scores, always show "F" (all games are finished)
+                        if (isYesterdayScores) {
+                            currentTimeLabel = "F";
+                        } else if (data.timeString === '') {
+                            // Check if timeString field exists and is empty (manual games with blank time)
                             currentTimeLabel = ""; // Display as empty for blank times
                         } else if (isLive) {
                             // Use EXACT same logic as individual league sections
@@ -44034,8 +44037,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Extract plain text from currentTimeLabel before normalizing (remove HTML tags)
                     const currentTimeLabelPlain = currentTimeLabel ? currentTimeLabel.replace(/<[^>]*>/g, '') : '';
                     let displayTimeLabel = currentTimeLabel;
-                    const normalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(currentTimeLabelPlain) : null;
-                    if (!isLive && !isFinal && normalizedTimeLabel && normalizedTimeLabel !== 'TBD') {
+                    // Skip normalization for yesterday's scores (always show "F")
+                    const normalizedTimeLabel = (!isLive && !isFinal && !isYesterdayScores) ? normalizeDisplayTime(currentTimeLabelPlain) : null;
+                    if (!isLive && !isFinal && !isYesterdayScores && normalizedTimeLabel && normalizedTimeLabel !== 'TBD') {
                         if (normalizedTimeLabel === lastDisplayedTimeLabel) {
                             displayTimeLabel = "";
                         } else {
@@ -44047,7 +44051,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     const isHardcodedToday = data.isHardcodedToday === true;
                     const hardcodedUrl = data.hardcodedTodayUrl || '';
                     
-                    if (isHardcodedToday && !isYesterdayScores && data.hardcodedStartTime && data.hardcodedEndTime && data.gameDate) {
+                    // For yesterday's scores, always show "F" for hardcoded games (skip time status logic)
+                    if (isHardcodedToday && isYesterdayScores) {
+                        displayTimeLabel = 'F';
+                        currentTimeLabel = displayTimeLabel;
+                        isLive = false;
+                        isFinal = true;
+                        hardcodedTimeStatus = 'after'; // Set for consistency
+                    } else if (isHardcodedToday && data.hardcodedStartTime && data.hardcodedEndTime && data.gameDate) {
                         // For hardcoded games, determine time status and display accordingly
                         hardcodedTimeStatus = getHardcodedGameTimeStatus(data.hardcodedStartTime, data.hardcodedEndTime, data.gameDate);
                         const timeStatus = hardcodedTimeStatus;
@@ -44089,7 +44100,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Store icon separately - it will be placed in top row, time/LIVE/F in bottom row
                         // The icon will be handled in the rendering section below
                     } else if (isHardcodedToday && hardcodedUrl && (displayTimeLabel === 'TBD' || displayTimeLabel === '' || currentTimeLabelPlain === 'TBD')) {
-                        // Fallback: show icon for hardcoded games without time data
+                        // Fallback: show icon for hardcoded games without time data (for today's games)
                         displayTimeLabel = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 11px; height: 11px; vertical-align: middle;"></a>`;
                     }
                     
@@ -44103,8 +44114,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     let timeColumnBottom = ''; // Default: empty
                     
                     // For hardcoded games, separate icon from time/LIVE/F
+                    // Show icon for all hardcoded games with URL (including yesterday's scores)
                     let hardcodedIconForTop = '';
-                    if (isHardcodedToday && hardcodedUrl && !isYesterdayScores) {
+                    if (isHardcodedToday && hardcodedUrl) {
                         hardcodedIconForTop = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 11px; height: 11px; vertical-align: middle;"></a>`;
                         // Remove icon from displayTimeLabel if it's there (it shouldn't be after our fix, but just in case)
                         if (displayTimeLabel && displayTimeLabel.includes('<img')) {
@@ -44118,15 +44130,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Set timeColumnTop to icon, timeColumnBottom to the time/LIVE/F
                         timeColumnTop = hardcodedIconForTop;
                         timeColumnBottom = displayTimeLabel;
-                    } else if (isHardcodedToday && !hardcodedUrl && !isYesterdayScores) {
+                    } else if (isHardcodedToday && !hardcodedUrl) {
                         // Hardcoded game without URL - just show time/LIVE/F
                         timeColumnTop = '';
                         timeColumnBottom = displayTimeLabel;
-                    } else if (isHardcodedToday && hardcodedUrl && !isYesterdayScores) {
-                        // Fallback: if we have a URL but no time status logic ran, still show icon
-                        hardcodedIconForTop = `<a href="${hardcodedUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block;"><img src="https://raw.githubusercontent.com/kyle4news/thporth/main/screen.png" alt="" style="width: 11px; height: 11px; vertical-align: middle;"></a>`;
-                        timeColumnTop = hardcodedIconForTop;
-                        timeColumnBottom = displayTimeLabel || '';
                     }
                     
                     if (!isSoccerLeague && isLive && !(isHardcodedToday && hardcodedTimeStatus === 'live')) {
@@ -44576,12 +44583,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     const isDoublesMatch = isHomeDoubles && isAwayDoubles;
                     const row2TeamCellPadding = isDoublesMatch ? 'padding: 7px 1px 2px 1px;' : 'padding: 2px 1px;';
                     
-                    // Determine time status and display text for hardcoded games (only for today, not yesterday)
+                    // Determine time status and display text for hardcoded games
                     let timeDisplayText = '';
                     let matchStatus = 'SCHEDULED';
                     let gameStatusClass = 'scheduled-game';
                     
-                    if (!isYesterdayScores && data.hardcodedStartTime && data.hardcodedEndTime && data.gameDate) {
+                    // For yesterday's scores, always show "F" for hardcoded games (skip time status logic)
+                    if (isYesterdayScores) {
+                        timeDisplayText = 'F';
+                        matchStatus = 'FINAL';
+                        gameStatusClass = 'final-game';
+                    } else if (data.hardcodedStartTime && data.hardcodedEndTime && data.gameDate) {
                         const timeStatus = getHardcodedGameTimeStatus(data.hardcodedStartTime, data.hardcodedEndTime, data.gameDate);
                         
                         if (timeStatus === 'before') {
@@ -44614,7 +44626,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             gameStatusClass = 'final-game';
                         }
                     } else {
-                        // For yesterday or games without time data, use default behavior
+                        // For today's games without time data, use default behavior
                         timeDisplayText = '';
                         matchStatus = 'SCHEDULED';
                         gameStatusClass = 'scheduled-game';
@@ -44630,7 +44642,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // For yesterday: no channel column; for today: include channel column
                     if (isYesterdayScores) {
                         row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td>`;
-                        row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;"></td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
+                        row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;">${timeDisplayText}</td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
                     } else {
                         // Top row: icon in time column, away team in team column
                         row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml || ''}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${channelDisplay}</div></td><td rowspan="2"></td>`;
