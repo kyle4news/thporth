@@ -39104,7 +39104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Tennis", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Tennis", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         // NFL: "https://www.nfl.com/scores",
@@ -40257,14 +40257,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // Maps league display names to external URLs that open in new tab
     const EXTERNAL_LEAGUE_URLS = {
         'Scottish Premiership': 'https://spfl.co.uk/match-day',
-        "Super Lig": 'https://www.fotmob.com/leagues/71/fixtures/super-lig?group=by-round',
-        "Belgian Pro League": 'https://www.fotmob.com/leagues/40/fixtures/first-division?group=by-round',
-        "Eredivisie": 'https://www.fotmob.com/leagues/57/fixtures/eredivisie?group=by-round',
+        "Super Lig": 'https://www.fotmob.com/leagues/71/fixtures/super-lig?group=by-date',
+        "Belgian Pro League": 'https://www.fotmob.com/leagues/40/fixtures/first-division?group=by-date',
+        "Eredivisie": 'https://www.fotmob.com/leagues/57/fixtures/eredivisie?group=by-date',
         "Liga Portugal": 'https://www.ligaportugal.pt/competition/618/liga-portugal-betclic/round/20252026?tab=general',
         "EFL Championship": 'https://www.efl.com/match-centre?',
-        "Argentine Primera": 'https://www.fotmob.com/leagues/112/fixtures/liga-profesional?group=by-round',
+        "Argentine Primera": 'https://www.fotmob.com/leagues/112/fixtures/liga-profesional?group=by-date',
         "Saudi Pro League": 'https://www.spl.com.sa/en/',
-        "Women's Super League": 'https://www.fotmob.com/leagues/9227/fixtures/wsl?group=by-round',
+        "Women's Super League": 'https://www.fotmob.com/leagues/9227/fixtures/wsl?group=by-date',
         "USWNT": 'https://www.fotmob.com/teams/5909/overview/usa',
     
         // Add more leagues here as needed:
@@ -43113,6 +43113,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.marginTop = "-2px";
                     titleContent.appendChild(logo);
+                } else if (leagueNameKey === "IMSA SportsCar") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/IMSA_SportsCar_Championship_logo.svg/960px-IMSA_SportsCar_Championship_logo.svg.png?20210617181717";
+                    logo.alt = "IMSA SportsCar Logo";
+                        logo.width = 14;
+                        logo.height = 14;
+                    logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
                 } else if (leagueNameKey === "UFC") {
                     const logo = document.createElement("img");
                     logo.src = "https://static.flashscore.com/res/image/data/tx44OMld-rojuRsh2.png";
@@ -43652,6 +43667,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     title.style.userSelect = 'none';
                     title.addEventListener('click', function(e) {
                         e.stopPropagation();
+                        
+                        // Skip if clicking on collapse arrow (for collapsed leagues, this is handled separately)
+                        if (e.target.closest('.collapse-arrow') || e.target.classList.contains('collapse-arrow')) {
+                            return;
+                        }
                         
                         // Check if this league has an external URL (not in main menu)
                         if (EXTERNAL_LEAGUE_URLS[leagueNameKey]) {
@@ -45445,20 +45465,53 @@ document.addEventListener('DOMContentLoaded', function () {
                     title.innerHTML = "";
                     title.appendChild(titleContainer);
                     
-                    // Initially hide table if league is in collapsed list
-                    table.style.display = "none";
-                    table.dataset.collapsible = "true";
-                    table.dataset.isCollapsed = "true";
-                    if (collapsedScoresRow) {
-                        collapsedScoresRow.style.display = "none";
+                    // Remove cursor pointer from title since we're handling clicks separately
+                    title.style.cursor = "default";
+                    
+                    // For collapsed leagues, move the external URL click handler to nameColumn only
+                    // and add collapse handler to arrowColumn only
+                    if (leagueNameKey !== 'FEATURED') {
+                        // Make nameColumn clickable for external URL navigation
+                        const hasExternalUrl = EXTERNAL_LEAGUE_URLS[leagueNameKey];
+                        if (hasExternalUrl || getSectionKeyFromLeagueDisplayName(leagueNameKey)) {
+                            nameColumn.style.cursor = 'pointer';
+                            nameColumn.style.userSelect = 'none';
+                            nameColumn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                
+                                // Check if this league has an external URL (not in main menu)
+                                if (EXTERNAL_LEAGUE_URLS[leagueNameKey]) {
+                                    // Open external URL in new tab
+                                    window.open(EXTERNAL_LEAGUE_URLS[leagueNameKey], '_blank', 'noopener,noreferrer');
+                                    return;
+                                }
+                                
+                                // Otherwise, try to navigate to league page on site
+                                const sectionKey = getSectionKeyFromLeagueDisplayName(leagueNameKey);
+                                if (sectionKey) {
+                                    // Find the corresponding menu item and click it
+                                    const menuItem = document.querySelector(`#menuList li[data-section="${sectionKey}"]`);
+                                    if (menuItem) {
+                                        menuItem.click();
+                                    } else {
+                                        console.warn(`No menu item found for section: ${sectionKey} (from league: ${leagueNameKey})`);
+                                    }
+                                }
+                            });
+                            // Add hover effect to nameColumn
+                            nameColumn.addEventListener('mouseenter', function() {
+                                nameColumn.style.opacity = '0.8';
+                            });
+                            nameColumn.addEventListener('mouseleave', function() {
+                                nameColumn.style.opacity = '1';
+                            });
+                        }
                     }
-                }
-                
-                // Add click handler to title for toggling (only for leagues that can collapse)
-                if (isCollapsed && title) {
-                    title.style.cursor = "pointer";
-                    title.addEventListener('click', function() {
-                        const arrow = this.querySelector('.collapse-arrow');
+                    
+                    // Add click handler to arrowColumn for toggling collapse/expand
+                    arrowColumn.addEventListener('click', function(e) {
+                        e.stopPropagation(); // Prevent event from bubbling to nameColumn
+                        const arrow = arrowColumn.querySelector('.collapse-arrow');
                         if (table.style.display === "none") {
                             // Expand
                             table.style.display = "";
@@ -45481,6 +45534,17 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         }
                     });
+                    
+                    // Initially hide table if league is in collapsed list
+                    table.style.display = "none";
+                    table.dataset.collapsible = "true";
+                    table.dataset.isCollapsed = "true";
+                    if (collapsedScoresRow) {
+                        collapsedScoresRow.style.display = "none";
+                    }
+                } else {
+                    // For non-collapsed leagues, keep the original click handler on title
+                    // (This is already set up earlier in the code around line 43668)
                 }
             }
             
