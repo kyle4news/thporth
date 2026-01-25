@@ -39034,9 +39034,15 @@ document.addEventListener('DOMContentLoaded', function () {
 { date: '2026-04-17', time: '9:00 pm', startTime: '21:00', endTime: '23:00', away: 'Japan', home: 'United States', channel: 'TNT', url: 'https://www.fotmob.com/teams/5909/fixtures/usa' },
 ],
 
+'IMSASportsCar': [
+  { date: '2026-01-25', time: '1:00 am', startTime: '1:00', endTime: '14:00', away: '24 Hours of', home: 'Daytona', channel: 'Peacock, NBC', url: 'https://www.imsa.com/scoring/' }, // Add IMSA SportsCar Championship races here
+  // Example format:
+  // { date: '2026-01-24', time: '1:00 PM', startTime: '13:00', endTime: '18:00', home: 'Rolex 24 at Daytona', away: 'Daytona', channel: 'NBC', url: 'https://www.imsa.com/events/...' },
+],
+
            
 
-        // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf, USWNT
+        // Add more leagues here as needed: Boxing, UFC, PGATour, LPGATour, PGATourChampions, NASCARCupSeries, DPWorldTour, LIVGolf, USWNT, IMSASportsCar
     };
 
     // Helper function to get hardcoded game data from Hardcoded_Today_Schedules
@@ -40259,6 +40265,7 @@ document.addEventListener('DOMContentLoaded', function () {
         "Argentine Primera": 'https://www.fotmob.com/leagues/112/fixtures/liga-profesional?group=by-round',
         "Saudi Pro League": 'https://www.spl.com.sa/en/',
         "Women's Super League": 'https://www.fotmob.com/leagues/9227/fixtures/wsl?group=by-round',
+        "USWNT": 'https://www.fotmob.com/teams/5909/overview/usa',
     
         // Add more leagues here as needed:
         // 'League Name': 'https://example.com/url'
@@ -42795,6 +42802,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     const logo = document.createElement("img");
                     logo.src = "https://cdn.sanity.io/images/oyf3dba6/production/bf72ee7b299178803e565d6c872cdb4baf2aef2d-640x877.png";
                     logo.alt = "USMNT Logo";
+                        logo.width = 14;
+                        logo.height = 14;
+                        logo.style.width = "14px";
+                    logo.style.height = "14px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.marginTop = "-2px";
+                    titleContent.appendChild(logo);
+                } else if (leagueNameKey === "USWNT") {
+                    const logo = document.createElement("img");
+                    logo.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/United_States_women%27s_national_soccer_team_logo.svg/330px-United_States_women%27s_national_soccer_team_logo.svg.png";
+                    logo.alt = "USWNT Logo";
                         logo.width = 14;
                         logo.height = 14;
                         logo.style.width = "14px";
@@ -46397,8 +46419,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         html += '</tr>';
                     });
                     html += '</tbody></table>';
-                } else if (leagueKey === 'IndyCar' || leagueKey === 'NASCARCupSeries' || leagueKey === 'FormulaOne') {
-                    // IndyCar, NASCAR Cup Series, FormulaOne: Rank (blank header), Name, Pts
+                } else if (leagueKey === 'IndyCar' || leagueKey === 'NASCARCupSeries' || leagueKey === 'FormulaOne' || leagueKey === 'IMSASportsCar') {
+                    // IndyCar, NASCAR Cup Series, FormulaOne, IMSA SportsCar: Rank (blank header), Name, Pts
                     html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
                     html += '<th style="padding: 8px; text-align: left; width: 30px;"></th>';
                     html += '<th style="padding: 8px; text-align: left;">Name</th>';
@@ -49068,7 +49090,7 @@ async function fetchFeaturedGames() {
                 
                 // Add hardcoded today schedules for specified leagues
                 const hardcodedTodayGames = [];
-                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'USWNT'];
+                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'USWNT', 'IMSASportsCar'];
                 
                 leaguesWithHardcodedToday.forEach((leagueKey, leagueIndex) => {
                     // Map league keys to display names (must match LEAGUE_DISPLAY_ORDER exactly)
@@ -49082,7 +49104,8 @@ async function fetchFeaturedGames() {
                         'NASCARCupSeries': 'NASCAR Cup Series',
                         'DPWorldTour': 'DP World Tour',
                         'LIVGolf': 'LIV Golf',
-                        'USWNT': 'USWNT'
+                        'USWNT': 'USWNT',
+                        'IMSASportsCar': 'IMSA SportsCar'
                     };
                     
                     const leagueDisplayName = leagueDisplayNameMap[leagueKey] || leagueKey;
@@ -49696,7 +49719,7 @@ async function fetchFeaturedGames() {
                 });
                 
                 // Add hardcoded games that are currently live
-                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'USWNT'];
+                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'USWNT', 'IMSASportsCar'];
                 const leagueDisplayNameMap = {
                     'Boxing': 'Boxing',
                     'UFC': 'UFC',
@@ -49707,7 +49730,8 @@ async function fetchFeaturedGames() {
                     'NASCARCupSeries': 'NASCAR Cup Series',
                     'DPWorldTour': 'DP World Tour',
                     'LIVGolf': 'LIV Golf',
-                    'USWNT': 'USWNT'
+                    'USWNT': 'USWNT',
+                    'IMSASportsCar': 'IMSA SportsCar'
                 };
                 
                 leaguesWithHardcodedToday.forEach(leagueKey => {
@@ -50021,7 +50045,7 @@ async function fetchFeaturedGames() {
                 
                 // Add hardcoded games from Hardcoded_Today_Schedules for yesterday's date
                 const hardcodedYesterdayGames = [];
-                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'USWNT'];
+                const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'USWNT', 'IMSASportsCar'];
                 
                 leaguesWithHardcodedToday.forEach(leagueKey => {
                     // Map league keys to display names (must match LEAGUE_DISPLAY_ORDER exactly)
@@ -50035,7 +50059,8 @@ async function fetchFeaturedGames() {
                         'NASCARCupSeries': 'NASCAR Cup Series',
                         'DPWorldTour': 'DP World Tour',
                         'LIVGolf': 'LIV Golf',
-                        'USWNT': 'USWNT'
+                        'USWNT': 'USWNT',
+                        'IMSASportsCar': 'IMSA SportsCar'
                     };
                     
                     const leagueDisplayName = leagueDisplayNameMap[leagueKey] || leagueKey;
@@ -52332,6 +52357,11 @@ async function fetchFeaturedGames() {
                 homeField = 'location';
                 timeField = 'time';
                 dateField = 'date';
+            } else if (leagueKey === 'IMSASportsCar') {
+                awayField = 'race';
+                homeField = 'location';
+                timeField = 'time';
+                dateField = 'date';
             } else if (leagueKey === 'Tennis') {
                 awayField = 'tournament';
                 homeField = 'tour';
@@ -52956,16 +52986,16 @@ async function fetchFeaturedGames() {
                         </div>
                     `;
                     }
-                } else if (['NASCARCupSeries'].includes(leagueKey)) {
-                    // NASCARCupSeries: Race on top, Location on bottom, time on right
-                    let nascarCupTime = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
+                } else if (['NASCARCupSeries', 'IMSASportsCar'].includes(leagueKey)) {
+                    // NASCARCupSeries, IMSA SportsCar: Race on top, Location on bottom, time on right
+                    let raceTime = game.time && game.time !== '12:00 AM' ? game.time : (game.time === '' || game.time === '12:00 AM' ? 'TBD' : '');
                     // Convert EST time to user's local timezone for hardcoded games
-                    if (nascarCupTime && nascarCupTime !== 'TBD' && game.isHardcodedToday) {
+                    if (raceTime && raceTime !== 'TBD' && game.isHardcodedToday) {
                         try {
-                            const estTime = luxon.DateTime.fromFormat(nascarCupTime, 'h:mm a', { zone: 'America/New_York' });
+                            const estTime = luxon.DateTime.fromFormat(raceTime, 'h:mm a', { zone: 'America/New_York' });
                             if (estTime.isValid) {
                                 const localTime = estTime.setZone('local');
-                                nascarCupTime = localTime.toFormat('h:mm a');
+                                raceTime = localTime.toFormat('h:mm a');
                             }
                         } catch (e) {
                             // Fallback to original if parsing fails
@@ -52977,7 +53007,7 @@ async function fetchFeaturedGames() {
                                 <div class="race" style="color: white; font-size: 11px; line-height: 1.4; margin-bottom: 4px;">${game.away}</div>
                                 <div class="location" style="color: white; font-size: 11px; line-height: 1.4;">${game.home}</div>
                             </div>
-                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${nascarCupTime}</div>
+                            <div class="time" style="color: white; font-size: 11px; font-weight: normal; margin-top: 4px;">${raceTime}</div>
                         </div>
                     `;
                 } else if (['TrackAndField'].includes(leagueKey)) {
