@@ -4029,8 +4029,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             <!-- Videos tabs (only shown for pages with two tabs) -->
             <div id="videos-tabs" style="display: none; height: 18px; background-color: #2a2a2a; position: sticky; top: 18px; z-index: 10;">
-                    <div class="videos-tab active" data-tab="highlights">HIGHLIGHTS</div>
-          <div class="videos-tab" data-tab="all-videos">ALL VIDEOS</div>
+                    <!-- <div class="videos-tab active" data-tab="highlights">HIGHLIGHTS</div> -->
+          <div class="videos-tab active" data-tab="all-videos">VIDEOS</div>
         </div>
 
         <!-- Videos content -->
@@ -56383,7 +56383,7 @@ const VIDEOS_CONFIG = {
     // Two tab pages ("Videos" header + "Highlights" and "All Videos" tabs)
     twoTabs: {
                 'NFL': {
-                    highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gnK2f32zf7qlXGtHZlTZiyQ.xml',
+                    // highlights: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/youtube/playlist/PLRdw3IjKY2gnK2f32zf7qlXGtHZlTZiyQ.xml',
                         allVideos: 'https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/youtube-nfl.xml'
                 },
         'MLB': {
@@ -56471,7 +56471,7 @@ function loadVideosWithTabs(section) {
             highlightsTab.textContent = 'HIGHLIGHTS';
         }
         if (allVideosTab) {
-            allVideosTab.textContent = 'ALL VIDEOS';
+            allVideosTab.textContent = 'VIDEOS';
         }
     } else {
         // Reset to default labels for other sections
@@ -56514,11 +56514,21 @@ function loadVideosWithTabs(section) {
         });
     }
     
-    // Load highlights by default
-    switchVideosTab('highlights');
-    if (videosContent) {
-        videosContent.innerHTML = ''; // Clear before loading
-        displayRSSWidget(highlightsFeed, videosContent);
+    // Load highlights by default (or allVideos for NFL since highlights tab is commented out)
+    if (section === 'NFL' || !highlightsTab || !highlightsFeed) {
+        // For NFL or when highlights tab doesn't exist, load allVideos by default
+        switchVideosTab('all-videos');
+        if (videosContent) {
+            videosContent.innerHTML = ''; // Clear before loading
+            displayRSSWidget(allVideosFeed, videosContent);
+        }
+    } else {
+        // For other sections, load highlights by default
+        switchVideosTab('highlights');
+        if (videosContent) {
+            videosContent.innerHTML = ''; // Clear before loading
+            displayRSSWidget(highlightsFeed, videosContent);
+        }
     }
 }
 // Switch between video tabs
