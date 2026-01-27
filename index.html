@@ -38227,7 +38227,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Tennis", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Tennis", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "USMNT", "Formula 1", "NCAAF", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "Cricket Live", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         // NFL: "https://www.nfl.com/scores",
@@ -39393,6 +39393,27 @@ document.addEventListener('DOMContentLoaded', function () {
         // Add more leagues here as needed:
         // 'League Name': 'https://example.com/url'
     };
+
+    // Logos for URL-only leagues (and menu items like Cricket / TGL). Use same map when adding TGL to main menu.
+    const URL_ONLY_LEAGUE_LOGOS = {
+        'Cricket': 'https://thporth.com/cricket.png',
+        'TGL': 'https://upload.wikimedia.org/wikipedia/en/f/f7/TGL_logo.png'
+    };
+
+    // URL-only leagues: header-only sections in games column (no games). Like hardcoded_today_schedules but per league/day.
+    // Each entry: date ('YYYY-MM-DD'), name, url, startTime, endTime ('HH:mm' 24h EST), time ('7:30 pm' EST for "before").
+    // Only show the league header on dates listed. Add each name to LEAGUE_DISPLAY_ORDER for sort position.
+    const URL_ONLY_LEAGUES = [
+        { date: '2026-01-25', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '23:59', time: '12:00 am' },
+        { date: '2026-01-26', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:05', endTime: '23:59', time: '12:05 am' },
+        { date: '2026-01-26', name: 'TGL', url: 'https://www.espn.com/golf/leaderboard/_/tour/tgl', startTime: '19:00', endTime: '21:00', time: '7:00 pm' },
+
+
+
+        
+        // Add more entries (same league on different dates, or other leagues). Example:
+        // { date: '2026-01-28', name: 'Another League', url: 'https://...', startTime: '14:00', endTime: '18:00', time: '2:00 pm' },
+    ];
     
     // Convert league display name to section key (for navigation)
     function getSectionKeyFromLeagueDisplayName(displayName) {
@@ -41359,6 +41380,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         const leagueGroups = {};
 
+        const displayDate = isYesterdayScores
+            ? (typeof luxon !== 'undefined' && luxon.DateTime ? luxon.DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate() : '')
+            : (typeof getTodayDisplayDate === 'function' ? getTodayDisplayDate() : (typeof luxon !== 'undefined' && luxon.DateTime ? luxon.DateTime.now().setZone('America/New_York').toISODate() : ''));
+        const urlOnlyForDate = (typeof URL_ONLY_LEAGUES !== 'undefined' && Array.isArray(URL_ONLY_LEAGUES) && displayDate)
+            ? URL_ONLY_LEAGUES.filter(function(e) { return e.date === displayDate; })
+            : [];
+        const urlOnlyMapByDate = {};
+        urlOnlyForDate.forEach(function(e) { urlOnlyMapByDate[e.name] = e; });
+
         if (isGroupedByLeague) {
             gamesData.forEach(game => {
                 // Check if this is a featured game (has a special property or is in featured games list)
@@ -41376,6 +41406,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
                 leagueGroups[leagueDisplayName].push(game);
             });
+            urlOnlyForDate.forEach(function(c) { leagueGroups[c.name] = []; });
         } else {
             leagueGroups['singleLeague'] = gamesData;
         }
@@ -41410,6 +41441,98 @@ document.addEventListener('DOMContentLoaded', function () {
             const isSpecialNCAALeague = (detectedLeagueKey === 'NCAAM' || detectedLeagueKey === 'NCAAW' || detectedLeagueKey === 'NCAAF');
             const hasEnoughGames = games && games.length >= 10;
             const shouldPrioritizeImportant = isSpecialNCAALeague && hasEnoughGames;
+
+            // URL-only leagues: header-only, clickable to open URL. Time/LIVE/F like hardcoded; icon instead of expand arrow.
+            if (isGroupedByLeague && games.length === 0 && urlOnlyMapByDate[leagueNameKey]) {
+                const cfg = urlOnlyMapByDate[leagueNameKey];
+                const status = isYesterdayScores ? 'after' : ((cfg.startTime && cfg.endTime) ? getHardcodedGameTimeStatus(cfg.startTime, cfg.endTime, cfg.date) : 'before');
+                let timeDisplay = '';
+                if (status === 'before') {
+                    let t = cfg.time || '';
+                    if (t && String(t).toUpperCase() !== 'TBD') {
+                        try {
+                            const estTime = luxon.DateTime.fromFormat(t, 'h:mm a', { zone: 'America/New_York' });
+                            if (estTime.isValid) {
+                                const localTime = estTime.setZone('local');
+                                t = localTime.toFormat('h:mm a');
+                            }
+                        } catch (e) { /* keep t */ }
+                    }
+                    timeDisplay = t;
+                } else if (status === 'live') {
+                    timeDisplay = 'LIVE';
+                } else {
+                    timeDisplay = 'F';
+                }
+                const iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+                leagueSection.className = "league-section";
+                const title = document.createElement("div");
+                title.className = "league-title";
+                title.style.display = "flex";
+                title.style.alignItems = "center";
+                title.style.justifyContent = "space-between";
+                title.style.cursor = "pointer";
+                title.style.userSelect = "none";
+                title.style.marginBottom = "0";
+                title.style.paddingRight = "5px";
+                title.addEventListener('click', function() { window.open(cfg.url, '_blank', 'noopener,noreferrer'); });
+                title.addEventListener('mouseenter', function() { title.style.opacity = '0.8'; });
+                title.addEventListener('mouseleave', function() { title.style.opacity = '1'; });
+                const left = document.createElement("div");
+                left.style.display = "flex";
+                left.style.alignItems = "center";
+                left.style.gap = "5px";
+                left.style.flex = "1";
+                left.style.minWidth = "0";
+                left.style.overflow = "hidden";
+                const logo = document.createElement("img");
+                logo.src = (typeof URL_ONLY_LEAGUE_LOGOS !== 'undefined' && URL_ONLY_LEAGUE_LOGOS[leagueNameKey]) ? URL_ONLY_LEAGUE_LOGOS[leagueNameKey] : "https://thporth.com/cricket.png";
+                logo.alt = leagueNameKey;
+                logo.style.width = "12px";
+                logo.style.height = "12px";
+                logo.style.marginRight = "6px";
+                logo.style.verticalAlign = "middle";
+                logo.style.display = "inline-block";
+                logo.style.flexShrink = "0";
+                left.appendChild(logo);
+                const nameSpan = document.createElement("span");
+                nameSpan.textContent = leagueNameKey;
+                nameSpan.style.overflow = "hidden";
+                nameSpan.style.textOverflow = "ellipsis";
+                nameSpan.style.whiteSpace = "nowrap";
+                left.appendChild(nameSpan);
+                title.appendChild(left);
+                const right = document.createElement("div");
+                right.style.display = "flex";
+                right.style.alignItems = "center";
+                right.style.gap = "10px";
+                right.style.flexShrink = "0";
+                if (status === 'live') {
+                    const liveSpan = document.createElement("span");
+                    liveSpan.style.color = "red";
+                    liveSpan.style.fontSize = "11px";
+                    liveSpan.style.fontWeight = "normal";
+                    liveSpan.style.fontFamily = "Helvetica, Arial, sans-serif";
+                    liveSpan.textContent = "LIVE";
+                    right.appendChild(liveSpan);
+                } else {
+                    const timeSpan = document.createElement("span");
+                    timeSpan.style.color = "#e0e0e0";
+                    timeSpan.textContent = timeDisplay;
+                    right.appendChild(timeSpan);
+                }
+                const iconWrap = document.createElement("span");
+                iconWrap.innerHTML = iconSvg;
+                iconWrap.style.display = "inline-flex";
+                iconWrap.style.alignItems = "center";
+                iconWrap.style.color = "#e0e0e0";
+                right.appendChild(iconWrap);
+                title.appendChild(right);
+                leagueSection.appendChild(title);
+                leagueSection.style.marginBottom = "";
+                container.appendChild(leagueSection);
+                return;
+            }
 
             if(isGroupedByLeague) {
                 leagueSection.className = "league-section";
