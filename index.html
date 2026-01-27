@@ -5160,6 +5160,31 @@ function loadCustomRSSFeed(feedUrl, container) {
                 newsContainer.appendChild(newsFeed);
             }
         }
+        
+        // On mobile, switch to news column when a game is clicked
+        if (window.innerWidth <= 767) {
+            // Check if showMobileColumn function exists (it should be defined in the mobile section)
+            if (typeof window.showMobileColumn === 'function') {
+                window.showMobileColumn('news');
+            } else {
+                // Fallback: manually show news column if function isn't available yet
+                document.querySelectorAll('.column').forEach(col => {
+                    col.classList.remove('mobile-active');
+                });
+                const newsColumn = document.querySelector('.column.news');
+                if (newsColumn) {
+                    newsColumn.classList.add('mobile-active');
+                    // Update toolbar button state
+                    document.querySelectorAll('.mobile-toolbar-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    const mobileNewsBtn = document.getElementById('mobile-news-btn');
+                    if (mobileNewsBtn) {
+                        mobileNewsBtn.classList.add('active');
+                    }
+                }
+            }
+        }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -53889,6 +53914,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error in showMobileColumn:', error);
         }
     }
+    
+    // Expose showMobileColumn globally so handleGameClick can access it
+    window.showMobileColumn = showMobileColumn;
     
     // Populate mobile league menu
     function populateMobileLeagueMenu() {
