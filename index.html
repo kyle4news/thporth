@@ -231,11 +231,14 @@ table.game-table td:nth-child(1) {
 .column.tv-listings .game-table td:nth-child(5) { /* Clickable indicator column */
     width: 5px !important;
     padding: 0 !important;
-    background-color: #4a4a4a !important;
     position: relative !important;
     vertical-align: middle !important;
 }
-.column.tv-listings .game-table td:nth-child(5)::after {
+/* Only show clickable indicator styling for cells with the game-click-indicator class */
+.column.tv-listings .game-table td:nth-child(5).game-click-indicator {
+    background-color: #4a4a4a !important;
+}
+.column.tv-listings .game-table td:nth-child(5).game-click-indicator::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -40593,9 +40596,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     // Check if game is clickable (has at least one team with feed mappings)
+                    // Hardcoded games are NEVER clickable
                     const originalHomeTeam = data["Home Team"] || "";
                     const originalAwayTeam = data["Away Team"] || "";
-                    const isClickable = isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay);
+                    const isClickable = isHardcodedToday ? false : (isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay));
                     const gameId = data["Game ID"] || data.gameId || data["GameID"] || null;
                     const gameIdString = gameId ? String(gameId) : null;
                     const isSelected = gameIdString && window.currentSelectedGameId === gameIdString;
@@ -41355,9 +41359,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 // Check if game is clickable (has at least one team with feed mappings)
+                // Hardcoded games are NEVER clickable
                 const originalHomeTeam = data["Home Team"] || "";
                 const originalAwayTeam = data["Away Team"] || "";
-                const isClickable = isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay);
+                const isHardcodedToday = data.isHardcodedToday === true;
+                const isClickable = isHardcodedToday ? false : (isGameClickable(originalHomeTeam, originalAwayTeam) || isGameClickable(homeDisplay, awayDisplay));
                 const clickIndicatorHtml = isClickable ? '<td rowspan="2" class="game-click-indicator"></td>' : '<td rowspan="2"></td>';
                 
                 if (isSoccerLeague) {
