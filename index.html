@@ -40162,10 +40162,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     const subColgroup = document.createElement("colgroup");
                     
                     if (hasHardcodedGames) {
-                        // Hardcoded games: no scores column - icon (32%), teams (39.25%), channel (23.75%), clickable (5px)
+                        // Hardcoded games: match regular games layout - icon (32%), team (30.25%), score (9%), channel (23.75%), clickable (5px)
                         subColgroup.innerHTML = `
                             <col style="width: 32%;">   <!-- time/icon -->
-                            <col style="width: 39.25%;">  <!-- team (takes up team + score width) -->
+                            <col style="width: 30.25%;">  <!-- team -->
+                            <col style="width: 9%;">   <!-- score (empty for hardcoded games) -->
                             <col style="width: 23.75%;">   <!-- channel -->
                             <col style="width: 5px;">   <!-- clickable indicator -->
                         `;
@@ -40185,7 +40186,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     subTable.dataset.hasHardcodedGames = hasHardcodedGames ? 'true' : 'false';
                     
                     const spacerRow = subTable.insertRow();
-                    const spacerColspan = hasHardcodedGames ? (isYesterdayScores ? 2 : 3) : 4;
+                    const spacerColspan = hasHardcodedGames ? (isYesterdayScores ? 2 : 4) : 4;
                     spacerRow.innerHTML = `<td colspan="${spacerColspan}" style="height: 5px; padding: 0; border: none;"></td>`;
                     
                     leagueSection.appendChild(subTable);
@@ -40632,22 +40633,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     const clickIndicatorHtml = isClickable ? '<td rowspan="2" class="game-click-indicator"></td>' : '<td rowspan="2"></td>';
                     
-                    // Check if this is a hardcoded game - no scores column for hardcoded games
+                    // Check if this is a hardcoded game - include empty score column to match regular games layout
                     if (isHardcodedToday) {
                         // For hardcoded games, use the already-separated icon and time
                         // hardcodedIconForTop has the icon (if URL exists), timeColumnBottom has time/LIVE/F
                         const iconForTopRow = hardcodedIconForTop || '';
                         const timeForBottomRow = timeColumnBottom || displayTimeLabel || '';
                         
-                        // Hardcoded games: no scores column - icon/time, teams, channel, clickable indicator
+                        // Hardcoded games: include empty score column to match regular games layout
                         if (isSoccerLeague) {
                             // Soccer: home team on top, away team on bottom
-                            row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconForTopRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${featuredChannelDisplay}</div></td>${clickIndicatorHtml}`;
-                            row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeForBottomRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td>`;
+                            row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconForTopRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${featuredChannelDisplay}</div></td>${clickIndicatorHtml}`;
+                            row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeForBottomRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>`;
                         } else {
                             // All other leagues: away team on top, home team on bottom
-                            row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconForTopRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${featuredChannelDisplay}</div></td>${clickIndicatorHtml}`;
-                            row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeForBottomRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td>`;
+                            row1.innerHTML = `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconForTopRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box; ${awayColor}">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${featuredChannelDisplay}</div></td>${clickIndicatorHtml}`;
+                            row2.innerHTML = `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeForBottomRow}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box; ${homeColor}">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>`;
                         }
                     } else {
                         // Regular games: include scores column
@@ -40775,8 +40776,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     let colspan;
                     let firstCell;
                     if (tableHasHardcodedGames || isHardcodedToday || nextIsHardcodedToday) {
-                        // Hardcoded games: no scores column
-                        const separatorColspan = isYesterdayScores ? 2 : 3;
+                        // Hardcoded games: include score column (empty) to match regular games layout
+                        const separatorColspan = isYesterdayScores ? 2 : 4;
                         colspan = separatorColspan;
                         firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
                     } else {
