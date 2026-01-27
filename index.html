@@ -38382,8 +38382,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const displayDate = isYesterdayScores
             ? (typeof luxon !== 'undefined' && luxon.DateTime ? luxon.DateTime.now().setZone('America/New_York').minus({ days: 1 }).toISODate() : '')
             : (typeof getTodayDisplayDate === 'function' ? getTodayDisplayDate() : (typeof luxon !== 'undefined' && luxon.DateTime ? luxon.DateTime.now().setZone('America/New_York').toISODate() : ''));
+        // For yesterday's scores, include URL_ONLY_LEAGUES entries for both yesterday and today
+        // This ensures entries shown in today also appear in yesterday
+        const todayDate = (typeof getTodayDisplayDate === 'function' ? getTodayDisplayDate() : (typeof luxon !== 'undefined' && luxon.DateTime ? luxon.DateTime.now().setZone('America/New_York').toISODate() : ''));
         const urlOnlyForDate = (typeof URL_ONLY_LEAGUES !== 'undefined' && Array.isArray(URL_ONLY_LEAGUES) && displayDate)
-            ? URL_ONLY_LEAGUES.filter(function(e) { return e.date === displayDate; })
+            ? URL_ONLY_LEAGUES.filter(function(e) { 
+                if (isYesterdayScores) {
+                    // For yesterday, include entries for both yesterday and today
+                    return e.date === displayDate || e.date === todayDate;
+                } else {
+                    // For today, only include entries for today
+                    return e.date === displayDate;
+                }
+            })
             : [];
         const urlOnlyMapByDate = {};
         urlOnlyForDate.forEach(function(e) { urlOnlyMapByDate[e.name] = e; });
