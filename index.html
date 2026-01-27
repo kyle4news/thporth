@@ -38456,6 +38456,13 @@ document.addEventListener('DOMContentLoaded', function () {
             if (isGroupedByLeague && games.length === 0 && urlOnlyMapByDate[leagueNameKey]) {
                 const cfg = urlOnlyMapByDate[leagueNameKey];
                 const status = isYesterdayScores ? 'after' : ((cfg.startTime && cfg.endTime) ? getHardcodedGameTimeStatus(cfg.startTime, cfg.endTime, cfg.date) : 'before');
+                
+                // Check if LIVE tab is active - if so, only show URL_ONLY_LEAGUES with status 'live'
+                const liveFilterElement = document.getElementById('live-filter-toggle');
+                const isLiveFilterActive = liveFilterElement && liveFilterElement.classList.contains('active');
+                if (isLiveFilterActive && status !== 'live') {
+                    return; // Skip rendering this URL_ONLY_LEAGUE if LIVE tab is active and it's not live
+                }
                 let timeDisplay = '';
                 if (status === 'before') {
                     let t = cfg.time || '';
@@ -38529,6 +38536,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     const timeSpan = document.createElement("span");
                     timeSpan.style.color = "#e0e0e0";
+                    timeSpan.style.fontSize = "11px";
+                    timeSpan.style.fontWeight = "normal";
+                    timeSpan.style.fontFamily = "Helvetica, Arial, sans-serif";
                     timeSpan.textContent = timeDisplay;
                     right.appendChild(timeSpan);
                 }
