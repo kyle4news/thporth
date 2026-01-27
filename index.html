@@ -37974,7 +37974,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'Tennis': [
 
 
-{ date: '2026-01-26', time: '7:30 pm', startTime: '19:30', endTime: '23:59', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+  { date: '2026-01-26', time: '7:30 pm', startTime: '19:30', endTime: '23:59', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
 
 { date: '2026-01-27', time: '7:00 pm', startTime: '19:00', endTime: '23:59', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
 
@@ -49527,11 +49527,48 @@ async function fetchFeaturedGames() {
                 // Combine games with yesterday's featured games first, then hardcoded games, then regular games
                 const allGames = [...yesterdayFeaturedGames, ...hardcodedYesterdayGames, ...gamesData];
                 
+                // Manual deduplication: Remove duplicate Australian Open entries for same date
+                // Keep featured games, remove duplicates from hardcoded/regular games
+                const deduplicatedGames = [];
+                const seenKeys = new Set();
+                const excludedGameIds = new Set(); // Manually add Game IDs here to exclude them
+                // Example: excludedGameIds.add('hardcoded-yesterday-Tennis-2026-01-26-1234567890-0.123');
+                
+                allGames.forEach(game => {
+                    const gameId = game['Game ID'] || '';
+                    const gameDate = game.gameDate || '';
+                    const league = game.League || '';
+                    const awayTeam = game['Away Team'] || '';
+                    const homeTeam = game['Home Team'] || '';
+                    
+                    // Skip manually excluded games
+                    if (excludedGameIds.has(gameId)) {
+                        return;
+                    }
+                    
+                    // For Australian Open (or any hardcoded games), create a deduplication key
+                    if (awayTeam === 'Australian Open' && gameDate === yesterdayStr) {
+                        const dedupKey = `${gameDate}|${league}|${awayTeam}|${homeTeam}`;
+                        
+                        // If we've seen this key before, skip this game (unless it's featured)
+                        if (seenKeys.has(dedupKey)) {
+                            // Keep featured games, skip non-featured duplicates
+                            if (!game.isFeatured) {
+                                return;
+                            }
+                        } else {
+                            seenKeys.add(dedupKey);
+                        }
+                    }
+                    
+                    deduplicatedGames.push(game);
+                });
+                
                 // Cache the results until next 3:55 AM ET
-                yesterdayScoresCache = allGames;
+                yesterdayScoresCache = deduplicatedGames;
                 yesterdayScoresCacheExpiry = getNextPrepExpiryTimestamp();
                 
-                renderYesterdayScores(allGames);
+                renderYesterdayScores(deduplicatedGames);
             })
             .catch(error => {
             scoresLoading.style.display = 'none';
