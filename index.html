@@ -40827,10 +40827,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         <col style="width: 68%;">   <!-- team (takes up team + channel width) -->
                     `;
                 } else {
-                    // Today: icon (32%), teams (39.25%), channel (23.75%)
+                    // Today: match regular games layout - icon (32%), team (30.25%), score (9%), channel (23.75%)
                     hardcodedColgroup.innerHTML = `
                         <col style="width: 32%;">   <!-- time/icon -->
-                        <col style="width: 39.25%;">  <!-- team (takes up team + score width) -->
+                        <col style="width: 30.25%;">  <!-- team -->
+                        <col style="width: 9%;">   <!-- score (empty for hardcoded games) -->
                         <col style="width: 23.75%;">   <!-- channel -->
                         <col style="width: 5px;">   <!-- clickable indicator -->
                     `;
@@ -40839,7 +40840,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Add spacer row
                 const hardcodedSpacerRow = hardcodedTable.insertRow();
-                const spacerColspan = isYesterdayScores ? 2 : 3;
+                const spacerColspan = isYesterdayScores ? 2 : 4;
                 hardcodedSpacerRow.innerHTML = `<td colspan="${spacerColspan}" style="height: 5px; padding: 0; border: none;"></td>`;
                 
                 hardcodedTodayGames.forEach((data, idx) => {
@@ -40926,10 +40927,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td>`;
                         row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;">${timeDisplayText}</td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
                     } else {
-                        // Top row: icon in time column, away team in team column
-                        row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml || ''}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${channelDisplay}</div></td><td rowspan="2"></td>`;
-                        // Bottom row: time/F/LIVE in time column, home team in team column
-                        row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;">${timeDisplayText}</td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td>`;
+                        // Top row: icon in time column, away team in team column, empty score column, channel column
+                        row1.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${iconHtml || ''}</td><td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; ${awayWhiteSpace} font-size: 11px; box-sizing: border-box;">${away}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td><td rowspan="2" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box; overflow: hidden;" class="channel-cell-desktop"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 4px); word-wrap: break-word; font-size: 10px; text-align: center;">${channelDisplay}</div></td><td rowspan="2"></td>`;
+                        // Bottom row: time/F/LIVE in time column, home team in team column, empty score column
+                        row2.innerHTML = `<td style="text-align: center; font-size: ${timeFontSize}; padding: 2px 1px; box-sizing: border-box;">${timeDisplayText}</td><td class="team-cell" style="${row2TeamCellPadding} overflow: hidden; text-overflow: ellipsis; ${homeWhiteSpace} font-size: 11px; box-sizing: border-box;">${home}</td><td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>`;
                     }
                     
                     row1.dataset.matchStatus = matchStatus;
@@ -40939,7 +40940,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (idx < hardcodedTodayGames.length - 1) {
                         const separatorRow = hardcodedTable.insertRow();
                         separatorRow.className = "game-separator-line";
-                        const separatorColspan = isYesterdayScores ? 2 : 3;
+                        const separatorColspan = isYesterdayScores ? 2 : 4;
                         separatorRow.innerHTML = `<td colspan="${separatorColspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
                     }
                 });
