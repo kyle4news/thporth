@@ -423,8 +423,12 @@
 
      // Hardcoded_Today_Schedules data structure (same as index.html)
      const Hardcoded_Today_Schedules = {
-        'Tennis': [
+        'CFB': [
+{ date: '2026-01-27', time: '7:00 pm', startTime: '19:00', endTime: '22:00', away: 'East-West', home: 'Shrine Bowl', channel: 'NFL Network', url: 'https://x.com/ShrineBowl' },
 
+],
+
+        'Tennis': [
 
 { date: '2026-01-26', time: '7:30 pm', startTime: '19:30', endTime: '23:59', away: 'Australian Open', home: 'Quarterfinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
 
@@ -653,20 +657,21 @@
                  games = snapshot.empty ? [] : snapshot.docs.map(d => d.data());
              }
             
-             // Add hardcoded games from Hardcoded_Today_Schedules
-             const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'IMSASportsCar'];
-             const leagueDisplayNameMap = {
-                 'Boxing': 'Boxing',
-                 'UFC': 'UFC',
-                 'PGATour': 'PGA Tour',
-                 'LPGATour': 'LPGA Tour',
-                 'Tennis': 'Tennis',
-                 'PGATourChampions': 'PGA Champions',
-                 'NASCARCupSeries': 'NASCAR Cup Series',
-                 'DPWorldTour': 'DP World Tour',
-                 'LIVGolf': 'LIV Golf',
-                 'IMSASportsCar': 'IMSA SportsCar'
-             };
+            // Add hardcoded games from Hardcoded_Today_Schedules
+            const leaguesWithHardcodedToday = ['Boxing', 'UFC', 'PGATour', 'LPGATour', 'Tennis', 'PGATourChampions', 'NASCARCupSeries', 'DPWorldTour', 'LIVGolf', 'IMSASportsCar', 'CFB'];
+            const leagueDisplayNameMap = {
+                'Boxing': 'Boxing',
+                'UFC': 'UFC',
+                'PGATour': 'PGA Tour',
+                'LPGATour': 'LPGA Tour',
+                'Tennis': 'Tennis',
+                'PGATourChampions': 'PGA Champions',
+                'NASCARCupSeries': 'NASCAR Cup Series',
+                'DPWorldTour': 'DP World Tour',
+                'LIVGolf': 'LIV Golf',
+                'IMSASportsCar': 'IMSA SportsCar',
+                'CFB': 'CFB'
+            };
             
              leaguesWithHardcodedToday.forEach((leagueKey, leagueIndex) => {
                  const leagueDisplayName = leagueDisplayNameMap[leagueKey] || leagueKey;
@@ -684,7 +689,7 @@
                              'Away Team': game.away,
                              'Home Team': game.home,
                              'League': leagueDisplayName,
-                             'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : 'Racing'))),
+                             'Sport': leagueKey === 'Tennis' ? 'Tennis' : (leagueKey === 'CFB' ? 'American Football' : (leagueKey.includes('Golf') ? 'Golf' : (leagueKey.includes('PGA') ? 'Golf' : (leagueKey === 'Boxing' || leagueKey === 'UFC' ? 'Combat' : 'Racing')))),
                              'Match Status': 'SCHEDULED',
                              'gameDate': game.date,
                              'channel': game.channel || '',
