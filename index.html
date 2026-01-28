@@ -2390,6 +2390,37 @@ div[id^="breaking-content-"] a:hover {
   }
 }
 
+/* Mobile Game Info Bar Styling */
+#mobile-game-info-bar {
+  display: none;
+  position: fixed;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  height: 18px;
+  background-color: white;
+  color: black;
+  font-size: 12px;
+  font-family: Helvetica, Arial, sans-serif;
+  padding-left: 5px;
+  align-items: center;
+  z-index: 999;
+}
+
+@media (min-width: 768px) {
+  #mobile-game-info-bar {
+    display: none !important;
+  }
+}
+
+#mobile-game-info-bar .league-name {
+  font-weight: bold;
+}
+
+#mobile-game-info-bar .team-names {
+  font-weight: normal;
+}
+
 /* Bottom Toolbar Styling */
 #mobile-bottom-toolbar {
   display: none;
@@ -4064,6 +4095,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="divider"></div>
 
     <!-- Mobile Toolbar (hidden by default) -->
+    <!-- Mobile Game Info Bar (shown when game is selected) -->
+    <div id="mobile-game-info-bar" style="display: none;"></div>
+    
     <!-- Mobile Bottom Toolbar -->
     <div id="mobile-bottom-toolbar">
         <button class="mobile-toolbar-btn" id="mobile-league-btn">
@@ -4896,6 +4930,116 @@ function loadCustomRSSFeed(feedUrl, container) {
     // Store the currently selected game ID globally so we can re-apply highlight after re-renders
     window.currentSelectedGameId = null;
     
+    // Function to update mobile game info bar
+    async function updateMobileGameInfoBar(gameId, awayTeamDisplayFromDOM = null, homeTeamDisplayFromDOM = null) {
+        const infoBar = document.getElementById('mobile-game-info-bar');
+        if (!infoBar) return;
+        
+        try {
+            // Try to get game data from cache first (needed for league name and soccer detection)
+            let gameData = null;
+            if (window.getGameDataFromCache) {
+                gameData = window.getGameDataFromCache(gameId);
+            }
+            
+            // If not in cache, try fetching from API
+            if (!gameData) {
+                try {
+                    const gameResponse = await fetch(`https://flashlive-scraper-124291936014.us-central1.run.app/data/game/${encodeURIComponent(gameId)}.json`);
+                    if (gameResponse.ok) {
+                        gameData = await gameResponse.json();
+                        // Update cache for future use
+                        if (window.updateGameDataCache && gameData) {
+                            window.updateGameDataCache([gameData]);
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[updateMobileGameInfoBar] Error fetching game data:', err);
+                }
+            }
+            
+            if (!gameData) {
+                // Hide bar if no game data found
+                infoBar.style.display = 'none';
+                return;
+            }
+            
+            // Extract league information
+            const leagueField = gameData['League'] || '';
+            const sport = gameData['Sport'] || '';
+            
+            // Extract league name from League field (e.g., "USA: NBA" -> "NBA")
+            let leagueName = leagueField;
+            if (leagueField.includes(':')) {
+                leagueName = leagueField.split(':').pop().trim();
+            }
+            
+            // Determine if it's a soccer league
+            const isSoccer = sport === 'Soccer' || 
+                leagueName.includes('Champions League') || 
+                leagueName.includes('Europa League') || 
+                leagueName.includes('Conference League') ||
+                ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'USL Championship', "Women's UCL", 'Campeones Cup'].includes(leagueName) ||
+                leagueField.includes('Champions League') ||
+                leagueField.includes('Europa League') ||
+                leagueField.includes('Conference League') ||
+                leagueField.includes('Premier League') ||
+                leagueField.includes('LaLiga') ||
+                leagueField.includes('Serie A') ||
+                leagueField.includes('Bundesliga') ||
+                leagueField.includes('Ligue 1') ||
+                leagueField.includes('MLS') ||
+                leagueField.includes('NWSL') ||
+                leagueField.includes('FA Cup') ||
+                leagueField.includes('Liga MX');
+            
+            // Use display names from DOM if available, otherwise fall back to game data
+            let awayTeam = awayTeamDisplayFromDOM;
+            let homeTeam = homeTeamDisplayFromDOM;
+            
+            // If we have display names from DOM, determine which is which based on soccer
+            if (awayTeamDisplayFromDOM && homeTeamDisplayFromDOM) {
+                // In the DOM, for non-soccer: row1 = away, row2 = home
+                // For soccer: row1 = home, row2 = away
+                if (isSoccer) {
+                    homeTeam = awayTeamDisplayFromDOM; // row1 is home for soccer
+                    awayTeam = homeTeamDisplayFromDOM; // row2 is away for soccer
+                } else {
+                    awayTeam = awayTeamDisplayFromDOM; // row1 is away for non-soccer
+                    homeTeam = homeTeamDisplayFromDOM; // row2 is home for non-soccer
+                }
+            } else {
+                // Fallback to game data fields
+                awayTeam = gameData['Away Team'] || gameData['AwayTeam'] || '';
+                homeTeam = gameData['Home Team'] || gameData['HomeTeam'] || '';
+            }
+            
+            // Format team names based on soccer or not
+            let teamDisplay = '';
+            if (isSoccer) {
+                // Soccer: Home - Away
+                teamDisplay = homeTeam && awayTeam ? `${homeTeam} - ${awayTeam}` : (homeTeam || awayTeam || '');
+            } else {
+                // Non-soccer: Away - Home
+                teamDisplay = awayTeam && homeTeam ? `${awayTeam} - ${homeTeam}` : (awayTeam || homeTeam || '');
+            }
+            
+            // Update the bar content
+            if (leagueName && teamDisplay) {
+                infoBar.innerHTML = `<span class="league-name">${leagueName}</span> <span class="team-names">> ${teamDisplay}</span>`;
+                infoBar.style.display = 'flex';
+            } else {
+                infoBar.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('[updateMobileGameInfoBar] Error:', error);
+            infoBar.style.display = 'none';
+        }
+    }
+    
+    // Make function globally accessible
+    window.updateMobileGameInfoBar = updateMobileGameInfoBar;
+    
     // --- GLOBAL GAME CLICK HANDLER (must be global for inline onclick) ---
     function handleGameClick(gameId, event) {
         if (event) {
@@ -5159,6 +5303,36 @@ function loadCustomRSSFeed(feedUrl, container) {
                 `;
                 newsContainer.appendChild(newsFeed);
             }
+        }
+        
+        // Update mobile game info bar (mobile only)
+        if (window.innerWidth <= 767) {
+            // Extract team names from clicked rows if available
+            let awayTeamDisplay = null;
+            let homeTeamDisplay = null;
+            if (clickedRows.length > 0) {
+                // First row typically has away team (non-soccer) or home team (soccer)
+                // Second row (game-separator) typically has home team (non-soccer) or away team (soccer)
+                const row1 = clickedRows[0];
+                const row2 = clickedRows.length > 1 ? clickedRows[1] : null;
+                
+                if (row1 && row2) {
+                    const teamCell1 = row1.querySelector('.team-cell');
+                    const teamCell2 = row2.querySelector('.team-cell');
+                    
+                    if (teamCell1 && teamCell2) {
+                        const team1Text = teamCell1.textContent.trim();
+                        const team2Text = teamCell2.textContent.trim();
+                        
+                        // Determine order based on whether it's soccer (check from game data or league)
+                        // For now, we'll determine this from game data in updateMobileGameInfoBar
+                        // But store the display names from the DOM
+                        awayTeamDisplay = team1Text;
+                        homeTeamDisplay = team2Text;
+                    }
+                }
+            }
+            updateMobileGameInfoBar(gameId, awayTeamDisplay, homeTeamDisplay);
         }
         
         // On mobile, switch to news column when a game is clicked
@@ -5555,6 +5729,12 @@ function loadCustomRSSFeed(feedUrl, container) {
                 // Clear the selected game ID and highlight flag
                 window.currentSelectedGameId = null;
                 window.persistGameHighlight = false;
+                
+                // Hide mobile game info bar when switching to league view
+                const mobileGameInfoBar = document.getElementById('mobile-game-info-bar');
+                if (mobileGameInfoBar) {
+                    mobileGameInfoBar.style.display = 'none';
+                }
                 
                 // League mode: use existing league rendering logic (ready for future Firestore league news)
                 const section = selectedId || 'Home';
@@ -8367,6 +8547,12 @@ function loadCustomRSSFeed(feedUrl, container) {
                     }
                 });
                 window.currentSelectedGameId = null;
+                
+                // Hide mobile game info bar when switching leagues
+                const mobileGameInfoBar = document.getElementById('mobile-game-info-bar');
+                if (mobileGameInfoBar) {
+                    mobileGameInfoBar.style.display = 'none';
+                }
                 
                 // Scroll the selected item into view in the menu
                 item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
