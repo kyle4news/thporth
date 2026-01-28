@@ -2395,7 +2395,7 @@ div[id^="breaking-content-"] a:hover {
   display: none;
   position: fixed;
   bottom: 60px;
-  left: 0;
+  left: 40%;
   right: 0;
   height: 18px;
   background-color: white;
@@ -3803,13 +3803,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="news-section-header">Headlines</div>
             <div style="display: flex; height: calc(100% - 18px);">
                 <div id="headlines-tabs-Boxing" class="headlines-tabs-column" style="width: 20%; flex-shrink: 0;">
-                    <div class="headlines-tab active" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/bbc-boxing.xml">BBC</div>
-                    <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/boxingnews-online.xml">Boxing News</div>
+                    <div class="headlines-tab active" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/boxingnews-online.xml">Boxing News</div>
                     <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/ringmagazine-rss.xml">Ring</div>
                     <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/boxingscene.xml">Boxing Scene</div>
                     <div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/boxingnews24.xml">Boxing News 24</div>
-					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/boxing247.xml">Boxing 24/7</div>
+					<!--<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/boxing247.xml">Boxing 24/7</div> -->
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/badlefthook.xml">Bad Left Hook</div>
+                    <div class="headlines-tab active" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/bbc-boxing.xml">BBC</div>
 					<!-- <div class="headlines-tab" data-url="https://rss.app/feeds/t5VOWN5DnuNwIVYF.xml">Headlines</div> -->
 					<div class="headlines-tab" data-url="https://rss-feed-service-vp7bkrygcq-uc.a.run.app/feeds/reddit-boxing.xml">Reddit</div>
 
@@ -5026,7 +5026,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             // Update the bar content
             if (leagueName && teamDisplay) {
-                infoBar.innerHTML = `<span class="league-name">${leagueName}</span> <span class="team-names">> ${teamDisplay}</span>`;
+                infoBar.innerHTML = `<span class="league-name">${leagueName}</span><span class="team-names"> > ${teamDisplay}</span>`;
                 infoBar.style.display = 'flex';
             } else {
                 infoBar.style.display = 'none';
