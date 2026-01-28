@@ -270,6 +270,18 @@ table.game-table td:nth-child(1) {
     padding-right: 4px !important;
     font-size: 11px !important;
 }
+
+/* Desktop only: hardcoded today schedules have no scores, so let team column consume score width */
+@media (min-width: 768px) {
+  .column.tv-listings .game-table.hardcoded-games-table td:nth-child(3),
+  #league-specific-column .game-table.hardcoded-games-table td:nth-child(3) {
+    width: 0 !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    font-size: 0 !important;
+  }
+}
 /* Channel column (4th) for hardcoded games - same styling as regular games */
 .column.tv-listings .game-table.hardcoded-games-table td:nth-child(4),
 #league-specific-column .game-table.hardcoded-games-table td:nth-child(4) {
@@ -2418,6 +2430,11 @@ div[id^="breaking-content-"] a:hover {
 
 #mobile-game-info-bar .team-names {
   font-weight: normal;
+}
+
+#mobile-game-info-bar .league-team-gap {
+  display: inline-block;
+  width: 6px;
 }
 
 /* Bottom Toolbar Styling */
@@ -5025,7 +5042,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             // Update the bar content
             if (leagueName && teamDisplay) {
-                infoBar.innerHTML = `<span class="league-name">${leagueName}</span><span class="team-names"><span style="margin: 0 3px;">></span>${teamDisplay}</span>`;
+                infoBar.innerHTML = `<span class="league-name">${leagueName}</span><span class="team-names"><span class="league-team-gap" aria-hidden="true"></span>${teamDisplay}</span>`;
                 
                 // Function to update bar position based on News and Media button positions
                 const updateBarPosition = () => {
@@ -44469,11 +44486,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     const subColgroup = document.createElement("colgroup");
                     
                     if (hasHardcodedGames) {
+                        // Desktop: hardcoded games have no scores; team column consumes score width to keep channel alignment
+                        const hardcodedNoScoreDesktop = (window.innerWidth >= 768);
                         // Hardcoded games: match regular games layout - icon (32%), team (30.25%), score (9%), channel (23.75%), clickable (5px)
                         subColgroup.innerHTML = `
                             <col style="width: 32%;">   <!-- time/icon -->
-                            <col style="width: 30.25%;">  <!-- team -->
-                            <col style="width: 9%;">   <!-- score (empty for hardcoded games) -->
+                            <col style="width: ${hardcodedNoScoreDesktop ? '39.25%' : '30.25%'};">  <!-- team -->
+                            <col style="width: ${hardcodedNoScoreDesktop ? '0%' : '9%'};">   <!-- score (empty for hardcoded games) -->
                             <col style="width: 23.75%;">   <!-- channel -->
                             <col style="width: 5px;">   <!-- clickable indicator -->
                         `;
@@ -44493,7 +44512,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     subTable.dataset.hasHardcodedGames = hasHardcodedGames ? 'true' : 'false';
                     
                     const spacerRow = subTable.insertRow();
-                    const spacerColspan = hasHardcodedGames ? (isYesterdayScores ? 2 : 4) : 4;
+                    // Spacer row spans all visible columns except the 5px click indicator column
+                    const spacerColspan = 4;
                     spacerRow.innerHTML = `<td colspan="${spacerColspan}" style="height: 5px; padding: 0; border: none;"></td>`;
                     
                     leagueSection.appendChild(subTable);
@@ -45137,10 +45157,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     `;
                 } else {
                     // Today: match regular games layout - icon (32%), team (30.25%), score (9%), channel (23.75%)
+                    // Desktop: hardcoded games have no scores; team column consumes score width to keep channel alignment
+                    const hardcodedNoScoreDesktop = (window.innerWidth >= 768);
                     hardcodedColgroup.innerHTML = `
                         <col style="width: 32%;">   <!-- time/icon -->
-                        <col style="width: 30.25%;">  <!-- team -->
-                        <col style="width: 9%;">   <!-- score (empty for hardcoded games) -->
+                        <col style="width: ${hardcodedNoScoreDesktop ? '39.25%' : '30.25%'};">  <!-- team -->
+                        <col style="width: ${hardcodedNoScoreDesktop ? '0%' : '9%'};">   <!-- score (empty for hardcoded games) -->
                         <col style="width: 23.75%;">   <!-- channel -->
                         <col style="width: 5px;">   <!-- clickable indicator -->
                     `;
