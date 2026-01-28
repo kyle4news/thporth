@@ -2396,7 +2396,7 @@ div[id^="breaking-content-"] a:hover {
   position: fixed;
   bottom: 60px;
   height: 18px;
-  background-color: white;
+  background-color: #cccccc;
   color: black;
   font-size: 12px;
   font-family: Helvetica, Arial, sans-serif;
@@ -5025,7 +5025,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             // Update the bar content
             if (leagueName && teamDisplay) {
-                infoBar.innerHTML = `<span class="league-name">${leagueName}</span><span class="team-names"> > ${teamDisplay}</span>`;
+                infoBar.innerHTML = `<span class="league-name">${leagueName}</span><span class="team-names"><span style="margin: 0 3px;">></span>${teamDisplay}</span>`;
                 
                 // Function to update bar position based on News and Media button positions
                 const updateBarPosition = () => {
