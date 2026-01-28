@@ -8464,6 +8464,16 @@ function loadCustomRSSFeed(feedUrl, container) {
         function fetchFeed(containerSelector, feedUrl) {
             const container = document.querySelector(containerSelector);
             if (!container) return;
+            
+            // Prevent duplicate fetches for the same container/URL (prevents memory leaks)
+            const fetchKey = `${containerSelector}_${feedUrl}`;
+            if (container._isFetching && container._fetchKey === fetchKey) {
+                console.log('⏭️  Skipping duplicate fetchFeed call:', containerSelector);
+                return;
+            }
+            container._isFetching = true;
+            container._fetchKey = fetchKey;
+            
             // Display loading message
             container.innerHTML = '<p style="padding: 10px; color: #9ca3af;">Loading feed...</p>';
             fetch(feedUrl)
@@ -8512,11 +8522,17 @@ function loadCustomRSSFeed(feedUrl, container) {
                     } else {
                         container.innerHTML = "<p style='padding: 10px;'>No items found in feed.</p>";
                     }
+                    // Clear fetching flag after successful load
+                    container._isFetching = false;
+                    container._fetchKey = null;
                 })
                 .catch(error => {
                     console.error("Error loading feed:", error);
                     console.error("Feed URL:", feedUrl);
                     container.innerHTML = `<p style='padding: 10px; color: #ef4444;'>Error loading feed: ${error.message || 'Unknown error'}</p>`;
+                    // Clear fetching flag after error
+                    container._isFetching = false;
+                    container._fetchKey = null;
                 });
         }
 
@@ -58363,6 +58379,16 @@ let lastRefreshTime = Date.now();
 
 async function smartBackgroundRefresh() {
     try {
+        // CRITICAL: Skip auto-refresh on mobile when viewing a game (prevents crashes)
+        const isMobile = window.innerWidth <= 767;
+        const mobileGameInfoBar = document.getElementById('mobile-game-info-bar');
+        const isViewingGameOnMobile = isMobile && mobileGameInfoBar && mobileGameInfoBar.style.display !== 'none';
+        
+        if (isViewingGameOnMobile) {
+            console.log('⏭️  Auto-refresh skipped (viewing game on mobile)');
+            return;
+        }
+        
         console.log('🔄 Auto-refresh: Checking for updates...');
         const startTime = Date.now();
         
@@ -58440,12 +58466,19 @@ if (document.readyState === 'loading') {
     initializeAutoRefresh();
 }
 
-// Log refresh status every 30 seconds (optional - for debugging)
+// Log refresh status every 2 minutes (reduced frequency to prevent memory issues)
 setInterval(() => {
-    const timeSinceLastRefresh = Math.floor((Date.now() - lastRefreshTime) / 1000);
-    const timeUntilNextRefresh = 120 - (timeSinceLastRefresh % 120);
-    console.log(`🕐 Auto-refresh status: Last refresh ${timeSinceLastRefresh}s ago, next in ${timeUntilNextRefresh}s`);
-}, 30000);
+    // Skip logging on mobile when viewing a game to prevent crashes
+    const isMobile = window.innerWidth <= 767;
+    const mobileGameInfoBar = document.getElementById('mobile-game-info-bar');
+    const isViewingGameOnMobile = isMobile && mobileGameInfoBar && mobileGameInfoBar.style.display !== 'none';
+    
+    if (!isViewingGameOnMobile) {
+        const timeSinceLastRefresh = Math.floor((Date.now() - lastRefreshTime) / 1000);
+        const timeUntilNextRefresh = 120 - (timeSinceLastRefresh % 120);
+        console.log(`🕐 Auto-refresh status: Last refresh ${timeSinceLastRefresh}s ago, next in ${timeUntilNextRefresh}s`);
+    }
+}, 120000); // Changed from 30000 to 120000 (2 minutes instead of 30 seconds)
 
 </script>
  
