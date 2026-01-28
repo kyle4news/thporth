@@ -45054,8 +45054,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                     
-                // Add separator line between games (but not after the last game) - SAME LOGIC AS REGULAR GAMES SECTION
-                if (i < sortedFeaturedGames.length - 1) {
+                // Add separator line between games (but not after the last game)
+                // Skip separator lines for hardcoded_today_schedules (only one game per header)
+                if (i < sortedFeaturedGames.length - 1 && !isHardcodedToday) {
                     const nextData = sortedFeaturedGames[i + 1];
                     // Get the NEXT game's time label to determine if the line above it should be full width
                     const nextRawStart = nextData["Start Time"];
@@ -45090,33 +45091,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     
                     const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
-                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabel;
+                    // Extract plain text from nextTimeLabel for comparison (remove HTML tags)
+                    const nextTimeLabelPlain = nextTimeLabel ? nextTimeLabel.replace(/<[^>]*>/g, '') : '';
+                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabelPlain;
                     
                     // Check if next game has a different start time from current game
-                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
+                    // Compare plain text versions (without HTML) for accurate comparison
+                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabelPlain;
                     const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
                     
-                    // Check if current or next game is hardcoded
+                    // Check if next game is hardcoded - skip separator if so (hardcoded games are single-game headers)
                     const nextIsHardcodedToday = nextData.isHardcodedToday === true;
-                    const tableHasHardcodedGames = currentTable && currentTable.dataset.hasHardcodedGames === 'true';
-                    
-                    // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
-                    let colspan;
-                    let firstCell;
-                    if (tableHasHardcodedGames || isHardcodedToday || nextIsHardcodedToday) {
-                        // Hardcoded games: include score column (empty) to match regular games layout
-                        const separatorColspan = isYesterdayScores ? 2 : 4;
-                        colspan = separatorColspan;
-                        firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
+                    if (nextIsHardcodedToday) {
+                        // Skip separator - hardcoded games don't need separators
                     } else {
-                        // Regular games: with scores column
-                        colspan = isDifferentTime ? 4 : 3;
-                        firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
+                        // Set colspan based on comparison (EXACT SAME LOGIC AS REGULAR GAMES SECTION)
+                        // When same time: separator doesn't extend over start time column (team, score, channel only)
+                        // When different time: separator extends full width (time, team, score, channel)
+                        const colspan = isDifferentTime ? 4 : 3;
+                        // For same time: empty cell with non-breaking space to ensure proper rendering
+                        const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;">&nbsp;</td>';
+                        
+                        const separatorRow = currentTable.insertRow();
+                        separatorRow.className = "game-separator-line";
+                        separatorRow.innerHTML = `${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
                     }
-                    
-                    const separatorRow = currentTable.insertRow();
-                    separatorRow.className = "game-separator-line";
-                    separatorRow.innerHTML = `${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
                 }
                 
                 // Update previous game time label and increment game index for next iteration
@@ -45830,16 +45829,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     // #endregion
                     
                     const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
-                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabel;
+                    // Extract plain text from nextTimeLabel for comparison (remove HTML tags)
+                    const nextTimeLabelPlain = nextTimeLabel ? nextTimeLabel.replace(/<[^>]*>/g, '') : '';
+                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabelPlain;
                     
                     // Check if next game has a different start time from current game
-                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabel;
+                    // Use plain text versions for consistent comparison
+                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabelPlain;
                     const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
                     // #region agent log
                     fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15059',message:'Separator line comparison',data:{nextTimeLabel,nextNormalizedTimeLabel,nextGameTimeLabel,normalizedTimeLabel,currentTimeLabel,currentGameTimeLabel,isDifferentTime,nextIsLive,nextIsFinal,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
                     // #endregion
                     
                     // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
+                    // When same start time: separator does NOT extend over time column (starts at team column, colspan=3)
+                    // When different start time: separator DOES extend over time column (starts at time column, colspan=4)
                     const colspan = isDifferentTime ? 4 : 3;
                     const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
                     // #region agent log
