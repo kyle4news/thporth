@@ -57549,7 +57549,80 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (mobileGamesBtn) {
-        mobileGamesBtn.addEventListener('click', () => showMobileColumn('games'));
+        mobileGamesBtn.addEventListener('click', () => {
+            // Check if a game is currently selected
+            const hasSelectedGame = window.currentSelectedGameId != null && window.currentSelectedGameId !== undefined;
+            
+            if (hasSelectedGame) {
+                // Reset to league-level data
+                try {
+                    // Clear selected game ID
+                    window.currentSelectedGameId = null;
+                    window.persistGameHighlight = false;
+                    
+                    // Remove selected classes from all game rows
+                    document.querySelectorAll('.game-row.selected, .game-row.active, .game-row.game-separator.active, .game-separator-line.active-above').forEach(row => {
+                        row.classList.remove('selected', 'active', 'active-above');
+                        row.style.backgroundColor = '';
+                        row.style.color = '';
+                        const cells = row.querySelectorAll('td');
+                        cells.forEach(cell => {
+                            cell.style.color = '';
+                            cell.style.backgroundColor = '';
+                        });
+                    });
+                    
+                    // Reset column backgrounds to default for league mode
+                    const newsColumn = document.querySelector('.column.news');
+                    if (newsColumn) {
+                        newsColumn.style.backgroundColor = '#fafaf9';
+                    }
+                    const socialColumn = document.querySelector('.column.social');
+                    if (socialColumn) {
+                        socialColumn.style.backgroundColor = '';
+                    }
+                    
+                    // Reset news header border for league mode
+                    const newsHeader = document.querySelector('.news-header');
+                    if (newsHeader) {
+                        newsHeader.style.borderBottom = '1px solid #1f1f1f';
+                    }
+                    
+                    // Reload league-level data for news, social, and media columns
+                    const section = currentMobileLeague || 'Home';
+                    
+                    // Reset news to league level
+                    if (window.renderNews) {
+                        window.renderNews(section, 'league');
+                    }
+                    
+                    // Reset social to league level
+                    // Clear currentFeedSection to force reload
+                    if (typeof currentFeedSection !== 'undefined') {
+                        currentFeedSection = null;
+                    }
+                    // Clear social feed container
+                    const socialContainer = document.getElementById('social-feed-container');
+                    if (socialContainer) {
+                        socialContainer.innerHTML = '';
+                    }
+                    // Reload league-level social feed
+                    if (typeof loadSocialFeed === 'function') {
+                        loadSocialFeed(section);
+                    }
+                    
+                    // Reset videos/media to league level
+                    if (typeof initializeVideosColumn === 'function') {
+                        initializeVideosColumn(section);
+                    }
+                } catch (error) {
+                    console.error('Error resetting to league-level data:', error);
+                }
+            }
+            
+            // Show games column
+            showMobileColumn('games');
+        });
     }
     
     if (mobileNewsBtn) {
