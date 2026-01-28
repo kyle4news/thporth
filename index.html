@@ -4902,7 +4902,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             event.preventDefault();
             event.stopPropagation();
         }
-        console.log('[handleGameClick] Called with gameId:', gameId);
+        console.log('[handleGameClick] Called with gameId:', gameId, 'Window width:', window.innerWidth, 'Is mobile:', window.innerWidth <= 767);
         if (!gameId) {
             console.log('[handleGameClick] No gameId, returning');
             return;
@@ -5163,6 +5163,322 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // On mobile, switch to news column when a game is clicked
         if (window.innerWidth <= 767) {
+            console.log(`[handleGameClick] Mobile: Detected mobile device (width: ${window.innerWidth}), starting league switch process for gameId: ${gameId}`);
+            // MOBILE ONLY: Switch main menu to the league of the clicked game and load league-specific games
+            (async function() {
+                try {
+                    console.log(`[handleGameClick] Mobile: Starting async function to fetch game data and switch league`);
+                    // Helper function to map League field (e.g., 'USA: NBA') to league key (e.g., 'NBA')
+                    function getLeagueKeyFromLeagueField(leagueField) {
+                        if (!leagueField) return null;
+                        
+                        // Search LEAGUE_DATA_CONFIG for matching leagueId (use window.LEAGUE_DATA_CONFIG for global access)
+                        const leagueConfig = window.LEAGUE_DATA_CONFIG || LEAGUE_DATA_CONFIG;
+                        if (!leagueConfig) {
+                            console.warn('[handleGameClick] Mobile: LEAGUE_DATA_CONFIG not available');
+                            return null;
+                        }
+                        
+                        for (const [leagueKey, config] of Object.entries(leagueConfig)) {
+                            if (config.leagueId === leagueField) {
+                                return leagueKey;
+                            }
+                        }
+                        
+                        // Fallback: try to extract league name from format "Country: League Name"
+                        if (leagueField.includes(':')) {
+                            const leagueName = leagueField.split(':').pop().trim();
+                            // Try direct match
+                            if (leagueConfig[leagueName]) {
+                                return leagueName;
+                            }
+                            // Try common variations
+                            const variations = {
+                                'NBA': 'NBA',
+                                'NFL': 'NFL',
+                                'MLB': 'MLB',
+                                'NHL': 'NHL',
+                                'MLS': 'MLS',
+                                'Premier League': 'PremierLeague',
+                                'LaLiga': 'LaLiga',
+                                'Serie A': 'SerieA',
+                                'Bundesliga': 'Bundesliga',
+                                'Ligue 1': 'Ligue1',
+                                'NCAA': 'NCAAF', // Default to NCAAF, but may need Sport field to distinguish
+                                'NCAA Women': 'NCAAW',
+                                'WNBA': 'WNBA'
+                            };
+                            if (variations[leagueName]) {
+                                const mappedKey = variations[leagueName];
+                                // Verify the mapped key exists in config
+                                if (leagueConfig && leagueConfig[mappedKey]) {
+                                    return mappedKey;
+                                }
+                            }
+                        }
+                        
+                        return null;
+                    }
+                    
+                    // Fetch game data to get League field
+                    let gameData = null;
+                    
+                    // Try cache first
+                    if (window.getGameDataFromCache) {
+                        gameData = window.getGameDataFromCache(gameId);
+                    }
+                    
+                    // If not in cache, try fetching from API
+                    if (!gameData) {
+                        try {
+                            const gameResponse = await fetch(`https://flashlive-scraper-124291936014.us-central1.run.app/data/game/${encodeURIComponent(gameId)}.json`);
+                            if (gameResponse.ok) {
+                                gameData = await gameResponse.json();
+                                // Update cache for future use
+                                if (window.updateGameDataCache && gameData) {
+                                    window.updateGameDataCache([gameData]);
+                                }
+                            }
+                        } catch (err) {
+                            console.warn('[handleGameClick] Error fetching game data for league switch:', err);
+                        }
+                    }
+                    
+                    // If still not found, try today.json/yesterday.json
+                    if (!gameData) {
+                        try {
+                            const { DateTime } = luxon;
+                            const todayStr = getTodayDisplayDate();
+                            
+                            // Try today.json first
+                            const todayResponse = await fetch('https://flashlive-scraper-124291936014.us-central1.run.app/data/today.json');
+                            if (todayResponse.ok) {
+                                const todayData = await todayResponse.json();
+                                if (window.updateGameDataCache) {
+                                    window.updateGameDataCache(todayData.games || []);
+                                    gameData = window.getGameDataFromCache(gameId);
+                                }
+                            }
+                            
+                            // If still not found, try yesterday.json
+                            if (!gameData) {
+                                const yesterdayResponse = await fetch('https://flashlive-scraper-124291936014.us-central1.run.app/data/yesterday.json');
+                                if (yesterdayResponse.ok) {
+                                    const yesterdayData = await yesterdayResponse.json();
+                                    if (window.updateGameDataCache) {
+                                        window.updateGameDataCache(yesterdayData.games || []);
+                                        gameData = window.getGameDataFromCache(gameId);
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.warn('[handleGameClick] Error fetching game from JSON fallback:', err);
+                        }
+                    }
+                    
+                    if (gameData && gameData['League']) {
+                        const leagueField = gameData['League'];
+                        console.log(`[handleGameClick] Mobile: Game League field: ${leagueField}`);
+                        let leagueKey = getLeagueKeyFromLeagueField(leagueField);
+                        console.log(`[handleGameClick] Mobile: Mapped league key: ${leagueKey}`);
+                        
+                        // Special handling for NCAA leagues - need Sport field to distinguish
+                        if (!leagueKey && leagueField === 'USA: NCAA') {
+                            const sport = gameData['Sport'] || '';
+                            console.log(`[handleGameClick] Mobile: NCAA game, Sport: ${sport}`);
+                            if (sport === 'Basketball') {
+                                // Check if it's women's basketball by checking League field variations
+                                // If League field contains "Women" or "Womens", it's NCAAW
+                                const leagueLower = leagueField.toLowerCase();
+                                if (leagueLower.includes('women') || leagueLower.includes('womens')) {
+                                    leagueKey = 'NCAAW';
+                                } else {
+                                    leagueKey = 'NCAAM'; // Default to men's
+                                }
+                            } else if (sport === 'American Football') {
+                                leagueKey = 'NCAAF';
+                            }
+                            console.log(`[handleGameClick] Mobile: NCAA league key determined: ${leagueKey}`);
+                        }
+                        
+                        const leagueConfig = window.LEAGUE_DATA_CONFIG || LEAGUE_DATA_CONFIG;
+                        if (leagueKey && leagueConfig && leagueConfig[leagueKey]) {
+                            console.log(`[handleGameClick] Mobile: League key found in config: ${leagueKey}`);
+                            
+                            // Switch main menu to this league - search in all menu lists (including nested)
+                            let menuItem = document.querySelector(`#menuList li[data-section="${leagueKey}"]`);
+                            // Also try searching in menuList-123 specifically
+                            if (!menuItem) {
+                                menuItem = document.querySelector(`#menuList-123 li[data-section="${leagueKey}"]`);
+                            }
+                            // Also try searching in nested lists
+                            if (!menuItem) {
+                                menuItem = document.querySelector(`#menuList ul li[data-section="${leagueKey}"]`);
+                            }
+                            
+                            console.log(`[handleGameClick] Mobile: Menu item found:`, menuItem);
+                            
+                            if (menuItem) {
+                                console.log(`[handleGameClick] Mobile: Found menu item, proceeding with switch...`);
+                                
+                                // Manually replicate the menu click handler behavior (lines 8280-8400)
+                                // but skip the parts that reset game content
+                                
+                                // 1. Ensure the correct menu list is visible (menuList-123 is default)
+                                const menuList123 = document.getElementById('menuList-123');
+                                if (menuList123) {
+                                    menuList123.style.display = 'block';
+                                    // Hide other menu lists
+                                    document.querySelectorAll('#menuList > ul').forEach(ul => {
+                                        if (ul.id !== 'menuList-123') {
+                                            ul.style.display = 'none';
+                                        }
+                                    });
+                                    console.log(`[handleGameClick] Mobile: Ensured menuList-123 is visible`);
+                                }
+                                
+                                // 2. Update mobile league button text (this is what displays "ALL" or the league name)
+                                const mobileLeagueBtn = document.getElementById('mobile-league-btn');
+                                if (mobileLeagueBtn) {
+                                    const leagueBtnSpan = mobileLeagueBtn.querySelector('span:first-child');
+                                    if (leagueBtnSpan) {
+                                        // Get display name from menu item text (remove any images/icons)
+                                        // Clean up text by removing image alt text if present
+                                        let displayName = menuItem.textContent?.trim() || leagueKey;
+                                        // Remove common image alt text patterns
+                                        displayName = displayName.replace(/^ALL\s*/i, '').trim() || leagueKey;
+                                        leagueBtnSpan.textContent = displayName;
+                                        console.log(`[handleGameClick] Mobile: Updated mobile league button to: ${displayName}`);
+                                    }
+                                }
+                                
+                                // Make currentMobileLeague accessible globally for mobile column switching
+                                // This ensures the Games button shows the league-specific column, not Home games
+                                window.currentMobileLeague = leagueKey;
+                                console.log(`[handleGameClick] Mobile: Set window.currentMobileLeague to: ${leagueKey}`);
+                                
+                                // 3. Update selectedSection (if accessible) and remove/add selected classes
+                                document.querySelectorAll("#menuList li[data-section], #menuList-123 li[data-section], #menuList ul li[data-section], #menuList-az li[data-section], #menuList-group li[data-section]").forEach(li => {
+                                    li.classList.remove("selected");
+                                });
+                                menuItem.classList.add("selected");
+                                console.log(`[handleGameClick] Mobile: Added 'selected' class to menu item for ${leagueKey}`);
+                                console.log(`[handleGameClick] Mobile: Menu item text content:`, menuItem.textContent?.trim());
+                                console.log(`[handleGameClick] Mobile: Menu item is in list:`, menuItem.closest('ul')?.id);
+                                
+                                // Verify selection
+                                const selectedItems = document.querySelectorAll('#menuList li.selected, #menuList-123 li.selected');
+                                console.log(`[handleGameClick] Mobile: Currently selected items:`, Array.from(selectedItems).map(li => ({text: li.textContent?.trim(), section: li.dataset.section})));
+                                
+                                // 2. Scroll menu item into view
+                                menuItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                
+                                // 3. Get column references
+                                const gamesColumn = document.getElementById('games-column');
+                                const leagueSpecificColumn = document.getElementById('league-specific-column');
+                                const gamesContent = document.getElementById('tv-listings-container');
+                                const f1Content = document.getElementById('f1-column-content');
+                                
+                                // 4. Handle column visibility based on section (matching menu handler logic)
+                                if (leagueKey === 'Home') {
+                                    if (gamesColumn) gamesColumn.style.display = 'flex';
+                                    if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'none';
+                                    if (gamesContent) gamesContent.style.display = 'flex';
+                                    if (f1Content) f1Content.style.display = 'none';
+                                } else if (leagueKey === 'FormulaOne') {
+                                    if (gamesColumn) gamesColumn.style.display = 'flex';
+                                    if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'none';
+                                    if (f1Content) f1Content.style.display = 'flex';
+                                    if (gamesContent) gamesContent.style.display = 'none';
+                                } else {
+                                    // For all other leagues (NBA, NFL, etc.)
+                                    if (gamesColumn) gamesColumn.style.display = 'none';
+                                    if (leagueSpecificColumn) leagueSpecificColumn.style.display = 'block';
+                                    if (f1Content) f1Content.style.display = 'none';
+                                    if (leagueSpecificColumn) {
+                                        leagueSpecificColumn.classList.remove('f1-active');
+                                    }
+                                    console.log(`[handleGameClick] Mobile: Set column visibility for ${leagueKey}`);
+                                }
+                                
+                                // 5. Load league-specific data (this populates games)
+                                if (typeof window.loadLeagueSpecificData === 'function') {
+                                    console.log(`[handleGameClick] Mobile: Calling loadLeagueSpecificData(${leagueKey})`);
+                                    // Use a longer delay to ensure DOM is ready
+                                    setTimeout(async () => {
+                                        try {
+                                            // Ensure league-specific column is visible before loading
+                                            if (leagueSpecificColumn) {
+                                                leagueSpecificColumn.style.display = 'block';
+                                                console.log(`[handleGameClick] Mobile: Ensured league-specific column is visible before loading`);
+                                            }
+                                            
+                                            await window.loadLeagueSpecificData(leagueKey);
+                                            console.log(`[handleGameClick] Mobile: Successfully loaded league data for ${leagueKey}`);
+                                            
+                                            // Verify games are loaded by checking for game rows
+                                            setTimeout(() => {
+                                                const leagueScheduleContent = document.getElementById('league-schedule-today-content');
+                                                if (leagueScheduleContent) {
+                                                    const gameRows = leagueScheduleContent.querySelectorAll('.game-row');
+                                                    console.log(`[handleGameClick] Mobile: Found ${gameRows.length} game rows in league-schedule-today-content`);
+                                                    
+                                                    // Check if the content is visible
+                                                    const contentDisplay = window.getComputedStyle(leagueScheduleContent).display;
+                                                    const contentVisibility = window.getComputedStyle(leagueScheduleContent).visibility;
+                                                    console.log(`[handleGameClick] Mobile: league-schedule-today-content display: ${contentDisplay}, visibility: ${contentVisibility}`);
+                                                    
+                                                    if (gameRows.length === 0) {
+                                                        console.warn(`[handleGameClick] Mobile: No games found! This might be normal if there are no games today.`);
+                                                    } else {
+                                                        console.log(`[handleGameClick] Mobile: ✓ Games successfully loaded and visible`);
+                                                    }
+                                                } else {
+                                                    console.warn(`[handleGameClick] Mobile: league-schedule-today-content element not found!`);
+                                                }
+                                            }, 1000); // Longer delay to allow games to render
+                                        } catch (err) {
+                                            console.error(`[handleGameClick] Mobile: Error loading league data:`, err);
+                                            console.error(`[handleGameClick] Mobile: Error stack:`, err.stack);
+                                        }
+                                    }, 100);
+                                } else {
+                                    console.error(`[handleGameClick] Mobile: loadLeagueSpecificData function NOT found!`);
+                                }
+                                
+                                // 6. Update standings tab text if function exists
+                                if (typeof updateStandingsTabText === 'function') {
+                                    try {
+                                        updateStandingsTabText(leagueKey);
+                                    } catch (e) {
+                                        console.warn('[handleGameClick] Mobile: Could not update standings tab text:', e);
+                                    }
+                                }
+                                
+                                console.log(`[handleGameClick] Mobile: Successfully switched menu to ${leagueKey}`);
+                            } else {
+                                console.warn(`[handleGameClick] Mobile: Menu item not found for league: ${leagueKey}`);
+                                // Debug: list all available menu items
+                                const allMenuItems = document.querySelectorAll('#menuList li[data-section], #menuList-123 li[data-section]');
+                                console.log(`[handleGameClick] Mobile: Available menu items:`, Array.from(allMenuItems).map(li => li.dataset.section));
+                            }
+                        } else {
+                            console.warn(`[handleGameClick] Mobile: Could not determine league key from League field: ${leagueField}, or league key not in config`);
+                            if (leagueKey) {
+                                console.warn(`[handleGameClick] Mobile: League key ${leagueKey} not found in LEAGUE_DATA_CONFIG`);
+                            }
+                        }
+                    } else {
+                        console.warn(`[handleGameClick] Mobile: Game data not found or missing League field for gameId: ${gameId}`);
+                        if (gameData) {
+                            console.warn(`[handleGameClick] Mobile: Game data exists but League field missing. Game data keys:`, Object.keys(gameData));
+                        }
+                    }
+                } catch (err) {
+                    console.error('[handleGameClick] Mobile: Error switching league menu:', err);
+                }
+            })();
+            
             // Check if showMobileColumn function exists (it should be defined in the mobile section)
             if (typeof window.showMobileColumn === 'function') {
                 window.showMobileColumn('news');
@@ -9399,6 +9715,9 @@ document.addEventListener('DOMContentLoaded', function () {
   'LPGATour': { leagueId: 'LPGA Tour', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgv4aRqL4dKgbADnZNH1e_oR8rgnbGOY9roEzXNVas0C6nlkx3RggqK7RCq0Cl148yFD0DfxAxtK4q/pub?gid=0&single=true&output=csv', upcomingCollectionName: 'LPGATour' },
   'TrackAndField': { leagueId: 'WORLD: TRACK AND FIELD', standingsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnsEETRJkJlYNokKws_nlk6-OfyJKg8aoq8AldZZgRcdV5YtuQ1kdINCKvR2H-XQZJVxRxcZaKOq2/pub?gid=2060167316&single=true&output=csv', upcomingCollectionName: 'TrackAndField' }
 };
+
+  // Make LEAGUE_DATA_CONFIG globally accessible
+  window.LEAGUE_DATA_CONFIG = LEAGUE_DATA_CONFIG;
 
     // ============================================
     // HARDCODED STANDINGS DATA (Generated by scrapers)
@@ -57509,10 +57828,40 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show the appropriate column based on current league and column type
             if (columnType === 'games') {
-                if (currentMobileLeague === 'Home') {
+                // Check selected menu item to determine which column to show
+                const selectedMenuItem = document.querySelector('#menuList li.selected, #menuList-123 li.selected');
+                const selectedSection = selectedMenuItem?.dataset.section || currentMobileLeague || window.currentMobileLeague || 'Home';
+                
+                console.log(`[showMobileColumn] Games button clicked, selectedSection: ${selectedSection}`);
+                
+                if (selectedSection === 'Home') {
                     document.getElementById('games-column')?.classList.add('mobile-active');
+                    console.log(`[showMobileColumn] Showing games-column for Home`);
                 } else {
-                    document.getElementById('league-specific-column')?.classList.add('mobile-active');
+                    const leagueSpecificColumn = document.getElementById('league-specific-column');
+                    if (leagueSpecificColumn) {
+                        leagueSpecificColumn.classList.add('mobile-active');
+                        console.log(`[showMobileColumn] Showing league-specific-column for ${selectedSection}`);
+                        
+                        // Ensure the column is visible and has display: block
+                        leagueSpecificColumn.style.display = 'block';
+                        
+                        // Verify games are loaded
+                        setTimeout(() => {
+                            const todayContent = document.getElementById('league-schedule-today-content');
+                            if (todayContent) {
+                                const gameRows = todayContent.querySelectorAll('.game-row');
+                                console.log(`[showMobileColumn] Found ${gameRows.length} games in league-schedule-today-content`);
+                                if (gameRows.length === 0) {
+                                    console.warn(`[showMobileColumn] No games found! Reloading league data...`);
+                                    // Reload league data if no games found
+                                    if (typeof window.loadLeagueSpecificData === 'function') {
+                                        window.loadLeagueSpecificData(selectedSection);
+                                    }
+                                }
+                            }
+                        }, 100);
+                    }
                 }
             } else if (columnType === 'news') {
                 document.querySelector('.column.news')?.classList.add('mobile-active');
@@ -57675,77 +58024,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (mobileGamesBtn) {
         mobileGamesBtn.addEventListener('click', () => {
-            // Check if a game is currently selected
-            const hasSelectedGame = window.currentSelectedGameId != null && window.currentSelectedGameId !== undefined;
-            
-            if (hasSelectedGame) {
-                // Reset to league-level data
-                try {
-                    // Clear selected game ID
-                    window.currentSelectedGameId = null;
-                    window.persistGameHighlight = false;
-                    
-                    // Remove selected classes from all game rows
-                    document.querySelectorAll('.game-row.selected, .game-row.active, .game-row.game-separator.active, .game-separator-line.active-above').forEach(row => {
-                        row.classList.remove('selected', 'active', 'active-above');
-                        row.style.backgroundColor = '';
-                        row.style.color = '';
-                        const cells = row.querySelectorAll('td');
-                        cells.forEach(cell => {
-                            cell.style.color = '';
-                            cell.style.backgroundColor = '';
-                        });
-                    });
-                    
-                    // Reset column backgrounds to default for league mode
-                    const newsColumn = document.querySelector('.column.news');
-                    if (newsColumn) {
-                        newsColumn.style.backgroundColor = '#fafaf9';
-                    }
-                    const socialColumn = document.querySelector('.column.social');
-                    if (socialColumn) {
-                        socialColumn.style.backgroundColor = '';
-                    }
-                    
-                    // Reset news header border for league mode
-                    const newsHeader = document.querySelector('.news-header');
-                    if (newsHeader) {
-                        newsHeader.style.borderBottom = '1px solid #1f1f1f';
-                    }
-                    
-                    // Reload league-level data for news, social, and media columns
-                    const section = currentMobileLeague || 'Home';
-                    
-                    // Reset news to league level
-                    if (window.renderNews) {
-                        window.renderNews(section, 'league');
-                    }
-                    
-                    // Reset social to league level
-                    // Clear currentFeedSection to force reload
-                    if (typeof currentFeedSection !== 'undefined') {
-                        currentFeedSection = null;
-                    }
-                    // Clear social feed container
-                    const socialContainer = document.getElementById('social-feed-container');
-                    if (socialContainer) {
-                        socialContainer.innerHTML = '';
-                    }
-                    // Reload league-level social feed
-                    if (typeof loadSocialFeed === 'function') {
-                        loadSocialFeed(section);
-                    }
-                    
-                    // Reset videos/media to league level
-                    if (typeof initializeVideosColumn === 'function') {
-                        initializeVideosColumn(section);
-                    }
-                } catch (error) {
-                    console.error('Error resetting to league-level data:', error);
-                }
-            }
-            
-            // Show games column
+            // Show games column - keep game-specific content in news, social, media columns
+            // Game-specific content will only reset when:
+            // 1. User clicks on main menu and switches to a different league
+            // 2. User clicks on a new game from the League > Games column
             showMobileColumn('games');
         });
     }
