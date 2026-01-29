@@ -1355,6 +1355,10 @@ body {
   #menuList .league-name.selected {
     color: white !important;
   }
+  /* When URL-only league is expanded: bold + white only, no gray highlight */
+  #menuList li.url-only-expanded .league-name.selected {
+    background-color: transparent;
+  }
 
   #menuList ul {
     padding-left: 0;
@@ -8629,10 +8633,13 @@ function loadCustomRSSFeed(feedUrl, container) {
                     const clickedNestedItem = e.target.closest('.url-only-nested li');
                     if (nested && clickedNestedItem) {
                         const action = clickedNestedItem.dataset.action;
-                        if (action === 'news') {
+                        if (action === 'news' && mainMenuUrlOnly.url) {
                             window.open(mainMenuUrlOnly.url, '_blank', 'noopener,noreferrer');
+                        } else if (action === 'social' && mainMenuUrlOnly.socialUrl) {
+                            window.open(mainMenuUrlOnly.socialUrl, '_blank', 'noopener,noreferrer');
+                        } else if (action === 'media' && mainMenuUrlOnly.mediaUrl) {
+                            window.open(mainMenuUrlOnly.mediaUrl, '_blank', 'noopener,noreferrer');
                         }
-                        // Social and Media: URLs to be added later
                         return;
                     }
                     // Active styling: only the league name (span), not the nested list
@@ -40862,8 +40869,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Main menu URL-only leagues: logo + name; click opens external URL in new tab (no thporth.com league page).
     // Exposed on window so the main menu click handler (in an earlier script) can access it.
     const MAIN_MENU_URL_ONLY_LEAGUES = {
-        'Rugby': { displayName: 'Rugby', logoUrl: 'https://thporth.com/rugby.png', url: 'https://www.rugbypass.com/news/' },
-        'Cycling': { displayName: 'Cycling', logoUrl: 'https://thporth.com/cycling.png', url: 'https://www.cyclingnews.com/' },
+        'Rugby': { displayName: 'Rugby', logoUrl: 'https://thporth.com/rugby.png', url: 'https://www.rugbypass.com/', socialUrl: 'https://x.com/RugbyPass', mediaUrl: 'https://www.youtube.com/@FloRugby/videos' },
+        'Cycling': { displayName: 'Cycling', logoUrl: 'https://thporth.com/cycling.png', url: 'https://www.cyclingnews.com/', socialUrl: 'https://x.com/cyclingontnt', mediaUrl: 'https://www.youtube.com/@TNTSportsCycling/videos' },
         'HorseRacing': { displayName: 'Horse Racing', logoUrl: 'https://thporth.com/horse-racing.png', url: 'https://www.drf.com/' },
         'Volleyball': { displayName: 'Volleyball', logoUrl: 'https://thporth.com/volleyball.png', url: 'https://en.volleyballworld.com/news/' },
         'TrackAndField': { displayName: 'Track & Field', logoUrl: 'https://thporth.com/track-and-field.png', url: 'https://trackandfieldnews.com/' },
@@ -40871,7 +40878,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'Swimming': { displayName: 'Swimming', logoUrl: 'https://thporth.com/swimming.png', url: 'https://swimswam.com/' },
         'WinterSports': { displayName: 'Winter Sports', logoUrl: 'https://thporth.com/skiing.png', url: 'https://www.tntsports.co.uk/winter-sports/' },
         'Lacrosse': { displayName: 'Lacrosse', logoUrl: 'https://thporth.com/lacrosse.png', url: 'https://www.insidelacrosse.com/' },
-        'TGL': { displayName: 'TGL', logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f7/TGL_logo.png', url: 'https://tglgolf.com/' }
+        'TGL': { displayName: 'TGL', logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f7/TGL_logo.png', url: 'https://tglgolf.com/', socialUrl: 'https://x.com/TGL', mediaUrl: 'https://www.youtube.com/@TGL' }
     };
     window.MAIN_MENU_URL_ONLY_LEAGUES = MAIN_MENU_URL_ONLY_LEAGUES;
 
