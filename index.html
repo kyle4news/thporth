@@ -2794,6 +2794,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
            <!-- <li data-section="NCAASoftball"><img src="https://static.flashscore.com/res/image/data/UN5z4YU1-423yojZa.png" alt="NCAA Softball" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">NCAA Softball</li> -->
             <li data-section="MotoGP"><img src="https://thporth.com/motogp.png" alt="MotoGP" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">MotoGP</li>
             <li data-section="LPGATour"><img src="https://thporth.com/LPGATour.png" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">LPGA Tour</li>
+            <li data-section="TGL" style="color: #9E9E9E;"><img src="https://upload.wikimedia.org/wikipedia/en/f/f7/TGL_logo.png" alt="TGL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">TGL</li>
             <li data-section="Cricket" style="color: #9E9E9E;"><img src="https://thporth.com/cricket.png" alt="Cricket" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Cricket</li>
             <li data-section="Rugby" style="color: #9E9E9E;"><img src="https://thporth.com/rugby.png" alt="Rugby" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Rugby</li>
             <li data-section="Cycling" style="color: #9E9E9E;"><img src="https://thporth.com/cycling.png" alt="Cycling" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Cycling</li>
@@ -2844,6 +2845,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li data-section="Softball" style="color: #9E9E9E;"><img src="https://thporth.com/softball.png" alt="Softball" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Softball</li>
             <li data-section="Swimming" style="color: #9E9E9E;"><img src="https://thporth.com/swimming.png" alt="Swimming" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Swimming</li>
             <li data-section="Tennis"><img src="https://thporth.com/atp.png" alt="Tennis" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Tennis</li>
+            <li data-section="TGL" style="color: #9E9E9E;"><img src="https://upload.wikimedia.org/wikipedia/en/f/f7/TGL_logo.png" alt="TGL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">TGL</li>
             <li data-section="TrackAndField" style="color: #9E9E9E;"><img src="https://thporth.com/track-and-field.png" alt="Track & Field" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Track & Field</li>
             <li data-section="UFC"><img src="https://static.flashscore.com/res/image/data/tx44OMld-rojuRsh2.png" alt="UFC" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">UFC</li>
             <li data-section="UEFAChampionsLeague"><img src="https://thporth.com/UCL.png" alt="UEFA Champions League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">UEFA Champions League</li>
@@ -2958,8 +2960,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <ul style="padding-left: 10px;">
               <li data-section="PGATour"><img src="https://thporth.com/PGATour.png" alt="PGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">PGA Tour</li>
               <li data-section="LIVGolf"><img src="https://thporth.com/LIVGolf.png" alt="LIV Golf" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">LIV Golf</li>
-           <!--    <li data-section="TGL">TGL</li> -->
               <li data-section="LPGATour"><img src="https://thporth.com/LPGATour.png" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">LPGA Tour</li>
+              <li data-section="TGL" style="color: #9E9E9E;"><img src="https://upload.wikimedia.org/wikipedia/en/f/f7/TGL_logo.png" alt="TGL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">TGL</li>
          <!--      <li data-section="PGAChampions">PGA Champions</li>
               <li data-section="DPWorldTour">DP World Tour</li>
               <li data-section="KornFerryTour">Korn Ferry Tour</li> -->
@@ -4905,6 +4907,9 @@ function loadCustomRSSFeed(feedUrl, container) {
    document.querySelectorAll("#menuList li[data-section]").forEach(item => {
      item.addEventListener("click", () => {
        const section = item.dataset.section;
+       // MAIN MENU URL ONLY: do not change social column; link opens in new tab only
+       if (section && window.MAIN_MENU_URL_ONLY_LEAGUES && window.MAIN_MENU_URL_ONLY_LEAGUES[section] && window.MAIN_MENU_URL_ONLY_LEAGUES[section].url) return;
+       if (section === 'Cricket') return;
        currentFeedSection = null; // Reset so a new feed loads
        loadSocialFeed(section);
      });
@@ -8578,6 +8583,23 @@ function loadCustomRSSFeed(feedUrl, container) {
                     e.stopPropagation();
                     return;
                 }
+                const section = item.dataset.section;
+                // MAIN MENU URL ONLY: open in new tab only; do not change selection or affect social/media columns
+                const mainMenuUrlOnly = section && window.MAIN_MENU_URL_ONLY_LEAGUES && window.MAIN_MENU_URL_ONLY_LEAGUES[section];
+                if (mainMenuUrlOnly && mainMenuUrlOnly.url) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.open(mainMenuUrlOnly.url, '_blank', 'noopener,noreferrer');
+                    return;
+                }
+                // Cricket: open both URLs in new tabs only
+                if (section === 'Cricket') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.open('https://espncricinfo.com', '_blank');
+                    window.open('https://cricbuzz.com', '_blank');
+                    return;
+                }
                 e.stopPropagation();
                 
                 // Scroll to top when navigating to a new page
@@ -8616,22 +8638,6 @@ function loadCustomRSSFeed(feedUrl, container) {
                 
                 // Scroll the selected item into view in the menu
                 item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                const section = item.dataset.section;
-
-                // Special handling for Cricket - open both URLs in new tabs
-                if (section === 'Cricket') {
-                    e.preventDefault();
-                    window.open('https://espncricinfo.com', '_blank');
-                    window.open('https://cricbuzz.com', '_blank');
-                    return;
-                }
-                // Main menu URL-only leagues: open single URL in new tab
-                const mainMenuUrlOnly = typeof MAIN_MENU_URL_ONLY_LEAGUES !== 'undefined' && MAIN_MENU_URL_ONLY_LEAGUES[section];
-                if (mainMenuUrlOnly && mainMenuUrlOnly.url) {
-                    e.preventDefault();
-                    window.open(mainMenuUrlOnly.url, '_blank');
-                    return;
-                }
 
                 if (section === 'Home') {
                     gamesColumn.style.display = 'flex';
@@ -40794,17 +40800,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Main menu URL-only leagues: logo + name + single URL that opens in new tab (no league page on thporth.com).
     // Set url to the destination when clicked; use '#' as placeholder until you set real external URLs.
+    // Main menu URL-only leagues: logo + name; click opens external URL in new tab (no thporth.com league page).
+    // Exposed on window so the main menu click handler (in an earlier script) can access it.
     const MAIN_MENU_URL_ONLY_LEAGUES = {
-        'Rugby': { displayName: 'Rugby', logoUrl: 'https://thporth.com/rugby.png', url: 'https://www.espn.com/rugby/' },
-        'Cycling': { displayName: 'Cycling', logoUrl: 'https://thporth.com/cycling.png', url: 'https://www.espn.com/cycling/' },
-        'HorseRacing': { displayName: 'Horse Racing', logoUrl: 'https://thporth.com/horse-racing.png', url: 'https://www.espn.com/horse-racing/' },
-        'Volleyball': { displayName: 'Volleyball', logoUrl: 'https://thporth.com/volleyball.png', url: 'https://www.espn.com/volleyball/' },
-        'TrackAndField': { displayName: 'Track & Field', logoUrl: 'https://thporth.com/track-and-field.png', url: 'https://www.espn.com/track-and-field/' },
-        'Softball': { displayName: 'Softball', logoUrl: 'https://thporth.com/softball.png', url: 'https://www.espn.com/softball/' },
-        'Swimming': { displayName: 'Swimming', logoUrl: 'https://thporth.com/swimming.png', url: 'https://www.espn.com/swimming/' },
-        'WinterSports': { displayName: 'Winter Sports', logoUrl: 'https://thporth.com/skiing.png', url: 'https://www.espn.com/winter-sports/' },
-        'Lacrosse': { displayName: 'Lacrosse', logoUrl: 'https://thporth.com/lacrosse.png', url: 'https://www.espn.com/lacrosse/' }
+        'Rugby': { displayName: 'Rugby', logoUrl: 'https://thporth.com/rugby.png', url: 'https://www.rugbypass.com/news/' },
+        'Cycling': { displayName: 'Cycling', logoUrl: 'https://thporth.com/cycling.png', url: 'https://www.cyclingnews.com/' },
+        'HorseRacing': { displayName: 'Horse Racing', logoUrl: 'https://thporth.com/horse-racing.png', url: 'https://www.drf.com/' },
+        'Volleyball': { displayName: 'Volleyball', logoUrl: 'https://thporth.com/volleyball.png', url: 'https://en.volleyballworld.com/news/' },
+        'TrackAndField': { displayName: 'Track & Field', logoUrl: 'https://thporth.com/track-and-field.png', url: 'https://trackandfieldnews.com/' },
+        'Softball': { displayName: 'Softball', logoUrl: 'https://thporth.com/softball.png', url: 'https://www.on3.com/softball' },
+        'Swimming': { displayName: 'Swimming', logoUrl: 'https://thporth.com/swimming.png', url: 'https://swimswam.com/' },
+        'WinterSports': { displayName: 'Winter Sports', logoUrl: 'https://thporth.com/skiing.png', url: 'https://www.tntsports.co.uk/winter-sports/' },
+        'Lacrosse': { displayName: 'Lacrosse', logoUrl: 'https://thporth.com/lacrosse.png', url: 'https://www.insidelacrosse.com/' },
+        'TGL': { displayName: 'TGL', logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f7/TGL_logo.png', url: 'https://tglgolf.com/' }
     };
+    window.MAIN_MENU_URL_ONLY_LEAGUES = MAIN_MENU_URL_ONLY_LEAGUES;
 
     // URL-only leagues: header-only sections in games column (no games). Like hardcoded_today_schedules but per league/day.
     // Each entry: date ('YYYY-MM-DD'), name, url, startTime, endTime ('HH:mm' 24h EST), time ('7:30 pm' EST for "before").
@@ -58124,6 +58134,9 @@ document.addEventListener('DOMContentLoaded', function() {
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
             const section = this.dataset.section;
+            // MAIN MENU URL ONLY: do not change media column; link opens in new tab only
+            if (section && window.MAIN_MENU_URL_ONLY_LEAGUES && window.MAIN_MENU_URL_ONLY_LEAGUES[section] && window.MAIN_MENU_URL_ONLY_LEAGUES[section].url) return;
+            if (section === 'Cricket') return;
             initializeVideosColumn(section);
         });
     });
@@ -58292,6 +58305,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // { section: 'NCAASoftball', text: 'NCAA Softball' },
             { section: 'MotoGP', text: 'MotoGP' },
             { section: 'LPGATour', text: 'LPGA Tour' },
+            { section: 'TGL', text: 'TGL' },
             { section: 'Cricket', text: 'Cricket' },
             { section: 'Rugby', text: 'Rugby' },
             { section: 'Cycling', text: 'Cycling' },
@@ -58320,7 +58334,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectMobileLeague(section, displayName) {
         try {
             // Main menu URL-only leagues: open URL in new tab and close menu (no in-app league view)
-            const mainMenuUrlOnly = typeof MAIN_MENU_URL_ONLY_LEAGUES !== 'undefined' && MAIN_MENU_URL_ONLY_LEAGUES[section];
+            const mainMenuUrlOnly = window.MAIN_MENU_URL_ONLY_LEAGUES && window.MAIN_MENU_URL_ONLY_LEAGUES[section];
             if (mainMenuUrlOnly && mainMenuUrlOnly.url) {
                 window.open(mainMenuUrlOnly.url, '_blank');
                 if (mobileLeagueMenu) mobileLeagueMenu.style.display = 'none';
