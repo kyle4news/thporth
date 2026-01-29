@@ -5957,7 +5957,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (contentType === 'news') {
                     console.log(`[loadGameContent] Rendering news team tabs for ${awayTeam} vs ${homeTeam}`);
                     try {
-                        renderNewsWithTeamTabs(homeTeam, awayTeam, container, isSoccer);
+                        renderNewsWithTeamTabs(homeTeam, awayTeam, container, isSoccer, league);
                     } catch (error) {
                         console.error('[loadGameContent] Error in renderNewsWithTeamTabs:', error);
                         container.innerHTML = `
@@ -5974,7 +5974,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (contentType === 'social') {
                     console.log(`[loadGameContent] Rendering social team tabs for ${awayTeam} vs ${homeTeam}`);
                     try {
-                        renderSocialWithTeamTabs(homeTeam, awayTeam, container, isSoccer);
+                        renderSocialWithTeamTabs(homeTeam, awayTeam, container, isSoccer, league);
                     } catch (error) {
                         console.error('[loadGameContent] Error in renderSocialWithTeamTabs:', error);
                         container.innerHTML = `
@@ -5991,7 +5991,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (contentType === 'media') {
                     console.log(`[loadGameContent] Rendering media team tabs for ${awayTeam} vs ${homeTeam}`);
                     try {
-                        renderMediaWithTeamTabs(homeTeam, awayTeam, container, isSoccer);
+                        renderMediaWithTeamTabs(homeTeam, awayTeam, container, isSoccer, league);
                     } catch (error) {
                         console.error('[loadGameContent] Error in renderMediaWithTeamTabs:', error);
                         container.innerHTML = `
@@ -7160,18 +7160,22 @@ function loadCustomRSSFeed(feedUrl, container) {
         }
         
         // Helper function to render news with team tabs (side by side, matching social/media columns)
-        function renderNewsWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false) {
-            console.log('[renderNewsWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer });
+        function renderNewsWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false, league = '') {
+            console.log('[renderNewsWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer, league });
             
             if (!container) {
                 console.error('[renderNewsWithTeamTabs] Container is null/undefined!');
                 return;
             }
             
-            const homeShort = getShortTeamName(homeTeam);
-            const awayShort = getShortTeamName(awayTeam);
-            const homeFeedUrls = getTeamNewsFeeds(homeTeam);
-            const awayFeedUrls = getTeamNewsFeeds(awayTeam);
+            // Use display name from team alias mappings if available, otherwise fall back to short name
+            const homeDisplayName = (league && typeof getDisplayNameSync === 'function') ? getDisplayNameSync(homeTeam, league) : getShortTeamName(homeTeam);
+            const awayDisplayName = (league && typeof getDisplayNameSync === 'function') ? getDisplayNameSync(awayTeam, league) : getShortTeamName(awayTeam);
+            const homeShort = homeDisplayName;
+            const awayShort = awayDisplayName;
+            // Try original name first, then display name for feed lookup
+            const homeFeedUrls = getTeamNewsFeeds(homeTeam) || getTeamNewsFeeds(homeDisplayName);
+            const awayFeedUrls = getTeamNewsFeeds(awayTeam) || getTeamNewsFeeds(awayDisplayName);
             
             // Build tabs array - for soccer, home team first; for others, away team first
             const tabs = isSoccer ? [
@@ -7580,18 +7584,22 @@ function loadCustomRSSFeed(feedUrl, container) {
         };
         
         // Helper function to render social with team tabs
-        function renderSocialWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false) {
-            console.log('[renderSocialWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer });
+        function renderSocialWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false, league = '') {
+            console.log('[renderSocialWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer, league });
             
             if (!container) {
                 console.error('[renderSocialWithTeamTabs] Container is null/undefined!');
                 return;
             }
             
-            const homeShort = getShortTeamName(homeTeam);
-            const awayShort = getShortTeamName(awayTeam);
-            const homeFeedUrl = TEAM_TO_RSS_FEED[homeTeam];
-            const awayFeedUrl = TEAM_TO_RSS_FEED[awayTeam];
+            // Use display name from team alias mappings if available, otherwise fall back to short name
+            const homeDisplayName = (league && typeof getDisplayNameSync === 'function') ? getDisplayNameSync(homeTeam, league) : getShortTeamName(homeTeam);
+            const awayDisplayName = (league && typeof getDisplayNameSync === 'function') ? getDisplayNameSync(awayTeam, league) : getShortTeamName(awayTeam);
+            const homeShort = homeDisplayName;
+            const awayShort = awayDisplayName;
+            // Try original name first, then display name for feed lookup
+            const homeFeedUrl = TEAM_TO_RSS_FEED[homeTeam] || TEAM_TO_RSS_FEED[homeDisplayName] || null;
+            const awayFeedUrl = TEAM_TO_RSS_FEED[awayTeam] || TEAM_TO_RSS_FEED[awayDisplayName] || null;
             
             console.log('[renderSocialWithTeamTabs] Feed URLs:', { homeFeedUrl, awayFeedUrl, homeShort, awayShort });
             
@@ -8036,18 +8044,22 @@ function loadCustomRSSFeed(feedUrl, container) {
         }
         
         // Helper function to render media with team tabs (similar to renderSocialWithTeamTabs)
-        function renderMediaWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false) {
-            console.log('[renderMediaWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer });
+        function renderMediaWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false, league = '') {
+            console.log('[renderMediaWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer, league });
             
             if (!container) {
                 console.error('[renderMediaWithTeamTabs] Container is null/undefined!');
                 return;
             }
             
-            const homeShort = getShortTeamName(homeTeam);
-            const awayShort = getShortTeamName(awayTeam);
-            const homeFeedUrl = TEAM_TO_MEDIA_FEED[homeTeam] || null;
-            const awayFeedUrl = TEAM_TO_MEDIA_FEED[awayTeam] || null;
+            // Use display name from team alias mappings if available, otherwise fall back to short name
+            const homeDisplayName = (league && typeof getDisplayNameSync === 'function') ? getDisplayNameSync(homeTeam, league) : getShortTeamName(homeTeam);
+            const awayDisplayName = (league && typeof getDisplayNameSync === 'function') ? getDisplayNameSync(awayTeam, league) : getShortTeamName(awayTeam);
+            const homeShort = homeDisplayName;
+            const awayShort = awayDisplayName;
+            // Try original name first, then display name for feed lookup
+            const homeFeedUrl = TEAM_TO_MEDIA_FEED[homeTeam] || TEAM_TO_MEDIA_FEED[homeDisplayName] || null;
+            const awayFeedUrl = TEAM_TO_MEDIA_FEED[awayTeam] || TEAM_TO_MEDIA_FEED[awayDisplayName] || null;
             
             console.log('[renderMediaWithTeamTabs] Feed URLs:', { homeFeedUrl, awayFeedUrl, homeShort, awayShort });
             
@@ -39320,45 +39332,45 @@ document.addEventListener('DOMContentLoaded', function () {
  ],
 
     'PGATour': [
-    { date: '2026-01-22', time: '11:30 am', startTime: '11:30', endTime: '17:15', home: 'The AMEX', away: 'First Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-01-23', time: '11:30 am', startTime: '11:30', endTime: '17:15', home: 'The AMEX', away: 'Second Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-01-24', time: '11:30 am', startTime: '11:30', endTime: '17:30', home: 'The AMEX', away: 'Third Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-01-25', time: '11:30 am', startTime: '11:30', endTime: '17:30', home: 'The AMEX', away: 'Final Round', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
+    { date: '2026-01-22', time: '11:30 am', startTime: '11:30', endTime: '17:15', home: 'First Round', away: 'The AMEX', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-23', time: '11:30 am', startTime: '11:30', endTime: '17:15', home: 'Second Round', away: 'The AMEX', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-24', time: '11:30 am', startTime: '11:30', endTime: '17:30', home: 'Third Round', away: 'The AMEX', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-25', time: '11:30 am', startTime: '11:30', endTime: '17:30', home: 'Final Round', away: 'The AMEX', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
 
-  { date: '2026-01-29', time: '3:00 pm', startTime: '15:00', endTime: '20:45', home: 'Farmers', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-01-30', time: '3:00 pm', startTime: '15:00', endTime: '20:45', home: 'Farmers', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-01-31', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Farmers', away: 'Third Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-01', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Farmers', away: 'Final Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-29', time: '3:00 pm', startTime: '15:00', endTime: '20:45', home: 'First Round', away: 'Farmers', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-30', time: '3:00 pm', startTime: '15:00', endTime: '20:45', home: 'Second Round', away: 'Farmers', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-01-31', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Third Round', away: 'Farmers', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-01', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Final Round', away: 'Farmers', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
 
-  { date: '2026-02-05', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Phoenix Open', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-06', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Phoenix Open', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-07', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'Phoenix Open', away: 'Third Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-08', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'Phoenix Open', away: 'Final Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-05', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'First Round', away: 'Phoenix Open', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-06', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Second Round', away: 'Phoenix Open', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-07', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'Third Round', away: 'Phoenix Open', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-08', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'Final Round', away: 'Phoenix Open', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
 
-  { date: '2026-02-12', time: '12:00 pm', startTime: '12:00', endTime: '17:45', home: 'Pebble Beach', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-13', time: '12:00 pm', startTime: '12:00', endTime: '17:45', home: 'Pebble Beach', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-14', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Pebble Beach', away: 'Third Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-15', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Pebble Beach', away: 'Final Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-12', time: '12:00 pm', startTime: '12:00', endTime: '17:45', home: 'First Round', away: 'Pebble Beach', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-13', time: '12:00 pm', startTime: '12:00', endTime: '17:45', home: 'Second Round', away: 'Pebble Beach', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-14', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Third Round', away: 'Pebble Beach', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-15', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Final Round', away: 'Pebble Beach', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
 
-  { date: '2026-02-19', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Genesis', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-20', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Genesis', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-21', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Genesis', away: 'Third Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-22', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Genesis', away: 'Final Round', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-19', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'First Round', away: 'Genesis', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-20', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Second Round', away: 'Genesis', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-21', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Third Round', away: 'Genesis', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-22', time: '12:00 pm', startTime: '12:00', endTime: '18:00', home: 'Final Round', away: 'Genesis', channel: 'CBS', url: 'https://www.pgatour.com/leaderboard' },
 
-  { date: '2026-02-26', time: '', startTime: '', endTime: '', home: 'Cognizant', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-27', time: '', startTime: '', endTime: '', home: 'Cognizant', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-02-28', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Cognizant', away: 'Third Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-03-01', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Cognizant', away: 'Final Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-26', time: '', startTime: '', endTime: '', home: 'First Round', away: 'Cognizant', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-27', time: '', startTime: '', endTime: '', home: 'Second Round', away: 'Cognizant', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-02-28', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Third Round', away: 'Cognizant', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-01', time: '3:00 pm', startTime: '15:00', endTime: '21:00', home: 'Final Round', away: 'Cognizant', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
 
-  { date: '2026-03-05', time: '2:00 pm', startTime: '14:00', endTime: '19:45', home: 'Arnold Palmer', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-03-06', time: '2:00 pm', startTime: '14:00', endTime: '19:45', home: 'Arnold Palmer', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-03-07', time: '2:30 pm', startTime: '14:30', endTime: '20:30', home: 'Arnold Palmer', away: 'Third Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-03-08', time: '2:30 pm', startTime: '14:30', endTime: '20:30', home: 'Arnold Palmer', away: 'Final Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-05', time: '2:00 pm', startTime: '14:00', endTime: '19:45', home: 'First Round', away: 'Arnold Palmer', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-06', time: '2:00 pm', startTime: '14:00', endTime: '19:45', home: 'Second Round', away: 'Arnold Palmer', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-07', time: '2:30 pm', startTime: '14:30', endTime: '20:30', home: 'Third Round', away: 'Arnold Palmer', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-08', time: '2:30 pm', startTime: '14:30', endTime: '20:30', home: 'Final Round', away: 'Arnold Palmer', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
 
-  { date: '2026-03-12', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'THE PLAYERS', away: 'First Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-03-13', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'THE PLAYERS', away: 'Second Round', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-03-14', time: '2:00 pm', startTime: '14:00', endTime: '20:00', home: 'THE PLAYERS', away: 'Third Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
-  { date: '2026-03-15', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'THE PLAYERS', away: 'Final Round', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-12', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'First Round', away: 'THE PLAYERS', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-13', time: '1:00 pm', startTime: '13:00', endTime: '18:45', home: 'Second Round', away: 'THE PLAYERS', channel: 'GOLF', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-14', time: '2:00 pm', startTime: '14:00', endTime: '20:00', home: 'Third Round', away: 'THE PLAYERS', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
+  { date: '2026-03-15', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'Final Round', away: 'THE PLAYERS', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
 ],
 
 'UFC': [
@@ -40367,10 +40379,147 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Make functions globally accessible
+    /**
+     * Get display name synchronously using cached mappings (for use in render functions)
+     * @param {string} teamName - The team name variation to look up
+     * @param {string} league - The league field (e.g., 'USA: NBA', 'Premier League')
+     * @returns {string} The display name, or original name if no mapping found
+     */
+    function getDisplayNameSync(teamName, league) {
+        if (!teamName || !league) return teamName;
+        
+        // Convert league to league key (same logic as getCanonicalTeamName)
+        let leagueKey = league;
+        // NCAA Leagues (from NCAA API)
+        if (league === 'USA: NCAA' || (league.includes('NCAA') && league.includes('Men'))) {
+            leagueKey = 'NCAAM';
+        } else if (league === 'USA: NCAA Women' || (league.includes('NCAA') && league.includes('Women'))) {
+            leagueKey = 'NCAAW';
+        } else if (league === 'NCAAF' || (league.includes('NCAA') && league.includes('Football'))) {
+            leagueKey = 'NCAAF';
+        }
+        // ESPN API - US Leagues
+        else if (league === 'USA: NFL' || league === 'NFL') {
+            leagueKey = 'NFL';
+        } else if (league === 'USA: NBA' || league === 'NBA') {
+            leagueKey = 'NBA';
+        } else if (league === 'USA: WNBA' || league === 'WNBA') {
+            leagueKey = 'WNBA';
+        } else if (league === 'USA: MLB' || league === 'MLB') {
+            leagueKey = 'MLB';
+        } else if (league === 'USA: NHL' || league === 'NHL') {
+            leagueKey = 'NHL';
+        } else if (league === 'USA: MLS' || league === 'MLS') {
+            leagueKey = 'MLS';
+        } else if (league === 'USA: NWSL Women' || league === 'NWSL' || league.includes('NWSL')) {
+            leagueKey = 'NWSL';
+        }
+        // ESPN API - Soccer Leagues
+        else if (league === 'England: Premier League' || league === 'Premier League' || league.includes('Premier League')) {
+            leagueKey = 'PremierLeague';
+        } else if (league === 'Spain: LaLiga' || league === 'La Liga' || league === 'LaLiga') {
+            leagueKey = 'LaLiga';
+        } else if (league === 'Germany: Bundesliga' || league === 'Bundesliga') {
+            leagueKey = 'Bundesliga';
+        } else if (league === 'Italy: Serie A' || league === 'Serie A' || league === 'SerieA') {
+            leagueKey = 'SerieA';
+        } else if (league === 'France: Ligue 1' || league === 'Ligue 1' || league === 'Ligue1') {
+            leagueKey = 'Ligue1';
+        } else if (league === 'Mexico: Liga MX' || league.includes('Liga MX')) {
+            leagueKey = 'LigaMX';
+        } else if (league === 'Netherlands: Eredivisie' || league === 'Eredivisie') {
+            leagueKey = 'Eredivisie';
+        } else if (league === 'Portugal: Liga Portugal' || league === 'Liga Portugal' || league === 'LigaPortugal') {
+            leagueKey = 'LigaPortugal';
+        } else if (league === 'Belgium: Jupiler Pro League' || league === 'Belgian Pro League' || league.includes('Belgian Pro League')) {
+            leagueKey = 'BelgianProLeague';
+        } else if (league === 'Scotland: Premiership' || league.includes('Scottish Premiership')) {
+            leagueKey = 'ScottishPremiership';
+        } else if (league === 'Saudi Arabia: Saudi Professional League' || league.includes('Saudi Professional League')) {
+            leagueKey = 'SaudiProLeague';
+        } else if (league === 'England: Championship' || league === 'EFL Championship' || league.includes('Championship')) {
+            leagueKey = 'EFLChampionship';
+        } else if (league === 'Turkey: Super Lig' || league === 'Turkish Super Lig' || league === 'SuperLig' || league === 'Super Lig') {
+            leagueKey = 'SuperLig';
+        } else if (league === 'USA: USL Championship' || league === 'USL Championship' || league.includes('USL Championship')) {
+            leagueKey = 'USLChampionship';
+        } else if (league === 'Argentina: Torneo Betano - Apertura' || league === 'Argentina: Torneo Betano - Clausura' || league.includes('Argentine Primera') || league.includes('ArgentinePrimera')) {
+            leagueKey = 'ArgentinePrimeraDivision';
+        } else if (league === 'Brazil: Serie A Betano' || league === 'Brasileirao' || league === 'Brasileirão' || league.includes('Brasileirao') || league.includes('Brasileirão')) {
+            leagueKey = 'Brasileirao';
+        } else if (league === 'England: WSL' || league === "Women's Super League" || league.includes("Women's Super League")) {
+            leagueKey = 'WomensSuperLeague';
+        }
+        // ESPN API - UEFA Competitions
+        else if (league === 'UEFA Champions League' || league.includes('Champions League') && !league.includes('Women')) {
+            leagueKey = 'UEFAChampionsLeague';
+        } else if (league === 'UEFA Europa League' || league === 'Europa League' || league.includes('Europa League')) {
+            leagueKey = 'UEFAEuropaLeague';
+        } else if (league === 'UEFA Conference League' || league === 'Conference League' || league.includes('Conference League')) {
+            leagueKey = 'UEFAConferenceLeague';
+        } else if (league === 'Europe: Champions League Women - League phase' || league.includes("Women's Champions League") || league.includes('Womens UCL')) {
+            leagueKey = 'WomensUCL';
+        }
+        // ESPN API - Cup Competitions
+        else if (league === 'England: FA Cup' || league === 'FA Cup' || league === 'FACup') {
+            leagueKey = 'FACup';
+        } else if (league === 'England: EFL Cup' || league === 'Carabao Cup' || league === 'EFLCup') {
+            leagueKey = 'EFLCup';
+        } else if (league === 'Spain: Copa del Rey' || league === 'Copa del Rey' || league === 'CopaDelRey') {
+            leagueKey = 'CopaDelRey';
+        } else if (league === 'Italy: Coppa Italia' || league === 'Coppa Italia' || league === 'CoppaItalia') {
+            leagueKey = 'CoppaItalia';
+        } else if (league === 'France: Coupe de France' || league === 'Coupe de France' || league === 'CoupeDeFrance') {
+            leagueKey = 'CoupeDeFrance';
+        } else if (league === 'Germany: DFB Pokal' || league === 'DFB-Pokal' || league === 'DFBPokal') {
+            leagueKey = 'DFBPokal';
+        } else if (league === 'Scotland: Scottish Cup' || league === 'Scottish Cup' || league === 'ScottishCup') {
+            leagueKey = 'ScottishCup';
+        }
+        // ESPN API - Other Competitions
+        else if (league === 'South America: Copa Libertadores' || league.includes('Copa Libertadores')) {
+            leagueKey = 'CopaLibertadores';
+        } else if (league === 'South America: Copa Sudamericana' || league.includes('Copa Sudamericana')) {
+            leagueKey = 'CopaSudamericana';
+        }
+        
+        // Use cached mappings if available
+        const mappings = window.teamAliasMappingsCache || window.teamAliasMappings || {};
+        const leagueMappings = mappings[leagueKey];
+        if (!leagueMappings) return teamName;
+        
+        // Try exact match first
+        if (leagueMappings[teamName]) {
+            return leagueMappings[teamName];
+        }
+        
+        // Try case-insensitive match
+        const teamNameLower = teamName.toLowerCase();
+        for (const [variation, displayName] of Object.entries(leagueMappings)) {
+            if (!variation.startsWith('_equivalents_') && variation.toLowerCase() === teamNameLower) {
+                return displayName;
+            }
+        }
+        
+        // Try normalized match (remove special chars, normalize whitespace)
+        const normalized = normalizeTeamNameForMatching(teamName);
+        for (const [variation, displayName] of Object.entries(leagueMappings)) {
+            if (!variation.startsWith('_equivalents_')) {
+                const normalizedVariation = normalizeTeamNameForMatching(variation);
+                if (normalizedVariation === normalized) {
+                    return displayName;
+                }
+            }
+        }
+        
+        return teamName;
+    }
+
     window.getCanonicalTeamName = getCanonicalTeamName;
     window.doTeamNamesMatch = doTeamNamesMatch;
     window.getAllTeamNameVariations = getAllTeamNameVariations;
     window.loadTeamAliasMappings = loadTeamAliasMappings;
+    window.getDisplayNameSync = getDisplayNameSync;
 
     // Pre-load mappings on page load and trigger re-render when ready
     loadTeamAliasMappings().then(mappings => {
