@@ -1371,6 +1371,31 @@ body {
     margin-left: 10px;
   }
 
+  /* MAIN MENU URL ONLY: nested dropdown (News, Social, Media) */
+  #menuList .url-only-nested {
+    list-style: none;
+    margin: 0;
+    padding-left: 10px;
+    display: none;
+  }
+  #menuList li.url-only-expanded > .url-only-nested {
+    display: block;
+  }
+  #menuList .url-only-nested li {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    cursor: pointer;
+    margin-left: 0;
+  }
+  #menuList .url-only-nested li .url-only-nested-icon {
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+    flex-shrink: 0;
+    vertical-align: middle;
+  }
+
   #newsSubMenu {
     position: sticky;
     top: 0;
@@ -8584,12 +8609,22 @@ function loadCustomRSSFeed(feedUrl, container) {
                     return;
                 }
                 const section = item.dataset.section;
-                // MAIN MENU URL ONLY: open in new tab only; do not change selection or affect social/media columns
+                // MAIN MENU URL ONLY: nested dropdown (News, Social, Media); league name toggles; News opens league URL
                 const mainMenuUrlOnly = section && window.MAIN_MENU_URL_ONLY_LEAGUES && window.MAIN_MENU_URL_ONLY_LEAGUES[section];
                 if (mainMenuUrlOnly && mainMenuUrlOnly.url) {
                     e.preventDefault();
                     e.stopPropagation();
-                    window.open(mainMenuUrlOnly.url, '_blank', 'noopener,noreferrer');
+                    const nested = item.querySelector('.url-only-nested');
+                    const clickedNestedItem = e.target.closest('.url-only-nested li');
+                    if (nested && clickedNestedItem) {
+                        const action = clickedNestedItem.dataset.action;
+                        if (action === 'news') {
+                            window.open(mainMenuUrlOnly.url, '_blank', 'noopener,noreferrer');
+                        }
+                        // Social and Media: URLs to be added later
+                        return;
+                    }
+                    item.classList.toggle('url-only-expanded');
                     return;
                 }
                 // Cricket: open both URLs in new tabs only
@@ -40815,6 +40850,39 @@ document.addEventListener('DOMContentLoaded', function () {
         'TGL': { displayName: 'TGL', logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f7/TGL_logo.png', url: 'https://tglgolf.com/' }
     };
     window.MAIN_MENU_URL_ONLY_LEAGUES = MAIN_MENU_URL_ONLY_LEAGUES;
+
+    // Inject nested dropdown (News, Social, Media) into every MAIN MENU URL ONLY league list item
+    function initUrlOnlyNestedMenus() {
+        const leagues = window.MAIN_MENU_URL_ONLY_LEAGUES;
+        if (!leagues) return;
+        const newsIcon = 'https://thporth.com/news.png';
+        const socialIcon = 'https://thporth.com/social.png';
+        const mediaIcon = 'https://thporth.com/media.png';
+        document.querySelectorAll('#menuList li[data-section]').forEach(li => {
+            const section = li.dataset.section;
+            if (!leagues[section] || li.querySelector('.url-only-nested')) return;
+            li.classList.add('url-only-league');
+            const ul = document.createElement('ul');
+            ul.className = 'url-only-nested';
+            [ { action: 'news', label: 'News', icon: newsIcon }, { action: 'social', label: 'Social', icon: socialIcon }, { action: 'media', label: 'Media', icon: mediaIcon } ].forEach(function(row) {
+                const item = document.createElement('li');
+                item.dataset.action = row.action;
+                const img = document.createElement('img');
+                img.src = row.icon;
+                img.alt = row.label;
+                img.className = 'url-only-nested-icon';
+                item.appendChild(img);
+                item.appendChild(document.createTextNode(row.label));
+                ul.appendChild(item);
+            });
+            li.appendChild(ul);
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initUrlOnlyNestedMenus);
+    } else {
+        initUrlOnlyNestedMenus();
+    }
 
     // URL-only leagues: header-only sections in games column (no games). Like hardcoded_today_schedules but per league/day.
     // Each entry: date ('YYYY-MM-DD'), name, url, startTime, endTime ('HH:mm' 24h EST), time ('7:30 pm' EST for "before").
