@@ -2121,10 +2121,13 @@ div[id^="breaking-content-"] a:hover {
     display: inline-block !important;
   }
   
-  /* Cricket font color */
-  li[data-section="Cricket"] {
-    color: #9E9E9E !important;
-  }
+  /* Main menu URL-only leagues' font color */
+  li[data-section="Cricket"],
+  li[data-section="TGL"],
+  li[data-section="Unrivaled"] {
+  color: #9E9E9E !important;
+}
+
 </style>
 	  <style>
 		  /* ───────────── Header Styling ───────────── */
@@ -45123,64 +45126,66 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                     
-                // Add separator line between games (but not after the last game)
+                // Add separator line between games (but not after the last game, and only when next game is in same table)
                 // Skip separator lines for hardcoded_today_schedules (only one game per header)
-                if (i < sortedFeaturedGames.length - 1 && !isHardcodedToday) {
-                    const nextData = sortedFeaturedGames[i + 1];
-                    // Get the NEXT game's time label to determine if the line above it should be full width
-                    const nextRawStart = nextData["Start Time"];
-                    const nextMatchStatus = (nextData["Match Status"] || "").toUpperCase();
-                    const nextStageValue = (nextData["Stage"] || "").toUpperCase();
-                    const nextStageTypeValue = (nextData["StageType"] || "").toUpperCase();
-                    const nextStatusValue = (nextData["Status"] || "").toUpperCase();
-                    // Check if POSTPONED is in any field (Stage, Status, StageType, or Match Status)
-                    const nextIsPostponed = nextStageValue.includes("POSTPONED") || nextStatusValue.includes("POSTPONED") || nextStageTypeValue.includes("POSTPONED") || nextMatchStatus.includes("POSTPONED");
-                    // Check if CANCELED is in any field (Stage, Status, StageType, or Match Status)
-                    const nextIsCanceled = nextStageValue.includes("CANCELED") || nextStatusValue.includes("CANCELED") || nextStageTypeValue.includes("CANCELED") || nextMatchStatus.includes("CANCELED");
-                    const nextIsLive = isYesterdayScores ? false : (nextMatchStatus.includes("IN PROGRESS") || nextMatchStatus.includes("LIVE"));
-                    const nextIsFinal = isYesterdayScores || nextMatchStatus.includes("FINISHED") || nextMatchStatus.includes("FINAL") || nextMatchStatus.includes("GAME OVER");
-                    const nextIsPostponedFinal = nextIsFinal && nextIsPostponed;
-                    const nextIsCanceledFinal = nextIsFinal && nextIsCanceled;
-                    let nextTimeLabel = "";
-                    
-                    if (nextData.timeString === '') {
-                        nextTimeLabel = "";
-                    } else if (nextIsLive) {
-                        nextTimeLabel = "Live";
-                    } else if (nextIsPostponed) {
-                        nextTimeLabel = '<span style="color: #545353;">PPD</span>';
-                    } else if (nextIsCanceled) {
-                        nextTimeLabel = '<span style="color: #545353;">Canceled</span>';
-                    } else if (nextIsFinal) {
-                        nextTimeLabel = "F";
-                    } else if (nextRawStart && nextRawStart.toDate) {
-                        nextTimeLabel = luxon.DateTime.fromJSDate(nextRawStart.toDate()).toFormat('h:mm a');
-                    } else {
-                        nextTimeLabel = "TBD";
-                    }
-                    
-                    const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
-                    // Extract plain text from nextTimeLabel for comparison (remove HTML tags)
-                    const nextTimeLabelPlain = nextTimeLabel ? nextTimeLabel.replace(/<[^>]*>/g, '') : '';
-                    const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabelPlain;
-                    
-                    // Check if next game has a different start time from current game
-                    // Compare plain text versions (without HTML) for accurate comparison
-                    const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabelPlain;
-                    const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
-                    
-                    // Check if next game is hardcoded - skip separator if so (hardcoded games are single-game headers)
+                if (i < finalSortedGames.length - 1 && !isHardcodedToday) {
+                    const nextData = finalSortedGames[i + 1];
+                    // Only add separator when next game is in the same table (same title/subheader)
+                    const nextHasHeaderText = 'headerText' in nextData || 'Header Text' in nextData;
+                    const nextHeaderText = nextHasHeaderText ? (nextData.headerText || nextData['Header Text'] || '') : '';
+                    const nextTitleText = nextHasHeaderText ? nextHeaderText : (getLeagueDisplayName(nextData.League, nextData.Sport) || "Other");
                     const nextIsHardcodedToday = nextData.isHardcodedToday === true;
-                    if (nextIsHardcodedToday) {
-                        // Skip separator - hardcoded games don't need separators
-                    } else {
-                        // Set colspan based on comparison (EXACT SAME LOGIC AS REGULAR GAMES SECTION)
-                        // When same time: separator doesn't extend over start time column (team, score, channel only)
-                        // When different time: separator extends full width (time, team, score, channel)
-                        const colspan = isDifferentTime ? 4 : 3;
-                        // For same time: empty cell with non-breaking space to ensure proper rendering
+                    if (titleText === nextTitleText && !nextIsHardcodedToday) {
+                        // Same table - add separator with same logic as league sections: same time = line not over time column; different time = full row
+                        const nextRawStart = nextData["Start Time"];
+                        const nextMatchStatus = (nextData["Match Status"] || "").toUpperCase();
+                        const nextStageValue = (nextData["Stage"] || "").toUpperCase();
+                        const nextStageTypeValue = (nextData["StageType"] || "").toUpperCase();
+                        const nextStatusValue = (nextData["Status"] || "").toUpperCase();
+                        const nextIsPostponed = nextStageValue.includes("POSTPONED") || nextStatusValue.includes("POSTPONED") || nextStageTypeValue.includes("POSTPONED") || nextMatchStatus.includes("POSTPONED");
+                        const nextIsCanceled = nextStageValue.includes("CANCELED") || nextStatusValue.includes("CANCELED") || nextStageTypeValue.includes("CANCELED") || nextMatchStatus.includes("CANCELED");
+                        const nextIsLive = isYesterdayScores ? false : (nextMatchStatus.includes("IN PROGRESS") || nextMatchStatus.includes("LIVE"));
+                        const nextIsFinal = isYesterdayScores || nextMatchStatus.includes("FINISHED") || nextMatchStatus.includes("FINAL") || nextMatchStatus.includes("GAME OVER");
+                        let nextTimeLabel = "";
+                        if (nextData.timeString === '') {
+                            nextTimeLabel = "";
+                        } else if (nextIsLive) {
+                            nextTimeLabel = "Live";
+                        } else if (nextIsPostponed) {
+                            nextTimeLabel = '<span style="color: #545353;">PPD</span>';
+                        } else if (nextIsCanceled) {
+                            nextTimeLabel = '<span style="color: #545353;">Canceled</span>';
+                        } else if (nextIsFinal) {
+                            nextTimeLabel = "F";
+                        } else if (nextRawStart !== undefined && nextRawStart !== null) {
+                            let nextDateObj = null;
+                            if (nextRawStart._seconds !== undefined && nextRawStart._seconds !== null) {
+                                nextDateObj = new Date(nextRawStart._seconds * 1000);
+                            } else if (nextRawStart.toDate && typeof nextRawStart.toDate === 'function') {
+                                nextDateObj = nextRawStart.toDate();
+                            } else if (typeof nextRawStart === 'string' && nextRawStart.length > 0) {
+                                nextDateObj = new Date(nextRawStart);
+                            } else if (nextRawStart instanceof Date) {
+                                nextDateObj = nextRawStart;
+                            }
+                            if (nextDateObj && !isNaN(nextDateObj.getTime())) {
+                                const nextUtcDateTime = luxon.DateTime.fromJSDate(nextDateObj, { zone: 'utc' });
+                                const nextLocalDateTime = nextUtcDateTime.setZone('local');
+                                nextTimeLabel = nextLocalDateTime.toFormat('h:mm a');
+                            } else {
+                                nextTimeLabel = "TBD";
+                            }
+                        } else {
+                            nextTimeLabel = "TBD";
+                        }
+                        const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
+                        const nextTimeLabelPlain = nextTimeLabel ? nextTimeLabel.replace(/<[^>]*>/g, '') : '';
+                        const nextGameTimeLabel = nextNormalizedTimeLabel || nextTimeLabelPlain;
+                        const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabelPlain;
+                        const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
+                        // Same time: separator does NOT extend over time column. Different time: separator extends full row.
+                        const colspan = 4;
                         const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;">&nbsp;</td>';
-                        
                         const separatorRow = currentTable.insertRow();
                         separatorRow.className = "game-separator-line";
                         separatorRow.innerHTML = `${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
@@ -45910,15 +45915,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15059',message:'Separator line comparison',data:{nextTimeLabel,nextNormalizedTimeLabel,nextGameTimeLabel,normalizedTimeLabel,currentTimeLabel,currentGameTimeLabel,isDifferentTime,nextIsLive,nextIsFinal,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
                     // #endregion
                     
-                    // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
-                    // When same start time: separator does NOT extend over time column (starts at team column, colspan=3)
-                    // When different start time: separator DOES extend over time column (starts at time column, colspan=4)
-                    const colspan = isDifferentTime ? 4 : 3;
+                    // Same time: separator does NOT extend over time column. Different time: separator extends full row.
+                    const colspan = isDifferentTime ? 4 : 4;
                     const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15067',message:'Separator colspan decision',data:{colspan,firstCell:firstCell?firstCell.substring(0,50):'',isDifferentTime,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                    // #endregion
-                    
                     const separatorRow = table.insertRow();
                     separatorRow.className = "game-separator-line";
                     separatorRow.innerHTML = `${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
@@ -46078,16 +46077,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             // Show separator if current game is visible AND there's a visible game after it
                             if (currentGameVisible && nextVisibleGameIndex !== -1) {
                                 separatorRow.style.display = '';
-                                
-                                // Update width based on whether next visible game has different time
-                                // Compare normalized times, or raw labels if normalized not available
+                                // Same as initial render: full row when different time, skip time column when same time
                                 const currentTimeForComparison = currentGameTimeLabel || '';
                                 const nextTimeForComparison = nextVisibleGameTimeLabel || '';
                                 const nextVisibleIsDifferentTime = nextTimeForComparison && nextTimeForComparison !== currentTimeForComparison;
-                                const actualColspan = nextVisibleIsDifferentTime ? 4 : 3;
+                                const actualColspan = 4;
                                 const actualFirstCell = nextVisibleIsDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
-                                
-                                // Update the separator row HTML if width changed
                                 separatorRow.innerHTML = `${actualFirstCell}<td colspan="${actualColspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td>`;
                             } else {
                                 separatorRow.style.display = 'none';
@@ -52344,10 +52339,9 @@ async function fetchFeaturedGames() {
                         // Compare normalized times (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
                         const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
                         
-                        // Set colspan based on comparison (EXACT SAME LOGIC AS LEAGUE-SPECIFIC SECTION)
-                        const colspan = isDifferentTime ? 4 : 3;
+                        // Same time: separator does NOT extend over time column. Different time: separator extends full row.
+                        const colspan = isDifferentTime ? 4 : 4;
                         const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
-                        
                         html += `<tr class="game-separator-line">${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td></tr>`;
                     }
                 });
@@ -53611,10 +53605,9 @@ async function fetchFeaturedGames() {
                         const currentGameTimeLabel = normalizedTimeLabel || timeDisplayRaw;
                         const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
                         
-                        // If next game has different time, full width (colspan="4"), otherwise partial width (colspan="3")
-                        const colspan = isDifferentTime ? 4 : 3;
+                        // Same time: separator does NOT extend over time column. Different time: separator extends full row.
+                        const colspan = isDifferentTime ? 4 : 4;
                         const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
-                        
                         html += `<tr class="game-separator-line">${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td></tr>`;
                     }
                     
@@ -53700,10 +53693,9 @@ async function fetchFeaturedGames() {
                         const currentGameTimeLabel = normalizedTimeLabel || timeDisplayRaw;
                         const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
                         
-                        // If next game has different time, full width (colspan="4"), otherwise partial width (colspan="3")
-                        const colspan = isDifferentTime ? 4 : 3;
+                        // Same time: separator does NOT extend over time column. Different time: separator extends full row.
+                        const colspan = isDifferentTime ? 4 : 4;
                         const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
-                        
                         html += `<tr class="game-separator-line">${firstCell}<td colspan="${colspan}" style="padding: 0 0 10px 0; border: none;"><div style="border-top: 1px solid #000000; margin: 0;"></div></td></tr>`;
                     }
                     
