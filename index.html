@@ -1401,6 +1401,9 @@ body {
     cursor: pointer;
     margin-left: 0;
   }
+  #menuList li.url-only-expanded .url-only-nested li {
+    color: white;
+  }
   #menuList .url-only-nested li .url-only-nested-icon {
     width: 12px;
     height: 12px;
@@ -8642,12 +8645,17 @@ function loadCustomRSSFeed(feedUrl, container) {
                         }
                         return;
                     }
-                    // Active styling: only the league name (span), not the nested list
-                    document.querySelectorAll("#menuList li[data-section]").forEach(li => li.classList.remove("selected"));
-                    document.querySelectorAll("#menuList .league-name").forEach(el => el.classList.remove("selected"));
-                    const nameEl = item.querySelector('.league-name');
-                    (nameEl || item).classList.add("selected");
+                    // Toggle expand/collapse first, then apply or remove active styling
                     item.classList.toggle('url-only-expanded');
+                    const nameEl = item.querySelector('.league-name');
+                    const target = nameEl || item;
+                    if (item.classList.contains('url-only-expanded')) {
+                        document.querySelectorAll("#menuList li[data-section]").forEach(li => li.classList.remove("selected"));
+                        document.querySelectorAll("#menuList .league-name").forEach(el => el.classList.remove("selected"));
+                        target.classList.add("selected");
+                    } else {
+                        target.classList.remove("selected");
+                    }
                     return;
                 }
                 // Cricket: open both URLs in new tabs only
