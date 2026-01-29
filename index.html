@@ -39183,7 +39183,7 @@ document.addEventListener('DOMContentLoaded', function () {
 ],
 
     };
-
+// Find hardcoded today schedules
     // Hardcoded today schedules (for leagues without live data - displays in Home > Games > Today)
     // Format: { date, away, home, channel, url }
     // url: link to external site with live data (opens in new tab)
@@ -39250,14 +39250,11 @@ document.addEventListener('DOMContentLoaded', function () {
   { date: '2026-03-15', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'Final Round', away: 'THE PLAYERS', channel: 'NBC', url: 'https://www.pgatour.com/leaderboard' },
 ],
 
-'LPGATour':
-[
-{ date: '2026-01-29', time: '11:30 am', startTime: '11:30', endTime: '16:30', home: 'First Round', away: 'Tourney of Champions', channel: 'GOLF', url: 'https://www.lpga.com/leaderboard' },
-  { date: '2026-01-30', time: '11:30 am', startTime: '11:30', endTime: '16:30', home: 'Second Round', away: 'Tourney of Champions', channel: 'GOLF', url: 'https://www.lpga.com/leaderboard' },
-  { date: '2026-01-31', time: '2:00 pm', startTime: '14:00', endTime: '19:00', home: 'Third Round', away: 'Tourney of Champions', channel: 'Peacock', url: 'https://www.lpga.com/leaderboard' },
-  { date: '2026-01-31', time: '3:00 pm', startTime: '15:00', endTime: '20:00', home: 'Third Round', away: 'Tourney of Champions', channel: 'NBC, Peacock', url: 'https://www.lpga.com/leaderboard' },
-  { date: '2026-02-01', time: '1:00 pm', startTime: '13:00', endTime: '18:00', home: 'Final Round', away: 'Tourney of Champions', channel: 'Peacock', url: 'https://www.lpga.com/leaderboard' },
-  { date: '2026-02-01', time: '2:00 pm', startTime: '14:00', endTime: '19:00', home: 'Final Round', away: 'Tourney of Champions', channel: 'NBC, Peacock', url: 'https://www.lpga.com/leaderboard' },
+'LPGATour': [
+{ date: '2026-01-29', time: '11:30 am', startTime: '11:30', endTime: '16:30', home: 'Champions, R1', away: 'Tournament of', channel: 'GOLF', url: 'https://www.lpga.com/leaderboard' },
+  { date: '2026-01-30', time: '11:30 am', startTime: '11:30', endTime: '16:30', home: 'Champions, R2', away: 'Tournament of', channel: 'GOLF', url: 'https://www.lpga.com/leaderboard' },
+  { date: '2026-01-31', time: '2:00 pm', startTime: '14:00', endTime: '20:00', home: 'Champions, R3', away: 'Tournament of', channel: 'NBC, Peacock', url: 'https://www.lpga.com/leaderboard' },
+  { date: '2026-02-01', time: '1:00 pm', startTime: '13:00', endTime: '19:00', home: 'Champions, R4', away: 'Tournament of', channel: 'NBC, Peacock', url: 'https://www.lpga.com/leaderboard' },
   { date: '2026-02-19', time: '10:00 pm', startTime: '22:00', endTime: '03:00', home: 'First Round', away: 'Thailand', channel: 'GOLF', url: 'https://www.lpga.com/leaderboard' },
   { date: '2026-02-20', time: '10:00 pm', startTime: '22:00', endTime: '03:00', home: 'Second Round', away: 'Thailand', channel: 'GOLF', url: 'https://www.lpga.com/leaderboard' },
   { date: '2026-02-21', time: '10:30 pm', startTime: '22:30', endTime: '03:30', home: 'Third Round', away: 'Thailand', channel: 'GOLF', url: 'https://www.lpga.com/leaderboard' },
@@ -39292,9 +39289,8 @@ document.addEventListener('DOMContentLoaded', function () {
   { date: '2026-04-24', time: '11:00 am', startTime: '11:00', endTime: '16:00', home: 'Second Round', away: 'Chevron', channel: 'GOLF', url: 'https://www.lpga.com/leaderboard' },
   { date: '2026-04-25', time: '3:00 pm', startTime: '15:00', endTime: '20:00', home: 'Third Round', away: 'Chevron', channel: 'NBC, Peacock', url: 'https://www.lpga.com/leaderboard' },
   { date: '2026-04-26', time: '3:00 pm', startTime: '15:00', endTime: '20:00', home: 'Final Round', away: 'Chevron', channel: 'NBC, Peacock', url: 'https://www.lpga.com/leaderboard' }
-
-],
-
+     ],
+ 
 'UFC': [
   { date: '2026-01-24', time: '5:00 PM', startTime: '17:00', endTime: '19:00', home: 'Gaethje-Pimblett', away: 'UFC 324 Early Prelims', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-324' },
   { date: '2026-01-24', time: '7:00 PM', startTime: '19:00', endTime: '21:00', home: 'Gaethje-Pimblett', away: 'UFC 324 Prelims', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-324' },
@@ -40801,7 +40797,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Only show the league header on dates listed. Add each name to LEAGUE_DISPLAY_ORDER for sort position.
     const URL_ONLY_LEAGUES = [
         { date: '2026-01-25', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '23:59', time: '12:00 am' },
-        { date: '2026-01-26', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:05', endTime: '23:59', time: '12:05 am' },
+        { date: '2026-01-29', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:05', endTime: '23:59', time: '12:05 am' },
         { date: '2026-01-26', name: 'TGL', url: 'https://www.espn.com/golf/leaderboard/_/tour/tgl', startTime: '19:00', endTime: '21:00', time: '7:00 pm' },
 
 
