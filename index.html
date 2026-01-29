@@ -1348,6 +1348,14 @@ body {
     color: white;
   }
 
+  /* League name only gets active styling for URL-only items (nested list stays unstyled) */
+  #menuList .league-name {
+    display: block;
+  }
+  #menuList .league-name.selected {
+    color: white !important;
+  }
+
   #menuList ul {
     padding-left: 0;
     padding-top: 10;
@@ -5596,7 +5604,9 @@ function loadCustomRSSFeed(feedUrl, container) {
                                 document.querySelectorAll("#menuList li[data-section], #menuList-123 li[data-section], #menuList ul li[data-section], #menuList-az li[data-section], #menuList-group li[data-section]").forEach(li => {
                                     li.classList.remove("selected");
                                 });
-                                menuItem.classList.add("selected");
+                                document.querySelectorAll("#menuList .league-name").forEach(el => el.classList.remove("selected"));
+                                const selTarget = (menuItem.classList.contains('url-only-league') && menuItem.querySelector('.league-name')) ? menuItem.querySelector('.league-name') : menuItem;
+                                selTarget.classList.add("selected");
                                 console.log(`[handleGameClick] Mobile: Added 'selected' class to menu item for ${leagueKey}`);
                                 console.log(`[handleGameClick] Mobile: Menu item text content:`, menuItem.textContent?.trim());
                                 console.log(`[handleGameClick] Mobile: Menu item is in list:`, menuItem.closest('ul')?.id);
@@ -8625,6 +8635,11 @@ function loadCustomRSSFeed(feedUrl, container) {
                         // Social and Media: URLs to be added later
                         return;
                     }
+                    // Active styling: only the league name (span), not the nested list
+                    document.querySelectorAll("#menuList li[data-section]").forEach(li => li.classList.remove("selected"));
+                    document.querySelectorAll("#menuList .league-name").forEach(el => el.classList.remove("selected"));
+                    const nameEl = item.querySelector('.league-name');
+                    (nameEl || item).classList.add("selected");
                     item.classList.toggle('url-only-expanded');
                     return;
                 }
@@ -8632,6 +8647,10 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (section === 'Cricket') {
                     e.preventDefault();
                     e.stopPropagation();
+                    // Active styling: same as any other league
+                    document.querySelectorAll("#menuList li[data-section]").forEach(li => li.classList.remove("selected"));
+                    document.querySelectorAll("#menuList .league-name").forEach(el => el.classList.remove("selected"));
+                    item.classList.add("selected");
                     window.open('https://espncricinfo.com', '_blank');
                     window.open('https://cricbuzz.com', '_blank');
                     return;
@@ -8652,7 +8671,9 @@ function loadCustomRSSFeed(feedUrl, container) {
                     selectedSection = item.dataset.section;
                 }
                 document.querySelectorAll("#menuList li[data-section]").forEach(li => li.classList.remove("selected"));
-                item.classList.add("selected");
+                document.querySelectorAll("#menuList .league-name").forEach(el => el.classList.remove("selected"));
+                const target = (item.classList.contains('url-only-league') && item.querySelector('.league-name')) ? item.querySelector('.league-name') : item;
+                target.classList.add("selected");
                 
                 // Clear all active game states when switching leagues
                 document.querySelectorAll('.game-row.active, .game-row.game-separator.active, .game-separator-line.active-above').forEach(el => {
@@ -8811,7 +8832,8 @@ function loadCustomRSSFeed(feedUrl, container) {
 
         // Find the currently selected league (before we change the filter)
         const currentSelectedLi = document.querySelector("#menuList li.selected");
-        const selectedSection = currentSelectedLi ? currentSelectedLi.dataset.section : null;
+        const currentSelectedName = document.querySelector("#menuList .league-name.selected");
+        const selectedSection = (currentSelectedLi && currentSelectedLi.dataset.section) || (currentSelectedName && currentSelectedName.closest("li") && currentSelectedName.closest("li").dataset.section) || null;
 
         // Remove active class from all filters
         document.querySelectorAll("#menuFilters .menu-filter").forEach(filter => {
@@ -8822,11 +8844,11 @@ function loadCustomRSSFeed(feedUrl, container) {
 
         const filterId = clickedFilter.dataset.filter;
 
-        // Hide all menu lists and remove the 'selected' class from ALL li items
-        // This is important to prevent duplicates when switching back and forth
+        // Hide all menu lists and remove the 'selected' class from ALL li items and .league-name
         document.querySelectorAll("#menuList > ul").forEach(list => {
             list.style.display = "none";
             list.querySelectorAll("li").forEach(li => li.classList.remove("selected"));
+            list.querySelectorAll(".league-name").forEach(el => el.classList.remove("selected"));
         });
 
         // Show the list that matches the data-filter
@@ -8834,11 +8856,12 @@ function loadCustomRSSFeed(feedUrl, container) {
         if (targetList) {
             targetList.style.display = "block";
 
-            // If a league was previously selected, find it in the new list and select it
+            // If a league was previously selected, find it in the new list and select it (league name only for URL-only)
             if (selectedSection) {
                 const newSelectedLi = targetList.querySelector(`li[data-section="${selectedSection}"]`);
                 if (newSelectedLi) {
-                    newSelectedLi.classList.add("selected");
+                    const target = newSelectedLi.querySelector('.league-name') || newSelectedLi;
+                    target.classList.add("selected");
                 }
             }
         }
@@ -40863,6 +40886,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const section = li.dataset.section;
             if (!leagues[section] || li.querySelector('.url-only-nested')) return;
             li.classList.add('url-only-league');
+            const leagueName = document.createElement('span');
+            leagueName.className = 'league-name';
+            while (li.firstChild) leagueName.appendChild(li.firstChild);
+            li.appendChild(leagueName);
             const ul = document.createElement('ul');
             ul.className = 'url-only-nested';
             [ { action: 'news', label: 'News', icon: newsIcon }, { action: 'social', label: 'Social', icon: socialIcon }, { action: 'media', label: 'Media', icon: mediaIcon } ].forEach(function(row) {
