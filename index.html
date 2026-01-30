@@ -39274,19 +39274,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
 ],
 
-        'Tennis': [
-    
-    { date: '2026-01-29', time: '7:00 pm', startTime: '19:00', endTime: '23:59', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-        
-    { date: '2026-01-30', time: '8:00 pm', startTime: '20:00', endTime: '23:59', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-    
-    { date: '2026-01-31', time: '12:00 am', startTime: '00:00', endTime: '7:30', away: 'Australian Open', home: 'Women\'s Final', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-    
-    { date: '2026-01-31', time: '8:00 pm', startTime: '20:00', endTime: '23:59', away: 'Australian Open', home: '', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-    
-    { date: '2026-02-01', time: '12:00 am', startTime: '00:00', endTime: '7:30', away: 'Australian Open', home: 'Men\'s Final', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
-     ],
+      'Tennis': [
 
+  
+    
+  { date: '2026-01-29', time: '7:00 pm', startTime: '19:00', endTime: '23:59', away: 'Australian Open', home: 'Semifinals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+  
+  
+  { date: '2026-01-30', time: '8:00 pm', startTime: '20:00', endTime: '23:59', away: 'Australian Open', home: 'Finals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+  
+  { date: '2026-01-31', time: '12:00 am', startTime: '00:00', endTime: '7:30', away: 'Australian Open', home: 'Women\'s Final', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+  
+  { date: '2026-01-31', time: '8:00 pm', startTime: '20:00', endTime: '23:59', away: 'Australian Open', home: 'Finals', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+  
+  { date: '2026-02-01', time: '12:00 am', startTime: '00:00', endTime: '7:30', away: 'Australian Open', home: 'Men\'s Final', channel: 'ESPN networks', url: 'https://www.espn.com/tennis/scoreboard/tournament/_/eventId/154-2026' },
+   ],
+   
     'PGATour': [
     { date: '2026-01-22', time: '11:30 am', startTime: '11:30', endTime: '17:15', home: 'First Round', away: 'The AMEX', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
   { date: '2026-01-23', time: '11:30 am', startTime: '11:30', endTime: '17:15', home: 'Second Round', away: 'The AMEX', channel: 'ESPN+, GOLF', url: 'https://www.pgatour.com/leaderboard' },
@@ -41020,12 +41023,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // URL-only leagues: header-only sections in games column (no games). Like hardcoded_today_schedules but per league/day.
     // Each entry: date ('YYYY-MM-DD'), name, url, startTime, endTime ('HH:mm' 24h EST), time ('7:30 pm' EST for "before").
+    // Optional: home and/or away (strings). If either is set, this entry appears as a game-like row in the FEATURED section
+    // (games > yesterday / live / today) with that text displayed; click opens url. Leave blank for header-only.
     // Only show the league header on dates listed. Add each name to LEAGUE_DISPLAY_ORDER for sort position.
+    // Find URL_ONLY_LEAGUES here:
     const URL_ONLY_LEAGUES = [
         { date: '2026-01-25', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '23:59', time: '12:00 am' },
         { date: '2026-01-29', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:05', endTime: '23:59', time: '12:05 am' },
         { date: '2026-01-26', name: 'TGL', url: 'https://www.espn.com/golf/leaderboard/_/tour/tgl', startTime: '19:00', endTime: '21:00', time: '7:00 pm' },
-        { date: '2026-01-30', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm' },
+        { date: '2026-01-30', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm', home: '', away: '' },
         { date: '2026-01-31', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '16:30', endTime: '20:15', time: '4:30 pm' },
         { date: '2026-02-01', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm' },
         { date: '2026-02-02', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm' },
@@ -41046,6 +41052,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { date: '2026-03-04', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '21:30', endTime: '23:30', time: '9:30 pm' },
         // Add more entries (same league on different dates, or other leagues). Example:
         // { date: '2026-01-28', name: 'Another League', url: 'https://...', startTime: '14:00', endTime: '18:00', time: '2:00 pm' },
+        // With home/away for featured section: { date: '2026-01-28', name: 'Cricket', url: '...', startTime: '00:00', endTime: '23:59', time: '12:00 am', home: 'Championship', away: '' },
     ];
     
     // Convert league display name to section key (for navigation)
@@ -43051,7 +43058,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!leagueGroups[leagueDisplayName]) leagueGroups[leagueDisplayName] = [];
                 leagueGroups[leagueDisplayName].push(game);
             });
-            urlOnlyForDate.forEach(function(c) { leagueGroups[c.name] = []; });
+            // URL-only leagues: empty section unless we have synthetic featured games (home/away) for that league
+            urlOnlyForDate.forEach(function(c) {
+                if (!(leagueGroups[c.name] && leagueGroups[c.name].length > 0)) leagueGroups[c.name] = [];
+            });
         } else {
             leagueGroups['singleLeague'] = gamesData;
         }
@@ -45342,7 +45352,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Add click handlers for game selection (News column only) - only if game is clickable
                     // Note: gameId and gameIdString already extracted above
-                    if (gameIdString && isClickable) {
+                    // URL-only featured: row click opens external URL (no game detail)
+                    if (data.isUrlOnlyFeatured && data.urlOnlyFeaturedUrl) {
+                        const urlToOpen = data.urlOnlyFeaturedUrl;
+                        row1.style.cursor = 'pointer';
+                        row2.style.cursor = 'pointer';
+                        row1.addEventListener('click', function(e) { e.preventDefault(); window.open(urlToOpen, '_blank', 'noopener,noreferrer'); });
+                        row2.addEventListener('click', function(e) { e.preventDefault(); window.open(urlToOpen, '_blank', 'noopener,noreferrer'); });
+                    } else if (gameIdString && isClickable) {
                         row1.setAttribute('data-game-id', gameIdString);
                         row2.setAttribute('data-game-id', gameIdString);
                         row1.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)`);
@@ -46054,7 +46071,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Add click handlers for game selection (News column only) - only if game is clickable
                 // Note: gameId and gameIdString already extracted above
-                if (gameIdString && isClickable) {
+                // URL-only featured: row click opens external URL (no game detail)
+                if (data.isUrlOnlyFeatured && data.urlOnlyFeaturedUrl) {
+                    const urlToOpen = data.urlOnlyFeaturedUrl;
+                    row1.style.cursor = 'pointer';
+                    row2.style.cursor = 'pointer';
+                    row1.addEventListener('click', function(e) { e.preventDefault(); window.open(urlToOpen, '_blank', 'noopener,noreferrer'); });
+                    row2.addEventListener('click', function(e) { e.preventDefault(); window.open(urlToOpen, '_blank', 'noopener,noreferrer'); });
+                } else if (gameIdString && isClickable) {
                     row1.setAttribute('data-game-id', gameIdString);
                     row2.setAttribute('data-game-id', gameIdString);
                     row1.setAttribute('onclick', `handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)`);
@@ -49748,6 +49772,43 @@ async function fetchFeaturedGames() {
                 }
             });
             
+            // Merge url-only Featured docs from Firestore (marked in perspectives-admin)
+            try {
+                const firestoreDb = typeof db !== 'undefined' ? db : (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+                if (firestoreDb) {
+                    const featuredRef = firestoreDb.collection('artifacts/flashlive-daily-scraper/public/data/Featured');
+                    const urlOnlySnapshot = await featuredRef.where('gameDate', '==', dateStr).get();
+                    const includedIds = new Set(liveFeaturedGames.map(g => g['Game ID']));
+                    urlOnlySnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const gameId = data['Game ID'] || data.gameId;
+                        if (!gameId || !String(gameId).startsWith('url-only-') || includedIds.has(String(gameId))) return;
+                        const synthetic = {
+                            'Game ID': gameId,
+                            'Away Team': data['Away Team'] || data.away || '',
+                            'Home Team': data['Home Team'] || data.home || '',
+                            'League': data.League || data.league || '',
+                            'Sport': 'Other',
+                            'gameDate': dateStr,
+                            'Match Status': 'SCHEDULED',
+                            'isFeatured': true,
+                            'isUrlOnlyFeatured': true,
+                            'isHardcodedToday': true,
+                            'urlOnlyFeaturedUrl': data.urlOnlyFeaturedUrl || data.hardcodedTodayUrl || data.url || '',
+                            'hardcodedTodayUrl': data.urlOnlyFeaturedUrl || data.hardcodedTodayUrl || data.url || '',
+                            'hardcodedStartTime': data.hardcodedStartTime || '',
+                            'hardcodedEndTime': data.hardcodedEndTime || '',
+                            'hardcodedTime': data.hardcodedTime || data.time || '',
+                            'time': data.hardcodedTime || data.time || ''
+                        };
+                        liveFeaturedGames.push(synthetic);
+                        includedIds.add(String(gameId));
+                    });
+                }
+            } catch (e) {
+                console.warn('Error merging url-only Featured from Firestore:', e);
+            }
+            
             // Sort by leagueImportance first (ascending, nulls last), then by order as fallback
             // This preserves the league importance order set in perspectives-admin
             liveFeaturedGames.sort((a, b) => {
@@ -50823,6 +50884,48 @@ async function fetchFeaturedGames() {
                 });
             }
             
+            // Add URL_ONLY_LEAGUES entries that have home/away as featured rows (appear in FEATURED section)
+            // Skip if same league+date already came from Firestore (user marked in perspectives-admin)
+            if (typeof URL_ONLY_LEAGUES !== 'undefined' && Array.isArray(URL_ONLY_LEAGUES)) {
+                const todayStrForUrlOnly = getTodayDisplayDate();
+                URL_ONLY_LEAGUES.forEach(function(entry, idx) {
+                    if (entry.date !== todayStrForUrlOnly) return;
+                    const hasHomeOrAway = (entry.home && String(entry.home).trim()) || (entry.away && String(entry.away).trim());
+                    if (!hasHomeOrAway) return;
+                    const alreadyFromFirestore = gamesToRender.some(function(g) {
+                        return g.isUrlOnlyFeatured && g.League === entry.name && (g.gameDate || '') === entry.date;
+                    });
+                    if (alreadyFromFirestore) return;
+                    if (currentActiveTab === 'LIVE') {
+                        const status = (entry.startTime && entry.endTime) ? getHardcodedGameTimeStatus(entry.startTime, entry.endTime, entry.date) : '';
+                        if (status !== 'live') return;
+                    }
+                    const gameId = 'url-only-featured-' + (entry.name || 'League').replace(/\s+/g, '') + '-' + entry.date + '-' + idx;
+                    if (gamesToRender.some(function(g) { return g['Game ID'] === gameId; })) return;
+                    const syntheticGame = {
+                        'Game ID': gameId,
+                        'Away Team': entry.away || '',
+                        'Home Team': entry.home || '',
+                        'League': entry.name,
+                        'Sport': 'Other',
+                        'gameDate': entry.date,
+                        'time': entry.time || '',
+                        'hardcodedStartTime': entry.startTime || '',
+                        'hardcodedEndTime': entry.endTime || '',
+                        'hardcodedTodayUrl': entry.url || '',
+                        'isHardcodedToday': true,
+                        'isFeatured': true,
+                        'isUrlOnlyFeatured': true,
+                        'urlOnlyFeaturedUrl': entry.url || ''
+                    };
+                    if (entry.startTime && entry.endTime) {
+                        const urlOnlyStatus = getHardcodedGameTimeStatus(entry.startTime, entry.endTime, entry.date);
+                        syntheticGame.isFeaturedLive = (urlOnlyStatus === 'live');
+                    }
+                    gamesToRender.push(syntheticGame);
+                });
+            }
+            
             renderGames(todayContainer, gamesToRender, true);
             
             // ─────────────────────────────────────────────
@@ -51134,8 +51237,35 @@ async function fetchFeaturedGames() {
                     }
                 });
                 
-                // Combine games with yesterday's featured games first, then hardcoded games, then regular games
-                const allGames = [...yesterdayFeaturedGames, ...hardcodedYesterdayGames, ...gamesData];
+                // URL_ONLY_LEAGUES with home/away: show as featured rows in yesterday (for yesterday and today dates)
+                const urlOnlyYesterdayGames = [];
+                if (typeof URL_ONLY_LEAGUES !== 'undefined' && Array.isArray(URL_ONLY_LEAGUES)) {
+                    const todayDate = (typeof getTodayDisplayDate === 'function' ? getTodayDisplayDate() : '');
+                    URL_ONLY_LEAGUES.forEach(function(entry, idx) {
+                        if (entry.date !== yesterdayStr && entry.date !== todayDate) return;
+                        const hasHomeOrAway = (entry.home && String(entry.home).trim()) || (entry.away && String(entry.away).trim());
+                        if (!hasHomeOrAway) return;
+                        urlOnlyYesterdayGames.push({
+                            'Game ID': 'url-only-yesterday-' + (entry.name || 'League').replace(/\s+/g, '') + '-' + entry.date + '-' + idx,
+                            'Away Team': entry.away || '',
+                            'Home Team': entry.home || '',
+                            'League': entry.name,
+                            'Sport': 'Other',
+                            'gameDate': entry.date,
+                            'Match Status': 'SCHEDULED',
+                            'isFeatured': true,
+                            'isUrlOnlyFeatured': true,
+                            'urlOnlyFeaturedUrl': entry.url || '',
+                            'hardcodedTodayUrl': entry.url || '',
+                            'hardcodedStartTime': entry.startTime || '',
+                            'hardcodedEndTime': entry.endTime || '',
+                            'isHardcodedToday': true
+                        });
+                    });
+                }
+                
+                // Combine games with yesterday's featured games first, then hardcoded games, then URL-only featured, then regular games
+                const allGames = [...yesterdayFeaturedGames, ...hardcodedYesterdayGames, ...urlOnlyYesterdayGames, ...gamesData];
                 
                 // Manual deduplication: Remove duplicate Australian Open entries for same date
                 // Keep featured games, remove duplicates from hardcoded/regular games
