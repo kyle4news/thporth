@@ -41029,7 +41029,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { date: '2026-01-25', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '23:59', time: '12:00 am' },
         { date: '2026-01-29', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:05', endTime: '23:59', time: '12:05 am' },
         { date: '2026-01-26', name: 'TGL', url: 'https://www.espn.com/golf/leaderboard/_/tour/tgl', startTime: '19:00', endTime: '21:00', time: '7:00 pm' },
-        { date: '2026-01-30', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm', home: 'Rose vs Thorns', away: 'Championship' },
+        { date: '2026-01-30', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm', home: '', away: '' },
         { date: '2026-01-31', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '16:30', endTime: '20:15', time: '4:30 pm' },
         { date: '2026-02-01', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm' },
         { date: '2026-02-02', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm' },
@@ -43229,7 +43229,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Add league logo if applicable (skip for Tennis sections)
                 if (!isTennisSection) {
-                if (leagueNameKey === "NFL") {
+                // URL-only league with home/away: show logo in league header (same as header-only URL-only leagues)
+                if (urlOnlyCfg) {
+                    const logo = document.createElement("img");
+                    logo.src = (typeof URL_ONLY_LEAGUE_LOGOS !== 'undefined' && URL_ONLY_LEAGUE_LOGOS[leagueNameKey]) ? URL_ONLY_LEAGUE_LOGOS[leagueNameKey] : "https://thporth.com/cricket.png";
+                    logo.alt = leagueNameKey;
+                    logo.style.width = "12px";
+                    logo.style.height = "12px";
+                    logo.style.objectFit = "contain";
+                    logo.style.marginLeft = "5px";
+                    logo.style.marginRight = "8px";
+                    logo.style.verticalAlign = "middle";
+                    logo.style.display = "inline-block";
+                    logo.style.flexShrink = "0";
+                    titleContent.appendChild(logo);
+                } else if (leagueNameKey === "NFL") {
                     const logo = document.createElement("img");
                     logo.src = "https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png";
                     logo.alt = "NFL Logo";
