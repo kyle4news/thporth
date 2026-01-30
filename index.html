@@ -2929,7 +2929,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              <!--  <li data-section="NCAAMensHockey">NCAA Men's Hockey</li> -->
             </ul>
             <li class="spacer-line"></li>
-            <li><strong>SOCCER</strong></li>
+            <li data-section="Soccer"><strong>SOCCER</strong></li>
             <ul style="padding-left: 10px;">
               <li data-section="PremierLeague"><img src="https://thporth.com/premierleague.png" alt="Premier League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Premier League</li>
               <li data-section="UEFAChampionsLeague"><img src="https://thporth.com/UCL.png" alt="UEFA Champions League" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">UEFA Champions League</li>
@@ -8622,7 +8622,7 @@ function loadCustomRSSFeed(feedUrl, container) {
         let selectedSection = "Home";
         document.querySelectorAll("#menuList li").forEach(item => {
             item.addEventListener("click", e => {
-                if (item.classList.contains("spacer-line") || item.classList.contains("soccer-more-toggle") || item.querySelector("strong")) {
+                if (item.classList.contains("spacer-line") || item.classList.contains("soccer-more-toggle") || (item.querySelector("strong") && !item.dataset.section)) {
                     e.stopPropagation();
                     return;
                 }
