@@ -2062,25 +2062,30 @@ div[id^="breaking-content-"] a:hover {
     font-size: 11px;
 }
 
+/* Soccer page only: fixed column widths, team names fill remainder */
 /* Target the first column (Time/Status) inside the league-specific column */
 #league-specific-column .game-table td:first-child {
-    /* Widen the width to 65px for better fit (was 62px) */
-    width: 65px;
-    min-width: 65px;
+    width: 85px !important;
+    min-width: 85px !important;
     font-size: 10px !important; /* Font size for first column - reduced from 11px to 10px */
 }
 
-/* Target the second column (Team names) inside the league-specific column */
+/* Target the second column (Team names) - fill remainder */
 #league-specific-column .game-table td:nth-child(2) {
-    /* Reduce min-width to 245px to compensate for wider time column */
-    min-width: 245px !important;
+    width: auto !important;
+    min-width: 0 !important;
 }
 
-/* Target the last column (Score) inside the league-specific column */
-#league-specific-column .game-table td:last-child {
-    /* Reduce the width from 40px to 30px */
-    width: 30px;
-    min-width: 30px;
+/* Third column (Scores) */
+#league-specific-column .game-table td:nth-child(3) {
+    width: 30px !important;
+    min-width: 30px !important;
+}
+
+/* Fourth column (Channel) */
+#league-specific-column .game-table td:nth-child(4) {
+    width: 50px !important;
+    min-width: 50px !important;
 }
 
 
