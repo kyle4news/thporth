@@ -1396,16 +1396,19 @@
                                      applyToAllCheckbox.checked = false;
                                  }
                              } else {
-                                 throw new Error(data.error || data.details || `HTTP ${response.status}: ${response.statusText}`);
+                                 const e = new Error(data.error || data.details || `HTTP ${response.status}: ${response.statusText}`);
+                                 e.responseData = data;
+                                 throw e;
                              }
                           } catch (err) {
                               console.error('Error updating featured status:', err);
                               let errorMsg = err.message;
-                            
+                              if (err.responseData && (err.responseData.details || err.responseData.error)) {
+                                  errorMsg = err.responseData.details ? `${err.responseData.error || 'Error'}: ${err.responseData.details}` : (err.responseData.error || errorMsg);
+                              }
                               if (err.message.includes('Failed to fetch') || err.message.includes('Load failed')) {
                                   errorMsg = `Network error: Could not reach Cloud Function. Make sure the function is deployed with the new /perspectives/toggleFeatured endpoint. Details: ${err.message}`;
                               }
-                            
                               alert('Error updating featured status: ' + errorMsg);
                               featuredCheckbox.checked = !featuredCheckbox.checked; // Revert checkbox
                               updateHeaderTextEnabled();
