@@ -41029,7 +41029,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { date: '2026-01-25', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '23:59', time: '12:00 am' },
         { date: '2026-01-29', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:05', endTime: '23:59', time: '12:05 am' },
         { date: '2026-01-26', name: 'TGL', url: 'https://www.espn.com/golf/leaderboard/_/tour/tgl', startTime: '19:00', endTime: '21:00', time: '7:00 pm' },
-        { date: '2026-01-30', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm', home: '', away: '' },
+        { date: '2026-01-30', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm', home: 'Rose vs Thorns', away: 'Championship' },
         { date: '2026-01-31', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '16:30', endTime: '20:15', time: '4:30 pm' },
         { date: '2026-02-01', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm' },
         { date: '2026-02-02', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm' },
@@ -43095,9 +43095,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const hasEnoughGames = games && games.length >= 10;
             const shouldPrioritizeImportant = isSpecialNCAALeague && hasEnoughGames;
 
-            // URL-only leagues: header-only, clickable to open URL. Time/LIVE/F like hardcoded; icon instead of expand arrow.
-            if (isGroupedByLeague && games.length === 0 && urlOnlyMapByDate[leagueNameKey]) {
-                const cfg = urlOnlyMapByDate[leagueNameKey];
+            // URL-only leagues: header-only ONLY when no home/away. When home/away present, synthetic game renders as full row (icon + time in start column, teams in team column).
+            const urlOnlyCfg = urlOnlyMapByDate[leagueNameKey];
+            const urlOnlyHasHomeOrAway = urlOnlyCfg && ((urlOnlyCfg.home && String(urlOnlyCfg.home).trim()) || (urlOnlyCfg.away && String(urlOnlyCfg.away).trim()));
+            if (isGroupedByLeague && games.length === 0 && urlOnlyCfg && !urlOnlyHasHomeOrAway) {
+                const cfg = urlOnlyCfg;
                 const status = isYesterdayScores ? 'after' : ((cfg.startTime && cfg.endTime) ? getHardcodedGameTimeStatus(cfg.startTime, cfg.endTime, cfg.date) : 'before');
                 
                 // Check if LIVE tab is active - if so, only show URL_ONLY_LEAGUES with status 'live'
@@ -44862,8 +44864,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                         const displayLeague = getLeagueDisplayName(data.League, data.Sport);
                         const leagueKey = getLeagueKeyFromGame(data);
-                        const homeDisplay = getTeamDisplayName(data["Home Team"] || "", displayLeague);
-                        const awayDisplay = getTeamDisplayName(data["Away Team"] || "", displayLeague);
+                        // URL-only games: use raw values to avoid TEAM_DISPLAY_MAP overwriting
+                        const rawHome = data["Home Team"] || data.home || "";
+                        const rawAway = data["Away Team"] || data.away || "";
+                        const homeDisplay = (data.isUrlOnlyFeatured || data.isUrlOnly) ? rawHome : getTeamDisplayName(rawHome, displayLeague);
+                        const awayDisplay = (data.isUrlOnlyFeatured || data.isUrlOnly) ? rawAway : getTeamDisplayName(rawAway, displayLeague);
                         const home = formatTeamNameWithRanking(homeDisplay, leagueKey, data, true);
                         const away = formatTeamNameWithRanking(awayDisplay, leagueKey, data, false);
                         // Check if names contain <br> (doubles tennis) to adjust styling
@@ -45504,8 +45509,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 hardcodedTodayGames.forEach((data, idx) => {
                     const displayLeague = getLeagueDisplayName(data.League, data.Sport);
                     const leagueKey = getLeagueKeyFromGame(data);
-                    const homeDisplay = getTeamDisplayName(data["Home Team"] || "", displayLeague);
-                    const awayDisplay = getTeamDisplayName(data["Away Team"] || "", displayLeague);
+                    // URL-only games: use raw values to avoid TEAM_DISPLAY_MAP overwriting (e.g. "Championship" mapped by another league)
+                    const rawHome = data["Home Team"] || data.home || "";
+                    const rawAway = data["Away Team"] || data.away || "";
+                    const homeDisplay = (data.isUrlOnlyFeatured || data.isUrlOnly) ? rawHome : getTeamDisplayName(rawHome, displayLeague);
+                    const awayDisplay = (data.isUrlOnlyFeatured || data.isUrlOnly) ? rawAway : getTeamDisplayName(rawAway, displayLeague);
                     const home = formatTeamNameWithRanking(homeDisplay, leagueKey, data, true);
                     const away = formatTeamNameWithRanking(awayDisplay, leagueKey, data, false);
                     const isHomeDoubles = homeDisplay.includes('<br>');
@@ -49781,10 +49789,14 @@ async function fetchFeaturedGames() {
                         const data = doc.data();
                         const gameId = data['Game ID'] || data.gameId;
                         if (!gameId || !String(gameId).startsWith('url-only-') || includedIds.has(String(gameId))) return;
+                        const awayVal = data['Away Team'] || data.away || '';
+                        const homeVal = data['Home Team'] || data.home || '';
                         const synthetic = {
                             'Game ID': gameId,
-                            'Away Team': data['Away Team'] || data.away || '',
-                            'Home Team': data['Home Team'] || data.home || '',
+                            'Away Team': awayVal,
+                            'Home Team': homeVal,
+                            'away': awayVal,
+                            'home': homeVal,
                             'League': data.League || data.league || '',
                             'Sport': 'Other',
                             'gameDate': dateStr,
@@ -50453,7 +50465,23 @@ async function fetchFeaturedGames() {
                 // If this is a hardcoded game, enrich it with hardcoded data
                 let enrichedGame = { ...featuredGame };
                 let hardcodedIsLive = false;
-                if (featuredGameId && featuredGameId.startsWith('hardcoded-')) {
+                if (featuredGameId && featuredGameId.startsWith('url-only-')) {
+                    enrichedGame.isUrlOnlyFeatured = true;
+                    enrichedGame.isHardcodedToday = true;
+                    enrichedGame.urlOnlyFeaturedUrl = enrichedGame.urlOnlyFeaturedUrl || enrichedGame.hardcodedTodayUrl || enrichedGame.url || '';
+                    enrichedGame.hardcodedTodayUrl = enrichedGame.hardcodedTodayUrl || enrichedGame.urlOnlyFeaturedUrl || enrichedGame.url || '';
+                    if (!enrichedGame.hardcodedTime && enrichedGame.time) enrichedGame.hardcodedTime = enrichedGame.time;
+                    if (!enrichedGame.time && enrichedGame.hardcodedTime) enrichedGame.time = enrichedGame.hardcodedTime;
+                    if (!enrichedGame['Away Team'] && enrichedGame.away) enrichedGame['Away Team'] = enrichedGame.away;
+                    if (!enrichedGame['Home Team'] && enrichedGame.home) enrichedGame['Home Team'] = enrichedGame.home;
+                    try {
+                        const gd = enrichedGame.gameDate;
+                        const gameDateStr = (gd && typeof gd.toDate === 'function') ? gd.toDate().toISOString().slice(0, 10) : (typeof gd === 'string' ? gd : '');
+                        if (enrichedGame.hardcodedStartTime && enrichedGame.hardcodedEndTime && gameDateStr) {
+                            hardcodedIsLive = (getHardcodedGameTimeStatus(enrichedGame.hardcodedStartTime, enrichedGame.hardcodedEndTime, gameDateStr) === 'live');
+                        }
+                    } catch (e) { /* ignore */ }
+                } else if (featuredGameId && featuredGameId.startsWith('hardcoded-')) {
                     const hardcodedData = getHardcodedGameData(featuredGameId, featuredGame.gameDate || todayStr);
                     if (hardcodedData) {
                         enrichedGame.hardcodedTime = hardcodedData.time || '';
@@ -50882,8 +50910,8 @@ async function fetchFeaturedGames() {
                 });
             }
             
-            // Add URL_ONLY_LEAGUES entries that have home/away as featured rows (appear in FEATURED section)
-            // Skip if same league+date already came from Firestore (user marked in perspectives-admin)
+            // Add URL_ONLY_LEAGUES entries that have home/away as game rows in their league section (NOT Featured unless marked in perspectives-admin)
+            // Skip if same league+date already came from Firestore (user marked Featured in perspectives-admin)
             if (typeof URL_ONLY_LEAGUES !== 'undefined' && Array.isArray(URL_ONLY_LEAGUES)) {
                 const todayStrForUrlOnly = getTodayDisplayDate();
                 URL_ONLY_LEAGUES.forEach(function(entry, idx) {
@@ -50898,21 +50926,23 @@ async function fetchFeaturedGames() {
                         const status = (entry.startTime && entry.endTime) ? getHardcodedGameTimeStatus(entry.startTime, entry.endTime, entry.date) : '';
                         if (status !== 'live') return;
                     }
-                    const gameId = 'url-only-featured-' + (entry.name || 'League').replace(/\s+/g, '') + '-' + entry.date + '-' + idx;
+                    const gameId = 'url-only-' + (entry.name || 'League').replace(/\s+/g, '') + '-' + entry.date + '-' + idx;
                     if (gamesToRender.some(function(g) { return g['Game ID'] === gameId; })) return;
                     const syntheticGame = {
                         'Game ID': gameId,
                         'Away Team': entry.away || '',
                         'Home Team': entry.home || '',
+                        'away': entry.away || '',
+                        'home': entry.home || '',
                         'League': entry.name,
                         'Sport': 'Other',
                         'gameDate': entry.date,
                         'time': entry.time || '',
+                        'hardcodedTime': entry.time || '',
                         'hardcodedStartTime': entry.startTime || '',
                         'hardcodedEndTime': entry.endTime || '',
                         'hardcodedTodayUrl': entry.url || '',
                         'isHardcodedToday': true,
-                        'isFeatured': true,
                         'isUrlOnlyFeatured': true,
                         'urlOnlyFeaturedUrl': entry.url || ''
                     };
@@ -51244,14 +51274,17 @@ async function fetchFeaturedGames() {
                         const hasHomeOrAway = (entry.home && String(entry.home).trim()) || (entry.away && String(entry.away).trim());
                         if (!hasHomeOrAway) return;
                         urlOnlyYesterdayGames.push({
-                            'Game ID': 'url-only-yesterday-' + (entry.name || 'League').replace(/\s+/g, '') + '-' + entry.date + '-' + idx,
+                            'Game ID': 'url-only-' + (entry.name || 'League').replace(/\s+/g, '') + '-' + entry.date + '-' + idx,
                             'Away Team': entry.away || '',
                             'Home Team': entry.home || '',
+                            'away': entry.away || '',
+                            'home': entry.home || '',
                             'League': entry.name,
                             'Sport': 'Other',
                             'gameDate': entry.date,
+                            'time': entry.time || '',
+                            'hardcodedTime': entry.time || '',
                             'Match Status': 'SCHEDULED',
-                            'isFeatured': true,
                             'isUrlOnlyFeatured': true,
                             'urlOnlyFeaturedUrl': entry.url || '',
                             'hardcodedTodayUrl': entry.url || '',
@@ -53916,8 +53949,8 @@ async function fetchFeaturedGames() {
                         gameLeagueKey = leagueKey;
                     }
                     // For NHL upcoming schedule, show mascot names only
-                    const originalAwayTeam = game.away || '';
-                    const originalHomeTeam = game.home || '';
+                    const originalAwayTeam = game.away || game['Away Team'] || '';
+                    const originalHomeTeam = game.home || game['Home Team'] || '';
                     let awayDisplay, homeDisplay;
                     if (leagueKey === 'NHL') {
                         awayDisplay = getMascotName(originalAwayTeam);
@@ -54019,8 +54052,8 @@ async function fetchFeaturedGames() {
                     if (!gameLeagueKey) {
                         gameLeagueKey = leagueKey;
                     }
-                    const originalHomeTeam = game.home || '';
-                    const originalAwayTeam = game.away || '';
+                    const originalHomeTeam = game.home || game['Home Team'] || '';
+                    const originalAwayTeam = game.away || game['Away Team'] || '';
                     const homeDisplay = getTeamDisplayName(originalHomeTeam, displayLeague);
                     const awayDisplay = getTeamDisplayName(originalAwayTeam, displayLeague);
                     const homeTeam = formatTeamNameWithRanking(homeDisplay, gameLeagueKey, game, true);
