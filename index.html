@@ -2841,6 +2841,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li data-section="MotoGP"><img src="https://thporth.com/motogp.png" alt="MotoGP" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">MotoGP</li>
             <li data-section="LPGATour"><img src="https://thporth.com/LPGATour.png" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">LPGA Tour</li>
             <li data-section="TGL" style="color: #9E9E9E;"><img src="https://upload.wikimedia.org/wikipedia/en/f/f7/TGL_logo.png" alt="TGL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">TGL</li>
+            <li data-section="DPWorldTour">DP World Tour</li>
+            <li data-section="PGATourChampions"><img src="https://thporth.com/PGATourChampions" alt="PGA Champions" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">PGA Champions</li>
             <li data-section="Unrivaled" style="color: #9E9E9E;"><img src="https://thporth.com/Unrivaled.png" alt="Unrivaled" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Unrivaled</li>
             <li data-section="Cricket" style="color: #9E9E9E;"><img src="https://thporth.com/cricket.png" alt="Cricket" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Cricket</li>
             <li data-section="Rugby" style="color: #9E9E9E;"><img src="https://thporth.com/rugby.png" alt="Rugby" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">Rugby</li>
@@ -3011,9 +3013,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <li data-section="LIVGolf"><img src="https://thporth.com/LIVGolf.png" alt="LIV Golf" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">LIV Golf</li>
               <li data-section="LPGATour"><img src="https://thporth.com/LPGATour.png" alt="LPGA Tour" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">LPGA Tour</li>
               <li data-section="TGL" style="color: #9E9E9E;"><img src="https://upload.wikimedia.org/wikipedia/en/f/f7/TGL_logo.png" alt="TGL" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">TGL</li>
-         <!--      <li data-section="PGAChampions">PGA Champions</li>
               <li data-section="DPWorldTour">DP World Tour</li>
-              <li data-section="KornFerryTour">Korn Ferry Tour</li> -->
+              <li data-section="PGATourChampions"><img src="https://thporth.com/PGATourChampions" alt="PGA Champions" style="width: 12px; height: 12px; margin-right: 6px; vertical-align: top; display: inline-block;" width="12" height="12">PGA Champions</li>
             </ul>
             <li class="spacer-line"></li>
             <li><strong>FIGHTING</strong></li>
@@ -4069,6 +4070,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div> -->
       <div class="news-feed-content" id="headlines-feed-LPGATour" style="display:block; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
       <!-- <div class="news-feed-content" id="breaking-feed-LPGATour" style="display:none; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div> -->
+    </div>
+  </div>
+</div>
+
+<div id="news-PGATourChampions" class="content-section" style="display:none; height:100%; overflow:hidden;">
+  <div class="news-main-container" style="display:flex; flex-direction:column; height:100%; min-height:0;">
+    <div class="news-section" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0;">
+      <div class="news-feed-content" id="headlines-feed-PGATourChampions" style="display:block; flex:1 1 0; min-height:0; overflow:auto; position:relative;"></div>
     </div>
   </div>
 </div>
@@ -39232,6 +39241,99 @@ document.addEventListener('DOMContentLoaded', function () {
   { date: '2026-04-26', time: '3:00 pm', startTime: '15:00', endTime: '20:00', home: 'Final Round', away: 'Chevron', channel: 'NBC, Peacock', url: 'https://www.lpga.com/leaderboard' }
      ],
  
+'PGATourChampions': [
+
+  { date: '2026-02-13', time: '11:00 am', startTime: '11:00', endTime: '14:00', home: 'Chubb', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-02-14', time: '3:00 pm', startTime: '15:00', endTime: '18:00', home: 'Chubb', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-02-15', time: '3:00 pm', startTime: '15:00', endTime: '18:00', home: 'Chubb', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-03-06', time: '11:30 am', startTime: '11:30', endTime: '14:30', home: 'Football HOF', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-03-07', time: '3:30 pm', startTime: '15:30', endTime: '18:30', home: 'Football HOF', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-03-08', time: '2:30 pm', startTime: '14:30', endTime: '17:30', home: 'Football HOF', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-03-20', time: '', startTime: '', endTime: '', home: 'Cologuard', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-03-21', time: '', startTime: '', endTime: '', home: 'Cologuard', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-03-22', time: '', startTime: '', endTime: '', home: 'Cologuard', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-03-27', time: '', startTime: '', endTime: '', home: 'Hoag', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-03-28', time: '', startTime: '', endTime: '', home: 'Hoag', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-03-29', time: '', startTime: '', endTime: '', home: 'Hoag', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-04-16', time: '', startTime: '', endTime: '', home: 'Sr. PGA Championship', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-04-17', time: '', startTime: '', endTime: '', home: 'Sr. PGA Championship', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-04-18', time: '', startTime: '', endTime: '', home: 'Sr. PGA Championship', away: '3rd Round', channel: 'NBC, GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-04-19', time: '', startTime: '', endTime: '', home: 'Sr. PGA Championship', away: 'Final Round', channel: 'NBC, GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-04-24', time: '', startTime: '', endTime: '', home: 'Mitsubishi', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-04-25', time: '', startTime: '', endTime: '', home: 'Mitsubishi', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-04-26', time: '', startTime: '', endTime: '', home: 'Mitsubishi', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-04-30', time: '11:00 am', startTime: '11:00', endTime: '14:00', home: 'Regions', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-05-01', time: '11:00 am', startTime: '11:00', endTime: '14:00', home: 'Regions', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-05-02', time: '2:00 pm', startTime: '14:00', endTime: '17:00', home: 'Regions', away: '3rd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-05-03', time: '2:00 pm', startTime: '14:00', endTime: '17:00', home: 'Regions', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-05-08', time: '', startTime: '', endTime: '', home: 'Insperity', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-05-09', time: '', startTime: '', endTime: '', home: 'Insperity', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-05-10', time: '', startTime: '', endTime: '', home: 'Insperity', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-05-21', time: '', startTime: '', endTime: '', home: 'Hassan II', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-05-22', time: '', startTime: '', endTime: '', home: 'Hassan II', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-05-23', time: '', startTime: '', endTime: '', home: 'Hassan II', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-06-05', time: '', startTime: '', endTime: '', home: 'Am. Family', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-06-06', time: '', startTime: '', endTime: '', home: 'Am. Family', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-06-07', time: '', startTime: '', endTime: '', home: 'Am. Family', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-06-12', time: '', startTime: '', endTime: '', home: 'Principal', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-06-13', time: '', startTime: '', endTime: '', home: 'Principal', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-06-14', time: '', startTime: '', endTime: '', home: 'Principal', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-06-26', time: '', startTime: '', endTime: '', home: 'DICK\'S Open', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-06-27', time: '', startTime: '', endTime: '', home: 'DICK\'S Open', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-06-28', time: '', startTime: '', endTime: '', home: 'DICK\'S Open', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-02', time: '', startTime: '', endTime: '', home: 'U.S Sr. Open', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-03', time: '', startTime: '', endTime: '', home: 'U.S Sr. Open', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-04', time: '', startTime: '', endTime: '', home: 'U.S Sr. Open', away: '3rd Round', channel: 'NBC, GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-05', time: '', startTime: '', endTime: '', home: 'U.S Sr. Open', away: 'Final Round', channel: 'NBC, GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-09', time: '', startTime: '', endTime: '', home: 'Kaulig', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-10', time: '', startTime: '', endTime: '', home: 'Kaulig', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-11', time: '', startTime: '', endTime: '', home: 'Kaulig', away: '3rd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-12', time: '', startTime: '', endTime: '', home: 'Kaulig', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-23', time: '8:30 am', startTime: '08:30', endTime: '11:30', home: 'Sr. Open', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-24', time: '8:30 am', startTime: '08:30', endTime: '11:30', home: 'Sr. Open', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-25', time: '8:30 am', startTime: '08:30', endTime: '11:30', home: 'Sr. Open', away: '3rd Round', channel: 'NBC, GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-26', time: '8:30 am', startTime: '08:30', endTime: '11:30', home: 'Sr. Open', away: 'Final Round', channel: 'NBC, GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-07-31', time: '', startTime: '', endTime: '', home: 'Portugal', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-01', time: '', startTime: '', endTime: '', home: 'Portugal', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-02', time: '', startTime: '', endTime: '', home: 'Portugal', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-14', time: '', startTime: '', endTime: '', home: 'Boeing', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-15', time: '', startTime: '', endTime: '', home: 'Boeing', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-16', time: '', startTime: '', endTime: '', home: 'Boeing', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-21', time: '', startTime: '', endTime: '', home: 'Rogers', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-22', time: '', startTime: '', endTime: '', home: 'Rogers', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-23', time: '', startTime: '', endTime: '', home: 'Rogers', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-28', time: '', startTime: '', endTime: '', home: 'Ally', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-29', time: '', startTime: '', endTime: '', home: 'Ally', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-08-30', time: '', startTime: '', endTime: '', home: 'Ally', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-09-11', time: '', startTime: '', endTime: '', home: 'Sanford', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-09-12', time: '', startTime: '', endTime: '', home: 'Sanford', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-09-13', time: '', startTime: '', endTime: '', home: 'Sanford', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-09-18', time: '', startTime: '', endTime: '', home: 'PURE', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-09-19', time: '', startTime: '', endTime: '', home: 'PURE', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-09-20', time: '', startTime: '', endTime: '', home: 'PURE', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-02', time: '', startTime: '', endTime: '', home: 'Lehigh Valley', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-03', time: '', startTime: '', endTime: '', home: 'Lehigh Valley', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-04', time: '', startTime: '', endTime: '', home: 'Lehigh Valley', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-09', time: '', startTime: '', endTime: '', home: ' FURYK & FRIENDS', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-10', time: '', startTime: '', endTime: '', home: ' FURYK & FRIENDS', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-11', time: '', startTime: '', endTime: '', home: ' FURYK & FRIENDS', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-16', time: '', startTime: '', endTime: '', home: 'SAS', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-17', time: '', startTime: '', endTime: '', home: 'SAS', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-18', time: '', startTime: '', endTime: '', home: 'SAS', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-23', time: '', startTime: '', endTime: '', home: 'Stifel', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-24', time: '', startTime: '', endTime: '', home: 'Stifel', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-25', time: '', startTime: '', endTime: '', home: 'Stifel', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-30', time: '', startTime: '', endTime: '', home: 'Simmons', away: '1st Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-10-31', time: '', startTime: '', endTime: '', home: 'Simmons', away: '2nd Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-11-01', time: '', startTime: '', endTime: '', home: 'Simmons', away: 'Final Round', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-11-12', time: '', startTime: '', endTime: '', home: 'Charles Schwab ', away: '', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-11-13', time: '', startTime: '', endTime: '', home: 'Charles Schwab ', away: '', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-11-14', time: '', startTime: '', endTime: '', home: 'Charles Schwab ', away: '', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-11-15', time: '', startTime: '', endTime: '', home: 'Charles Schwab ', away: '', channel: 'GOLF', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-12-19', time: '2:30 pm', startTime: '14:30', endTime: '17:30', home: 'PNC', away: '1st Round', channel: 'NBC, Peacock', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' },
+  { date: '2026-12-20', time: '1:30 pm', startTime: '13:30', endTime: '16:30', home: 'PNC', away: 'Final Round', channel: 'NBC, Peacock', url: 'https://www.pgatour.com/pgatour-champions/leaderboard' }
+],
+
 'UFC': [
   { date: '2026-01-24', time: '5:00 PM', startTime: '17:00', endTime: '19:00', home: 'Gaethje-Pimblett', away: 'UFC 324 Early Prelims', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-324' },
   { date: '2026-01-24', time: '7:00 PM', startTime: '19:00', endTime: '21:00', home: 'Gaethje-Pimblett', away: 'UFC 324 Prelims', channel: 'Paramount+', url: 'https://www.ufc.com/event/ufc-324' },
@@ -40629,6 +40731,10 @@ document.addEventListener('DOMContentLoaded', function () {
             return "UEFA Conference League";
         }
         
+        if (name === "PGATourChampions") {
+            return "PGA Champions";
+        }
+        
         // Fuzzy logic matching for ATP Finals - check if name contains "Finals" AND "ATP" AND "(Singles)" or "(Doubles)"
         if (name && name.includes("Finals") && name.includes("ATP")) {
             if (name.includes("(Singles)")) {
@@ -40886,9 +40992,23 @@ document.addEventListener('DOMContentLoaded', function () {
     // Only show the league header on dates listed. Add each name to LEAGUE_DISPLAY_ORDER for sort position.
     // Find URL_ONLY_LEAGUES here:
     const URL_ONLY_LEAGUES = [
-        { date: '2026-01-25', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '23:59', time: '12:00 am' },
-        { date: '2026-01-29', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:05', endTime: '23:59', time: '12:05 am' },
-        { date: '2026-01-26', name: 'TGL', url: 'https://www.espn.com/golf/leaderboard/_/tour/tgl', startTime: '19:00', endTime: '21:00', time: '7:00 pm' },
+    { "date": "2026-01-30", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "20:10", "endTime": "23:59", "time": "8:10 pm" },
+  { "date": "2026-01-31", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "00:00", "endTime": "01:55", "time": "12:00 am" },
+  { "date": "2026-01-31", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "01:00", "endTime": "23:59", "time": "1:00 am" },
+  { "date": "2026-02-01", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "00:00", "endTime": "02:30", "time": "12:00 am" },
+  { "date": "2026-02-01", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "01:00", "endTime": "23:59", "time": "1:00 am" },
+  { "date": "2026-02-02", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "00:00", "endTime": "02:00", "time": "12:00 am" },
+  { "date": "2026-02-02", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "02:00", "endTime": "23:59", "time": "2:00 am" },
+  { "date": "2026-02-03", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "00:00", "endTime": "02:00", "time": "12:00 am" },
+  { "date": "2026-02-03", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "02:00", "endTime": "23:59", "time": "2:00 am" },
+  { "date": "2026-02-04", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "00:00", "endTime": "02:00", "time": "12:00 am" },
+  { "date": "2026-02-04", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "02:00", "endTime": "23:59", "time": "2:00 am" },
+  { "date": "2026-02-05", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "00:00", "endTime": "02:00", "time": "12:00 am" },
+  { "date": "2026-02-05", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "02:30", "endTime": "23:59", "time": "2:30 am" },
+  { "date": "2026-02-06", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "00:00", "endTime": "02:30", "time": "12:00 am" },
+  { "date": "2026-02-06", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "01:00", "endTime": "23:59", "time": "1:00 am" },
+  { "date": "2026-02-07", "name": "Cricket", "url": "https://www.espncricinfo.com/live-cricket-score", "startTime": "00:00", "endTime": "02:30", "time": "12:00 am" },
+       { date: '2026-01-26', name: 'TGL', url: 'https://www.espn.com/golf/leaderboard/_/tour/tgl', startTime: '19:00', endTime: '21:00', time: '7:00 pm' },
         { date: '2026-01-30', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm', home: '', away: '' },
         { date: '2026-01-31', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '16:30', endTime: '20:15', time: '4:30 pm' },
         { date: '2026-02-01', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm' },
@@ -40908,6 +41028,25 @@ document.addEventListener('DOMContentLoaded', function () {
         { date: '2026-02-28', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '20:30', endTime: '00:15', time: '8:30 pm' },
         { date: '2026-03-02', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:30', time: '7:30 pm' },
         { date: '2026-03-04', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '21:30', endTime: '23:30', time: '9:30 pm' },
+        { date: '2026-01-30', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '07:30', endTime: '18:00', time: '7:30 am' },
+        { date: '2026-01-31', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '07:30', endTime: '17:00', time: '7:30 am' },
+{ date: '2026-02-01', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '08:00', endTime: '17:05', time: '8:00 am' },
+{ date: '2026-02-05', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '15:10', endTime: '17:10', time: '3:10 pm' },
+{ date: '2026-02-06', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '14:15', endTime: '23:59', time: '2:15 pm' },
+{ date: '2026-02-07', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+{ date: '2026-02-07', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '07:00', endTime: '23:59', time: '7:00 am' },
+{ date: '2026-02-08', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+{ date: '2026-02-08', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '07:00', endTime: '12:00', time: '7:00 am' },
+{ date: '2026-02-12', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '15:00', endTime: '17:00', time: '3:00 pm' },
+{ date: '2026-02-13', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '01:05', endTime: '23:59', time: '1:05 am' },
+{ date: '2026-02-14', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:35', time: '12:00 am' },
+{ date: '2026-02-14', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:35', endTime: '23:59', time: '12:35 am' },
+{ date: '2026-02-15', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+{ date: '2026-02-15', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '07:00', endTime: '17:05', time: '7:00 am' },
+{ date: '2026-02-20', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '01:05', endTime: '17:00', time: '1:05 am' },
+{ date: '2026-02-21', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:35', endTime: '23:59', time: '12:35 am' },
+{ date: '2026-02-22', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+{ date: '2026-02-22', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '06:00', endTime: '15:10', time: '6:00 am' },
         // Add more entries (same league on different dates, or other leagues). Example:
         // { date: '2026-01-28', name: 'Another League', url: 'https://...', startTime: '14:00', endTime: '18:00', time: '2:00 pm' },
         // With home/away for featured section: { date: '2026-01-28', name: 'Cricket', url: '...', startTime: '00:00', endTime: '23:59', time: '12:00 am', home: 'Championship', away: '' },
@@ -40965,6 +41104,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'IndyCar': 'IndyCar',
             'LPGA Tour': 'LPGATour',
             'LIV Golf': 'LIVGolf',
+            'PGA Champions': 'PGATourChampions',
             'Unrivaled': 'Unrivaled'
         };
         
@@ -43481,7 +43621,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     titleContent.appendChild(logo);
                 } else if (leagueNameKey === "PGA Champions") {
                     const logo = document.createElement("img");
-                    logo.src = "https://upload.wikimedia.org/wikipedia/en/thumb/f/fe/PGA_Tour_Champions_logo.svg/500px-PGA_Tour_Champions_logo.svg.png";
+                    logo.src = "https://thporth.com/PGATourChampions";
                     logo.alt = "PGA Champions Logo";
                         logo.width = 14;
                         logo.height = 14;
@@ -47155,7 +47295,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Hockey also uses Points, so we need to exclude it explicitly
         const isUSSport = ['NFL', 'MLB', 'NBA', 'NHL', 'NCAAF', 'WNBA'].includes(leagueKey);
         // Exclude specific leagues that use Points but aren't soccer (MotoGP, IndyCar, NASCAR, etc.)
-        const nonSoccerPointLeagues = ['MotoGP', 'IndyCar', 'NASCARCupSeries', 'FormulaOne', 'PGATour', 'LPGATour', 'LIVGolf', 'Tennis', 'UFC', 'Boxing'];
+        const nonSoccerPointLeagues = ['MotoGP', 'IndyCar', 'NASCARCupSeries', 'FormulaOne', 'PGATour', 'LPGATour', 'PGATourChampions', 'LIVGolf', 'Tennis', 'UFC', 'Boxing'];
         const isSoccerLeague = !isUSSport && !nonSoccerPointLeagues.includes(leagueKey) && teams.length > 0 && teams[0].Points !== undefined && teams[0].Points !== 0;
             
             // Check if MLS has conference data and should use conference tabs
@@ -47224,8 +47364,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 html = createNCAAWStandings(teams);
                 } else if (leagueKey === 'WNBA') {
                     html = createWNBAStandings(teams);
-                } else if (leagueKey === 'PGATour' || leagueKey === 'LPGATour') {
-                    // PGA Tour, LPGA Tour: Rank (blank header), Name, Avg Pts
+                } else if (leagueKey === 'PGATour' || leagueKey === 'LPGATour' || leagueKey === 'PGATourChampions') {
+                    // PGA Tour, LPGA Tour, PGA Champions: Rank (blank header), Name, Avg Pts
                     html += '<thead><tr style="background-color: #4a4a4a; font-size: 11px; font-weight: 600;">';
                     html += '<th style="padding: 8px; text-align: left; width: 30px;"></th>';
                     html += '<th style="padding: 8px; text-align: left;">Name</th>';
@@ -58558,6 +58698,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // { section: 'NCAASoftball', text: 'NCAA Softball' },
             { section: 'MotoGP', text: 'MotoGP' },
             { section: 'LPGATour', text: 'LPGA Tour' },
+            { section: 'DPWorldTour', text: 'DP World Tour' },
+            { section: 'PGATourChampions', text: 'PGA Champions' },
             { section: 'TGL', text: 'TGL' },
             { section: 'Cricket', text: 'Cricket' },
             { section: 'Rugby', text: 'Rugby' },
