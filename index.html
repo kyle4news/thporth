@@ -43068,7 +43068,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ? Object.keys(leagueGroups).sort((a, b) => (LEAGUE_DISPLAY_ORDER.indexOf(a) === -1 ? 99 : LEAGUE_DISPLAY_ORDER.indexOf(a)) - (LEAGUE_DISPLAY_ORDER.indexOf(b) === -1 ? 99 : LEAGUE_DISPLAY_ORDER.indexOf(b)))
             : ['singleLeague'];
 
-        sortedLeagueNames.forEach(leagueNameKey => {
+        sortedLeagueNames.forEach((leagueNameKey, leagueIndex) => {
             // Don't sort FEATURED games here - they'll be sorted by leagueImportance in the special FEATURED handling below
             const games = leagueNameKey === 'FEATURED' && isGroupedByLeague 
                 ? leagueGroups[leagueNameKey] 
@@ -43195,7 +43195,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 right.appendChild(iconWrap);
                 title.appendChild(right);
                 leagueSection.appendChild(title);
-                leagueSection.appendChild(document.createElement('br'));
+                // Only add <br> if next league is NOT a URL_ONLY_LEAGUE header-only
+                const nextLeagueKey = sortedLeagueNames[leagueIndex + 1];
+                let nextIsUrlOnlyHeaderOnly = false;
+                if (nextLeagueKey) {
+                    const nextUrlOnlyCfg = urlOnlyMapByDate[nextLeagueKey];
+                    const nextGames = leagueGroups[nextLeagueKey] || [];
+                    const nextUrlOnlyHasHomeOrAway = nextUrlOnlyCfg && ((nextUrlOnlyCfg.home && String(nextUrlOnlyCfg.home).trim()) || (nextUrlOnlyCfg.away && String(nextUrlOnlyCfg.away).trim()));
+                    nextIsUrlOnlyHeaderOnly = nextGames.length === 0 && nextUrlOnlyCfg && !nextUrlOnlyHasHomeOrAway;
+                }
+                if (!nextIsUrlOnlyHeaderOnly) {
+                    leagueSection.appendChild(document.createElement('br'));
+                }
                 container.appendChild(leagueSection);
                 return;
             }
