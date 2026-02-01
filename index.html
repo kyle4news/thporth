@@ -8655,6 +8655,8 @@ function loadCustomRSSFeed(feedUrl, container) {
                         const action = clickedNestedItem.dataset.action;
                         if (action === 'news' && mainMenuUrlOnly.url) {
                             window.open(mainMenuUrlOnly.url, '_blank', 'noopener,noreferrer');
+                        } else if (action === 'schedule' && mainMenuUrlOnly.scheduleUrl) {
+                            window.open(mainMenuUrlOnly.scheduleUrl, '_blank', 'noopener,noreferrer');
                         } else if (action === 'social' && mainMenuUrlOnly.socialUrl) {
                             window.open(mainMenuUrlOnly.socialUrl, '_blank', 'noopener,noreferrer');
                         } else if (action === 'media' && mainMenuUrlOnly.mediaUrl) {
@@ -39600,7 +39602,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 // Find League display order here:
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Tennis", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "NCAAF", "USMNT", "Formula 1", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "USWNT", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "Unrivaled", "CFB", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "Cricket Live", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Tennis", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "NCAAF", "USMNT", "Formula 1", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "USWNT", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "Unrivaled", "CFB", "NASCAR Cup Series", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "Cricket Live", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         // NFL: "https://www.nfl.com/scores",
@@ -40903,6 +40905,7 @@ document.addEventListener('DOMContentLoaded', function () {
         "Saudi Pro League": 'https://www.spl.com.sa/en/',
         "Women's Super League": 'https://www.fotmob.com/leagues/9227/fixtures/wsl?group=by-date',
         "USWNT": 'https://www.fotmob.com/teams/5909/overview/usa',
+        "Argentine Primera": 'https://www.sofascore.com/football/tournament/argentina/liga-profesional-de-futbol/155#id:87913',
     
         // Add more leagues here as needed:
         // 'League Name': 'https://example.com/url'
@@ -40931,7 +40934,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const MAIN_MENU_URL_ONLY_LEAGUES = {
         'Rugby': { displayName: 'Rugby', logoUrl: 'https://thporth.com/rugby.png', url: 'https://www.rugbypass.com/', socialUrl: 'https://x.com/RugbyPass', mediaUrl: 'https://www.youtube.com/@FloRugby/videos' },
         'Cycling': { displayName: 'Cycling', logoUrl: 'https://thporth.com/cycling.png', url: 'https://www.cyclingnews.com/', socialUrl: 'https://x.com/cyclingontnt', mediaUrl: 'https://www.youtube.com/@TNTSportsCycling/videos' },
-        'HorseRacing': { displayName: 'Horse Racing', logoUrl: 'https://thporth.com/horse-racing.png', url: 'https://www.drf.com/' },
+        'HorseRacing': { displayName: 'Horse Racing', logoUrl: 'https://thporth.com/horse-racing.png', url: 'https://www.drf.com/', scheduleUrl: 'https://www.tvg.com/races', scheduleIcon: 'https://thporth.com/schedule.png', socialUrl: 'https://x.com/FanDuel_Racing', mediaUrl: 'https://www.youtube.com/tvgnetwork' },
         'Volleyball': { displayName: 'Volleyball', logoUrl: 'https://thporth.com/volleyball.png', url: 'https://en.volleyballworld.com/news/' },
         'TrackAndField': { displayName: 'Track & Field', logoUrl: 'https://thporth.com/track-and-field.png', url: 'https://trackandfieldnews.com/' },
         'Softball': { displayName: 'Softball', logoUrl: 'https://thporth.com/softball.png', url: 'https://www.on3.com/softball' },
@@ -40943,11 +40946,12 @@ document.addEventListener('DOMContentLoaded', function () {
     };
     window.MAIN_MENU_URL_ONLY_LEAGUES = MAIN_MENU_URL_ONLY_LEAGUES;
 
-    // Inject nested dropdown (News, Social, Media) into every MAIN MENU URL ONLY league list item
+    // Inject nested dropdown (News, Schedule, Social, Media) into every MAIN MENU URL ONLY league list item
     function initUrlOnlyNestedMenus() {
         const leagues = window.MAIN_MENU_URL_ONLY_LEAGUES;
         if (!leagues) return;
         const newsIcon = 'https://thporth.com/news.png';
+        const scheduleIcon = 'https://thporth.com/schedule.png';
         const socialIcon = 'https://thporth.com/social.png';
         const mediaIcon = 'https://thporth.com/media.png';
         document.querySelectorAll('#menuList li[data-section]').forEach(li => {
@@ -40961,7 +40965,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const ul = document.createElement('ul');
             ul.className = 'url-only-nested';
             const league = leagues[section];
-            const rows = [ { action: 'news', label: 'News', icon: newsIcon }, { action: 'social', label: 'Social', icon: socialIcon }, { action: 'media', label: 'Media', icon: mediaIcon } ];
+            const rows = [ { action: 'news', label: 'News', icon: newsIcon } ];
+            if (league.scheduleUrl) {
+                rows.push({ action: 'schedule', label: 'Schedule', icon: league.scheduleIcon || scheduleIcon });
+            }
+            rows.push({ action: 'social', label: 'Social', icon: socialIcon }, { action: 'media', label: 'Media', icon: mediaIcon });
             if (league.highlightsUrl) {
                 rows.push({ action: 'highlights', label: 'Highlights', icon: league.highlightsIcon || 'https://thporth.com/highlights.png' });
             }
