@@ -2616,6 +2616,43 @@ div[id^="breaking-content-"] a:hover {
   color: white;
 }
 
+/* Mobile: URL-only leagues nested list (same behavior as desktop) */
+#mobile-league-menu .league-list .url-only-nested {
+  list-style: none;
+  margin: 0;
+  padding-left: 24px;
+  padding-top: 6px;
+  display: none;
+}
+#mobile-league-menu .league-list li.url-only-expanded > .url-only-nested {
+  display: block;
+}
+#mobile-league-menu .league-list .url-only-nested li {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  cursor: pointer;
+  color: #ccc;
+  border-bottom: none;
+}
+#mobile-league-menu .league-list .url-only-nested li:hover {
+  color: white;
+}
+#mobile-league-menu .league-list .url-only-nested li .url-only-nested-icon {
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+#mobile-league-menu .league-list li.url-only-league {
+  display: block;
+}
+#mobile-league-menu .league-list li.url-only-league > .league-name {
+  display: block;
+  padding: 12px 0;
+}
+
 #mobile-league-menu .close-btn {
   position: absolute;
   top: 15px;
@@ -58747,25 +58784,96 @@ document.addEventListener('DOMContentLoaded', function() {
             // { section: 'TrackAndField', text: 'Track & Field' }
         ];
         
+        const urlOnlyLeagues = window.MAIN_MENU_URL_ONLY_LEAGUES || {};
+        const newsIcon = 'https://thporth.com/news.png';
+        const scheduleIcon = 'https://thporth.com/schedule.png';
+        const socialIcon = 'https://thporth.com/social.png';
+        const mediaIcon = 'https://thporth.com/media.png';
+        const highlightsIcon = 'https://thporth.com/highlights.png';
+
         mobileLeagues.forEach(league => {
-            const li = document.createElement('li');
-            li.textContent = league.text;
-            li.dataset.section = league.section;
-            li.addEventListener('click', () => {
-                selectMobileLeague(league.section, league.text);
-            });
-            mobileLeagueList.appendChild(li);
+            const urlOnly = urlOnlyLeagues[league.section];
+            if (urlOnly && urlOnly.url) {
+                // URL-only league: build expandable row with nested News, Social, Media, etc. (same as desktop)
+                const li = document.createElement('li');
+                li.className = 'url-only-league';
+                li.dataset.section = league.section;
+                const span = document.createElement('span');
+                span.className = 'league-name';
+                span.textContent = league.text.trim();
+                li.appendChild(span);
+                const ul = document.createElement('ul');
+                ul.className = 'url-only-nested';
+                const rows = [{ action: 'news', label: 'News', icon: newsIcon }];
+                if (urlOnly.scheduleUrl) {
+                    rows.push({ action: 'schedule', label: 'Schedule', icon: urlOnly.scheduleIcon || scheduleIcon });
+                }
+                rows.push({ action: 'social', label: 'Social', icon: socialIcon }, { action: 'media', label: 'Media', icon: mediaIcon });
+                if (urlOnly.highlightsUrl) {
+                    rows.push({ action: 'highlights', label: 'Highlights', icon: urlOnly.highlightsIcon || highlightsIcon });
+                }
+                rows.forEach(function(row) {
+                    const item = document.createElement('li');
+                    item.dataset.action = row.action;
+                    const img = document.createElement('img');
+                    img.src = row.icon;
+                    img.alt = row.label;
+                    img.className = 'url-only-nested-icon';
+                    item.appendChild(img);
+                    item.appendChild(document.createTextNode(row.label));
+                    ul.appendChild(item);
+                });
+                li.appendChild(ul);
+                mobileLeagueList.appendChild(li);
+            } else {
+                // Normal league or Cricket: single clickable row
+                const li = document.createElement('li');
+                li.textContent = league.text;
+                li.dataset.section = league.section;
+                mobileLeagueList.appendChild(li);
+            }
         });
+
+        // Single delegated click handler for mobile league list (handles url-only expand + nested links + normal leagues)
+        if (mobileLeagueList) {
+            mobileLeagueList.addEventListener('click', function(e) {
+                const li = e.target.closest('.league-list > li');
+                if (!li) return;
+                const nestedLi = e.target.closest('.url-only-nested li');
+                if (nestedLi) {
+                    const parentLeagueLi = nestedLi.closest('.url-only-league');
+                    const section = parentLeagueLi && parentLeagueLi.dataset.section;
+                    const action = nestedLi.dataset.action;
+                    const urlOnly = section && window.MAIN_MENU_URL_ONLY_LEAGUES && window.MAIN_MENU_URL_ONLY_LEAGUES[section];
+                    if (urlOnly && action) {
+                        let url = null;
+                        if (action === 'news' && urlOnly.url) url = urlOnly.url;
+                        else if (action === 'schedule' && urlOnly.scheduleUrl) url = urlOnly.scheduleUrl;
+                        else if (action === 'social' && urlOnly.socialUrl) url = urlOnly.socialUrl;
+                        else if (action === 'media' && urlOnly.mediaUrl) url = urlOnly.mediaUrl;
+                        else if (action === 'highlights' && urlOnly.highlightsUrl) url = urlOnly.highlightsUrl;
+                        if (url) {
+                            window.open(url, '_blank', 'noopener,noreferrer');
+                            if (mobileLeagueMenu) mobileLeagueMenu.style.display = 'none';
+                        }
+                    }
+                    return;
+                }
+                if (li.classList.contains('url-only-league')) {
+                    li.classList.toggle('url-only-expanded');
+                    return;
+                }
+                selectMobileLeague(li.dataset.section, li.textContent.trim());
+            });
+        }
     }
     
     // Select league on mobile - use desktop functionality exactly
     function selectMobileLeague(section, displayName) {
         try {
-            // Main menu URL-only leagues: open URL in new tab and close menu (no in-app league view)
+            // URL-only leagues are handled in the mobile list (expand + nested item click); no-op if called for them
             const mainMenuUrlOnly = window.MAIN_MENU_URL_ONLY_LEAGUES && window.MAIN_MENU_URL_ONLY_LEAGUES[section];
             if (mainMenuUrlOnly && mainMenuUrlOnly.url) {
-                window.open(mainMenuUrlOnly.url, '_blank');
-                if (mobileLeagueMenu) mobileLeagueMenu.style.display = 'none';
                 return;
             }
             
