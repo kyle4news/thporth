@@ -8809,6 +8809,16 @@ function loadCustomRSSFeed(feedUrl, container) {
                     if (leagueSpecificColumn) {
                         leagueSpecificColumn.classList.add('f1-active');
                     }
+                    // When Standings tab is active (default when no events today), load driver standings automatically
+                    setTimeout(function () {
+                        const activeMainTab = document.querySelector('.f1-main-tab.active');
+                        const activeTabType = activeMainTab ? activeMainTab.dataset.f1MainTab : 'standings';
+                        if (activeTabType === 'standings' && typeof loadDriverStandings === 'function') {
+                            if (!window.driverStandingsLoaded) {
+                                loadDriverStandings();
+                            }
+                        }
+                    }, 150);
                 } else {
                     gamesColumn.style.display = 'none';
                     leagueSpecificColumn.style.display = 'block';
@@ -9211,8 +9221,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const f1MainTabsContainer = document.getElementById('f1-main-tabs');
     const f1MainTabContents = document.querySelectorAll('.f1-main-tab-content');
     
-    let driverStandingsLoaded = false;
-    let constructorStandingsLoaded = false;
+    if (typeof window.driverStandingsLoaded === 'undefined') window.driverStandingsLoaded = false;
+    if (typeof window.constructorStandingsLoaded === 'undefined') window.constructorStandingsLoaded = false;
+    let driverStandingsLoaded = window.driverStandingsLoaded;
+    let constructorStandingsLoaded = window.constructorStandingsLoaded;
     if (typeof window.f1ScheduleLastUserSelection === 'undefined') {
         window.f1ScheduleLastUserSelection = null;
     }
@@ -9228,9 +9240,8 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(() => {
                 if (activeTabType === 'standings') {
                     // Standings tab is active by default - load driver standings
-                    if (!driverStandingsLoaded && typeof loadDriverStandings === 'function') {
+                    if (!window.driverStandingsLoaded && typeof loadDriverStandings === 'function') {
                         loadDriverStandings();
-                        driverStandingsLoaded = true;
                     }
                 } else {
                     // Schedule tab - load schedule
@@ -9240,7 +9251,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             }, 100);
-        }, { once: true });
+        });
     }
     
     // Also check on initial page load if FormulaOne section is already visible
@@ -9251,9 +9262,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const activeMainTab = document.querySelector('.f1-main-tab.active');
             const activeTabType = activeMainTab ? activeMainTab.dataset.f1MainTab : 'standings';
             
-            if (activeTabType === 'standings' && !driverStandingsLoaded && typeof loadDriverStandings === 'function') {
+            if (activeTabType === 'standings' && !window.driverStandingsLoaded && typeof loadDriverStandings === 'function') {
                 loadDriverStandings();
-                driverStandingsLoaded = true;
             }
         }
     }, 500);
@@ -9272,10 +9282,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         const activeMainTab = document.querySelector('.f1-main-tab.active');
                         const activeTabType = activeMainTab ? activeMainTab.dataset.f1MainTab : 'standings';
                         
-                        if (activeTabType === 'standings' && !driverStandingsLoaded && typeof loadDriverStandings === 'function') {
+                        if (activeTabType === 'standings' && !window.driverStandingsLoaded && typeof loadDriverStandings === 'function') {
                             setTimeout(() => {
                                 loadDriverStandings();
-                                driverStandingsLoaded = true;
                             }, 100);
                         }
                     }
@@ -9319,9 +9328,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             // Load standings data when Standings tab is clicked
-            if (targetTab === 'standings' && !driverStandingsLoaded) {
+            if (targetTab === 'standings' && !window.driverStandingsLoaded) {
                 loadDriverStandings();
-                driverStandingsLoaded = true;
             }
         });
     }
@@ -9415,12 +9423,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             // Load data if it hasn't been loaded yet
-            if (targetTab === 'driver' && !driverStandingsLoaded) {
+            if (targetTab === 'driver' && !window.driverStandingsLoaded) {
                 loadDriverStandings();
-                driverStandingsLoaded = true; 
-            } else if (targetTab === 'constructor' && !constructorStandingsLoaded) {
+            } else if (targetTab === 'constructor' && !window.constructorStandingsLoaded) {
                 loadConstructorStandings();
-                constructorStandingsLoaded = true;
             }
         });
     }
@@ -9612,6 +9618,7 @@ async function loadDriverStandings() {
         
         loadingDiv.style.display = 'none';
         table.style.display = 'table';
+        window.driverStandingsLoaded = true;
     } catch (error) {
         loadingDiv.style.display = 'none';
         errorDiv.style.display = 'block';
@@ -9661,6 +9668,7 @@ async function loadConstructorStandings() {
         
         loadingDiv.style.display = 'none';
         table.style.display = 'table';
+        window.constructorStandingsLoaded = true;
     } catch (error) {
         loadingDiv.style.display = 'none';
         errorDiv.style.display = 'block';
