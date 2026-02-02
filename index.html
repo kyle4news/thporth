@@ -53038,6 +53038,13 @@ async function fetchFeaturedGames() {
             if (isNCALeague && (leagueKey === 'NCAAM' || leagueKey === 'NCAAW')) {
                 // Top 25 tab is already active by default for NCAAM/NCAAW, so load the data
                 loadTop25Data(leagueKey);
+            } else if (leagueKey !== 'NFL' && !isNCALeague) {
+                // When Rankings/Standings tab is shown by default (e.g. Tennis, UFC, Boxing),
+                // load the standings so content appears without requiring a tab click
+                const leagueInfo = typeof LEAGUE_DATA_CONFIG !== 'undefined' && LEAGUE_DATA_CONFIG[leagueKey];
+                if (leagueInfo && leagueInfo.standingsUrl) {
+                    fetchLeagueStandings(leagueInfo.standingsUrl, leagueKey);
+                }
             }
         }
 
