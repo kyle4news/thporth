@@ -46732,6 +46732,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- 6. DATA FETCHING AND LOGIC FUNCTIONS ---
+    // Canonical key for same event (order-independent matchup): catches "Lopez vs Stevenson" and "Stevenson vs Lopez", duplicate UFC cards, etc.
+    function getCanonicalMatchupKey(game) {
+        const date = (game.gameDate || game.scheduledDate || '').toString().trim();
+        const league = (game.League || game.Sport || '').toString().trim().toLowerCase();
+        const home = (game['Home Team'] || game.home || '').toString().trim().toLowerCase();
+        const away = (game['Away Team'] || game.away || '').toString().trim().toLowerCase();
+        const participants = [home, away].filter(Boolean).sort().join('|');
+        return `${league}|${date}|${participants}`;
+    }
     function sortGames(a, b) {
         // For Boxing/UFC, use sortOrder if available to preserve exact sheet order
         const leagueA = getLeagueDisplayName(a.League, a.Sport);
@@ -50908,6 +50917,15 @@ async function fetchFeaturedGames() {
                 }
             });
             gamesToRender = Array.from(gamesMap.values());
+
+            // Deduplicate by canonical matchup (same league + date + two participants, order-independent) so Boxing/UFC etc. never show twice
+            const seenCanonical = new Set();
+            gamesToRender = gamesToRender.filter(game => {
+                const key = getCanonicalMatchupKey(game);
+                if (seenCanonical.has(key)) return false;
+                seenCanonical.add(key);
+                return true;
+            });
             
             // Exclude old "Asia: AFC Elite" games from Google Sheets (source is not ESPN_LIVE) and any unmapped "AFC Champions League" games
             gamesToRender = gamesToRender.filter(game => {
@@ -51413,11 +51431,20 @@ async function fetchFeaturedGames() {
                 // Only add games from raw yesterday.json that weren't already in featured (avoids NHL, Premier League, etc. appearing twice)
                 gamesData.forEach(addGame);
 
+                // Deduplicate by canonical matchup (same league + date + two participants, order-independent) so Boxing/UFC etc. never show twice
+                const seenCanonicalYesterday = new Set();
+                const afterCanonicalDedup = deduplicatedGames.filter(game => {
+                    const key = getCanonicalMatchupKey(game);
+                    if (seenCanonicalYesterday.has(key)) return false;
+                    seenCanonicalYesterday.add(key);
+                    return true;
+                });
+
                 // Manual deduplication: Remove duplicate Australian Open entries for same date (by custom key)
                 const excludedGameIds = new Set();
                 const seenKeys = new Set();
                 const afterAustralianDedup = [];
-                deduplicatedGames.forEach(game => {
+                afterCanonicalDedup.forEach(game => {
                     const gameId = game['Game ID'] || '';
                     const gameDate = game.gameDate || '';
                     const league = game.League || '';
