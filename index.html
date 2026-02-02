@@ -5936,10 +5936,11 @@ function loadCustomRSSFeed(feedUrl, container) {
          * @param {HTMLElement} container - DOM element to render content into
          */
         async function loadGameContent(gameId, contentType, container) {
+            console.log('[MOBILE_DEBUG] loadGameContent ENTRY', { gameId, contentType, hasContainer: !!container });
             try {
                 // 1. Try to get game data from cache (populated from today.json/yesterday.json)
                 let gameData = window.getGameDataFromCache ? window.getGameDataFromCache(gameId) : null;
-                
+                console.log('[MOBILE_DEBUG] loadGameContent after cache', { hasGameData: !!gameData });
                 // 2. If not in cache, try fetching from today.json/yesterday.json as fallback
                 if (!gameData) {
                     try {
@@ -6053,10 +6054,13 @@ function loadCustomRSSFeed(feedUrl, container) {
                 
                 // For news content, render team tabs with vertical split (50% top, 50% bottom)
                 if (contentType === 'news') {
+                    console.log('[MOBILE_DEBUG] loadGameContent branching to NEWS');
                     console.log(`[loadGameContent] Rendering news team tabs for ${awayTeam} vs ${homeTeam}`);
                     try {
                         renderNewsWithTeamTabs(homeTeam, awayTeam, container, isSoccer, league);
+                        console.log('[MOBILE_DEBUG] loadGameContent renderNewsWithTeamTabs DONE');
                     } catch (error) {
+                        console.error('[MOBILE_DEBUG] CRASH in loadGameContent (news):', error && error.message, error && error.stack);
                         console.error('[loadGameContent] Error in renderNewsWithTeamTabs:', error);
                         container.innerHTML = `
                             <div style="padding: 20px; color: #ff6b6b;">
@@ -6070,10 +6074,13 @@ function loadCustomRSSFeed(feedUrl, container) {
                 
                 // For social content, bypass Perspectives and directly render team RSS feeds
                 if (contentType === 'social') {
+                    console.log('[MOBILE_DEBUG] loadGameContent branching to SOCIAL');
                     console.log(`[loadGameContent] Rendering social team tabs for ${awayTeam} vs ${homeTeam}`);
                     try {
                         renderSocialWithTeamTabs(homeTeam, awayTeam, container, isSoccer, league);
+                        console.log('[MOBILE_DEBUG] loadGameContent renderSocialWithTeamTabs DONE');
                     } catch (error) {
+                        console.error('[MOBILE_DEBUG] CRASH in loadGameContent (social):', error && error.message, error && error.stack);
                         console.error('[loadGameContent] Error in renderSocialWithTeamTabs:', error);
                         container.innerHTML = `
                             <div style="padding: 20px; color: #ff6b6b;">
@@ -6087,10 +6094,13 @@ function loadCustomRSSFeed(feedUrl, container) {
                 
                 // For media content, bypass Perspectives and directly render team media feeds
                 if (contentType === 'media') {
+                    console.log('[MOBILE_DEBUG] loadGameContent branching to MEDIA');
                     console.log(`[loadGameContent] Rendering media team tabs for ${awayTeam} vs ${homeTeam}`);
                     try {
                         renderMediaWithTeamTabs(homeTeam, awayTeam, container, isSoccer, league);
+                        console.log('[MOBILE_DEBUG] loadGameContent renderMediaWithTeamTabs DONE');
                     } catch (error) {
+                        console.error('[MOBILE_DEBUG] CRASH in loadGameContent (media):', error && error.message, error && error.stack);
                         console.error('[loadGameContent] Error in renderMediaWithTeamTabs:', error);
                         container.innerHTML = `
                             <div style="padding: 20px; color: #ff6b6b;">
@@ -6139,8 +6149,9 @@ function loadCustomRSSFeed(feedUrl, container) {
                 }
                 
             } catch (error) {
+                console.error('[MOBILE_DEBUG] CRASH in loadGameContent (outer catch):', error && error.message, error && error.stack);
                 console.error(`[loadGameContent] Error loading ${contentType} for game ${gameId}:`, error);
-                container.innerHTML = `
+                if (container && container.innerHTML !== undefined) container.innerHTML = `
                     <div style="padding: 20px; color: #ff6b6b;">
                         Error loading ${contentType}: ${error.message}<br/>
                         <small>Check console for details</small>
@@ -7287,9 +7298,11 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // Helper function to render news with team tabs (side by side, matching social/media columns)
         function renderNewsWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false, league = '') {
+            console.log('[MOBILE_DEBUG] renderNewsWithTeamTabs ENTRY', { homeTeam, awayTeam, hasContainer: !!container, isSoccer, league });
             console.log('[renderNewsWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer, league });
             
             if (!container) {
+                console.error('[MOBILE_DEBUG] renderNewsWithTeamTabs: container null');
                 console.error('[renderNewsWithTeamTabs] Container is null/undefined!');
                 return;
             }
@@ -7341,7 +7354,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                     data-unique-id="${uniqueId}"
                     onclick="window.switchNewsTeamTab(${i}, '${uniqueId}')"
                 >
-                    ${tab.name.toUpperCase()}
+                    ${(tab.name != null ? String(tab.name) : 'Team').toUpperCase()}
                 </div>
             `).join('');
             
@@ -7359,6 +7372,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 </div>
             `).join('');
             
+            console.log('[MOBILE_DEBUG] renderNewsWithTeamTabs setting innerHTML');
             container.innerHTML = `
                 <div style="display: flex; flex-direction: column; height: 100vh;">
                     <div class="news-team-tabs">
@@ -7369,7 +7383,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                     </div>
                 </div>
             `;
-            
+            console.log('[MOBILE_DEBUG] renderNewsWithTeamTabs innerHTML DONE, loading first tab');
             // Load the first tab's content immediately
             if (tabs[0].feedUrls && Array.isArray(tabs[0].feedUrls)) {
                 loadTeamNewsFeeds(tabs[0].feedUrls, tabIds[0], tabs[0].name);
@@ -7387,9 +7401,12 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // Function to load and merge multiple news RSS feeds, then render
         async function loadTeamNewsFeeds(feedUrls, contentElementId, teamName) {
+            console.log('[MOBILE_DEBUG] loadTeamNewsFeeds ENTRY', { contentElementId, teamName, feedUrlsCount: (feedUrls && feedUrls.length) || 0 });
             const contentElement = document.getElementById(contentElementId);
-            if (!contentElement) return;
-            
+            if (!contentElement) {
+                console.error('[MOBILE_DEBUG] loadTeamNewsFeeds: contentElement not found', contentElementId);
+                return;
+            }
             try {
                 // Show loading state
                 contentElement.innerHTML = `
@@ -7588,18 +7605,23 @@ function loadCustomRSSFeed(feedUrl, container) {
                 `;
                 
             } catch (error) {
+                console.error('[MOBILE_DEBUG] CRASH in loadTeamNewsFeeds:', error && error.message, error && error.stack);
                 console.error(`Error loading news feeds for ${teamName}:`, error);
-                contentElement.innerHTML = `
-                    <div style="padding: 20px; color: #ff6b6b;">
-                        Error loading ${teamName} news: ${error.message}
-                    </div>
-                `;
+                if (contentElement && contentElement.innerHTML !== undefined) {
+                    contentElement.innerHTML = `
+                        <div style="padding: 20px; color: #ff6b6b;">
+                            Error loading ${teamName} news: ${error.message}
+                        </div>
+                    `;
+                }
             }
         }
         
         // Helper function to find team index by team name across all columns
         // Since each column has a different uniqueId, we search all tabs of the given type
         function findTeamIndexByTeamName(teamName, uniqueId, tabType) {
+            console.log('[MOBILE_DEBUG] findTeamIndexByTeamName ENTRY', { teamName, uniqueId, tabType });
+            try {
             // Find all tabs of this type (ignore uniqueId since each column has different one)
             const allTabs = document.querySelectorAll(`.${tabType}-team-tab`);
             
@@ -7622,35 +7644,55 @@ function loadCustomRSSFeed(feedUrl, container) {
             const containerTabs = container.querySelectorAll(`.${tabType}-team-tab`);
             for (let i = 0; i < containerTabs.length; i++) {
                 if (containerTabs[i].getAttribute('data-team') === teamName) {
+                    console.log('[MOBILE_DEBUG] findTeamIndexByTeamName return', i);
                     return i;
                 }
             }
-            
+            console.log('[MOBILE_DEBUG] findTeamIndexByTeamName return -1');
             return -1;
+            } catch (e) {
+                console.error('[MOBILE_DEBUG] CRASH in findTeamIndexByTeamName:', e && e.message, e && e.stack);
+                return -1;
+            }
         }
         
         // Helper function to find uniqueId for a tab type by team name
         function findUniqueIdByTeamName(teamName, tabType) {
+            console.log('[MOBILE_DEBUG] findUniqueIdByTeamName ENTRY', { teamName, tabType });
+            try {
             const tabs = document.querySelectorAll(`.${tabType}-team-tab`);
             for (const tab of tabs) {
                 if (tab.getAttribute('data-team') === teamName) {
-                    return tab.getAttribute('data-unique-id');
+                    const uid = tab.getAttribute('data-unique-id');
+                    console.log('[MOBILE_DEBUG] findUniqueIdByTeamName return', uid);
+                    return uid;
                 }
             }
+            console.log('[MOBILE_DEBUG] findUniqueIdByTeamName return null');
             return null;
+            } catch (e) {
+                console.error('[MOBILE_DEBUG] CRASH in findUniqueIdByTeamName:', e && e.message, e && e.stack);
+                return null;
+            }
         }
         
         // Global function to switch news team tabs (wrapped in try/catch to prevent mobile crash)
         window.switchNewsTeamTab = function(activeIndex, uniqueId) {
+            console.log('[MOBILE_DEBUG] switchNewsTeamTab ENTRY', { activeIndex, uniqueId, activeIndexType: typeof activeIndex });
             try {
-                if (typeof activeIndex !== 'number' || activeIndex < 0 || !uniqueId) return;
+                if (typeof activeIndex !== 'number' || activeIndex < 0 || !uniqueId) {
+                    console.log('[MOBILE_DEBUG] switchNewsTeamTab early return (bad args)');
+                    return;
+                }
+                console.log('[MOBILE_DEBUG] switchNewsTeamTab step: querySelectorAll');
                 const allTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${uniqueId}"]`);
                 const allContents = document.querySelectorAll(`.news-team-content[data-unique-id="${uniqueId}"]`);
-                
+                console.log('[MOBILE_DEBUG] switchNewsTeamTab', { tabsCount: allTabs.length, contentsCount: allContents.length });
                 if (allTabs.length === 0 || allContents.length === 0) return;
                 
                 const activeTab = allTabs[activeIndex];
                 const activeContent = allContents[activeIndex];
+                console.log('[MOBILE_DEBUG] switchNewsTeamTab', { hasActiveTab: !!activeTab, hasActiveContent: !!activeContent });
                 if (!activeTab || !activeContent) return;
                 
                 const teamName = activeTab.getAttribute('data-team');
@@ -7695,12 +7737,13 @@ function loadCustomRSSFeed(feedUrl, container) {
                 }
                 
                 // Synchronize with other columns (only if not already active to avoid loops)
+                console.log('[MOBILE_DEBUG] switchNewsTeamTab step: sync with other columns');
                 try {
                     const socialIndex = findTeamIndexByTeamName(teamName, uniqueId, 'social');
                     const mediaIndex = findTeamIndexByTeamName(teamName, uniqueId, 'media');
                     const socialUniqueId = findUniqueIdByTeamName(teamName, 'social');
                     const mediaUniqueId = findUniqueIdByTeamName(teamName, 'media');
-                    
+                    console.log('[MOBILE_DEBUG] switchNewsTeamTab sync', { teamName, socialIndex, mediaIndex, socialUniqueId: !!socialUniqueId, mediaUniqueId: !!mediaUniqueId });
                     if (socialIndex >= 0 && socialUniqueId) {
                         const socialTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${socialUniqueId}"]`);
                         if (socialTabs[socialIndex] && !socialTabs[socialIndex].classList.contains('active')) {
@@ -7713,18 +7756,24 @@ function loadCustomRSSFeed(feedUrl, container) {
                             window.switchMediaTeamTab(mediaIndex, mediaUniqueId);
                         }
                     }
+                    console.log('[MOBILE_DEBUG] switchNewsTeamTab sync DONE');
                 } catch (syncErr) {
+                    console.error('[MOBILE_DEBUG] CRASH in switchNewsTeamTab (sync):', syncErr && syncErr.message, syncErr && syncErr.stack);
                     console.warn('[switchNewsTeamTab] Sync with other columns failed:', syncErr);
                 }
+                console.log('[MOBILE_DEBUG] switchNewsTeamTab DONE');
             } catch (error) {
+                console.error('[MOBILE_DEBUG] CRASH in switchNewsTeamTab:', error && error.message, error && error.stack);
                 console.error('[switchNewsTeamTab] Error:', error);
             }
         };
         
         // Helper function to render social with team tabs (wrapped so social column load never crashes)
         function renderSocialWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false, league = '') {
+            console.log('[MOBILE_DEBUG] renderSocialWithTeamTabs ENTRY', { homeTeam, awayTeam, hasContainer: !!container });
             try {
                 if (!container) {
+                    console.error('[MOBILE_DEBUG] renderSocialWithTeamTabs: container null');
                     console.error('[renderSocialWithTeamTabs] Container is null/undefined!');
                     return;
                 }
@@ -7806,6 +7855,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 </div>
             `).join('');
             
+            console.log('[MOBILE_DEBUG] renderSocialWithTeamTabs setting innerHTML');
             container.innerHTML = `
                 <div style="display: flex; flex-direction: column; height: 100vh;">
                     <div class="social-team-tabs">
@@ -7816,7 +7866,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                     </div>
                 </div>
             `;
-            
+            console.log('[MOBILE_DEBUG] renderSocialWithTeamTabs innerHTML DONE, loading first tab');
                 // Load the first tab's content immediately (wrapped so one failure doesn't crash)
                 try {
                     if (tabs[0] && tabs[0].feedUrl) {
@@ -7841,6 +7891,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                         }
                     }
                 } catch (firstTabErr) {
+                    console.error('[MOBILE_DEBUG] CRASH in renderSocialWithTeamTabs (first-tab load):', firstTabErr && firstTabErr.message, firstTabErr && firstTabErr.stack);
                     console.error('[renderSocialWithTeamTabs] First-tab load error:', firstTabErr);
                     try {
                         var fc = document.getElementById(tabIds[0]);
@@ -7848,6 +7899,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                     } catch (e) {}
                 }
             } catch (err) {
+                console.error('[MOBILE_DEBUG] CRASH in renderSocialWithTeamTabs:', err && err.message, err && err.stack);
                 console.error('[renderSocialWithTeamTabs] Error:', err);
                 try {
                     if (container && container.innerHTML !== undefined) {
@@ -7859,6 +7911,7 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // Function to embed Nitter profile (wrapped in try/catch to prevent social column crash)
         function embedNitterProfile(nitterUrl, contentElementId, teamName) {
+            console.log('[MOBILE_DEBUG] embedNitterProfile ENTRY', { contentElementId, teamName });
             try {
                 if (!nitterUrl || typeof nitterUrl !== 'string' || !contentElementId) return;
                 const contentElement = document.getElementById(contentElementId);
@@ -7983,6 +8036,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 };
             }
             } catch (err) {
+                console.error('[MOBILE_DEBUG] CRASH in embedNitterProfile:', err && err.message, err && err.stack);
                 console.error('[embedNitterProfile] Error:', err);
                 try {
                     const el = document.getElementById(contentElementId);
@@ -8225,9 +8279,11 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // Helper function to render media with team tabs (similar to renderSocialWithTeamTabs)
         function renderMediaWithTeamTabs(homeTeam, awayTeam, container, isSoccer = false, league = '') {
+            console.log('[MOBILE_DEBUG] renderMediaWithTeamTabs ENTRY', { homeTeam, awayTeam, hasContainer: !!container, isSoccer, league });
             console.log('[renderMediaWithTeamTabs] Called with:', { homeTeam, awayTeam, container, isSoccer, league });
             
             if (!container) {
+                console.error('[MOBILE_DEBUG] renderMediaWithTeamTabs: container null');
                 console.error('[renderMediaWithTeamTabs] Container is null/undefined!');
                 return;
             }
@@ -8281,7 +8337,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                     data-unique-id="${uniqueId}"
                     onclick="if (typeof window.switchMediaTeamTab === 'function') { try { window.switchMediaTeamTab(${i}, '${uniqueId}'); } catch(e) { console.error('Error in switchMediaTeamTab:', e); } }"
                 >
-                    ${tab.name.toUpperCase()}
+                    ${(tab.name != null ? String(tab.name) : 'Team').toUpperCase()}
                 </div>
             `).join('');
             
@@ -8327,9 +8383,12 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // Function to load and render a single RSS feed (RSS XML)
         async function loadTeamMediaFeed(feedUrl, contentElementId, teamName) {
+            console.log('[MOBILE_DEBUG] loadTeamMediaFeed ENTRY', { contentElementId, teamName, hasFeedUrl: !!feedUrl });
             const contentElement = document.getElementById(contentElementId);
-            if (!contentElement) return;
-            
+            if (!contentElement) {
+                console.error('[MOBILE_DEBUG] loadTeamMediaFeed: contentElement not found', contentElementId);
+                return;
+            }
             try {
                 // Show loading state
                 contentElement.innerHTML = `
@@ -8446,28 +8505,37 @@ function loadCustomRSSFeed(feedUrl, container) {
                 `;
                 
             } catch (error) {
+                console.error('[MOBILE_DEBUG] CRASH in loadTeamMediaFeed:', error && error.message, error && error.stack);
                 console.error(`Error loading media feeds for ${teamName}:`, error);
-                contentElement.innerHTML = `
-                    <div style="padding: 20px; color: #ff6b6b;">
-                        Error loading ${teamName} media: ${error.message}
-                    </div>
-                `;
+                if (contentElement && contentElement.innerHTML !== undefined) {
+                    contentElement.innerHTML = `
+                        <div style="padding: 20px; color: #ff6b6b;">
+                            Error loading ${teamName} media: ${error.message}
+                        </div>
+                    `;
+                }
             }
         }
         
         // Global function to switch between media team tabs
         window.switchMediaTeamTab = function(activeIndex, uniqueId) {
+            console.log('[MOBILE_DEBUG] switchMediaTeamTab ENTRY', { activeIndex, uniqueId });
             try {
+                console.log('[MOBILE_DEBUG] switchMediaTeamTab step: querySelectorAll');
                 const allTabs = document.querySelectorAll(`.media-team-tab[data-unique-id="${uniqueId}"]`);
                 const allContents = document.querySelectorAll(`.media-team-content[data-unique-id="${uniqueId}"]`);
-                
+                console.log('[MOBILE_DEBUG] switchMediaTeamTab', { tabsCount: allTabs.length, contentsCount: allContents.length });
                 if (allTabs.length === 0 || allContents.length === 0) return;
                 
                 const activeTab = allTabs[activeIndex];
                 if (!activeTab) return;
-                
+                const activeContentEl = allContents[activeIndex];
+                if (!activeContentEl) {
+                    console.error('[MOBILE_DEBUG] CRASH in switchMediaTeamTab: allContents[activeIndex] is null', { activeIndex, contentsLength: allContents.length });
+                    return;
+                }
                 const teamName = activeTab.getAttribute('data-team');
-                const contentElementId = allContents[activeIndex].id;
+                const contentElementId = activeContentEl.id;
                 const feedUrl = (typeof TEAM_TO_MEDIA_FEED !== 'undefined' && TEAM_TO_MEDIA_FEED) ? (TEAM_TO_MEDIA_FEED[teamName] || null) : null;
             
             const isAlreadyActive = activeTab.classList.contains('active');
@@ -8505,36 +8573,45 @@ function loadCustomRSSFeed(feedUrl, container) {
             const socialIndex = findTeamIndexByTeamName(teamName, uniqueId, 'social');
             const newsUniqueId = findUniqueIdByTeamName(teamName, 'news');
             const socialUniqueId = findUniqueIdByTeamName(teamName, 'social');
-            
-            if (newsIndex >= 0 && newsUniqueId) {
-                const newsTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${newsUniqueId}"]`);
-                if (newsTabs[newsIndex] && !newsTabs[newsIndex].classList.contains('active')) {
-                    window.switchNewsTeamTab(newsIndex, newsUniqueId);
+            console.log('[MOBILE_DEBUG] switchMediaTeamTab step: sync');
+            try {
+                if (newsIndex >= 0 && newsUniqueId) {
+                    const newsTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${newsUniqueId}"]`);
+                    if (newsTabs[newsIndex] && !newsTabs[newsIndex].classList.contains('active')) {
+                        window.switchNewsTeamTab(newsIndex, newsUniqueId);
+                    }
                 }
-            }
-            if (socialIndex >= 0 && socialUniqueId) {
-                const socialTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${socialUniqueId}"]`);
-                if (socialTabs[socialIndex] && !socialTabs[socialIndex].classList.contains('active')) {
-                    window.switchSocialTeamTab(socialIndex, socialUniqueId);
+                if (socialIndex >= 0 && socialUniqueId) {
+                    const socialTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${socialUniqueId}"]`);
+                    if (socialTabs[socialIndex] && !socialTabs[socialIndex].classList.contains('active')) {
+                        window.switchSocialTeamTab(socialIndex, socialUniqueId);
+                    }
                 }
+                console.log('[MOBILE_DEBUG] switchMediaTeamTab sync DONE');
+            } catch (syncErr) {
+                console.error('[MOBILE_DEBUG] CRASH in switchMediaTeamTab (sync):', syncErr && syncErr.message, syncErr && syncErr.stack);
             }
+                console.log('[MOBILE_DEBUG] switchMediaTeamTab DONE');
             } catch (error) {
+                console.error('[MOBILE_DEBUG] CRASH in switchMediaTeamTab:', error && error.message, error && error.stack);
                 console.error('[switchMediaTeamTab] Error:', error);
-                // Prevent page crash by catching and logging the error
             }
         };
         
         // Global function to switch between team tabs (wrapped in try/catch to prevent mobile crash)
         window.switchSocialTeamTab = function(activeIndex, uniqueId) {
+            console.log('[MOBILE_DEBUG] switchSocialTeamTab ENTRY', { activeIndex, uniqueId });
             try {
                 if (typeof activeIndex !== 'number' || activeIndex < 0 || !uniqueId) return;
+                console.log('[MOBILE_DEBUG] switchSocialTeamTab step: querySelectorAll');
                 const allTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${uniqueId}"]`);
                 const allContents = document.querySelectorAll(`.social-team-content[data-unique-id="${uniqueId}"]`);
-                
+                console.log('[MOBILE_DEBUG] switchSocialTeamTab', { tabsCount: allTabs.length, contentsCount: allContents.length });
                 if (allTabs.length === 0 || allContents.length === 0) return;
                 
                 const activeTab = allTabs[activeIndex];
                 const content = allContents[activeIndex];
+                console.log('[MOBILE_DEBUG] switchSocialTeamTab', { hasActiveTab: !!activeTab, hasContent: !!content });
                 if (!activeTab || !content) return;
                 
                 const feedUrl = activeTab.getAttribute('data-feed-url');
@@ -8603,6 +8680,8 @@ function loadCustomRSSFeed(feedUrl, container) {
             });
             
             // Synchronize with other columns (only if not already active to avoid loops)
+            console.log('[MOBILE_DEBUG] switchSocialTeamTab step: sync');
+            try {
             const newsIndex = findTeamIndexByTeamName(teamName, uniqueId, 'news');
             const mediaIndex = findTeamIndexByTeamName(teamName, uniqueId, 'media');
             const newsUniqueId = findUniqueIdByTeamName(teamName, 'news');
@@ -8620,7 +8699,13 @@ function loadCustomRSSFeed(feedUrl, container) {
                     window.switchMediaTeamTab(mediaIndex, mediaUniqueId);
                 }
             }
+            console.log('[MOBILE_DEBUG] switchSocialTeamTab sync DONE');
+            } catch (syncErr) {
+                console.error('[MOBILE_DEBUG] CRASH in switchSocialTeamTab (sync):', syncErr && syncErr.message, syncErr && syncErr.stack);
+            }
+            console.log('[MOBILE_DEBUG] switchSocialTeamTab DONE');
             } catch (error) {
+                console.error('[MOBILE_DEBUG] CRASH in switchSocialTeamTab:', error && error.message, error && error.stack);
                 console.error('[switchSocialTeamTab] Error:', error);
             }
         };
@@ -8661,6 +8746,14 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // Make loadGameContent globally accessible
         window.loadGameContent = loadGameContent;
+
+        // MOBILE_DEBUG: global handler to log uncaught errors (helps find crash cause from console)
+        window.addEventListener('error', function(ev) {
+            console.error('[MOBILE_DEBUG] Uncaught error:', ev.message, ev.filename, ev.lineno, ev.colno, ev.error && ev.error.stack);
+        });
+        window.addEventListener('unhandledrejection', function(ev) {
+            console.error('[MOBILE_DEBUG] Unhandled promise rejection:', ev.reason && (ev.reason.message || ev.reason), ev.reason && ev.reason && ev.reason.stack);
+        });
 
         // --- NEW: FALLBACK URLs FOR THE HOME PAGE ---
         const HOME_PAGE_FEEDS = {
