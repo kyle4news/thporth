@@ -8572,12 +8572,12 @@ function loadCustomRSSFeed(feedUrl, container) {
             }
         };
         
-        // Prevent team tab clicks from bubbling (stops mobile toolbar/parent handlers from firing and "returning to home")
+        // Stop team tab clicks from bubbling *after* the tab's onclick runs (bubble phase), so toolbar/parent handlers don't fire
         document.addEventListener('click', function(e) {
             if (e.target && typeof e.target.closest === 'function' && e.target.closest('.news-team-tab, .social-team-tab, .media-team-tab')) {
                 e.stopPropagation();
             }
-        }, true);
+        }, false);
         
         // Helper function to format dates
         function formatDate(dateObj) {
