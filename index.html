@@ -2492,6 +2492,23 @@ div[id^="breaking-content-"] a:hover {
   font-weight: normal;
 }
 
+#mobile-game-info-bar .mobile-game-back-btn {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 0 8px;
+  margin-right: 6px;
+  font-size: 16px;
+  line-height: 18px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 32px;
+}
+
+#mobile-game-info-bar .mobile-game-back-btn:active {
+  background: #555;
+}
+
 #mobile-game-info-bar .league-team-gap {
   display: inline-block;
   width: 6px;
@@ -5125,9 +5142,9 @@ function loadCustomRSSFeed(feedUrl, container) {
                 teamDisplay = awayTeam && homeTeam ? `${awayTeam} - ${homeTeam}` : (awayTeam || homeTeam || '');
             }
             
-            // Update the bar content
+            // Update the bar content - include Back button to prevent accidental Games toolbar taps
             if (leagueName && teamDisplay) {
-                infoBar.innerHTML = `<span class="league-name">${leagueName}</span><span class="team-names"><span class="league-team-gap" aria-hidden="true"></span>${teamDisplay}</span>`;
+                infoBar.innerHTML = `<button type="button" class="mobile-game-back-btn" aria-label="Back to games">←</button><span class="league-name">${leagueName}</span><span class="team-names"><span class="league-team-gap" aria-hidden="true"></span>${teamDisplay}</span>`;
                 
                 // Function to update bar position based on News and Media button positions
                 const updateBarPosition = () => {
@@ -5158,6 +5175,26 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (!infoBar._hasResizeListener) {
                     window.addEventListener('resize', updateBarPosition);
                     infoBar._hasResizeListener = true;
+                }
+                // Wire up Back button (delegated - works when innerHTML is replaced)
+                if (!infoBar._hasBackClickListener) {
+                    infoBar.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('mobile-game-back-btn')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const section = document.querySelector('#menuList li.selected, #menuList-123 li.selected')?.dataset?.section || 'Home';
+                            infoBar.style.display = 'none';
+                            try { window.selectedGameId = null; window.currentSelectedGameId = null; } catch (err) {}
+                            document.querySelectorAll('.game-row').forEach(r => r.classList.remove('game-selected'));
+                            if (typeof window.renderNews === 'function') {
+                                window.renderNews(section, 'league');
+                            }
+                            if (typeof window.showMobileColumn === 'function') {
+                                window.showMobileColumn('games');
+                            }
+                        }
+                    });
+                    infoBar._hasBackClickListener = true;
                 }
             } else {
                 infoBar.style.display = 'none';
@@ -54973,45 +55010,8 @@ const gamesTabsContainer = document.getElementById('games-tabs');
 // Call initialization function
 initializeTabsAndFilters();
 
-// DEBUGGING: MutationObserver to catch what's undoing our changes
-const todayTarget = document.getElementById('tv-listings-today');
-const scoresTarget = document.getElementById('tv-listings-scores');
-
-if (todayTarget) {
-    new MutationObserver(mutations => {
-        mutations.forEach(m => {
-            console.log(
-                '🔴 TODAY MUTATION:',
-                m.attributeName,
-                'display =',
-                getComputedStyle(todayTarget).display,
-                'stack:',
-                new Error().stack
-            );
-        });
-    }).observe(todayTarget, {
-        attributes: true,
-        attributeFilter: ['style', 'class']
-    });
-}
-
-if (scoresTarget) {
-    new MutationObserver(mutations => {
-        mutations.forEach(m => {
-            console.log(
-                '🔴 SCORES MUTATION:',
-                m.attributeName,
-                'display =',
-                getComputedStyle(scoresTarget).display,
-                'stack:',
-                new Error().stack
-            );
-        });
-    }).observe(scoresTarget, {
-        attributes: true,
-        attributeFilter: ['style', 'class']
-    });
-}
+// DEBUGGING MutationObservers removed - they caused mobile Safari crashes
+// (Creating new Error().stack on every DOM mutation was extremely expensive)
 
 // --- STATS SUB-TABS INITIALIZATION ---
 const statsSubTabsContainer = document.getElementById('stats-sub-tabs');
@@ -58963,11 +58963,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (mobileGamesBtn) {
-        mobileGamesBtn.addEventListener('click', () => {
-            // Show games column - keep game-specific content in news, social, media columns
-            // Game-specific content will only reset when:
-            // 1. User clicks on main menu and switches to a different league
-            // 2. User clicks on a new game from the League > Games column
+        let gamesBtnFirstTapTime = 0;
+        mobileGamesBtn.addEventListener('click', (e) => {
+            const infoBar = document.getElementById('mobile-game-info-bar');
+            const isViewingGame = infoBar && getComputedStyle(infoBar).display !== 'none';
+            if (isViewingGame) {
+                const now = Date.now();
+                if (now - gamesBtnFirstTapTime < 2000 && gamesBtnFirstTapTime > 0) {
+                    gamesBtnFirstTapTime = 0;
+                    const section = document.querySelector('#menuList li.selected, #menuList-123 li.selected')?.dataset?.section || 'Home';
+                    infoBar.style.display = 'none';
+                    try { window.selectedGameId = null; window.currentSelectedGameId = null; } catch (err) {}
+                    document.querySelectorAll('.game-row').forEach(r => r.classList.remove('game-selected'));
+                    if (typeof window.renderNews === 'function') window.renderNews(section, 'league');
+                    showMobileColumn('games');
+                } else {
+                    gamesBtnFirstTapTime = now;
+                    mobileGamesBtn.setAttribute('title', 'Tap again to return to games');
+                    const orig = mobileGamesBtn.style.opacity;
+                    mobileGamesBtn.style.opacity = '0.6';
+                    setTimeout(() => { mobileGamesBtn.style.opacity = orig || ''; mobileGamesBtn.removeAttribute('title'); }, 600);
+                }
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            gamesBtnFirstTapTime = 0;
             showMobileColumn('games');
         });
     }
@@ -59015,8 +59036,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Resize events fire frequently on mobile (address bar hide/show, etc.) and would
         // incorrectly reset the view back to home. Skip reinitialization when game info bar is visible.
         const mobileGameInfoBar = document.getElementById('mobile-game-info-bar');
-        const isViewingGame = mobileGameInfoBar && mobileGameInfoBar.style.display !== 'none' && getComputedStyle(mobileGameInfoBar).display !== 'none';
-        if (isViewingGame) return;
+        const infoBarVisible = mobileGameInfoBar && getComputedStyle(mobileGameInfoBar).display !== 'none';
+        const hasSelectedGame = !!(window.selectedGameId || window.currentSelectedGameId);
+        if (infoBarVisible || hasSelectedGame) return;
         
         showMobileColumn('news');
     }
