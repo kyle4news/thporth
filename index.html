@@ -58941,6 +58941,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const infoBar = document.getElementById('mobile-game-info-bar');
         if (infoBar && getComputedStyle(infoBar).display !== 'none') return;
         if (window.selectedGameId || window.currentSelectedGameId) return;
+        // Also skip when news column shows game-specific content (team tabs) - e.g. after clicking team tab
+        if (document.querySelector('.column.news .news-team-tabs')) return;
         showMobileColumn('news');
     }
     
