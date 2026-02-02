@@ -42959,15 +42959,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (hour === 12) hour = 0;
             if (meridiem === 'PM') hour += 12;
             const result = `${hour.toString().padStart(2, '0')}:${minutes}`;
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:12476',message:'normalizeDisplayTime result',data:{originalLabel,withoutHTML,cleaned,result},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             return result;
         }
         const result = cleaned.toUpperCase();
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:12495',message:'normalizeDisplayTime fallback',data:{originalLabel,withoutHTML,cleaned,result},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
         return result;
     }
 
@@ -45862,9 +45856,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Extract plain text from currentTimeLabel before normalizing (remove HTML tags)
                 const currentTimeLabelPlain = currentTimeLabel ? currentTimeLabel.replace(/<[^>]*>/g, '') : '';
                 const normalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(currentTimeLabelPlain) : null;
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:14682',message:'Current game time values',data:{currentTimeLabel,currentTimeLabelPlain,normalizedTimeLabel,isLive,isFinal,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
                 let displayTimeLabel = currentTimeLabel;
                 if (!isLive && !isFinal && normalizedTimeLabel && normalizedTimeLabel !== 'TBD') {
                     if (shouldPrioritizeImportant && !isImportantGame) {
@@ -46239,10 +46230,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // Get the NEXT game's time label to determine if the line above it should be full width
                     let nextTimeLabel = "";
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15057',message:'Next game raw data',data:{nextDataTimeString:nextData.timeString,nextRawStart:nextRawStart?typeof nextRawStart:'null',hasToDate:nextRawStart&&nextRawStart.toDate?'yes':'no',nextIsLive,nextIsFinal,nextIsPostponed,nextIsCanceled,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-                    // #endregion
-                    
                     if (nextData.timeString === '') {
                         nextTimeLabel = "";
                     } else if (nextIsLive) {
@@ -46283,10 +46270,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         nextTimeLabel = "TBD";
                     }
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15068',message:'Next time label determined',data:{nextTimeLabel,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-                    // #endregion
-                    
                     const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
                     // Extract plain text from nextTimeLabel for comparison (remove HTML tags)
                     const nextTimeLabelPlain = nextTimeLabel ? nextTimeLabel.replace(/<[^>]*>/g, '') : '';
@@ -46296,10 +46279,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Use plain text versions for consistent comparison
                     const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabelPlain;
                     const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15059',message:'Separator line comparison',data:{nextTimeLabel,nextNormalizedTimeLabel,nextGameTimeLabel,normalizedTimeLabel,currentTimeLabel,currentGameTimeLabel,isDifferentTime,nextIsLive,nextIsFinal,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-                    // #endregion
-                    
                     // Same time: separator does NOT extend over time column. Different time: separator extends full row.
                     const colspan = isDifferentTime ? 4 : 4;
                     const firstCell = isDifferentTime ? '' : '<td style="padding: 0; border: none; width: 32%;"></td>';
@@ -58157,7 +58136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function fetchFeedNCAASoftball(url, contentPane) {
         if (!contentPane) return;
         contentPane.innerHTML = '<p>Loading...</p>';
-        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        const proxyUrl = 'https://rss-feed-service-124291936014.us-central1.run.app/proxy/rss?url=';
         const finalUrl = proxyUrl + encodeURIComponent(url);
         fetch(finalUrl)
             .then(r => r.text())
@@ -58199,7 +58178,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function fetchFeedNCAAW(url, contentPane) {
         if (!contentPane) return;
         contentPane.innerHTML = '<p>Loading...</p>';
-        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        const proxyUrl = 'https://rss-feed-service-124291936014.us-central1.run.app/proxy/rss?url=';
         const finalUrl = proxyUrl + encodeURIComponent(url);
         fetch(finalUrl)
             .then(r => r.text())
@@ -58241,7 +58220,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function fetchFeedNCAABaseball(url, contentPane) {
         if (!contentPane) return;
         contentPane.innerHTML = '<p>Loading...</p>';
-        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        const proxyUrl = 'https://rss-feed-service-124291936014.us-central1.run.app/proxy/rss?url=';
         const finalUrl = proxyUrl + encodeURIComponent(url);
         fetch(finalUrl)
             .then(r => r.text())
