@@ -6464,7 +6464,33 @@ function loadCustomRSSFeed(feedUrl, container) {
             'San Antonio Spurs': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-sanantoniospurs.xml',
             'Toronto Raptors': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-torontoraptors.xml',
             'Utah Jazz': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-utahjazz.xml',
-            'Washington Wizards': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-washingtonwizards.xml'
+            'Washington Wizards': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-washingtonwizards.xml',
+            // Premier League teams (game-specific Media tabs)
+            'Arsenal': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-arsenal.xml',
+            'Manchester City': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-mancity.xml',
+            'Aston Villa': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-astonvilla.xml',
+            'Liverpool': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-liverpool.xml',
+            'Brentford': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-brentford.xml',
+            'Newcastle': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-newcastle.xml',
+            'Newcastle United': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-newcastle.xml',
+            'Manchester United': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-manutd.xml',
+            'Chelsea': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-chelsea.xml',
+            'Fulham': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-fulham.xml',
+            'Sunderland': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-sunderland.xml',
+            'Brighton & Hove Albion': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-brighton.xml',
+            'Brighton': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-brighton.xml',
+            'Everton': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-everton.xml',
+            'Crystal Palace': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-crystalpalace.xml',
+            'Tottenham Hotspur': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-tottenham.xml',
+            'Tottenham': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-tottenham.xml',
+            'Bournemouth': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-bournemouth.xml',
+            'Leeds United': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-leeds.xml',
+            'Leeds': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-leeds.xml',
+            'Nottingham Forest': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-nottinghamforest.xml',
+            'West Ham United': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-westham.xml',
+            'West Ham': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-westham.xml',
+            'Burnley': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-burnley.xml',
+            'Wolves': 'https://rss-feed-service-124291936014.us-central1.run.app/feeds/youtube-wolves.xml'
         };
         
         // Function to check if a game is clickable (has at least one team with feed mappings)
@@ -51367,51 +51393,51 @@ async function fetchFeaturedGames() {
                     });
                 }
                 
-                // Combine games with yesterday's featured games first, then hardcoded games, then URL-only featured, then regular games
-                const allGames = [...yesterdayFeaturedGames, ...hardcodedYesterdayGames, ...urlOnlyYesterdayGames, ...gamesData];
-                
-                // Manual deduplication: Remove duplicate Australian Open entries for same date
-                // Keep featured games, remove duplicates from hardcoded/regular games
+                // Build list without duplicating: featured first (already has yesterday.json merged in),
+                // then hardcoded, then URL-only, then only games from gamesData that are NOT already in featured
+                const seenGameIds = new Set();
                 const deduplicatedGames = [];
+                const addGame = (game) => {
+                    const gameId = (game['Game ID'] || '').toString().trim();
+                    if (!gameId) {
+                        deduplicatedGames.push(game);
+                        return;
+                    }
+                    if (seenGameIds.has(gameId)) return;
+                    seenGameIds.add(gameId);
+                    deduplicatedGames.push(game);
+                };
+                yesterdayFeaturedGames.forEach(addGame);
+                hardcodedYesterdayGames.forEach(addGame);
+                urlOnlyYesterdayGames.forEach(addGame);
+                // Only add games from raw yesterday.json that weren't already in featured (avoids NHL, Premier League, etc. appearing twice)
+                gamesData.forEach(addGame);
+
+                // Manual deduplication: Remove duplicate Australian Open entries for same date (by custom key)
+                const excludedGameIds = new Set();
                 const seenKeys = new Set();
-                const excludedGameIds = new Set(); // Manually add Game IDs here to exclude them
-                // Example: excludedGameIds.add('hardcoded-yesterday-Tennis-2026-01-26-1234567890-0.123');
-                
-                allGames.forEach(game => {
+                const afterAustralianDedup = [];
+                deduplicatedGames.forEach(game => {
                     const gameId = game['Game ID'] || '';
                     const gameDate = game.gameDate || '';
                     const league = game.League || '';
                     const awayTeam = game['Away Team'] || '';
                     const homeTeam = game['Home Team'] || '';
-                    
-                    // Skip manually excluded games
-                    if (excludedGameIds.has(gameId)) {
-                        return;
-                    }
-                    
-                    // For Australian Open (or any hardcoded games), create a deduplication key
+                    if (excludedGameIds.has(gameId)) return;
                     if (awayTeam === 'Australian Open' && gameDate === yesterdayStr) {
                         const dedupKey = `${gameDate}|${league}|${awayTeam}|${homeTeam}`;
-                        
-                        // If we've seen this key before, skip this game (unless it's featured)
-                        if (seenKeys.has(dedupKey)) {
-                            // Keep featured games, skip non-featured duplicates
-                            if (!game.isFeatured) {
-                                return;
-                            }
-                        } else {
-                            seenKeys.add(dedupKey);
-                        }
+                        if (seenKeys.has(dedupKey) && !game.isFeatured) return;
+                        seenKeys.add(dedupKey);
                     }
-                    
-                    deduplicatedGames.push(game);
+                    afterAustralianDedup.push(game);
                 });
-                
+                const deduplicatedGamesFinal = afterAustralianDedup;
+
                 // Cache the results until next 3:55 AM ET
-                yesterdayScoresCache = deduplicatedGames;
+                yesterdayScoresCache = deduplicatedGamesFinal;
                 yesterdayScoresCacheExpiry = getNextPrepExpiryTimestamp();
-                
-                renderYesterdayScores(deduplicatedGames);
+
+                renderYesterdayScores(deduplicatedGamesFinal);
             })
             .catch(error => {
             scoresLoading.style.display = 'none';
