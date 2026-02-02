@@ -4375,10 +4375,11 @@ function loadSocialFeed(section) {
 
 // Route YouTube and other CORS-blocked URLs through the RSS proxy
 const RSS_FEED_PROXY_BASE = 'https://rss-feed-service-124291936014.us-central1.run.app';
+const FEED_FETCH_TIMEOUT_MS = 25000; // 25s - avoid indefinite hangs on slow feeds
 function toProxiedUrlIfNeeded(url) {
   if (!url || typeof url !== 'string') return url;
-  // YouTube and other domains that block cross-origin fetch - use proxy
-  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+  // YouTube and rss.app - use proxy to avoid CORS and improve reliability
+  if (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('rss.app')) {
     return `${RSS_FEED_PROXY_BASE}/proxy/rss?url=${encodeURIComponent(url)}`;
   }
   return url;
@@ -4386,13 +4387,17 @@ function toProxiedUrlIfNeeded(url) {
 
 // Load multiple RSS feeds, combine, sort by date, and display
 async function loadMultipleRSSFeeds(feedUrls, container) {
+  const loadId = (container._videosLoadId = (container._videosLoadId || 0) + 1);
   container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">Loading feeds...</div>';
   
   try {
-    // Fetch all feeds in parallel (YouTube URLs routed through proxy to avoid CORS)
-    const feedPromises = feedUrls.map(url => 
-      fetch(toProxiedUrlIfNeeded(url))
+    // Fetch all feeds in parallel (YouTube/rss.app via proxy). Timeout to avoid hangs.
+    const feedPromises = feedUrls.map(url => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FEED_FETCH_TIMEOUT_MS);
+      return fetch(toProxiedUrlIfNeeded(url), { signal: controller.signal })
         .then(response => {
+          clearTimeout(timeoutId);
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status} for ${url}`);
           }
@@ -4400,10 +4405,11 @@ async function loadMultipleRSSFeeds(feedUrls, container) {
         })
         .then(xml => ({ url, xml, success: true }))
         .catch(error => {
+          clearTimeout(timeoutId);
           console.error(`Error fetching feed ${url}:`, error);
           return { url, xml: null, success: false, error: error.message };
-        })
-    );
+        });
+    });
     
     const feedResults = await Promise.all(feedPromises);
     
@@ -4670,10 +4676,15 @@ async function loadMultipleRSSFeeds(feedUrls, container) {
     });
     html += '</div>';
     
-    container.innerHTML = html;
+    // Only update if this load is still current (user hasn't switched sections)
+    if (container._videosLoadId === loadId) {
+      container.innerHTML = html;
+    }
   } catch (error) {
     console.error('Error loading multiple RSS feeds:', error);
-    container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading feeds.</div>';
+    if (container._videosLoadId === loadId) {
+      container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading feeds.</div>';
+    }
   }
 }
 
@@ -4683,12 +4694,16 @@ function loadCustomRSSFeed(feedUrl, container) {
     return loadMultipleRSSFeeds(feedUrl, container);
   }
   
+  const loadId = (container._videosLoadId = (container._videosLoadId || 0) + 1);
   container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">Loading feed...</div>';
   
-  // Route YouTube through proxy to avoid CORS; direct fetch for same-origin/proxyable URLs
+  // Route YouTube/rss.app through proxy; add timeout to avoid indefinite hangs
   const fetchUrl = toProxiedUrlIfNeeded(feedUrl);
-  fetch(fetchUrl)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FEED_FETCH_TIMEOUT_MS);
+  fetch(fetchUrl, { signal: controller.signal })
     .then(response => {
+      clearTimeout(timeoutId);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -4732,7 +4747,9 @@ function loadCustomRSSFeed(feedUrl, container) {
       if (items.length === 0) {
         console.error('No items found in feed. XML structure:', xml.substring(0, 1000));
         console.error('XML Namespaces:', Array.from(xmlDoc.documentElement.attributes).map(a => `${a.name}="${a.value}"`).join(', '));
-        container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">No items in feed.</div>';
+        if (container._videosLoadId === loadId) {
+          container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">No items in feed.</div>';
+        }
         return;
       }
       
@@ -4999,11 +5016,16 @@ function loadCustomRSSFeed(feedUrl, container) {
       });
       html += '</div>';
       
-      container.innerHTML = html;
+      if (container._videosLoadId === loadId) {
+        container.innerHTML = html;
+      }
     })
     .catch(error => {
+      clearTimeout(timeoutId);
       console.error('Error loading RSS feed:', error);
-      container.innerHTML = `<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading feed: ${error.message}</div>`;
+      if (container._videosLoadId === loadId) {
+        container.innerHTML = `<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading feed: ${error.message}</div>`;
+      }
     });
 }
 
@@ -8634,7 +8656,8 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             // Display loading message
             container.innerHTML = '<p style="padding: 10px; color: #9ca3af;">Loading feed...</p>';
-            fetch(feedUrl)
+            const actualUrl = (typeof toProxiedUrlIfNeeded === 'function' ? toProxiedUrlIfNeeded(feedUrl) : feedUrl);
+            fetch(actualUrl)
                 .then(res => {
                     if (!res.ok) {
                         throw new Error(`HTTP error! status: ${res.status}`);
