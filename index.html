@@ -4373,31 +4373,15 @@ function loadSocialFeed(section) {
 
 // Load custom RSS feed from our RSS service
 
-// Route YouTube and other CORS-blocked URLs through the RSS proxy
-const RSS_FEED_PROXY_BASE = 'https://rss-feed-service-124291936014.us-central1.run.app';
-const FEED_FETCH_TIMEOUT_MS = 25000; // 25s - avoid indefinite hangs on slow feeds
-function toProxiedUrlIfNeeded(url) {
-  if (!url || typeof url !== 'string') return url;
-  // YouTube and rss.app - use proxy to avoid CORS and improve reliability
-  if (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('rss.app')) {
-    return `${RSS_FEED_PROXY_BASE}/proxy/rss?url=${encodeURIComponent(url)}`;
-  }
-  return url;
-}
-
 // Load multiple RSS feeds, combine, sort by date, and display
 async function loadMultipleRSSFeeds(feedUrls, container) {
-  const loadId = (container._videosLoadId = (container._videosLoadId || 0) + 1);
   container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">Loading feeds...</div>';
   
   try {
-    // Fetch all feeds in parallel (YouTube/rss.app via proxy). Timeout to avoid hangs.
-    const feedPromises = feedUrls.map(url => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), FEED_FETCH_TIMEOUT_MS);
-      return fetch(toProxiedUrlIfNeeded(url), { signal: controller.signal })
+    // Fetch all feeds in parallel
+    const feedPromises = feedUrls.map(url => 
+      fetch(url)
         .then(response => {
-          clearTimeout(timeoutId);
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status} for ${url}`);
           }
@@ -4405,11 +4389,10 @@ async function loadMultipleRSSFeeds(feedUrls, container) {
         })
         .then(xml => ({ url, xml, success: true }))
         .catch(error => {
-          clearTimeout(timeoutId);
           console.error(`Error fetching feed ${url}:`, error);
           return { url, xml: null, success: false, error: error.message };
-        });
-    });
+        })
+    );
     
     const feedResults = await Promise.all(feedPromises);
     
@@ -4676,15 +4659,10 @@ async function loadMultipleRSSFeeds(feedUrls, container) {
     });
     html += '</div>';
     
-    // Only update if this load is still current (user hasn't switched sections)
-    if (container._videosLoadId === loadId) {
-      container.innerHTML = html;
-    }
+    container.innerHTML = html;
   } catch (error) {
     console.error('Error loading multiple RSS feeds:', error);
-    if (container._videosLoadId === loadId) {
-      container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading feeds.</div>';
-    }
+    container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading feeds.</div>';
   }
 }
 
@@ -4694,16 +4672,11 @@ function loadCustomRSSFeed(feedUrl, container) {
     return loadMultipleRSSFeeds(feedUrl, container);
   }
   
-  const loadId = (container._videosLoadId = (container._videosLoadId || 0) + 1);
   container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">Loading feed...</div>';
   
-  // Route YouTube/rss.app through proxy; add timeout to avoid indefinite hangs
-  const fetchUrl = toProxiedUrlIfNeeded(feedUrl);
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), FEED_FETCH_TIMEOUT_MS);
-  fetch(fetchUrl, { signal: controller.signal })
+  // Use CORS proxy or direct fetch if same domain
+  fetch(feedUrl)
     .then(response => {
-      clearTimeout(timeoutId);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -4747,9 +4720,7 @@ function loadCustomRSSFeed(feedUrl, container) {
       if (items.length === 0) {
         console.error('No items found in feed. XML structure:', xml.substring(0, 1000));
         console.error('XML Namespaces:', Array.from(xmlDoc.documentElement.attributes).map(a => `${a.name}="${a.value}"`).join(', '));
-        if (container._videosLoadId === loadId) {
-          container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">No items in feed.</div>';
-        }
+        container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">No items in feed.</div>';
         return;
       }
       
@@ -5016,16 +4987,11 @@ function loadCustomRSSFeed(feedUrl, container) {
       });
       html += '</div>';
       
-      if (container._videosLoadId === loadId) {
-        container.innerHTML = html;
-      }
+      container.innerHTML = html;
     })
     .catch(error => {
-      clearTimeout(timeoutId);
       console.error('Error loading RSS feed:', error);
-      if (container._videosLoadId === loadId) {
-        container.innerHTML = `<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading feed: ${error.message}</div>`;
-      }
+      container.innerHTML = `<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading feed: ${error.message}</div>`;
     });
 }
 
@@ -8656,8 +8622,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             
             // Display loading message
             container.innerHTML = '<p style="padding: 10px; color: #9ca3af;">Loading feed...</p>';
-            const actualUrl = (typeof toProxiedUrlIfNeeded === 'function' ? toProxiedUrlIfNeeded(feedUrl) : feedUrl);
-            fetch(actualUrl)
+            fetch(feedUrl)
                 .then(res => {
                     if (!res.ok) {
                         throw new Error(`HTTP error! status: ${res.status}`);
@@ -42960,6 +42925,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function normalizeDisplayTime(label) {
         if (label === null || label === undefined) return label;
         if (typeof label !== 'string') return label;
+        // #region agent log
+        const originalLabel = label;
+        // #endregion
         // Strip HTML tags first (like sampler.html does implicitly)
         const withoutHTML = label.replace(/<[^>]*>/g, '');
         const cleaned = withoutHTML
@@ -42975,9 +42943,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (hour === 12) hour = 0;
             if (meridiem === 'PM') hour += 12;
             const result = `${hour.toString().padStart(2, '0')}:${minutes}`;
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:12476',message:'normalizeDisplayTime result',data:{originalLabel,withoutHTML,cleaned,result},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
             return result;
         }
         const result = cleaned.toUpperCase();
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:12495',message:'normalizeDisplayTime fallback',data:{originalLabel,withoutHTML,cleaned,result},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
         return result;
     }
 
@@ -45872,6 +45846,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Extract plain text from currentTimeLabel before normalizing (remove HTML tags)
                 const currentTimeLabelPlain = currentTimeLabel ? currentTimeLabel.replace(/<[^>]*>/g, '') : '';
                 const normalizedTimeLabel = (!isLive && !isFinal) ? normalizeDisplayTime(currentTimeLabelPlain) : null;
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:14682',message:'Current game time values',data:{currentTimeLabel,currentTimeLabelPlain,normalizedTimeLabel,isLive,isFinal,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
                 let displayTimeLabel = currentTimeLabel;
                 if (!isLive && !isFinal && normalizedTimeLabel && normalizedTimeLabel !== 'TBD') {
                     if (shouldPrioritizeImportant && !isImportantGame) {
@@ -46246,6 +46223,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // Get the NEXT game's time label to determine if the line above it should be full width
                     let nextTimeLabel = "";
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15057',message:'Next game raw data',data:{nextDataTimeString:nextData.timeString,nextRawStart:nextRawStart?typeof nextRawStart:'null',hasToDate:nextRawStart&&nextRawStart.toDate?'yes':'no',nextIsLive,nextIsFinal,nextIsPostponed,nextIsCanceled,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                    // #endregion
                     
                     if (nextData.timeString === '') {
                         nextTimeLabel = "";
@@ -46287,6 +46267,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         nextTimeLabel = "TBD";
                     }
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15068',message:'Next time label determined',data:{nextTimeLabel,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                    // #endregion
                     
                     const nextNormalizedTimeLabel = (!nextIsLive && !nextIsFinal) ? normalizeDisplayTime(nextTimeLabel) : null;
                     // Extract plain text from nextTimeLabel for comparison (remove HTML tags)
@@ -46297,6 +46280,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Use plain text versions for consistent comparison
                     const currentGameTimeLabel = normalizedTimeLabel || currentTimeLabelPlain;
                     const isDifferentTime = nextGameTimeLabel !== currentGameTimeLabel;
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/8d43e2ae-96b3-4b87-9e24-72d6b5349967',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:15059',message:'Separator line comparison',data:{nextTimeLabel,nextNormalizedTimeLabel,nextGameTimeLabel,normalizedTimeLabel,currentTimeLabel,currentGameTimeLabel,isDifferentTime,nextIsLive,nextIsFinal,gameIndex:i},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                    // #endregion
                     
                     // Same time: separator does NOT extend over time column. Different time: separator extends full row.
                     const colspan = isDifferentTime ? 4 : 4;
