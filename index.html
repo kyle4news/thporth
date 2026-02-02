@@ -54938,35 +54938,6 @@ const gamesTabsContainer = document.getElementById('games-tabs');
         console.warn('⚠️ Today tab not found for initial load');
     }
     
-    // Debug: Monitor for any code that's overriding display (as suggested by ChatGPT)
-    const todayContainer = document.getElementById('tv-listings-today');
-    const scoresContainer = document.getElementById('tv-listings-scores');
-    
-    if (todayContainer) {
-        new MutationObserver(() => {
-            const computed = getComputedStyle(todayContainer).display;
-            if (computed === 'none' && todayContainer.classList.contains('active')) {
-                console.warn('🔴 WARNING: todayContainer has "active" class but display is "none"!');
-                console.trace('Stack trace:');
-            }
-        }).observe(todayContainer, { 
-            attributes: true, 
-            attributeFilter: ['style', 'class'] 
-        });
-    }
-    
-    if (scoresContainer) {
-        new MutationObserver(() => {
-            const computed = getComputedStyle(scoresContainer).display;
-            if (computed === 'none' && scoresContainer.classList.contains('active')) {
-                console.warn('🔴 WARNING: scoresContainer has "active" class but display is "none"!');
-                console.trace('Stack trace:');
-            }
-        }).observe(scoresContainer, { 
-            attributes: true, 
-            attributeFilter: ['style', 'class'] 
-        });
-    }
 }
 
 // Call initialization function
