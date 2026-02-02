@@ -4373,14 +4373,25 @@ function loadSocialFeed(section) {
 
 // Load custom RSS feed from our RSS service
 
+// Route YouTube and other CORS-blocked URLs through the RSS proxy
+const RSS_FEED_PROXY_BASE = 'https://rss-feed-service-124291936014.us-central1.run.app';
+function toProxiedUrlIfNeeded(url) {
+  if (!url || typeof url !== 'string') return url;
+  // YouTube and other domains that block cross-origin fetch - use proxy
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    return `${RSS_FEED_PROXY_BASE}/proxy/rss?url=${encodeURIComponent(url)}`;
+  }
+  return url;
+}
+
 // Load multiple RSS feeds, combine, sort by date, and display
 async function loadMultipleRSSFeeds(feedUrls, container) {
   container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">Loading feeds...</div>';
   
   try {
-    // Fetch all feeds in parallel
+    // Fetch all feeds in parallel (YouTube URLs routed through proxy to avoid CORS)
     const feedPromises = feedUrls.map(url => 
-      fetch(url)
+      fetch(toProxiedUrlIfNeeded(url))
         .then(response => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status} for ${url}`);
@@ -4674,8 +4685,9 @@ function loadCustomRSSFeed(feedUrl, container) {
   
   container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #9ca3af;">Loading feed...</div>';
   
-  // Use CORS proxy or direct fetch if same domain
-  fetch(feedUrl)
+  // Route YouTube through proxy to avoid CORS; direct fetch for same-origin/proxyable URLs
+  const fetchUrl = toProxiedUrlIfNeeded(feedUrl);
+  fetch(fetchUrl)
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
