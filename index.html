@@ -47820,12 +47820,26 @@ async function fetchFeaturedGames() {
             return;
         }
         
-        // Special handling for Tennis - show ATP/WTA sub-tabs for Today tab
+        // Special handling for Tennis - no Today/Upcoming sub-tabs; Schedule tab shows only the message
         const isTennis = leagueKey === 'Tennis';
         const tennisTodayTabs = document.getElementById('tennis-today-tabs');
         const tennisTodayAtpContent = document.getElementById('tennis-today-atp-content');
         const tennisTodayWtaContent = document.getElementById('tennis-today-wta-content');
         const todayDefaultContent = document.getElementById('league-schedule-today-default-content');
+        
+        if (leagueKey === 'Tennis') {
+            if (scheduleTabsContainer) scheduleTabsContainer.style.display = 'none';
+            if (todayScheduleContent) todayScheduleContent.style.display = 'block';
+            if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
+            if (tennisTodayTabs) tennisTodayTabs.style.display = 'none';
+            if (tennisTodayAtpContent) tennisTodayAtpContent.style.display = 'none';
+            if (tennisTodayWtaContent) tennisTodayWtaContent.style.display = 'none';
+            if (todayDefaultContent) {
+                todayDefaultContent.style.display = 'block';
+                todayDefaultContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.flashscoreusa.com/tennis/" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View tennis schedule</a></p>';
+            }
+            return;
+        }
         
         if (isTennis && tennisTodayTabs && tennisTodayAtpContent && tennisTodayWtaContent) {
             tennisTodayTabs.style.display = 'flex';
@@ -47904,8 +47918,8 @@ async function fetchFeaturedGames() {
         const { DateTime } = luxon;
         const todayStr = getTodayDisplayDate();
         
-        // Special handling for Tennis - use Hardcoded_Today_Schedules
-        if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
+        // (Tennis now handled above - no Today/Upcoming sub-tabs)
+        if (false && isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
             if (Hardcoded_Today_Schedules && Hardcoded_Today_Schedules['Tennis']) {
                 const todayGames = Hardcoded_Today_Schedules['Tennis'].filter(game => game.date === todayStr);
                 
@@ -47950,17 +47964,18 @@ async function fetchFeaturedGames() {
                     
                     // Render games (Tennis doesn't use ATP/WTA separation for hardcoded games)
                     renderGames(tennisTodayAtpContent, formattedGames, false);
-                    tennisTodayWtaContent.innerHTML = '';
+                    tennisTodayAtpContent.insertAdjacentHTML('afterbegin', typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '<p style="margin-bottom: 12px;"><a href="https://www.flashscoreusa.com/tennis/" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">See upcoming tennis schedule</a></p>');
+                    tennisTodayWtaContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '<p style="margin-bottom: 12px;"><a href="https://www.flashscoreusa.com/tennis/" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">See upcoming tennis schedule</a></p>');
                 } else {
-                    tennisTodayAtpContent.innerHTML = `<p>No Tennis games found for today.</p>`;
-                    tennisTodayWtaContent.innerHTML = '';
+                    tennisTodayAtpContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + `<p>No Tennis games found for today.</p>`;
+                    tennisTodayWtaContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '');
                     handleNoTodayGames();
                 }
                 // Skip JSON endpoint fetch for Tennis
                 return;
             } else {
-                tennisTodayAtpContent.innerHTML = '<p style="color: #9ca3af;">Loading ATP schedule...</p>';
-                tennisTodayWtaContent.innerHTML = '<p style="color: #9ca3af;">Loading WTA schedule...</p>';
+                tennisTodayAtpContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + '<p style="color: #9ca3af;">Loading ATP schedule...</p>';
+                tennisTodayWtaContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + '<p style="color: #9ca3af;">Loading WTA schedule...</p>';
             }
         } else {
         todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
@@ -48002,8 +48017,8 @@ async function fetchFeaturedGames() {
                 
                 if (todayGames.length === 0) {
                     if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
-                        tennisTodayAtpContent.innerHTML = `<p>No ATP games found for today.</p>`;
-                        tennisTodayWtaContent.innerHTML = `<p>No WTA games found for today.</p>`;
+                        tennisTodayAtpContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + `<p>No ATP games found for today.</p>`;
+                        tennisTodayWtaContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + `<p>No WTA games found for today.</p>`;
                     } else {
                         todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
                     }
@@ -48015,8 +48030,8 @@ async function fetchFeaturedGames() {
             } catch (error) {
                 console.error('Error loading today\'s schedule:', error);
                 if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
-                    tennisTodayAtpContent.innerHTML = '<p style="color: #ef4444;">Error loading ATP schedule.</p>';
-                    tennisTodayWtaContent.innerHTML = '<p style="color: #ef4444;">Error loading WTA schedule.</p>';
+                    tennisTodayAtpContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + '<p style="color: #ef4444;">Error loading ATP schedule.</p>';
+                    tennisTodayWtaContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + '<p style="color: #ef4444;">Error loading WTA schedule.</p>';
                 } else {
                     todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
                 }
@@ -48142,8 +48157,8 @@ async function fetchFeaturedGames() {
 
             if (filteredGamesData.length === 0) {
                 if (isTennis && tennisTodayAtpContent && tennisTodayWtaContent) {
-                    tennisTodayAtpContent.innerHTML = `<p>No ATP games found for today.</p>`;
-                    tennisTodayWtaContent.innerHTML = `<p>No WTA games found for today.</p>`;
+                    tennisTodayAtpContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + `<p>No ATP games found for today.</p>`;
+                    tennisTodayWtaContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + `<p>No WTA games found for today.</p>`;
                 } else {
                     todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
                 }
@@ -48184,18 +48199,21 @@ async function fetchFeaturedGames() {
                 const sortedAtpGames = atpGames.sort(sortGames);
                 const sortedWtaGames = wtaGames.sort(sortGames);
                 
+                var tennisMsg = typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '<p style="margin-bottom: 12px;"><a href="https://www.flashscoreusa.com/tennis/" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">See upcoming tennis schedule</a></p>';
                 if (sortedAtpGames.length > 0) {
                     // Use isGroupedByLeague: true to show league headers (e.g., "ATP Finals (Singles)", "ATP Finals (Doubles)", "Davis Cup (Singles)", "Davis Cup (Doubles)")
                     renderGames(tennisTodayAtpContent, sortedAtpGames, true);
+                    tennisTodayAtpContent.insertAdjacentHTML('afterbegin', tennisMsg);
                 } else {
-                    tennisTodayAtpContent.innerHTML = `<p>No ATP games found for today.</p>`;
+                    tennisTodayAtpContent.innerHTML = tennisMsg + `<p>No ATP games found for today.</p>`;
                 }
                 
                 if (sortedWtaGames.length > 0) {
                     // Use isGroupedByLeague: true to show league headers
                     renderGames(tennisTodayWtaContent, sortedWtaGames, true);
+                    tennisTodayWtaContent.insertAdjacentHTML('afterbegin', tennisMsg);
                 } else {
-                    tennisTodayWtaContent.innerHTML = `<p>No WTA games found for today.</p>`;
+                    tennisTodayWtaContent.innerHTML = tennisMsg + `<p>No WTA games found for today.</p>`;
                 }
             } else {
                 const sortedGames = filteredGamesData.sort(sortGames);
@@ -48959,8 +48977,17 @@ async function fetchFeaturedGames() {
         container.innerHTML = html;
     }
 
+    // Hardcoded message for Tennis Schedule (Today and Upcoming) - underlined link to Flashscore
+    var TENNIS_SCHEDULE_MESSAGE_HTML = '<p style="margin-bottom: 12px;"><a href="https://www.flashscoreusa.com/tennis/" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">See upcoming tennis schedule</a></p>';
+    
     function loadTennisUpcomingSchedule(tourType, container) {
         if (!container) return;
+        
+        // Tennis Schedule > Upcoming: always show hardcoded message (underlined link)
+        if (container.id === 'tennis-upcoming-atp-content' || container.id === 'tennis-upcoming-wta-content') {
+            container.innerHTML = typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '<p><a href="https://www.flashscoreusa.com/tennis/" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">See upcoming tennis schedule</a></p>';
+            return;
+        }
         
         container.innerHTML = '<p style="color: #9ca3af;">Loading ' + tourType + ' schedule...</p>';
         
