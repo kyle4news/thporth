@@ -8046,9 +8046,9 @@ function loadCustomRSSFeed(feedUrl, container) {
         }
         
         // Function to load RSS.app feed for team tabs (similar to league feeds; guarded to prevent crash)
-        // IMPORTANT: Do NOT mount the RSS.app widget inside game team-tab containers (social-tab-content-*).
-        // The widget uses React and holds DOM references; when we switch tabs or replace content, it throws
-        // "Failed to execute 'appendChild' on 'Node': parameter 1 is not of type 'Node'" on mobile.
+        // For game team-tab containers (social-tab-content-*): load the feed in an IFRAME so the widget runs
+        // in the iframe's document. We only show/hide the iframe container—we never remove the widget's
+        // DOM—so the widget cannot throw "appendChild on Node" when tabs are switched.
         function loadTeamRSSAppFeed(feedId, contentElementId, teamName) {
             try {
                 if (!contentElementId) return;
@@ -8058,15 +8058,11 @@ function loadCustomRSSFeed(feedUrl, container) {
                     contentElement.innerHTML = '<div style="padding:20px;color:#888;text-align:center;">No feed ID configured.</div>';
                     return;
                 }
-                // Game team-tab containers get replaced when switching tabs; the RSS.app widget crashes when
-                // its mount node is removed. Use a link-only fallback so we never mount the widget here.
                 var isGameTeamTab = contentElementId && String(contentElementId).indexOf('social-tab-content-') === 0;
                 if (isGameTeamTab) {
-                    var feedUrl = 'https://rss.app/feed/' + encodeURIComponent(feedId);
-                    contentElement.innerHTML = '<div style="padding:20px;color:#888;text-align:center;">' +
-                        '<p style="margin-bottom:12px;">Social feed (simplified view)</p>' +
-                        '<a href="' + feedUrl + '" target="_blank" rel="noopener" style="color:#0066cc;text-decoration:underline;">Open ' + (teamName ? teamName + ' ' : '') + 'feed in new tab</a>' +
-                        '</div>';
+                    // Embed feed inline via iframe; widget runs inside iframe so our tab switching never touches its DOM.
+                    var embedSrc = 'https://rss.app/feed/' + encodeURIComponent(feedId);
+                    contentElement.innerHTML = '<iframe src="' + embedSrc + '" title="' + (teamName ? String(teamName).replace(/"/g, '&quot;') : 'Social feed') + '" style="width:100%;height:100%;min-height:400px;border:none;display:block;"></iframe>';
                     return;
                 }
                 // Clear previous content
