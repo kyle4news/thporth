@@ -54972,45 +54972,7 @@ const gamesTabsContainer = document.getElementById('games-tabs');
 // Call initialization function
 initializeTabsAndFilters();
 
-// DEBUGGING: MutationObserver to catch what's undoing our changes
-const todayTarget = document.getElementById('tv-listings-today');
-const scoresTarget = document.getElementById('tv-listings-scores');
-
-if (todayTarget) {
-    new MutationObserver(mutations => {
-        mutations.forEach(m => {
-            console.log(
-                '🔴 TODAY MUTATION:',
-                m.attributeName,
-                'display =',
-                getComputedStyle(todayTarget).display,
-                'stack:',
-                new Error().stack
-            );
-        });
-    }).observe(todayTarget, {
-        attributes: true,
-        attributeFilter: ['style', 'class']
-    });
-}
-
-if (scoresTarget) {
-    new MutationObserver(mutations => {
-        mutations.forEach(m => {
-            console.log(
-                '🔴 SCORES MUTATION:',
-                m.attributeName,
-                'display =',
-                getComputedStyle(scoresTarget).display,
-                'stack:',
-                new Error().stack
-            );
-        });
-    }).observe(scoresTarget, {
-        attributes: true,
-        attributeFilter: ['style', 'class']
-    });
-}
+// Debug MutationObservers removed - caused mobile Safari crashes
 
 // --- STATS SUB-TABS INITIALIZATION ---
 const statsSubTabsContainer = document.getElementById('stats-sub-tabs');
@@ -58963,10 +58925,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (mobileGamesBtn) {
         mobileGamesBtn.addEventListener('click', () => {
-            // Show games column - keep game-specific content in news, social, media columns
-            // Game-specific content will only reset when:
-            // 1. User clicks on main menu and switches to a different league
-            // 2. User clicks on a new game from the League > Games column
             showMobileColumn('games');
         });
     }
@@ -59007,10 +58965,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeMobileContent() {
         const toolbar = document.getElementById('mobile-bottom-toolbar');
         const isToolbarVisible = toolbar && window.getComputedStyle(toolbar).display !== 'none';
-        
-        if (isToolbarVisible) {
-            showMobileColumn('news');
-        }
+        if (!isToolbarVisible) return;
+        // Never reinitialize when user is viewing a game - resize fires constantly on mobile
+        const infoBar = document.getElementById('mobile-game-info-bar');
+        if (infoBar && getComputedStyle(infoBar).display !== 'none') return;
+        if (window.selectedGameId || window.currentSelectedGameId) return;
+        showMobileColumn('news');
     }
     
     // Check immediately
@@ -59020,9 +58980,11 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(initializeMobileContent, 100);
     setTimeout(initializeMobileContent, 500);
     
-    // Add resize listener to handle window resizing
+    // Resize listener - debounced, never runs when viewing game
+    let resizeTm = null;
     window.addEventListener('resize', () => {
-        setTimeout(initializeMobileContent, 50);
+        if (resizeTm) clearTimeout(resizeTm);
+        resizeTm = setTimeout(() => { resizeTm = null; initializeMobileContent(); }, 200);
     });
 });
 
