@@ -8572,13 +8572,6 @@ function loadCustomRSSFeed(feedUrl, container) {
             }
         };
         
-        // Stop team tab clicks from bubbling *after* the tab's onclick runs (bubble phase), so toolbar/parent handlers don't fire
-        document.addEventListener('click', function(e) {
-            if (e.target && typeof e.target.closest === 'function' && e.target.closest('.news-team-tab, .social-team-tab, .media-team-tab')) {
-                e.stopPropagation();
-            }
-        }, false);
-        
         // Helper function to format dates
         function formatDate(dateObj) {
             if (!dateObj) return '';
@@ -58618,18 +58611,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileLeagueMenu = document.getElementById('mobile-league-menu');
     const mobileLeagueList = document.getElementById('mobile-league-list');
     
-    // Show specific column on mobile
+    // Show specific column on mobile (must not throw in game view)
     function showMobileColumn(columnType) {
         try {
-            
+            if (!columnType || typeof columnType !== 'string') return;
             // Scroll to top when switching columns on mobile
-            window.scrollTo(0, 0);
-            
+            try { window.scrollTo(0, 0); } catch (e) {}
             // Hide all columns
-            document.querySelectorAll('.column').forEach(col => {
-                col.classList.remove('mobile-active');
-            });
-            
+            var cols = document.querySelectorAll('.column');
+            if (cols && cols.length) {
+                for (var i = 0; i < cols.length; i++) {
+                    try { if (cols[i]) cols[i].classList.remove('mobile-active'); } catch (e) {}
+                }
+            }
             // Show the appropriate column based on current league and column type
             if (columnType === 'games') {
                 // Check selected menu item to determine which column to show
@@ -58668,9 +58662,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             } else if (columnType === 'news') {
-                document.querySelector('.column.news')?.classList.add('mobile-active');
+                try {
+                    var newsCol = document.querySelector('.column.news');
+                    if (newsCol) newsCol.classList.add('mobile-active');
+                } catch (e) { console.warn('[showMobileColumn] news:', e); }
             } else if (columnType === 'social') {
-                document.querySelector('.column.social')?.classList.add('mobile-active');
+                try {
+                    var socialCol = document.querySelector('.column.social');
+                    if (socialCol) socialCol.classList.add('mobile-active');
+                } catch (e) { console.warn('[showMobileColumn] social:', e); }
             } else if (columnType === 'videos') {
                 // Check if there's game-specific content already loaded
                 const dynamicVideosContent = document.getElementById('dynamicVideosContent');
@@ -58707,15 +58707,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            document.querySelectorAll('.featured-subheader').forEach(header => {
-                header.style.display = columnType === 'games' ? '' : 'none';
-            });
-            
-            // Update toolbar button states
-            document.querySelectorAll('.mobile-toolbar-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById(`mobile-${columnType}-btn`)?.classList.add('active');
+            try {
+                var headers = document.querySelectorAll('.featured-subheader');
+                if (headers && headers.length) {
+                    for (var h = 0; h < headers.length; h++) {
+                        if (headers[h] && headers[h].style) headers[h].style.display = columnType === 'games' ? '' : 'none';
+                    }
+                }
+            } catch (e) {}
+            try {
+                var btns = document.querySelectorAll('.mobile-toolbar-btn');
+                if (btns && btns.length) {
+                    for (var b = 0; b < btns.length; b++) {
+                        if (btns[b]) btns[b].classList.remove('active');
+                    }
+                }
+                var activeBtn = document.getElementById('mobile-' + columnType + '-btn');
+                if (activeBtn) activeBtn.classList.add('active');
+            } catch (e) {}
             
         } catch (error) {
             console.error('Error in showMobileColumn:', error);
@@ -58919,20 +58928,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (mobileGamesBtn) {
         mobileGamesBtn.addEventListener('click', () => {
-            showMobileColumn('games');
+            try { showMobileColumn('games'); } catch (err) { console.error('[mobile] Games tab click error:', err); }
         });
     }
     
     if (mobileNewsBtn) {
-        mobileNewsBtn.addEventListener('click', () => showMobileColumn('news'));
+        mobileNewsBtn.addEventListener('click', () => {
+            try { showMobileColumn('news'); } catch (err) { console.error('[mobile] News tab click error:', err); }
+        });
     }
     
     if (mobileSocialBtn) {
-        mobileSocialBtn.addEventListener('click', () => showMobileColumn('social'));
+        mobileSocialBtn.addEventListener('click', () => {
+            try { showMobileColumn('social'); } catch (err) { console.error('[mobile] Social tab click error:', err); }
+        });
     }
     
     if (mobileVideosBtn) {
-        mobileVideosBtn.addEventListener('click', () => showMobileColumn('videos'));
+        mobileVideosBtn.addEventListener('click', () => {
+            try { showMobileColumn('videos'); } catch (err) { console.error('[mobile] Videos tab click error:', err); }
+        });
     }
     
     // Close mobile league menu
