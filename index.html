@@ -52119,7 +52119,15 @@ async function fetchFeaturedGames() {
             const todayDefaultContent = document.getElementById('league-schedule-today-default-content');
             if (todayDefaultContent) {
                 todayDefaultContent.style.display = 'block';
-                todayDefaultContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.olympics.com/en/milano-cortina-2026/schedule" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View Olympics schedule</a></p>';
+                todayDefaultContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.olympics.com/en/milano-cortina-2026/schedule" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View Olympics schedule</a></p><div id="olympics-ad-slot" style="margin-top: 50px; display: flex; justify-content: center;"></div>';
+                // Inject ad script 100px below the message (in games column)
+                var olympicsAdSlot = document.getElementById('olympics-ad-slot');
+                if (olympicsAdSlot) {
+                    window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
+                    var adScript = document.createElement('script');
+                    adScript.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
+                    olympicsAdSlot.appendChild(adScript);
+                }
             }
             const olympicsStandingsTab = mainTabsContainer ? mainTabsContainer.querySelector('.main-tab[data-main-tab="standings"]') : null;
             if (olympicsStandingsTab) {
