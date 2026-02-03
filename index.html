@@ -52130,7 +52130,7 @@ async function fetchFeaturedGames() {
             if (scheduleTabsContainer) scheduleTabsContainer.style.display = 'none';
             if (todayScheduleContent) {
                 todayScheduleContent.style.display = 'block';
-                todayScheduleContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.olympics.com/en/milano-cortina-2026/schedule" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View Olympics schedule</a></p><div id="olympics-ad-slot" style="margin-top: 50px; display: flex; justify-content: center;"></div>';
+                todayScheduleContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.olympics.com/en/milano-cortina-2026/schedule" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View Olympics schedule</a></p><div id="olympics-ad-slot" style="margin-top: 100px; display: flex; justify-content: center;"></div>';
                 var olympicsAdSlot = document.getElementById('olympics-ad-slot');
                 if (olympicsAdSlot) {
                     if (window.innerWidth <= 767) {
@@ -53639,7 +53639,7 @@ async function fetchFeaturedGames() {
         if (container.querySelector('#' + slotId)) return;
         var slot = document.createElement('div');
         slot.id = slotId;
-        slot.style.marginTop = '50px';
+        slot.style.marginTop = '100px';
         slot.style.display = 'flex';
         slot.style.justifyContent = 'center';
         container.appendChild(slot);
@@ -53660,7 +53660,7 @@ async function fetchFeaturedGames() {
         if (container.querySelector('#' + slotId)) return;
         var slot = document.createElement('div');
         slot.id = slotId;
-        slot.style.marginTop = '50px';
+        slot.style.marginTop = '100px';
         slot.style.display = 'flex';
         slot.style.justifyContent = 'center';
         container.appendChild(slot);
@@ -56743,7 +56743,7 @@ if (mainTabsContainer) {
                             if (existing) existing.remove();
                             var slot = document.createElement('div');
                             slot.id = 'ncaaf-upcoming-ad-slot';
-                            slot.style.marginTop = '50px';
+                            slot.style.marginTop = '100px';
                             slot.style.display = 'flex';
                             slot.style.justifyContent = 'center';
                             defaultContent.appendChild(slot);
@@ -56762,7 +56762,7 @@ if (mainTabsContainer) {
                             if (existing) existing.remove();
                             var slot = document.createElement('div');
                             slot.id = 'mlb-upcoming-ad-slot';
-                            slot.style.marginTop = '50px';
+                            slot.style.marginTop = '100px';
                             slot.style.display = 'flex';
                             slot.style.justifyContent = 'center';
                             defaultContent.appendChild(slot);
