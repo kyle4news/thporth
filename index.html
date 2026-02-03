@@ -52296,7 +52296,8 @@ async function fetchFeaturedGames() {
                 tennisTodayWtaContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + '<p style="color: #9ca3af;">Loading WTA schedule...</p>';
             }
         } else {
-        todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
+            todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
+            if (leagueKey === 'NCAAF') appendNCAAFAd(todayScheduleContent, 'ncaaf-today-ad-slot', leagueKey);
         }
         
         // Use JSON endpoint instead of direct Firestore access
@@ -52339,6 +52340,7 @@ async function fetchFeaturedGames() {
                         tennisTodayWtaContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + `<p>No WTA games found for today.</p>`;
                     } else {
                         todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                        if (leagueKey === 'NCAAF') appendNCAAFAd(todayScheduleContent, 'ncaaf-today-ad-slot', leagueKey);
                     }
                     handleNoTodayGames();
                     return;
@@ -52352,6 +52354,7 @@ async function fetchFeaturedGames() {
                     tennisTodayWtaContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + '<p style="color: #ef4444;">Error loading WTA schedule.</p>';
                 } else {
                     todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
+                    if (leagueKey === 'NCAAF') appendNCAAFAd(todayScheduleContent, 'ncaaf-today-ad-slot', leagueKey);
                 }
             }
         }
@@ -52479,6 +52482,7 @@ async function fetchFeaturedGames() {
                     tennisTodayWtaContent.innerHTML = (typeof TENNIS_SCHEDULE_MESSAGE_HTML !== 'undefined' ? TENNIS_SCHEDULE_MESSAGE_HTML : '') + `<p>No WTA games found for today.</p>`;
                 } else {
                     todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
+                    if (leagueKey === 'NCAAF') appendNCAAFAd(todayScheduleContent, 'ncaaf-today-ad-slot', leagueKey);
                 }
                 handleNoTodayGames();
                     return;
@@ -52536,6 +52540,7 @@ async function fetchFeaturedGames() {
             } else {
                 const sortedGames = filteredGamesData.sort(sortGames);
                 renderGames(todayScheduleContent, sortedGames, false);
+                if (leagueKey === 'NCAAF') appendNCAAFAd(todayScheduleContent, 'ncaaf-today-ad-slot', leagueKey);
             }
         }
 
@@ -53606,6 +53611,21 @@ async function fetchFeaturedGames() {
             });
     }
 
+    function appendNCAAFAd(container, slotId, leagueKey) {
+        if (leagueKey !== 'NCAAF' || !container) return;
+        if (container.querySelector('#' + slotId)) return;
+        var slot = document.createElement('div');
+        slot.id = slotId;
+        slot.style.marginTop = '50px';
+        slot.style.display = 'flex';
+        slot.style.justifyContent = 'center';
+        container.appendChild(slot);
+        window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
+        var script = document.createElement('script');
+        script.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
+        slot.appendChild(script);
+    }
+
     function loadUpcomingSchedule(leagueKey) {
         const upcomingScheduleContent = document.getElementById('league-schedule-upcoming-content');
         if (!upcomingScheduleContent) return;
@@ -53857,6 +53877,7 @@ async function fetchFeaturedGames() {
             if (futureGames.length === 0) {
                 if (defaultContent) {
                     defaultContent.innerHTML = '<p style="color: #9ca3af;">No upcoming games scheduled.</p>';
+                    if (leagueKey === 'NCAAF') appendNCAAFAd(defaultContent, 'ncaaf-upcoming-ad-slot', leagueKey);
                 }
                 return;
             }
@@ -54040,6 +54061,7 @@ async function fetchFeaturedGames() {
                         dateExpandStates[dateStr] = !dateExpandStates[dateStr];
                         
                         defaultContent.innerHTML = renderSchedule();
+                        if (leagueKey === 'NCAAF') appendNCAAFAd(defaultContent, 'ncaaf-upcoming-ad-slot', leagueKey);
                         
                         // Find the corresponding toggle button for this date after re-render
                         const newToggleButton = defaultContent.querySelector(`.upcoming-schedule-toggle[data-date="${dateStr}"]`);
@@ -54057,6 +54079,7 @@ async function fetchFeaturedGames() {
             // Initial render
             if (defaultContent) {
                 defaultContent.innerHTML = renderSchedule();
+                if (leagueKey === 'NCAAF') appendNCAAFAd(defaultContent, 'ncaaf-upcoming-ad-slot', leagueKey);
                 
                 // Add click handlers for all toggle buttons (only if we displayed toggles)
                 if (isNcaaLeague && nonFeaturedGamesCount > 0 && futureGames.length >= 10) {
