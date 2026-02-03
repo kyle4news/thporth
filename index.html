@@ -52112,15 +52112,12 @@ async function fetchFeaturedGames() {
         }
         
         // Special handling for Olympics - Schedule tab shows "View Olympics schedule" link only; Standings tab shows "MEDAL TABLE" and opens medal URL on click
+        // Always set content directly on todayScheduleContent so it resets correctly when returning from another league (other leagues replace innerHTML and remove league-schedule-today-default-content).
         if (leagueKey === 'Olympics') {
             if (scheduleTabsContainer) scheduleTabsContainer.style.display = 'none';
-            if (todayScheduleContent) todayScheduleContent.style.display = 'block';
-            if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
-            const todayDefaultContent = document.getElementById('league-schedule-today-default-content');
-            if (todayDefaultContent) {
-                todayDefaultContent.style.display = 'block';
-                todayDefaultContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.olympics.com/en/milano-cortina-2026/schedule" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View Olympics schedule</a></p><div id="olympics-ad-slot" style="margin-top: 50px; display: flex; justify-content: center;"></div>';
-                // Inject ad script 100px below the message (in games column)
+            if (todayScheduleContent) {
+                todayScheduleContent.style.display = 'block';
+                todayScheduleContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.olympics.com/en/milano-cortina-2026/schedule" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View Olympics schedule</a></p><div id="olympics-ad-slot" style="margin-top: 50px; display: flex; justify-content: center;"></div>';
                 var olympicsAdSlot = document.getElementById('olympics-ad-slot');
                 if (olympicsAdSlot) {
                     window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
@@ -52129,6 +52126,7 @@ async function fetchFeaturedGames() {
                     olympicsAdSlot.appendChild(adScript);
                 }
             }
+            if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
             const olympicsStandingsTab = mainTabsContainer ? mainTabsContainer.querySelector('.main-tab[data-main-tab="standings"]') : null;
             if (olympicsStandingsTab) {
                 olympicsStandingsTab.style.display = '';
@@ -54112,7 +54110,11 @@ async function fetchFeaturedGames() {
         // DISABLED: Firestore fallback to avoid costs
         // All upcoming schedules must be hardcoded in HARDCODED_UPCOMING_SCHEDULES
         if (defaultContent) {
-            defaultContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule is not available for this league. Please add it to HARDCODED_UPCOMING_SCHEDULES.</p>';
+            if (leagueKey === 'MLB') {
+                defaultContent.innerHTML = '<p style="color: #9ca3af;">No upcoming games scheduled.</p>';
+            } else {
+                defaultContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule is not available for this league. Please add it to HARDCODED_UPCOMING_SCHEDULES.</p>';
+            }
         }
         return;
         
