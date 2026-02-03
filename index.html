@@ -52018,6 +52018,15 @@ async function fetchFeaturedGames() {
             }
             if (todayScheduleContent) todayScheduleContent.style.display = 'none';
             if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'block';
+            // When Upcoming tab is shown by default, ensure NCAAF ad loads now (script runs while tab is visible)
+            if (leagueKey === 'NCAAF') {
+                const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
+                if (defaultContent) {
+                    const existingSlot = defaultContent.querySelector('#ncaaf-upcoming-ad-slot');
+                    if (existingSlot) existingSlot.remove();
+                    appendNCAAFAd(defaultContent, 'ncaaf-upcoming-ad-slot', leagueKey);
+                }
+            }
             // Default to Standings for most leagues when there are no today games,
             // but keep Schedule open by default for NFL.
             if (leagueKey === 'NFL') {
