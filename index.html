@@ -1355,6 +1355,11 @@ body {
   #menuList .league-name.selected {
     color: white !important;
   }
+  /* URL-only leagues: no gray highlight in any filter (123, A-Z, Group); active tab = bold white only */
+  #menuList li.url-only-league .league-name.selected,
+  #menuList li.url-only-league.selected {
+    background-color: transparent !important;
+  }
   /* When URL-only league is expanded: bold + white only, no gray highlight */
   #menuList li.url-only-expanded .league-name.selected {
     background-color: transparent;
