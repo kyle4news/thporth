@@ -39138,6 +39138,23 @@ document.addEventListener('DOMContentLoaded', function () {
         return result;
     }
 
+    /**
+     * RULE: Minutes and seconds (MM:SS) in the start time column may only appear on the BOTTOM row.
+     * Returns { periodPart, clockPart } so period/quarter/OT/Half/Int goes on top, clock (e.g. "03:09") only on bottom.
+     */
+    function splitPeriodAndClock(displayTimeLabel) {
+        if (!displayTimeLabel || typeof displayTimeLabel !== 'string') return { periodPart: displayTimeLabel || '', clockPart: '' };
+        const innerContent = displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '').trim();
+        if (!innerContent) return { periodPart: '', clockPart: '' };
+        // Match minutes:seconds (e.g. 03:09, 9:53) - only this goes on bottom line
+        const clockMatch = innerContent.match(/\d+:\d+/);
+        if (!clockMatch) return { periodPart: displayTimeLabel, clockPart: '' };
+        const clockPart = clockMatch[0];
+        // Strip ALL clock occurrences from top (e.g. "OT 00:09 00:09" -> "OT") so top never shows clock
+        const periodPart = innerContent.replace(/\d+:\d+/g, '').replace(/\s+/g, ' ').trim();
+        return { periodPart: periodPart || '', clockPart };
+    }
+
     function normalizeChannel(ch) {
       if (!ch) return '';
       if (typeof ch !== 'string') ch = String(ch);
@@ -41383,8 +41400,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                         timeColumnBottom = '';
                                         periodQuarter = 'HALF'; // Set flag to skip further processing
                                     } else {
-                                    // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
-                                    if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
+                                    // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, 5th, ..., OT)
+                                    if (topPart.match(/^(1st|2nd|3rd|4th|\d+th|OT)$/i)) {
                                         periodQuarter = topPart.toLowerCase();
                                     }
                                     
@@ -41395,13 +41412,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                     }
                                 }
                             } else {
-                                // No <br> - might be space-separated like "1st 9:53" or just period
+                                // No <br> - might be space-separated like "1st 9:53" or "OT 03:09" or "5th 02:00"
                                 // Try to extract period and time from space-separated format
-                                const spaceMatch = innerContent.match(/^(1st|2nd|3rd|4th|OT)\s+(\d+:\d+)$/i);
+                                const spaceMatch = innerContent.match(/^(1st|2nd|3rd|4th|\d+th|OT)\s+(\d+:\d+)$/i);
                                 if (spaceMatch) {
                                     periodQuarter = spaceMatch[1].toLowerCase();
                                     timeRemaining = spaceMatch[2];
-                                } else if (innerContent.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
+                                } else if (innerContent.match(/^(1st|2nd|3rd|4th|\d+th|OT)$/i)) {
                                     // Just period, no time
                                     periodQuarter = innerContent.toLowerCase();
                                 }
@@ -41471,7 +41488,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (!(isHardcodedToday && hardcodedTimeStatus !== null)) {
                             if (periodQuarter === 'HALF') {
                                 // Already set above, do nothing
-                            } else if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT")) {
+                            } else if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT" || /^\d+th$/.test(periodQuarter))) {
                                 timeColumnTop = `<span style="color: red;">${periodQuarter}</span>`;
                             } else {
                                 const innerContent = displayTimeLabel ? displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '') : '';
@@ -41486,6 +41503,15 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (timeRemaining && timeRemaining.match(/^\d+:\d+$/)) {
                                 timeColumnBottom = `<span style="color: red;">${timeRemaining}</span>`;
                             }
+                        }
+                    }
+
+                    // RULE: Top line = period only (OT, 1st, etc.). Bottom line = clock only (MM:SS). Never show clock on top.
+                    if (!isSoccerLeague && isLive && !(isHardcodedToday && hardcodedTimeStatus !== null)) {
+                        const split = splitPeriodAndClock(displayTimeLabel);
+                        if (split.clockPart) {
+                            timeColumnTop = split.periodPart ? `<span style="color: red;">${split.periodPart}</span>` : '';
+                            timeColumnBottom = `<span style="color: red;">${split.clockPart}</span>`;
                         }
                     }
                         
@@ -42198,8 +42224,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     timeColumnBottom = '';
                                     periodQuarter = 'HALF'; // Set flag to skip further processing
                                 } else {
-                                // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, OT)
-                                if (topPart.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
+                                // Validate top part is ONLY period/quarter (1st, 2nd, 3rd, 4th, 5th, ..., OT)
+                                if (topPart.match(/^(1st|2nd|3rd|4th|\d+th|OT)$/i)) {
                                     periodQuarter = topPart.toLowerCase();
                                 }
                                 
@@ -42210,13 +42236,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }
                         } else {
-                            // No <br> - might be space-separated like "1st 9:53" or just period
+                            // No <br> - might be space-separated like "1st 9:53" or "OT 03:09" or "5th 02:00"
                             // Try to extract period and time from space-separated format
-                            const spaceMatch = innerContent.match(/^(1st|2nd|3rd|4th|OT)\s+(\d+:\d+)$/i);
+                            const spaceMatch = innerContent.match(/^(1st|2nd|3rd|4th|\d+th|OT)\s+(\d+:\d+)$/i);
                             if (spaceMatch) {
                                 periodQuarter = spaceMatch[1].toLowerCase();
                                 timeRemaining = spaceMatch[2];
-                            } else if (innerContent.match(/^(1st|2nd|3rd|4th|OT)$/i)) {
+                            } else if (innerContent.match(/^(1st|2nd|3rd|4th|\d+th|OT)$/i)) {
                                 // Just period, no time
                                 periodQuarter = innerContent.toLowerCase();
                             }
@@ -42284,7 +42310,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Set time column values - STRICT: only period on top, only time on bottom
                     if (periodQuarter === 'HALF') {
                         // Already set above, do nothing
-                    } else if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT")) {
+                    } else if (periodQuarter && (periodQuarter === "1st" || periodQuarter === "2nd" || periodQuarter === "3rd" || periodQuarter === "4th" || periodQuarter === "OT" || /^\d+th$/.test(periodQuarter))) {
                         timeColumnTop = `<span style="color: red;">${periodQuarter}</span>`;
                     } else {
                         // If we don't have a valid period/quarter, check if displayTimeLabel is "Half" and convert to "HALF"
@@ -42299,6 +42325,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     if (timeRemaining && timeRemaining.match(/^\d+:\d+$/)) {
                         timeColumnBottom = `<span style="color: red;">${timeRemaining}</span>`;
+                    }
+
+                    // RULE: Top line = period only (OT, 1st, etc.). Bottom line = clock only (MM:SS). Never show clock on top.
+                    if (!isSoccerLeague && isLive) {
+                        const split = splitPeriodAndClock(displayTimeLabel);
+                        if (split.clockPart) {
+                            timeColumnTop = split.periodPart ? `<span style="color: red;">${split.periodPart}</span>` : '';
+                            timeColumnBottom = `<span style="color: red;">${split.clockPart}</span>`;
+                        }
                     }
                 }
                 
@@ -48947,6 +48982,10 @@ async function fetchFeaturedGames() {
                             }
                         }
                     }
+                    // RULE: Minutes and seconds only on bottom line in start time column
+                    const splitTime = splitPeriodAndClock(displayTimeLabel);
+                    const timeColumnTop = splitTime.clockPart ? (splitTime.periodPart ? (isLive ? `<span style="color: red;">${splitTime.periodPart}</span>` : splitTime.periodPart) : '') : displayTimeLabel;
+                    const timeColumnBottom = splitTime.clockPart ? (isLive ? `<span style="color: red;">${splitTime.clockPart}</span>` : splitTime.clockPart) : '';
                     
                     // Determine if it's today or upcoming for formatting
                     const isGameToday = game.isToday;
@@ -48998,7 +49037,7 @@ async function fetchFeaturedGames() {
                     const dataGameIdAttr = (isClickable && gameIdString) ? ` data-game-id="${gameIdString}"` : '';
                     
                     html += `<tr class="game-row"${onclickAttr}${dataGameIdAttr}>`;
-                    html += `<td rowspan="2" style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>`;
+                    html += `<td style="text-align: center; font-size: 11px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTop}</td>`;
                     html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${homeColor}">${homeTeam}</td>`;
                     html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${homeScoreColor}">${homeScoreDisplay}</td>`;
                     html += `<td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>`;
@@ -49006,6 +49045,7 @@ async function fetchFeaturedGames() {
                     html += `</tr>`;
                     
                     html += `<tr class="game-row game-separator"${onclickAttr}${dataGameIdAttr}>`;
+                    html += `<td style="text-align: center; font-size: 11px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottom}</td>`;
                     html += `<td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; ${awayColor}">${awayTeam}</td>`;
                     html += `<td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box; ${awayScoreColor}">${awayScoreDisplay}</td>`;
                     html += `</tr>`;
@@ -50277,6 +50317,10 @@ async function fetchFeaturedGames() {
                             lastDisplayedTimeLabel = normalizedTimeLabel;
                         }
                     }
+                    // RULE: Minutes and seconds only on bottom line in start time column
+                    const splitTimeNonSoccer = splitPeriodAndClock(displayTimeLabel);
+                    const timeColumnTopNS = splitTimeNonSoccer.clockPart ? (splitTimeNonSoccer.periodPart || '') : displayTimeLabel;
+                    const timeColumnBottomNS = splitTimeNonSoccer.clockPart || '';
                     // Use Tennis Channel for ATP leagues
                     let channelToDisplay = game.channel || '';
                     if (game.League && game.League.includes('ATP')) {
@@ -50323,16 +50367,17 @@ async function fetchFeaturedGames() {
                     const onclickAttr = (isClickable && gameIdString) ? ` onclick="handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)" style="cursor: pointer;"` : '';
                     const dataGameIdAttr = (isClickable && gameIdString) ? ` data-game-id="${gameIdString}"` : '';
                     
-                    // Use EXACT same table format as renderGames function (10px font for time column in league-specific column)
+                    // Use EXACT same table format as renderGames function (10px font for time column in league-specific column). Time: period on top row, clock on bottom row only.
                     html += `
                         <tr class="game-row scheduled-game"${onclickAttr}${dataGameIdAttr}>
-                            <td rowspan="2" style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>
+                            <td style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTopNS}</td>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0; ${awayColor}">${awayTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                             <td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
                             ${clickIndicatorHtml}
                         </tr>
                         <tr class="game-row game-separator scheduled-game"${onclickAttr}${dataGameIdAttr}>
+                            <td style="text-align: left; font-size: 10px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottomNS}</td>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0; ${homeColor}">${homeTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                         </tr>
@@ -50381,6 +50426,10 @@ async function fetchFeaturedGames() {
                             lastDisplayedTimeLabel = normalizedTimeLabel;
                         }
                     }
+                    // RULE: Minutes and seconds only on bottom line in start time column
+                    const splitTimeSoccer = splitPeriodAndClock(displayTimeLabel);
+                    const timeColumnTopSoc = splitTimeSoccer.clockPart ? (splitTimeSoccer.periodPart || '') : displayTimeLabel;
+                    const timeColumnBottomSoc = splitTimeSoccer.clockPart || '';
                     // Use Tennis Channel for ATP leagues
                     let channelToDisplay = game.channel || '';
                     if (game.League && game.League.includes('ATP')) {
@@ -50411,16 +50460,17 @@ async function fetchFeaturedGames() {
                     const onclickAttr = (isClickable && gameIdString) ? ` onclick="handleGameClick('${gameIdString.replace(/'/g, "\\'")}', event)" style="cursor: pointer;"` : '';
                     const dataGameIdAttr = (isClickable && gameIdString) ? ` data-game-id="${gameIdString}"` : '';
                     
-                    // Use EXACT same table format as renderGames function for soccer (10px font for time column in league-specific column)
+                    // Use EXACT same table format as renderGames function for soccer (10px font for time column). Time: period on top row, clock on bottom row only.
                     html += `
                         <tr class="game-row scheduled-game"${onclickAttr}${dataGameIdAttr}>
-                            <td rowspan="2" style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${displayTimeLabel}</td>
+                            <td style="text-align: left; font-size: 10px; vertical-align: top; padding: 2px 1px; box-sizing: border-box;">${timeColumnTopSoc}</td>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${homeTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                             <td rowspan="2" class="channel-cell-desktop" style="position: relative; text-align: center; font-size: 10px; color: #9ca3af; padding: 2px 1px; box-sizing: border-box;"><div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">${channelDisplay}</div></td>
                             ${clickIndicatorHtml}
                         </tr>
                         <tr class="game-row game-separator scheduled-game"${onclickAttr}${dataGameIdAttr}>
+                            <td style="text-align: left; font-size: 10px; padding: 2px 1px; box-sizing: border-box;">${timeColumnBottomSoc}</td>
                             <td class="team-cell" style="padding: 2px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; box-sizing: border-box; max-width: 0;">${awayTeam}</td>
                             <td style="text-align: right; padding: 2px 1px; font-size: 11px; box-sizing: border-box;"></td>
                         </tr>
