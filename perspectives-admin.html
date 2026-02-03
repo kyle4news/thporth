@@ -824,10 +824,60 @@
 
     // URL-only leagues (keep in sync with index (1).html URL_ONLY_LEAGUES). Shown in Load games; check Featured to show in FEATURED section. Optional home/away set in admin or in HTML.
     const URL_ONLY_LEAGUES = [
-        { date: '2026-01-25', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '23:59', time: '12:00 am' },
-        { date: '2026-01-29', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:05', endTime: '23:59', time: '12:05 am' },
-        { date: '2026-01-26', name: 'TGL', url: 'https://www.espn.com/golf/leaderboard/_/tour/tgl', startTime: '19:00', endTime: '21:00', time: '7:00 pm' },
-        { date: '2026-01-30', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm', away: '', home: ''},
+        // Tennis (startTime/endTime must be 24h HH:mm so games column doesn't break)
+        { date: '2026-02-02', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '02:00', endTime: '23:59', time: '2:00 am' },
+
+{ date: '2026-02-03', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '14:00', endTime: '17:00', time: '2:00 pm' },
+{ date: '2026-02-03', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '19:00', endTime: '22:00', time: '7:00 pm' },
+{ date: '2026-02-03', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '00:30', endTime: '03:30', time: '12:30 am' },
+
+{ date: '2026-02-04', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '02:00', endTime: '05:00', time: '2:00 am' },
+{ date: '2026-02-04', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '04:00', endTime: '07:00', time: '4:00 am' },
+{ date: '2026-02-04', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '05:00', endTime: '08:00', time: '5:00 am' },
+
+{ date: '2026-02-05', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '02:00', endTime: '05:00', time: '2:00 am' },
+{ date: '2026-02-05', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '12:00', endTime: '15:00', time: '12:00 pm' },
+{ date: '2026-02-05', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '19:00', endTime: '22:00', time: '7:00 pm' },
+{ date: '2026-02-05', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '00:00', endTime: '03:00', time: '12:00 am' },
+
+{ date: '2026-02-06', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '08:00', endTime: '11:00', time: '8:00 am' },
+{ date: '2026-02-06', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '12:00', endTime: '15:00', time: '12:00 pm' },
+{ date: '2026-02-06', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '16:00', endTime: '19:00', time: '4:00 pm' },
+{ date: '2026-02-06', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '19:00', endTime: '22:00', time: '7:00 pm' },
+{ date: '2026-02-06', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '00:00', endTime: '03:00', time: '12:00 am' },
+
+{ date: '2026-02-07', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '05:30', endTime: '08:30', time: '5:30 am' },
+{ date: '2026-02-07', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '10:00', endTime: '13:00', time: '10:00 am' },
+{ date: '2026-02-07', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '12:00', endTime: '15:00', time: '12:00 pm' },
+{ date: '2026-02-07', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '16:00', endTime: '19:00', time: '4:00 pm' },
+{ date: '2026-02-07', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '19:00', endTime: '22:00', time: '7:00 pm' },
+{ date: '2026-02-07', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '00:00', endTime: '03:00', time: '12:00 am' },
+
+{ date: '2026-02-08', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '05:30', endTime: '08:30', time: '5:30 am' },
+{ date: '2026-02-08', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '08:30', endTime: '11:30', time: '8:30 am' },
+{ date: '2026-02-08', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '11:00', endTime: '14:00', time: '11:00 am' },
+{ date: '2026-02-08', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '21:00', endTime: '23:59', time: '9:00 pm' },
+
+{ date: '2026-02-09', name: 'Tennis', url: 'https://www.flashscoreusa.com/tennis/', startTime: '00:00', endTime: '00:00', time: '12:00 am' },
+
+        // Cricket
+        { date: '2026-02-01', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+ { date: '2026-02-01', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '01:00', endTime: '23:59', time: '1:00 am' },
+ { date: '2026-02-02', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '02:00', time: '12:00 am' },
+ { date: '2026-02-02', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '02:00', endTime: '23:59', time: '2:00 am' },
+ { date: '2026-02-03', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '02:00', time: '12:00 am' },
+ { date: '2026-02-03', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '02:00', endTime: '23:59', time: '2:00 am' },
+ { date: '2026-02-04', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '02:00', time: '12:00 am' },
+ { date: '2026-02-04', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '02:00', endTime: '23:59', time: '2:00 am' },
+ { date: '2026-02-05', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '02:00', time: '12:00 am' },
+ { date: '2026-02-05', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '02:30', endTime: '23:59', time: '2:30 am' },
+ { date: '2026-02-06', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+ { date: '2026-02-06', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '01:00', endTime: '23:59', time: '1:00 am' },
+ { date: '2026-02-07', name: 'Cricket', url: 'https://www.espncricinfo.com/live-cricket-score', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+
+  
+       { date: '2026-01-26', name: 'TGL', url: 'https://www.espn.com/golf/leaderboard/_/tour/tgl', startTime: '19:00', endTime: '21:00', time: '7:00 pm' },
+        { date: '2026-01-30', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm', home: '', away: '' },
         { date: '2026-01-31', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '16:30', endTime: '20:15', time: '4:30 pm' },
         { date: '2026-02-01', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm' },
         { date: '2026-02-02', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm' },
@@ -845,7 +895,49 @@
         { date: '2026-02-27', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '13:00', endTime: '16:45', time: '1:00 pm' },
         { date: '2026-02-28', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '20:30', endTime: '00:15', time: '8:30 pm' },
         { date: '2026-03-02', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:30', time: '7:30 pm' },
-        { date: '2026-03-04', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '21:30', endTime: '23:30', time: '9:30 pm' }
+        { date: '2026-03-04', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '21:30', endTime: '23:30', time: '9:30 pm' },
+        { date: '2026-01-30', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '07:30', endTime: '18:00', time: '7:30 am' },
+        { date: '2026-01-31', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '07:30', endTime: '17:00', time: '7:30 am' },
+{ date: '2026-02-01', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '08:00', endTime: '17:05', time: '8:00 am' },
+{ date: '2026-02-05', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '15:10', endTime: '17:10', time: '3:10 pm' },
+{ date: '2026-02-06', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '14:15', endTime: '23:59', time: '2:15 pm' },
+{ date: '2026-02-07', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+{ date: '2026-02-07', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '07:00', endTime: '23:59', time: '7:00 am' },
+{ date: '2026-02-08', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+{ date: '2026-02-08', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '07:00', endTime: '12:00', time: '7:00 am' },
+{ date: '2026-02-12', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '15:00', endTime: '17:00', time: '3:00 pm' },
+{ date: '2026-02-13', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '01:05', endTime: '23:59', time: '1:05 am' },
+{ date: '2026-02-14', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:35', time: '12:00 am' },
+{ date: '2026-02-14', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:35', endTime: '23:59', time: '12:35 am' },
+{ date: '2026-02-15', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+{ date: '2026-02-15', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '07:00', endTime: '17:05', time: '7:00 am' },
+{ date: '2026-02-20', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '01:05', endTime: '17:00', time: '1:05 am' },
+{ date: '2026-02-21', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:35', endTime: '23:59', time: '12:35 am' },
+{ date: '2026-02-22', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+{ date: '2026-02-22', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '06:00', endTime: '15:10', time: '6:00 am' },
+{ date: '2026-02-04', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '05:30', endTime: '15:30', time: '5:30am' },
+{ date: '2026-02-05', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '04:05', endTime: '16:45', time: '4:05 am' },
+{ date: '2026-02-06', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '10:00', time: '3:00 am' },
+{ date: '2026-02-07', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '04:05', endTime: '18:05', time: '4:05 am' },
+{ date: '2026-02-08', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '02:00', endTime: '18:00', time: '2:00 am' },
+{ date: '2026-02-09', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '02:00', endTime: '17:10', time: '2:00 am' },
+{ date: '2026-02-10', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '02:00', endTime: '17:10', time: '2:00 am' },
+{ date: '2026-02-11', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:10', endTime: '17:10', time: '3:10 am' },
+{ date: '2026-02-12', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:05', endTime: '17:10', time: '3:05 am' },
+{ date: '2026-02-13', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '17:10', time: '3:00 am' },
+{ date: '2026-02-14', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '17:10', time: '3:00 am' },
+{ date: '2026-02-15', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '17:10', time: '3:00 am' },
+{ date: '2026-02-16', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '17:10', time: '3:00 am' },
+{ date: '2026-02-17', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:05', endTime: '17:10', time: '3:05 am' },
+{ date: '2026-02-18', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '17:10', time: '3:00 am' },
+{ date: '2026-02-19', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:05', endTime: '15:10', time: '3:05 am' },
+{ date: '2026-02-20', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '04:00', endTime: '17:10', time: '4:00 am' },
+{ date: '2026-02-21', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '04:00', endTime: '17:40', time: '4:00 am' },
+{ date: '2026-02-21', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '04:00', endTime: '10:10', time: '4:00 am' },
+
+        // Add more entries (same league on different dates, or other leagues). Example:
+        // { date: '2026-01-28', name: 'Another League', url: 'https://...', startTime: '14:00', endTime: '18:00', time: '2:00 pm' },
+        // With home/away for featured section: { date: '2026-01-28', name: 'Cricket', url: '...', startTime: '00:00', endTime: '23:59', time: '12:00 am', home: 'Championship', away: '' },
     ];
 
      // ----- New: Load games from Firestore and render list with URL inputs -----
