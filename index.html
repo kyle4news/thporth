@@ -35699,7 +35699,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 // Find League display order here:
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "NCAAF", "USMNT", "Formula 1", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "USWNT", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "Tennis", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "Unrivaled", "CFB", "NASCAR Cup Series", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "Cricket Live", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "Olympics", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "NCAAF", "USMNT", "Formula 1", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "USWNT", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "Tennis", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "Unrivaled", "CFB", "NASCAR Cup Series", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "Copa Libertadores", "Copa Sudamericana", "DFB-Pokal", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "Cricket Live", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "Coupe de France", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         // NFL: "https://www.nfl.com/scores",
@@ -37023,6 +37023,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'Winter Sports': 'https://thporth.com/skiing.png',
         'Lacrosse': 'https://thporth.com/lacrosse.png',
         'Unrivaled': 'https://thporth.com/Unrivaled.png',
+        'Olympics': 'https://thporth.com/olympics.png',
     };
 
     // Main menu URL-only leagues: logo + name + single URL that opens in new tab (no league page on thporth.com).
@@ -37192,6 +37193,26 @@ document.addEventListener('DOMContentLoaded', function () {
 { date: '2026-02-21', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:35', endTime: '23:59', time: '12:35 am' },
 { date: '2026-02-22', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
 { date: '2026-02-22', name: 'Rugby', url: 'https://www.rugbypass.com/fixtures', startTime: '06:00', endTime: '15:10', time: '6:00 am' },
+{ date: '2026-02-04', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '05:30', endTime: '15:30', time: '5:30am' },
+{ date: '2026-02-05', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '04:05', endTime: '16:45', time: '4:05 am' },
+{ date: '2026-02-06', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '10:00', time: '3:00 am' },
+{ date: '2026-02-07', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '04:05', endTime: '18:05', time: '4:05 am' },
+{ date: '2026-02-08', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '02:00', endTime: '18:00', time: '2:00 am' },
+{ date: '2026-02-09', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '02:00', endTime: '17:10', time: '2:00 am' },
+{ date: '2026-02-10', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '02:00', endTime: '17:10', time: '2:00 am' },
+{ date: '2026-02-11', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:10', endTime: '17:10', time: '3:10 am' },
+{ date: '2026-02-12', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:05', endTime: '17:10', time: '3:05 am' },
+{ date: '2026-02-13', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '17:10', time: '3:00 am' },
+{ date: '2026-02-14', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '17:10', time: '3:00 am' },
+{ date: '2026-02-15', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '17:10', time: '3:00 am' },
+{ date: '2026-02-16', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '17:10', time: '3:00 am' },
+{ date: '2026-02-17', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:05', endTime: '17:10', time: '3:05 am' },
+{ date: '2026-02-18', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:00', endTime: '17:10', time: '3:00 am' },
+{ date: '2026-02-19', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '03:05', endTime: '15:10', time: '3:05 am' },
+{ date: '2026-02-20', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '04:00', endTime: '17:10', time: '4:00 am' },
+{ date: '2026-02-21', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '04:00', endTime: '17:40', time: '4:00 am' },
+{ date: '2026-02-21', name: 'Olympics', url: 'https://www.olympics.com/en/milano-cortina-2026/schedule', startTime: '04:00', endTime: '10:10', time: '4:00 am' },
+
         // Add more entries (same league on different dates, or other leagues). Example:
         // { date: '2026-01-28', name: 'Another League', url: 'https://...', startTime: '14:00', endTime: '18:00', time: '2:00 pm' },
         // With home/away for featured section: { date: '2026-01-28', name: 'Cricket', url: '...', startTime: '00:00', endTime: '23:59', time: '12:00 am', home: 'Championship', away: '' },
