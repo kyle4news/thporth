@@ -7941,16 +7941,15 @@ function loadCustomRSSFeed(feedUrl, container) {
             `;
             
             // Load the first tab's content immediately
+            const loadOpts = { signal: beginSocialLoad(uniqueId), uniqueId: uniqueId };
             if (tabs[0].feedUrl) {
                 // Check if it's a Nitter URL (embed directly), RSS.app feed ID, or RSS feed URL (fetch and parse)
                 if (tabs[0].feedUrl.includes('nitter.net') || tabs[0].feedUrl.includes('nitter.') || tabs[0].feedUrl.includes('nitter/')) {
-                    embedNitterProfile(tabs[0].feedUrl, tabIds[0], tabs[0].name);
+                    embedNitterProfile(tabs[0].feedUrl, tabIds[0], tabs[0].name, loadOpts);
                 } else if (tabs[0].feedUrl.startsWith('http://') || tabs[0].feedUrl.startsWith('https://')) {
-                    // RSS feed URL
-                    loadTeamRSSFeed(tabs[0].feedUrl, tabIds[0], tabs[0].name);
+                    loadTeamRSSFeed(tabs[0].feedUrl, tabIds[0], tabs[0].name, loadOpts);
                 } else {
-                    // RSS.app feed ID (not a URL, just an ID)
-                    loadTeamRSSAppFeed(tabs[0].feedUrl, tabIds[0], tabs[0].name);
+                    loadTeamRSSAppFeed(tabs[0].feedUrl, tabIds[0], tabs[0].name, loadOpts);
                 }
             } else {
                 const firstContent = document.getElementById(tabIds[0]);
@@ -7964,8 +7963,30 @@ function loadCustomRSSFeed(feedUrl, container) {
             }
         }
         
+        // Abort in-flight social load when user switches tabs (prevents crash from race condition)
+        function abortSocialLoad(uniqueId) {
+            const state = window._socialLoadState && window._socialLoadState[uniqueId];
+            if (!state) return;
+            if (state.abortController) state.abortController.abort();
+            if (typeof state.nitterCleanup === 'function') state.nitterCleanup();
+            delete (window._socialLoadState || {})[uniqueId];
+        }
+        
+        // Create and store new load state for a tab, return signal to pass to loaders
+        function beginSocialLoad(uniqueId) {
+            abortSocialLoad(uniqueId);
+            window._socialLoadState = window._socialLoadState || {};
+            const ctrl = new AbortController();
+            window._socialLoadState[uniqueId] = { abortController: ctrl };
+            return ctrl.signal;
+        }
+        
         // Function to embed Nitter profile
-        function embedNitterProfile(nitterUrl, contentElementId, teamName) {
+        function embedNitterProfile(nitterUrl, contentElementId, teamName, options) {
+            const signal = options && options.signal;
+            const uniqueId = options && options.uniqueId;
+            if (signal && signal.aborted) return;
+            
             const contentElement = document.getElementById(contentElementId);
             if (!contentElement) return;
             
@@ -8081,25 +8102,41 @@ function loadCustomRSSFeed(feedUrl, container) {
                         }, 2000);
                     }
                 };
+                
+                // Register cleanup so switching tabs can stop this load
+                if (uniqueId && window._socialLoadState && window._socialLoadState[uniqueId]) {
+                    window._socialLoadState[uniqueId].nitterCleanup = function() {
+                        try {
+                            clearInterval(navCheckInterval);
+                            clearInterval(checkInterval);
+                            if (iframe) iframe.src = 'about:blank';
+                        } catch (e) {}
+                    };
+                }
             }
         }
         
         // Function to load RSS.app feed for team tabs (similar to league feeds).
         // If the widget script isn't loaded yet, shows "Loading..." and waits for script onload
         // before creating the feed element, so the widget finds it (avoids mobile giving up / crash).
-        function loadTeamRSSAppFeed(feedId, contentElementId, teamName) {
+        function loadTeamRSSAppFeed(feedId, contentElementId, teamName, options) {
+            const signal = options && options.signal;
+            if (signal && signal.aborted) return;
+            
             const contentElement = document.getElementById(contentElementId);
             if (!contentElement) return;
             
             const WIDGET_SCRIPT_URL = 'https://widget.rss.app/v1/feed.js';
             
             function createFeedElement() {
+                if (signal && signal.aborted) return;
                 try {
                     contentElement.innerHTML = '';
                     const feedTag = document.createElement("rssapp-feed");
                     feedTag.setAttribute("id", feedId);
                     contentElement.appendChild(feedTag);
                 } catch (error) {
+                    if (signal && signal.aborted) return;
                     console.error('Error creating RSS.app widget:', error);
                     contentElement.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading social feed.</div>';
                 }
@@ -8116,9 +8153,11 @@ function loadCustomRSSFeed(feedUrl, container) {
             script.async = true;
             script.setAttribute('data-rssapp', 'true');
             script.onload = function() {
+                if (signal && signal.aborted) return;
                 createFeedElement();
             };
             script.onerror = function() {
+                if (signal && signal.aborted) return;
                 console.error('Failed to load RSS.app widget script');
                 contentElement.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading social feed. Try again.</div>';
             };
@@ -8126,7 +8165,10 @@ function loadCustomRSSFeed(feedUrl, container) {
         }
         
         // Function to load and display RSS feed (JSON Feed format)
-        async function loadTeamRSSFeed(feedUrl, contentElementId, teamName) {
+        async function loadTeamRSSFeed(feedUrl, contentElementId, teamName, options) {
+            const signal = options && options.signal;
+            if (signal && signal.aborted) return;
+            
             const contentElement = document.getElementById(contentElementId);
             if (!contentElement) return;
             
@@ -8138,7 +8180,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                     </div>
                 `;
                 
-                const response = await fetch(feedUrl);
+                const response = await fetch(feedUrl, { signal: signal || undefined });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -8153,6 +8195,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 const items = feedData.items;
                 
                 if (items.length === 0) {
+                    if (signal && signal.aborted) return;
                     contentElement.innerHTML = `
                         <div style="padding: 20px; text-align: center; color: #888;">
                             No posts found for ${teamName}.
@@ -8295,6 +8338,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                     `;
                 }).join('');
                 
+                if (signal && signal.aborted) return;
                 contentElement.innerHTML = `
                     <div style="padding: 10px; background: #1a1a1a; min-height: 100vh;">
                         ${itemsHTML}
@@ -8302,7 +8346,9 @@ function loadCustomRSSFeed(feedUrl, container) {
                 `;
                 
             } catch (error) {
+                if (error && error.name === 'AbortError') return; // User switched tabs, ignore
                 console.error(`Error loading RSS feed for ${teamName}:`, error);
+                if (signal && signal.aborted) return;
                 contentElement.innerHTML = `
                     <div style="padding: 20px; color: #ff6b6b;">
                         Error loading ${teamName} feed: ${error.message}<br/>
@@ -8618,13 +8664,11 @@ function loadCustomRSSFeed(feedUrl, container) {
         // Global function to switch between team tabs
         window.switchSocialTeamTab = function(activeIndex, uniqueId) {
             if (window.thporthLogAction) window.thporthLogAction('social-team-tab', { index: activeIndex, uniqueId: uniqueId });
-            // Find the container by searching for the unique ID
             const allTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${uniqueId}"]`);
             const allContents = document.querySelectorAll(`.social-team-content[data-unique-id="${uniqueId}"]`);
             
             if (allTabs.length === 0 || allContents.length === 0) return;
             
-            // Get the active tab data
             const activeTab = allTabs[activeIndex];
             if (!activeTab) return;
             
@@ -8634,8 +8678,10 @@ function loadCustomRSSFeed(feedUrl, container) {
             const contentElementId = allContents[activeIndex].id;
             const content = allContents[activeIndex];
             
-            // Check if this tab is already active
             const isAlreadyActive = activeTab.classList.contains('active');
+            
+            // Abort previous tab's in-flight load before starting new one (prevents crash)
+            const loadOpts = { signal: beginSocialLoad(uniqueId), uniqueId: uniqueId };
             
             // Update tab styling using classes
             allTabs.forEach((tab, i) => {
@@ -8657,29 +8703,22 @@ function loadCustomRSSFeed(feedUrl, container) {
                     // If tab was already active and clicked again, reset to original URL
                     if (isAlreadyActive && originalUrl) {
                         console.log(`[switchSocialTeamTab] Resetting ${teamName} tab to original URL: ${originalUrl}`);
-                        // Check if it's a Nitter URL (embed directly), RSS.app feed ID, or RSS feed URL (fetch and parse)
                         if (originalUrl.includes('nitter.net') || originalUrl.includes('nitter.') || originalUrl.includes('nitter/')) {
-                            embedNitterProfile(originalUrl, contentElementId, teamName);
+                            embedNitterProfile(originalUrl, contentElementId, teamName, loadOpts);
                         } else if (originalUrl.startsWith('http://') || originalUrl.startsWith('https://')) {
-                            // RSS feed URL
-                            loadTeamRSSFeed(originalUrl, contentElementId, teamName);
+                            loadTeamRSSFeed(originalUrl, contentElementId, teamName, loadOpts);
                         } else {
-                            // RSS.app feed ID (not a URL, just an ID)
-                            loadTeamRSSAppFeed(originalUrl, contentElementId, teamName);
+                            loadTeamRSSAppFeed(originalUrl, contentElementId, teamName, loadOpts);
                         }
                     } else {
-                        // Normal tab activation - check if content is already loaded
                         const currentContent = contentItem.innerHTML.trim();
                         if (currentContent.includes('Loading') || currentContent.includes('No social feed') || currentContent.includes('No RSS feed')) {
-                            // Check if it's a Nitter URL (embed directly), RSS.app feed ID, or RSS feed URL (fetch and parse)
                             if (feedUrl.includes('nitter.net') || feedUrl.includes('nitter.') || feedUrl.includes('nitter/')) {
-                                embedNitterProfile(feedUrl, contentElementId, teamName);
+                                embedNitterProfile(feedUrl, contentElementId, teamName, loadOpts);
                             } else if (feedUrl.startsWith('http://') || feedUrl.startsWith('https://')) {
-                                // RSS feed URL
-                                loadTeamRSSFeed(feedUrl, contentElementId, teamName);
+                                loadTeamRSSFeed(feedUrl, contentElementId, teamName, loadOpts);
                             } else {
-                                // RSS.app feed ID (not a URL, just an ID)
-                                loadTeamRSSAppFeed(feedUrl, contentElementId, teamName);
+                                loadTeamRSSAppFeed(feedUrl, contentElementId, teamName, loadOpts);
                             }
                         }
                     }
