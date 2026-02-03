@@ -62,7 +62,105 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         window.location.replace('https://thporth.com' + window.location.pathname + window.location.search + window.location.hash);
       }
     </script>
-    
+
+    <!-- Error logging for crash diagnosis: persists to localStorage. After a crash, visit ?thporth_log=1 to view/copy log. -->
+    <script>
+(function() {
+  var STORAGE_KEY = 'thporth_error_log';
+  var MAX_ENTRIES = 150;
+  var MAX_SIZE = 80000;
+
+  function safeStringify(obj) {
+    try {
+      if (obj && typeof obj === 'object' && obj instanceof Error) {
+        return obj.message + (obj.stack ? '\n' + obj.stack : '');
+      }
+      return typeof obj === 'string' ? obj : JSON.stringify(obj);
+    } catch (e) { return String(obj); }
+  }
+
+  function push(type, data) {
+    var entry = {
+      ts: new Date().toISOString(),
+      type: type,
+      message: data.message != null ? String(data.message) : '',
+      source: data.source != null ? String(data.source) : '',
+      line: data.line != null ? data.line : null,
+      col: data.col != null ? data.col : null,
+      stack: data.stack != null ? String(data.stack) : '',
+      reason: data.reason != null ? safeStringify(data.reason) : '',
+      action: data.action != null ? String(data.action) : '',
+      extra: data.extra
+    };
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      list.push(entry);
+      while (list.length > MAX_ENTRIES || (raw = JSON.stringify(list)).length > MAX_SIZE) {
+        list.shift();
+        raw = JSON.stringify(list);
+      }
+      localStorage.setItem(STORAGE_KEY, raw);
+    } catch (e) {}
+    if (typeof console !== 'undefined' && console.log) {
+      console.log('[thporth]', type, entry);
+    }
+  }
+
+  window.thporthErrorLog = {
+    push: push,
+    getLog: function() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) { return []; }
+    },
+    clearLog: function() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    }
+  };
+
+  window.thporthLogAction = function(actionName, extra) {
+    push('action', { action: actionName, extra: extra || {} });
+  };
+
+  window.addEventListener('error', function(event) {
+    push('error', {
+      message: event.message,
+      source: event.filename || event.sourceURL || '',
+      line: event.lineno,
+      col: event.colno,
+      stack: event.error && event.error.stack ? event.error.stack : '',
+      reason: event.error
+    });
+  });
+
+  window.addEventListener('unhandledrejection', function(event) {
+    push('unhandledrejection', {
+      message: 'Unhandled promise rejection',
+      reason: event.reason,
+      stack: event.reason && event.reason.stack ? event.reason.stack : ''
+    });
+  });
+
+  if (typeof location !== 'undefined' && location.search && location.search.indexOf('thporth_log=1') !== -1) {
+    setTimeout(function() {
+      var log = window.thporthErrorLog.getLog();
+      if (typeof console !== 'undefined' && console.log) {
+        console.log('[thporth error log]', log);
+        console.log('[thporth error log JSON]', JSON.stringify(log, null, 2));
+      }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(JSON.stringify(log, null, 2));
+          if (typeof alert === 'function') alert('Error log copied to clipboard.');
+        }
+      } catch (e) {}
+    }, 500);
+  }
+})();
+    </script>
+
     <!-- Additional meta tags to help with mobile/desktop versioning -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -5201,6 +5299,7 @@ function loadCustomRSSFeed(feedUrl, container) {
             event.preventDefault();
             event.stopPropagation();
         }
+        if (window.thporthLogAction) window.thporthLogAction('game-selected', { gameId: gameId || null });
         console.log('[handleGameClick] Called with gameId:', gameId, 'Window width:', window.innerWidth, 'Is mobile:', window.innerWidth <= 767);
         if (!gameId) {
             console.log('[handleGameClick] No gameId, returning');
@@ -7664,6 +7763,7 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // Global function to switch news team tabs
         window.switchNewsTeamTab = function(activeIndex, uniqueId) {
+            if (window.thporthLogAction) window.thporthLogAction('news-team-tab', { index: activeIndex, uniqueId: uniqueId });
             const allTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${uniqueId}"]`);
             const allContents = document.querySelectorAll(`.news-team-content[data-unique-id="${uniqueId}"]`);
             
@@ -8425,6 +8525,7 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // Global function to switch between media team tabs
         window.switchMediaTeamTab = function(activeIndex, uniqueId) {
+            if (window.thporthLogAction) window.thporthLogAction('media-team-tab', { index: activeIndex, uniqueId: uniqueId });
             try {
                 const allTabs = document.querySelectorAll(`.media-team-tab[data-unique-id="${uniqueId}"]`);
                 const allContents = document.querySelectorAll(`.media-team-content[data-unique-id="${uniqueId}"]`);
@@ -8494,6 +8595,7 @@ function loadCustomRSSFeed(feedUrl, container) {
         
         // Global function to switch between team tabs
         window.switchSocialTeamTab = function(activeIndex, uniqueId) {
+            if (window.thporthLogAction) window.thporthLogAction('social-team-tab', { index: activeIndex, uniqueId: uniqueId });
             // Find the container by searching for the unique ID
             const allTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${uniqueId}"]`);
             const allContents = document.querySelectorAll(`.social-team-content[data-unique-id="${uniqueId}"]`);
@@ -54720,6 +54822,7 @@ const gamesTabsContainer = document.getElementById('games-tabs');
         e.stopPropagation();
         
         const tabId = clickedTab.dataset.tab || clickedTab.id;
+        if (window.thporthLogAction) window.thporthLogAction('games-tab', { tabId: tabId });
         console.log('🎯 Tab clicked:', tabId);
         
     const todayTab = gamesTabsContainer.querySelector('.games-tab[data-tab="today"]');
@@ -58994,7 +59097,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show specific column on mobile
     function showMobileColumn(columnType) {
         try {
-            
+            if (window.thporthLogAction) window.thporthLogAction('show-mobile-column', { columnType: columnType });
             // Scroll to top when switching columns on mobile
             window.scrollTo(0, 0);
             
