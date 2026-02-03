@@ -52133,10 +52133,12 @@ async function fetchFeaturedGames() {
                 todayScheduleContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.olympics.com/en/milano-cortina-2026/schedule" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View Olympics schedule</a></p><div id="olympics-ad-slot" style="margin-top: 50px; display: flex; justify-content: center;"></div>';
                 var olympicsAdSlot = document.getElementById('olympics-ad-slot');
                 if (olympicsAdSlot) {
-                    window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
-                    var adScript = document.createElement('script');
-                    adScript.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
-                    olympicsAdSlot.appendChild(adScript);
+                    if (window.innerWidth > 767) {
+                        window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
+                        var adScript = document.createElement('script');
+                        adScript.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
+                        olympicsAdSlot.appendChild(adScript);
+                    }
                 }
             }
             if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
@@ -53629,6 +53631,7 @@ async function fetchFeaturedGames() {
 
     function appendNCAAFAd(container, slotId, leagueKey) {
         if (leagueKey !== 'NCAAF' || !container) return;
+        if (window.innerWidth <= 767) return;
         if (container.querySelector('#' + slotId)) return;
         var slot = document.createElement('div');
         slot.id = slotId;
@@ -53644,6 +53647,7 @@ async function fetchFeaturedGames() {
 
     function appendMLBAd(container, slotId) {
         if (!container) return;
+        if (window.innerWidth <= 767) return;
         if (container.querySelector('#' + slotId)) return;
         var slot = document.createElement('div');
         slot.id = slotId;
@@ -56717,6 +56721,7 @@ if (mainTabsContainer) {
             const isUpcomingVisible = upcomingContent && upcomingContent.style.display !== 'none';
             if (isUpcomingVisible && (leagueKey === 'NCAAF' || leagueKey === 'MLB')) {
                 setTimeout(function() {
+                    if (window.innerWidth <= 767) return;
                     const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
                     if (defaultContent) {
                         if (leagueKey === 'NCAAF') {
