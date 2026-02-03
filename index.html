@@ -52018,13 +52018,17 @@ async function fetchFeaturedGames() {
             }
             if (todayScheduleContent) todayScheduleContent.style.display = 'none';
             if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'block';
-            // When Upcoming tab is shown by default, ensure NCAAF ad loads now (script runs while tab is visible)
-            if (leagueKey === 'NCAAF') {
-                const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
-                if (defaultContent) {
+            // When Upcoming tab is shown by default, ensure NCAAF/MLB ad loads now (script runs while tab is visible)
+            const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
+            if (defaultContent) {
+                if (leagueKey === 'NCAAF') {
                     const existingSlot = defaultContent.querySelector('#ncaaf-upcoming-ad-slot');
                     if (existingSlot) existingSlot.remove();
                     appendNCAAFAd(defaultContent, 'ncaaf-upcoming-ad-slot', leagueKey);
+                } else if (leagueKey === 'MLB') {
+                    const existingSlot = defaultContent.querySelector('#mlb-upcoming-ad-slot');
+                    if (existingSlot) existingSlot.remove();
+                    appendMLBAd(defaultContent, 'mlb-upcoming-ad-slot');
                 }
             }
             // Default to Standings for most leagues when there are no today games,
@@ -54121,6 +54125,7 @@ async function fetchFeaturedGames() {
         if (defaultContent) {
             if (leagueKey === 'MLB') {
                 defaultContent.innerHTML = '<p style="color: #9ca3af;">No upcoming games scheduled.</p>';
+                appendMLBAd(defaultContent, 'mlb-upcoming-ad-slot');
             } else {
                 defaultContent.innerHTML = '<p style="color: #9ca3af;">Upcoming schedule is not available for this league. Please add it to HARDCODED_UPCOMING_SCHEDULES.</p>';
             }
@@ -56704,17 +56709,17 @@ if (mainTabsContainer) {
             tabContent.style.display = 'block';
         }
         
-        // When Schedule tab is shown and Upcoming sub-tab is active for NCAAF, re-inject the ad so it loads with the panel visible
+        // When Schedule tab is shown and Upcoming sub-tab is active, re-inject the ad so it loads with the panel visible (NCAAF and MLB)
         if (tabType === 'schedule') {
             const leagueHeader = document.getElementById('league-specific-header');
             const leagueKey = leagueHeader ? leagueHeader.innerText.trim() : null;
-            if (leagueKey === 'NCAAF') {
-                const upcomingContent = document.getElementById('league-schedule-upcoming-content');
-                const isUpcomingVisible = upcomingContent && upcomingContent.style.display !== 'none';
-                if (isUpcomingVisible) {
-                    setTimeout(function() {
-                        const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
-                        if (defaultContent) {
+            const upcomingContent = document.getElementById('league-schedule-upcoming-content');
+            const isUpcomingVisible = upcomingContent && upcomingContent.style.display !== 'none';
+            if (isUpcomingVisible && (leagueKey === 'NCAAF' || leagueKey === 'MLB')) {
+                setTimeout(function() {
+                    const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
+                    if (defaultContent) {
+                        if (leagueKey === 'NCAAF') {
                             const existing = defaultContent.querySelector('#ncaaf-upcoming-ad-slot');
                             if (existing) existing.remove();
                             var slot = document.createElement('div');
@@ -56727,9 +56732,22 @@ if (mainTabsContainer) {
                             var adScript = document.createElement('script');
                             adScript.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
                             slot.appendChild(adScript);
+                        } else if (leagueKey === 'MLB') {
+                            const existing = defaultContent.querySelector('#mlb-upcoming-ad-slot');
+                            if (existing) existing.remove();
+                            var slot = document.createElement('div');
+                            slot.id = 'mlb-upcoming-ad-slot';
+                            slot.style.marginTop = '50px';
+                            slot.style.display = 'flex';
+                            slot.style.justifyContent = 'center';
+                            defaultContent.appendChild(slot);
+                            window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
+                            var adScript = document.createElement('script');
+                            adScript.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
+                            slot.appendChild(adScript);
                         }
-                    }, 0);
-                }
+                    }
+                }, 0);
             }
         }
         
