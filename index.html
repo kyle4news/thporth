@@ -5501,6 +5501,14 @@ function loadCustomRSSFeed(feedUrl, container) {
                 </div>
             `;
             socialContainer.setAttribute('data-pending-game-id', gameId);
+            // On mobile, preload rss.app widget script when game is selected so it's ready when user opens Social
+            if (window.innerWidth <= 767 && !document.querySelector('script[src="https://widget.rss.app/v1/feed.js"]')) {
+                const preload = document.createElement('script');
+                preload.src = 'https://widget.rss.app/v1/feed.js';
+                preload.async = true;
+                preload.setAttribute('data-rssapp', 'true');
+                document.head.appendChild(preload);
+            }
             if (window.innerWidth > 767) {
                 if (window.loadGameContent) {
                     window.loadGameContent(gameId, 'social', socialContainer);
@@ -8076,40 +8084,45 @@ function loadCustomRSSFeed(feedUrl, container) {
             }
         }
         
-        // Function to load RSS.app feed for team tabs (similar to league feeds)
+        // Function to load RSS.app feed for team tabs (similar to league feeds).
+        // If the widget script isn't loaded yet, shows "Loading..." and waits for script onload
+        // before creating the feed element, so the widget finds it (avoids mobile giving up / crash).
         function loadTeamRSSAppFeed(feedId, contentElementId, teamName) {
             const contentElement = document.getElementById(contentElementId);
             if (!contentElement) return;
             
-            try {
-                // Clear previous content
-                contentElement.innerHTML = '';
-                
-                // Create RSS.app feed element
-                const feedTag = document.createElement("rssapp-feed");
-                feedTag.setAttribute("id", feedId);
-                contentElement.appendChild(feedTag);
-                
-                // Remove any previous RSS.app script from container
-                const oldScript = contentElement.querySelector('script[data-rssapp]');
-                if (oldScript) oldScript.remove();
-                
-                // Only add the RSS.app script once to document head (not container)
-                if (!document.querySelector('script[src="https://widget.rss.app/v1/feed.js"]')) {
-                    const script = document.createElement("script");
-                    script.src = "https://widget.rss.app/v1/feed.js";
-                    script.async = true;
-                    script.setAttribute('data-rssapp', 'true');
-                    script.onerror = function() {
-                        console.error('Failed to load RSS.app widget script');
-                        contentElement.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading social feed.</div>';
-                    };
-                    document.head.appendChild(script);
+            const WIDGET_SCRIPT_URL = 'https://widget.rss.app/v1/feed.js';
+            
+            function createFeedElement() {
+                try {
+                    contentElement.innerHTML = '';
+                    const feedTag = document.createElement("rssapp-feed");
+                    feedTag.setAttribute("id", feedId);
+                    contentElement.appendChild(feedTag);
+                } catch (error) {
+                    console.error('Error creating RSS.app widget:', error);
+                    contentElement.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading social feed.</div>';
                 }
-            } catch (error) {
-                console.error('Error creating RSS.app widget:', error);
-                contentElement.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading social feed.</div>';
             }
+            
+            var existing = document.querySelector('script[src="' + WIDGET_SCRIPT_URL + '"]');
+            if (existing) {
+                createFeedElement();
+                return;
+            }
+            contentElement.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Loading ' + (teamName || '') + ' feed...</div>';
+            var script = document.createElement("script");
+            script.src = WIDGET_SCRIPT_URL;
+            script.async = true;
+            script.setAttribute('data-rssapp', 'true');
+            script.onload = function() {
+                createFeedElement();
+            };
+            script.onerror = function() {
+                console.error('Failed to load RSS.app widget script');
+                contentElement.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #ef4444;">Error loading social feed. Try again.</div>';
+            };
+            document.head.appendChild(script);
         }
         
         // Function to load and display RSS feed (JSON Feed format)
