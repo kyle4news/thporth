@@ -56704,6 +56704,35 @@ if (mainTabsContainer) {
             tabContent.style.display = 'block';
         }
         
+        // When Schedule tab is shown and Upcoming sub-tab is active for NCAAF, re-inject the ad so it loads with the panel visible
+        if (tabType === 'schedule') {
+            const leagueHeader = document.getElementById('league-specific-header');
+            const leagueKey = leagueHeader ? leagueHeader.innerText.trim() : null;
+            if (leagueKey === 'NCAAF') {
+                const upcomingContent = document.getElementById('league-schedule-upcoming-content');
+                const isUpcomingVisible = upcomingContent && upcomingContent.style.display !== 'none';
+                if (isUpcomingVisible) {
+                    setTimeout(function() {
+                        const defaultContent = document.getElementById('league-schedule-upcoming-default-content');
+                        if (defaultContent) {
+                            const existing = defaultContent.querySelector('#ncaaf-upcoming-ad-slot');
+                            if (existing) existing.remove();
+                            var slot = document.createElement('div');
+                            slot.id = 'ncaaf-upcoming-ad-slot';
+                            slot.style.marginTop = '50px';
+                            slot.style.display = 'flex';
+                            slot.style.justifyContent = 'center';
+                            defaultContent.appendChild(slot);
+                            window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
+                            var adScript = document.createElement('script');
+                            adScript.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
+                            slot.appendChild(adScript);
+                        }
+                    }, 0);
+                }
+            }
+        }
+        
         // Load standings when Standings tab is clicked
         if (tabType === 'standings') {
             const leagueHeader = document.getElementById('league-specific-header');
