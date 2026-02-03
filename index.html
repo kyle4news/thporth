@@ -5490,7 +5490,7 @@ function loadCustomRSSFeed(feedUrl, container) {
         const newsFeed = document.querySelector('.column.news .news-feed');
         if (newsFeed) newsFeed.remove();
         
-        // Clear Social column content and load game social posts
+        // Clear Social column content. On mobile, defer loading until user opens Social column (prevents crash).
         const socialContainer = document.getElementById('social-feed-container');
         if (socialContainer) {
             socialContainer.innerHTML = `
@@ -5500,10 +5500,13 @@ function loadCustomRSSFeed(feedUrl, container) {
                     </div>
                 </div>
             `;
-            if (window.loadGameContent) {
-                window.loadGameContent(gameId, 'social', socialContainer);
-            } else {
-                console.error('[handleGameClick] loadGameContent not available yet');
+            socialContainer.setAttribute('data-pending-game-id', gameId);
+            if (window.innerWidth > 767) {
+                if (window.loadGameContent) {
+                    window.loadGameContent(gameId, 'social', socialContainer);
+                } else {
+                    console.error('[handleGameClick] loadGameContent not available yet');
+                }
             }
         }
         
@@ -5538,10 +5541,13 @@ function loadCustomRSSFeed(feedUrl, container) {
                         </div>
                     </div>
                 `;
-                if (window.loadGameContent) {
-                    window.loadGameContent(gameId, 'media', dynamicVideosContent);
-                } else {
-                    console.error('[handleGameClick] loadGameContent not available yet');
+                dynamicVideosContent.setAttribute('data-pending-game-id', gameId);
+                if (window.innerWidth > 767) {
+                    if (window.loadGameContent) {
+                        window.loadGameContent(gameId, 'media', dynamicVideosContent);
+                    } else {
+                        console.error('[handleGameClick] loadGameContent not available yet');
+                    }
                 }
             }
         }
@@ -59151,6 +59157,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('.column.news')?.classList.add('mobile-active');
             } else if (columnType === 'social') {
                 document.querySelector('.column.social')?.classList.add('mobile-active');
+                // On mobile, load game Social content only when user opens Social column (deferred from handleGameClick)
+                const socialContainer = document.getElementById('social-feed-container');
+                const pendingGameId = socialContainer?.getAttribute('data-pending-game-id');
+                if (pendingGameId && window.loadGameContent) {
+                    socialContainer.removeAttribute('data-pending-game-id');
+                    window.loadGameContent(pendingGameId, 'social', socialContainer);
+                }
             } else if (columnType === 'videos') {
                 // Check if there's game-specific content already loaded
                 const dynamicVideosContent = document.getElementById('dynamicVideosContent');
@@ -59162,6 +59175,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Only show the column - don't re-initialize if game-specific content exists
                 document.querySelector('.column.videos-column')?.classList.add('mobile-active');
+                
+                // On mobile, load game Media content only when user opens Media column (deferred from handleGameClick)
+                const dynamicVideosEl = document.getElementById('dynamicVideosContent');
+                const pendingMediaGameId = dynamicVideosEl?.getAttribute('data-pending-game-id');
+                if (pendingMediaGameId && window.loadGameContent) {
+                    dynamicVideosEl.removeAttribute('data-pending-game-id');
+                    window.loadGameContent(pendingMediaGameId, 'media', dynamicVideosEl);
+                }
                 
                 // If there's no game-specific content, ensure the videos column structure exists
                 if (!hasGameSpecificContent) {
