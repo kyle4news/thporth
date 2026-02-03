@@ -51957,7 +51957,7 @@ async function fetchFeaturedGames() {
             return;
         }
         
-        // Special handling for Olympics - Schedule tab shows "View Olympics schedule" link only
+        // Special handling for Olympics - Schedule tab shows "View Olympics schedule" link only; Standings tab shows "MEDAL TABLE" and opens medal URL on click
         if (leagueKey === 'Olympics') {
             if (scheduleTabsContainer) scheduleTabsContainer.style.display = 'none';
             if (todayScheduleContent) todayScheduleContent.style.display = 'block';
@@ -51968,7 +51968,10 @@ async function fetchFeaturedGames() {
                 todayDefaultContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.olympics.com/en/milano-cortina-2026/schedule" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View Olympics schedule</a></p>';
             }
             const olympicsStandingsTab = mainTabsContainer ? mainTabsContainer.querySelector('.main-tab[data-main-tab="standings"]') : null;
-            if (olympicsStandingsTab) olympicsStandingsTab.style.display = 'none';
+            if (olympicsStandingsTab) {
+                olympicsStandingsTab.style.display = '';
+                olympicsStandingsTab.textContent = 'MEDAL TABLE';
+            }
             if (standingsTabContentEl) standingsTabContentEl.style.display = 'none';
             return;
         }
@@ -56402,7 +56405,9 @@ window.updateStandingsTabText = function(leagueName) {
     // Ensure the tab is visible for all other leagues
     standingsTab.style.display = '';
 
-    if (soccerLeagues.includes(leagueName)) {
+    if (leagueName === 'Olympics') {
+        standingsTab.innerText = 'MEDAL TABLE';
+    } else if (soccerLeagues.includes(leagueName)) {
         standingsTab.innerText = 'TABLE';
     } else if (rankingsLeagues.includes(leagueName)) {
         standingsTab.innerText = 'RANKINGS';
@@ -56421,6 +56426,16 @@ if (mainTabsContainer) {
         if (!clickedTab) return;
         
         const tabType = clickedTab.dataset.mainTab;
+        
+        // Olympics: Standings tab is "MEDAL TABLE" - open medal URL in new tab
+        if (tabType === 'standings') {
+            const leagueHeader = document.getElementById('league-specific-header');
+            const leagueKey = leagueHeader ? leagueHeader.innerText : null;
+            if (leagueKey === 'Olympics') {
+                window.open('https://www.olympics.com/en/milano-cortina-2026/medals', '_blank');
+                return;
+            }
+        }
         
         // Special handling for STATS tab - open URL in new tab based on league
         if (tabType === 'stats') {
