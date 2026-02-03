@@ -52298,6 +52298,7 @@ async function fetchFeaturedGames() {
         } else {
             todayScheduleContent.innerHTML = '<p style="color: #9ca3af;">Loading today\'s schedule...</p>';
             if (leagueKey === 'NCAAF') appendNCAAFAd(todayScheduleContent, 'ncaaf-today-ad-slot', leagueKey);
+            if (leagueKey === 'MLB') appendMLBAd(todayScheduleContent, 'mlb-today-ad-slot');
         }
         
         // Use JSON endpoint instead of direct Firestore access
@@ -52341,6 +52342,7 @@ async function fetchFeaturedGames() {
                     } else {
                         todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
                         if (leagueKey === 'NCAAF') appendNCAAFAd(todayScheduleContent, 'ncaaf-today-ad-slot', leagueKey);
+                        if (leagueKey === 'MLB') appendMLBAd(todayScheduleContent, 'mlb-today-ad-slot');
                     }
                     handleNoTodayGames();
                     return;
@@ -52355,6 +52357,7 @@ async function fetchFeaturedGames() {
                 } else {
                     todayScheduleContent.innerHTML = '<p style="color: #ef4444;">Error loading today\'s schedule.</p>';
                     if (leagueKey === 'NCAAF') appendNCAAFAd(todayScheduleContent, 'ncaaf-today-ad-slot', leagueKey);
+                    if (leagueKey === 'MLB') appendMLBAd(todayScheduleContent, 'mlb-today-ad-slot');
                 }
             }
         }
@@ -52483,6 +52486,7 @@ async function fetchFeaturedGames() {
                 } else {
                     todayScheduleContent.innerHTML = `<p>No games found for today.</p>`;
                     if (leagueKey === 'NCAAF') appendNCAAFAd(todayScheduleContent, 'ncaaf-today-ad-slot', leagueKey);
+                    if (leagueKey === 'MLB') appendMLBAd(todayScheduleContent, 'mlb-today-ad-slot');
                 }
                 handleNoTodayGames();
                     return;
@@ -52541,6 +52545,7 @@ async function fetchFeaturedGames() {
                 const sortedGames = filteredGamesData.sort(sortGames);
                 renderGames(todayScheduleContent, sortedGames, false);
                 if (leagueKey === 'NCAAF') appendNCAAFAd(todayScheduleContent, 'ncaaf-today-ad-slot', leagueKey);
+                if (leagueKey === 'MLB') appendMLBAd(todayScheduleContent, 'mlb-today-ad-slot');
             }
         }
 
@@ -53613,6 +53618,21 @@ async function fetchFeaturedGames() {
 
     function appendNCAAFAd(container, slotId, leagueKey) {
         if (leagueKey !== 'NCAAF' || !container) return;
+        if (container.querySelector('#' + slotId)) return;
+        var slot = document.createElement('div');
+        slot.id = slotId;
+        slot.style.marginTop = '50px';
+        slot.style.display = 'flex';
+        slot.style.justifyContent = 'center';
+        container.appendChild(slot);
+        window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
+        var script = document.createElement('script');
+        script.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
+        slot.appendChild(script);
+    }
+
+    function appendMLBAd(container, slotId) {
+        if (!container) return;
         if (container.querySelector('#' + slotId)) return;
         var slot = document.createElement('div');
         slot.id = slotId;
