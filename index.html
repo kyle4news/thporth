@@ -8974,6 +8974,15 @@ function loadCustomRSSFeed(feedUrl, container) {
         if (targetList) {
             targetList.style.display = "block";
 
+            // Reset search when switching filters: clear the search input and show all items in the new list
+            const menuSearchEl = document.getElementById("menuSearch");
+            if (menuSearchEl) {
+                menuSearchEl.value = "";
+            }
+            targetList.querySelectorAll("li").forEach(li => {
+                li.style.display = "";
+            });
+
             // If a league was previously selected, find it in the new list and select it (league name only for URL-only)
             if (selectedSection) {
                 const newSelectedLi = targetList.querySelector(`li[data-section="${selectedSection}"]`);
