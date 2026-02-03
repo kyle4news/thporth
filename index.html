@@ -7811,22 +7811,24 @@ function loadCustomRSSFeed(feedUrl, container) {
                 }
             }
             
-            // Synchronize with other columns (only if not already active to avoid loops)
-            const socialIndex = findTeamIndexByTeamName(teamName, uniqueId, 'social');
-            const mediaIndex = findTeamIndexByTeamName(teamName, uniqueId, 'media');
-            const socialUniqueId = findUniqueIdByTeamName(teamName, 'social');
-            const mediaUniqueId = findUniqueIdByTeamName(teamName, 'media');
-            
-            if (socialIndex >= 0 && socialUniqueId) {
-                const socialTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${socialUniqueId}"]`);
-                if (socialTabs[socialIndex] && !socialTabs[socialIndex].classList.contains('active')) {
-                    window.switchSocialTeamTab(socialIndex, socialUniqueId);
+            // Synchronize with other columns on desktop only. On mobile, syncing causes Social to load
+            // many Twitter embeds at once when switching news team tab, which can crash the tab.
+            if (window.innerWidth > 767) {
+                const socialIndex = findTeamIndexByTeamName(teamName, uniqueId, 'social');
+                const mediaIndex = findTeamIndexByTeamName(teamName, uniqueId, 'media');
+                const socialUniqueId = findUniqueIdByTeamName(teamName, 'social');
+                const mediaUniqueId = findUniqueIdByTeamName(teamName, 'media');
+                if (socialIndex >= 0 && socialUniqueId) {
+                    const socialTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${socialUniqueId}"]`);
+                    if (socialTabs[socialIndex] && !socialTabs[socialIndex].classList.contains('active')) {
+                        window.switchSocialTeamTab(socialIndex, socialUniqueId);
+                    }
                 }
-            }
-            if (mediaIndex >= 0 && mediaUniqueId) {
-                const mediaTabs = document.querySelectorAll(`.media-team-tab[data-unique-id="${mediaUniqueId}"]`);
-                if (mediaTabs[mediaIndex] && !mediaTabs[mediaIndex].classList.contains('active')) {
-                    window.switchMediaTeamTab(mediaIndex, mediaUniqueId);
+                if (mediaIndex >= 0 && mediaUniqueId) {
+                    const mediaTabs = document.querySelectorAll(`.media-team-tab[data-unique-id="${mediaUniqueId}"]`);
+                    if (mediaTabs[mediaIndex] && !mediaTabs[mediaIndex].classList.contains('active')) {
+                        window.switchMediaTeamTab(mediaIndex, mediaUniqueId);
+                    }
                 }
             }
         };
@@ -8569,22 +8571,23 @@ function loadCustomRSSFeed(feedUrl, container) {
                 }
             });
             
-            // Synchronize with other columns (only if not already active to avoid loops)
-            const newsIndex = findTeamIndexByTeamName(teamName, uniqueId, 'news');
-            const socialIndex = findTeamIndexByTeamName(teamName, uniqueId, 'social');
-            const newsUniqueId = findUniqueIdByTeamName(teamName, 'news');
-            const socialUniqueId = findUniqueIdByTeamName(teamName, 'social');
-            
-            if (newsIndex >= 0 && newsUniqueId) {
-                const newsTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${newsUniqueId}"]`);
-                if (newsTabs[newsIndex] && !newsTabs[newsIndex].classList.contains('active')) {
-                    window.switchNewsTeamTab(newsIndex, newsUniqueId);
+            // Synchronize with other columns on desktop only (mobile: avoid cascade that can crash tab)
+            if (window.innerWidth > 767) {
+                const newsIndex = findTeamIndexByTeamName(teamName, uniqueId, 'news');
+                const socialIndex = findTeamIndexByTeamName(teamName, uniqueId, 'social');
+                const newsUniqueId = findUniqueIdByTeamName(teamName, 'news');
+                const socialUniqueId = findUniqueIdByTeamName(teamName, 'social');
+                if (newsIndex >= 0 && newsUniqueId) {
+                    const newsTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${newsUniqueId}"]`);
+                    if (newsTabs[newsIndex] && !newsTabs[newsIndex].classList.contains('active')) {
+                        window.switchNewsTeamTab(newsIndex, newsUniqueId);
+                    }
                 }
-            }
-            if (socialIndex >= 0 && socialUniqueId) {
-                const socialTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${socialUniqueId}"]`);
-                if (socialTabs[socialIndex] && !socialTabs[socialIndex].classList.contains('active')) {
-                    window.switchSocialTeamTab(socialIndex, socialUniqueId);
+                if (socialIndex >= 0 && socialUniqueId) {
+                    const socialTabs = document.querySelectorAll(`.social-team-tab[data-unique-id="${socialUniqueId}"]`);
+                    if (socialTabs[socialIndex] && !socialTabs[socialIndex].classList.contains('active')) {
+                        window.switchSocialTeamTab(socialIndex, socialUniqueId);
+                    }
                 }
             }
             } catch (error) {
@@ -8671,22 +8674,23 @@ function loadCustomRSSFeed(feedUrl, container) {
                 }
             });
             
-            // Synchronize with other columns (only if not already active to avoid loops)
-            const newsIndex = findTeamIndexByTeamName(teamName, uniqueId, 'news');
-            const mediaIndex = findTeamIndexByTeamName(teamName, uniqueId, 'media');
-            const newsUniqueId = findUniqueIdByTeamName(teamName, 'news');
-            const mediaUniqueId = findUniqueIdByTeamName(teamName, 'media');
-            
-            if (newsIndex >= 0 && newsUniqueId) {
-                const newsTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${newsUniqueId}"]`);
-                if (newsTabs[newsIndex] && !newsTabs[newsIndex].classList.contains('active')) {
-                    window.switchNewsTeamTab(newsIndex, newsUniqueId);
+            // Synchronize with other columns on desktop only (mobile: avoid cascade that can crash tab)
+            if (window.innerWidth > 767) {
+                const newsIndex = findTeamIndexByTeamName(teamName, uniqueId, 'news');
+                const mediaIndex = findTeamIndexByTeamName(teamName, uniqueId, 'media');
+                const newsUniqueId = findUniqueIdByTeamName(teamName, 'news');
+                const mediaUniqueId = findUniqueIdByTeamName(teamName, 'media');
+                if (newsIndex >= 0 && newsUniqueId) {
+                    const newsTabs = document.querySelectorAll(`.news-team-tab[data-unique-id="${newsUniqueId}"]`);
+                    if (newsTabs[newsIndex] && !newsTabs[newsIndex].classList.contains('active')) {
+                        window.switchNewsTeamTab(newsIndex, newsUniqueId);
+                    }
                 }
-            }
-            if (mediaIndex >= 0 && mediaUniqueId) {
-                const mediaTabs = document.querySelectorAll(`.media-team-tab[data-unique-id="${mediaUniqueId}"]`);
-                if (mediaTabs[mediaIndex] && !mediaTabs[mediaIndex].classList.contains('active')) {
-                    window.switchMediaTeamTab(mediaIndex, mediaUniqueId);
+                if (mediaIndex >= 0 && mediaUniqueId) {
+                    const mediaTabs = document.querySelectorAll(`.media-team-tab[data-unique-id="${mediaUniqueId}"]`);
+                    if (mediaTabs[mediaIndex] && !mediaTabs[mediaIndex].classList.contains('active')) {
+                        window.switchMediaTeamTab(mediaIndex, mediaUniqueId);
+                    }
                 }
             }
         };
