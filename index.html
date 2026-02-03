@@ -45096,9 +45096,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         let currentTimeLabel = "";
                         let hardcodedTimeStatus = null; // Track hardcoded game time status
 
-                        // For yesterday's scores, always show "F" (all games are finished)
+                        // For yesterday's scores, show F for finished games, but PPD for postponed, Canceled for canceled
                         if (isYesterdayScores) {
-                            currentTimeLabel = "F";
+                            if (isPostponed) {
+                                currentTimeLabel = '<span style="color: #545353;">PPD</span>';
+                            } else if (isCanceled) {
+                                currentTimeLabel = '<span style="color: #545353;">Canceled</span>';
+                            } else {
+                                currentTimeLabel = "F";
+                            }
                         } else if (data.timeString === '') {
                             // Check if timeString field exists and is empty (manual games with blank time)
                             currentTimeLabel = ""; // Display as empty for blank times
