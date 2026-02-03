@@ -8724,7 +8724,12 @@ function loadCustomRSSFeed(feedUrl, container) {
                 if (mainMenuUrlOnly && mainMenuUrlOnly.url) {
                     e.preventDefault();
                     e.stopPropagation();
-                    const nested = item.querySelector('.url-only-nested');
+                    // Ensure nested menu exists (e.g. when clicked from search before init ran)
+                    let nested = item.querySelector('.url-only-nested');
+                    if (!nested && typeof initUrlOnlyNestedMenus === 'function') {
+                        initUrlOnlyNestedMenus();
+                        nested = item.querySelector('.url-only-nested');
+                    }
                     const clickedNestedItem = e.target.closest('.url-only-nested li');
                     if (nested && clickedNestedItem) {
                         const action = clickedNestedItem.dataset.action;
@@ -8741,8 +8746,12 @@ function loadCustomRSSFeed(feedUrl, container) {
                         }
                         return;
                     }
-                    // Toggle expand/collapse first, then apply or remove active styling
+                    // Toggle expand/collapse; when expanding, ensure nested items are visible (search may have set display:none on them)
                     item.classList.toggle('url-only-expanded');
+                    if (item.classList.contains('url-only-expanded')) {
+                        item.querySelectorAll('.url-only-nested li').forEach(li => { li.style.display = ''; });
+                        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
                     const nameEl = item.querySelector('.league-name');
                     const target = nameEl || item;
                     if (item.classList.contains('url-only-expanded')) {
