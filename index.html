@@ -43050,11 +43050,16 @@ document.addEventListener('DOMContentLoaded', function () {
     /**
      * RULE: Minutes and seconds (MM:SS) in the start time column may only appear on the BOTTOM row.
      * Returns { periodPart, clockPart } so period/quarter/OT/Half/Int goes on top, clock (e.g. "03:09") only on bottom.
+     * For plain start times (e.g. "11:00 AM", "1:45 PM", "TBD"), keep the whole string on the top line (no split).
      */
     function splitPeriodAndClock(displayTimeLabel) {
         if (!displayTimeLabel || typeof displayTimeLabel !== 'string') return { periodPart: displayTimeLabel || '', clockPart: '' };
         const innerContent = displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '').trim();
         if (!innerContent) return { periodPart: '', clockPart: '' };
+        // Plain start time (e.g. "11:00 AM", "1:45 PM", "TBD") — do NOT split; show all on one line
+        if (/^\d{1,2}:\d{2}\s*[AP]M$/i.test(innerContent) || /^TBD$/i.test(innerContent)) {
+            return { periodPart: displayTimeLabel, clockPart: '' };
+        }
         // Match minutes:seconds (e.g. 03:09, 9:53) - only this goes on bottom line
         const clockMatch = innerContent.match(/\d+:\d+/);
         if (!clockMatch) return { periodPart: displayTimeLabel, clockPart: '' };
