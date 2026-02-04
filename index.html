@@ -9339,29 +9339,70 @@ function loadCustomRSSFeed(feedUrl, container) {
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // ── A) Grab row 1 tab elements only (row 2 uses data-url and separate handler) ──
-    const tabs    = Array.from(document.querySelectorAll("#headlines-tabs .headlines-tab"));
+    // ── A) Explicit scroll order: 1 ESPN, 2 B/R, 3 CBS, 4 Yahoo, 5 FOX, 6 SI, 7 NBC, 8 Yardbarker, 9 SB Nation, 10 Athletic ──
+    const HEADLINES_ORDER = [
+      { type: "row1", source: "espn" },   // 1
+      { type: "row1", source: "br" },    // 2
+      { type: "row1", source: "cbs" },   // 3
+      { type: "row1", source: "yahoo" }, // 4
+      { type: "row1", source: "fox" },   // 5
+      { type: "row2", index: 0 },        // 6 SI
+      { type: "row2", index: 1 },        // 7 NBC
+      { type: "row2", index: 2 },        // 8 Yardbarker
+      { type: "row2", index: 3 },        // 9 SB Nation
+      { type: "row2", index: 4 }         // 10 Athletic
+    ];
     const sources = ["espn", "br", "cbs", "yahoo", "fox"];
+    const tabs = Array.from(document.querySelectorAll("#headlines-tabs .headlines-tab"));
+    const row2Container = document.getElementById("headlines-tabs-row2");
+    const row2Tabs = row2Container
+      ? Array.from(row2Container.querySelectorAll(".headlines-tab[data-url]"))
+      : [];
 
     // ── B) Keep track of which feeds already have a scroll listener ──
     const scrollListeners = {};
+    let row2ScrollListenerAttached = false;
+    const ADVANCE_COOLDOWN_MS = 800;
+    let lastAdvanceTime = 0;
+
+    function getTabAtOrderIndex(orderIdx) {
+      const item = HEADLINES_ORDER[orderIdx];
+      if (!item) return null;
+      if (item.type === "row1") {
+        return document.querySelector(`.headlines-tab[data-source="${item.source}"]`);
+      }
+      return row2Tabs[item.index] || null;
+    }
+
+    function getCurrentOrderIndex() {
+      for (let i = 0; i < sources.length; i++) {
+        const div = document.getElementById(sources[i] + "-feed");
+        if (div && div.style.display !== "none") return i;
+      }
+      const row2Feed = document.getElementById("headlines-row2-feed");
+      if (row2Feed && row2Feed.style.display !== "none") {
+        const active = row2Tabs.findIndex(t => t.classList.contains("active"));
+        if (active >= 0) return 5 + active;
+      }
+      return 0;
+    }
 
     // ── C) Function to attach a "scroll to bottom" watcher on a feed ──
     function attachScrollWatcher(src) {
       const feedEl = document.getElementById(src + "-feed");
-      // If there's no such element or we've already wired it, do nothing
       if (!feedEl || scrollListeners[src]) return;
 
       const onScroll = () => {
-        // When scrolled to (or within 1px of) bottom, auto‐advance:
+        if (Date.now() - lastAdvanceTime < ADVANCE_COOLDOWN_MS) return;
         if (feedEl.scrollHeight - feedEl.scrollTop - feedEl.clientHeight <= 1) {
-          const idx     = sources.indexOf(src);
-          const nextIdx = idx + 1;
-          if (nextIdx < sources.length) {
-            const nextTab = document.querySelector(
-              `.headlines-tab[data-source="${sources[nextIdx]}"]`
-            );
-            if (nextTab) nextTab.click();
+          const idx = sources.indexOf(src);
+          const nextOrderIdx = idx + 1;
+          if (nextOrderIdx < HEADLINES_ORDER.length) {
+            const nextTab = getTabAtOrderIndex(nextOrderIdx);
+            if (nextTab) {
+              lastAdvanceTime = Date.now();
+              nextTab.click();
+            }
           }
         }
       };
@@ -9377,7 +9418,6 @@ function loadCustomRSSFeed(feedUrl, container) {
         "active",
         t.getAttribute("data-source") === src
       ));
-      const row2Container = document.getElementById("headlines-tabs-row2");
       if (row2Container) row2Container.querySelectorAll(".headlines-tab").forEach(t => t.classList.remove("active"));
 
       // 2) Hide row 2 feed, hide all row 1 feed‐divs, then show only the chosen one
@@ -9406,7 +9446,6 @@ function loadCustomRSSFeed(feedUrl, container) {
     activateSource("espn");
 
     // ── G) Row 2 tabs (SI, NBC, Yardbarker, Athletic) - data-url feeds ──
-    const row2Container = document.getElementById("headlines-tabs-row2");
     if (row2Container) {
       row2Container.addEventListener("click", (e) => {
         const tab = e.target.closest(".headlines-tab[data-url]");
@@ -9425,7 +9464,31 @@ function loadCustomRSSFeed(feedUrl, container) {
             window.fetchFeed("#headlines-row2-feed", tab.dataset.url);
           }
         }
+        if (!row2ScrollListenerAttached) {
+          attachRow2ScrollWatcher();
+        }
       });
+    }
+
+    function attachRow2ScrollWatcher() {
+      const row2Feed = document.getElementById("headlines-row2-feed");
+      if (!row2Feed || row2ScrollListenerAttached) return;
+      const onScroll = () => {
+        if (Date.now() - lastAdvanceTime < ADVANCE_COOLDOWN_MS) return;
+        if (row2Feed.scrollHeight - row2Feed.scrollTop - row2Feed.clientHeight <= 1) {
+          const currentIdx = getCurrentOrderIndex();
+          const nextOrderIdx = currentIdx + 1;
+          if (nextOrderIdx < HEADLINES_ORDER.length) {
+            const nextTab = getTabAtOrderIndex(nextOrderIdx);
+            if (nextTab) {
+              lastAdvanceTime = Date.now();
+              nextTab.click();
+            }
+          }
+        }
+      };
+      row2Feed.addEventListener("scroll", onScroll);
+      row2ScrollListenerAttached = true;
     }
   });
 </script>
