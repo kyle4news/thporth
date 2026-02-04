@@ -3473,17 +3473,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <!-- NEWS PANEL -->
       <div class="column news" style="height: 100%;">
-        <!-- Headlines header -->
-        <div class="news-header" style="width: 100%; height: 18px; min-height: 18px;
+        <!-- News header (hidden on Home page; Headlines header shown inside news-Home instead) -->
+        <div id="news-header-shared" class="news-header" style="width: 100%; height: 18px; min-height: 18px;
             background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif;
-            font-size: 10px; font-weight: bold; display: flex; align-items: center;
-            padding-left: 10px; z-index: 11; border-bottom: 1px solid #1f1f1f;">Headlines</div>
+            font-size: 10px; display: flex; align-items: center;
+            padding-left: 1px; z-index: 11; border-bottom: 1px solid #1f1f1f;">News</div>
 
         <!-- Home News Section (Headlines + Breaking) -->
       <div id="news-Home" class="content-section" style="display: block; height: calc(100% - 18px);">
   <div class="news-main-container" style="display: flex; flex-direction: column; height: 100%;">
-    <!-- Headlines Section -->
+    <!-- Headlines Section - Home only: Headlines header replaces News, 10px left, bold -->
     <div class="news-section headlines-section" style="flex: 0 0 60%; min-height: 0;">
+      <div class="news-header news-header-home" style="width: 100%; height: 18px; min-height: 18px; background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: bold; display: flex; align-items: center; padding-left: 10px; z-index: 11; border-bottom: 1px solid #1f1f1f;">Headlines</div>
       <div id="headlines-tabs">
         <div class="headlines-tab active" data-source="espn">ESPN</div>
         <div class="headlines-tab" data-source="br">B/R</div>
@@ -6020,6 +6021,8 @@ function loadCustomRSSFeed(feedUrl, container) {
                 const news = document.getElementById("news-" + section);
                 if (news) {
                     news.style.display = "block";
+                    const newsHeaderShared = document.getElementById("news-header-shared");
+                    if (newsHeaderShared) newsHeaderShared.style.display = section === "Home" ? "none" : "flex";
                     const newsSubMenu = document.getElementById("newsSubMenu");
                     if (newsSubMenu) newsSubMenu.style.display = section === "Home" ? "flex" : "none";
                     const container = document.querySelector(".news");
@@ -6061,6 +6064,13 @@ function loadCustomRSSFeed(feedUrl, container) {
         window.renderNews = renderNews;
         
         console.log('[DOMContentLoaded] renderNews assigned to window.renderNews');
+        
+        // On initial load, Home is the default news section - hide shared News header (show Headlines from news-Home)
+        const newsHeaderShared = document.getElementById("news-header-shared");
+        const newsHome = document.getElementById("news-Home");
+        if (newsHeaderShared && newsHome && window.getComputedStyle(newsHome).display !== "none") {
+            newsHeaderShared.style.display = "none";
+        }
         
         // --- GAME CONTENT LOADING FUNCTION ---
         /**
