@@ -3500,12 +3500,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="headlines-tab" data-source="fox">FOX</div>
       </div>
       <div id="headlines-tabs-row2">
-        <div class="headlines-tab active" data-source="espn">ESPN</div>
-        <div class="headlines-tab" data-source="br">B/R</div>
-        <div class="headlines-tab" data-source="cbs">CBS</div>
-        <div class="headlines-tab" data-source="yahoo">Yahoo</div>
-        <div class="headlines-tab" data-source="fox">FOX</div>
+        <div class="headlines-tab" data-url="https://rss.app/feeds/OmfyY4xfhhYKiPZv.xml">SI</div>
+        <div class="headlines-tab" data-url="https://rss.app/feeds/uwLP6EDb3c3dwNVb.xml">NBC</div>
+        <div class="headlines-tab" data-url="https://rss.app/feeds/q0jgt3PQZCo0WJo5.xml">Yardbarker</div>
+        <div class="headlines-tab" data-url="https://rss.app/feeds/49STfLXifVCPprZP.xml">SB Nation</div>
+        <div class="headlines-tab" data-url="https://rss.app/feeds/xI8v7z5jNCkXQKKv.xml">Athletic</div>
       </div>
+      <div class="news-feed-content" id="headlines-row2-feed" style="display: none;">Loading...</div>
       <div class="news-feed-content" id="espn-feed" style="display: block;">Loading ESPN...</div>
       <div class="news-feed-content" id="br-feed" style="display:none;">Loading B/R...</div>
       <div class="news-feed-content" id="cbs-feed" style="display:none;">Loading CBS...</div>
@@ -8936,6 +8937,7 @@ function loadCustomRSSFeed(feedUrl, container) {
         Object.entries(feedMap).forEach(([source, url]) => {
             fetchFeed(`#${source}-feed`, url);
         });
+        window.fetchFeed = fetchFeed;
 
         // --- Main Menu and Page Switching Logic ---
         let selectedSection = "Home";
@@ -9337,8 +9339,8 @@ function loadCustomRSSFeed(feedUrl, container) {
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // ── A) Grab all tab elements and define their order ──
-    const tabs    = Array.from(document.querySelectorAll(".headlines-tab"));
+    // ── A) Grab row 1 tab elements only (row 2 uses data-url and separate handler) ──
+    const tabs    = Array.from(document.querySelectorAll("#headlines-tabs .headlines-tab"));
     const sources = ["espn", "br", "cbs", "yahoo", "fox"];
 
     // ── B) Keep track of which feeds already have a scroll listener ──
@@ -9370,13 +9372,17 @@ function loadCustomRSSFeed(feedUrl, container) {
 
     // ── D) Function to activate (highlight) exactly one tab + feed ──
     function activateSource(src) {
-      // 1) Toggle "active" class on tabs
+      // 1) Toggle "active" class on row 1 tabs; clear active from row 2
       tabs.forEach(t => t.classList.toggle(
         "active",
         t.getAttribute("data-source") === src
       ));
+      const row2Container = document.getElementById("headlines-tabs-row2");
+      if (row2Container) row2Container.querySelectorAll(".headlines-tab").forEach(t => t.classList.remove("active"));
 
-      // 2) Hide all four feed‐divs, then show only the chosen one
+      // 2) Hide row 2 feed, hide all row 1 feed‐divs, then show only the chosen one
+      const row2Feed = document.getElementById("headlines-row2-feed");
+      if (row2Feed) row2Feed.style.display = "none";
       sources.forEach(s => {
         const div = document.getElementById(s + "-feed");
         if (div) {
@@ -9398,6 +9404,29 @@ function loadCustomRSSFeed(feedUrl, container) {
 
     // ── F) On initial load, activate ESPN by default ──
     activateSource("espn");
+
+    // ── G) Row 2 tabs (SI, NBC, Yardbarker, Athletic) - data-url feeds ──
+    const row2Container = document.getElementById("headlines-tabs-row2");
+    if (row2Container) {
+      row2Container.addEventListener("click", (e) => {
+        const tab = e.target.closest(".headlines-tab[data-url]");
+        if (!tab) return;
+        tabs.forEach(t => t.classList.remove("active"));
+        row2Container.querySelectorAll(".headlines-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        sources.forEach(s => {
+          const div = document.getElementById(s + "-feed");
+          if (div) div.style.display = "none";
+        });
+        const row2Feed = document.getElementById("headlines-row2-feed");
+        if (row2Feed) {
+          row2Feed.style.display = "block";
+          if (typeof window.fetchFeed === "function") {
+            window.fetchFeed("#headlines-row2-feed", tab.dataset.url);
+          }
+        }
+      });
+    }
   });
 </script>
 	 
