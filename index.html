@@ -40055,7 +40055,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 // Find League display order here:
-    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "Olympics", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "NCAAF", "USMNT", "Formula 1", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "PGA Tour", "USWNT", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "Tennis", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "Unrivaled", "CFB", "NASCAR Cup Series", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "DFB-Pokal", "CONCACAF Champions Cup", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "Cricket Live", "Coupe de France", "Copa Libertadores", "Copa Sudamericana", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
+    const LEAGUE_DISPLAY_ORDER = ["FEATURED", "Olympics", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "NCAAF", "USMNT", "Formula 1", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "Tennis", "PGA Tour", "USWNT", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "Unrivaled", "CFB", "NASCAR Cup Series", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "DFB-Pokal", "CONCACAF Champions Cup", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "Cricket Live", "Coupe de France", "Copa Libertadores", "Copa Sudamericana", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         // NFL: "https://www.nfl.com/scores",
@@ -43561,7 +43561,25 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             : [];
         const urlOnlyMapByDate = {};
-        urlOnlyForDate.forEach(function(e) { urlOnlyMapByDate[e.name] = e; });
+        urlOnlyForDate.forEach(function(e) {
+            // If multiple entries exist for same league/date, pick the one that's currently LIVE
+            // Otherwise keep the existing one (first one wins if none are live)
+            if (!urlOnlyMapByDate[e.name]) {
+                urlOnlyMapByDate[e.name] = e;
+            } else {
+                // Check if this entry is currently live
+                const existingStatus = urlOnlyMapByDate[e.name].startTime && urlOnlyMapByDate[e.name].endTime
+                    ? getHardcodedGameTimeStatus(urlOnlyMapByDate[e.name].startTime, urlOnlyMapByDate[e.name].endTime, urlOnlyMapByDate[e.name].date)
+                    : 'before';
+                const newStatus = e.startTime && e.endTime
+                    ? getHardcodedGameTimeStatus(e.startTime, e.endTime, e.date)
+                    : 'before';
+                // Replace if new entry is live and existing is not
+                if (newStatus === 'live' && existingStatus !== 'live') {
+                    urlOnlyMapByDate[e.name] = e;
+                }
+            }
+        });
 
         if (isGroupedByLeague) {
             gamesData.forEach(game => {
