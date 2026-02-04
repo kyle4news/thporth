@@ -1294,14 +1294,15 @@ body {
     overflow: hidden !important;
   }
   
-  /* Soccer bar: keep orange background; JS sets .main-tab to #2a2a2a and overrides inline styles */
-  #league-specific-column #main-tabs,
-  #league-specific-column #main-tabs .main-tab {
-    background-color: #ff6801 !important;
+  /* Soccer page only: show VIEW ALL GAMES bar, hide normal SCHEDULE tab */
+  #league-specific-column #soccer-view-all-games-bar {
+    display: none;
   }
-  #league-specific-column #main-tabs .main-tab.active {
-    background-color: #ff6801 !important;
-    color: #000 !important;
+  #league-specific-column.soccer-active #soccer-view-all-games-bar {
+    display: block !important;
+  }
+  #league-specific-column.soccer-active #main-tabs {
+    display: none !important;
   }
   
   #f1-column-content {
@@ -3375,38 +3376,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- Header will be dynamically set -->
     <div id="league-specific-header" style="position: sticky; top: 0; width: 100%; height: 18px; background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif; font-size: 10px; display: flex; align-items: center; padding-left: 10px; z-index: 11; border-bottom: 1px solid #1f1f1f; font-weight: bold;"></div>
     
-            <!-- Main Tabs: Schedule | Standings (Stats hidden for now) -->
-            <a href="https://www.aiscore.com/" target="_blank" style="text-decoration: none;">
-              <div id="main-tabs"
-                   style="
-                     display: flex;
-                     height: 18px;
-                     background-color: #ff6801;
-                     overflow: hidden;
-                     flex-shrink: 0;
-                     cursor: pointer;
-                   ">
-                <div class="main-tab active"
-                     data-main-tab="schedule"
-                     style="
-                       flex: 1;
-                       display: flex;
-                       align-items: center;
-                       font-size: 10px;
-                       line-height: 18px;
-                       border-right: 1px solid #1f1f1f;
-                       color: #000;
-                       font-weight: bold;
-                       padding-left: 10px;
-                     ">
-                  VIEW ALL GAMES&nbsp;&nbsp;
-                  <img src="https://thporth.com/new-tab-black.png"
-                       alt="Open in new tab"
-                       style="height: 10px; vertical-align: middle;">
+            <!-- Soccer only: VIEW ALL GAMES bar (hidden by default; shown via .soccer-active on column) -->
+            <div id="soccer-view-all-games-bar">
+              <a href="https://www.aiscore.com/" target="_blank" style="text-decoration: none;">
+                <div style="display: flex; height: 18px; background-color: #ff6801; overflow: hidden; flex-shrink: 0; cursor: pointer; border-bottom: 2px solid #1f1f1f; border-top: 1px solid #1f1f1f;">
+                  <div style="flex: 1; display: flex; align-items: center; font-size: 10px; line-height: 20px; border-right: 0px solid #1f1f1f; color: #000; font-weight: bold; padding-left: 10px;">
+                    VIEW ALL GAMES&nbsp;&nbsp;
+                    <img src="https://thporth.com/new-tab-black.png" alt="Open in new tab" style="height: 10px; vertical-align: middle;">
+                  </div>
                 </div>
-              </div>
-            </a>
-            
+              </a>
+            </div>
+            <!-- Main Tabs: SCHEDULE (and Standings for other leagues); hidden on Soccer via .soccer-active -->
+            <div id="main-tabs" style="display: flex; height: 18px; background-color: #2a2a2a; overflow: hidden; flex-shrink: 0;">
+                <div class="main-tab active" data-main-tab="schedule" style="flex: 1; text-align: center; font-size: 10px; line-height: 18px; cursor: pointer; border-right: 1px solid #1f1f1f; background-color: #fff; color: #000; font-weight: bold;">SCHEDULE</div>
+            </div>
 
     <!-- Schedule Tab Content (active by default) -->
     <div id="schedule-tab-content" class="main-tab-content" style="display: block; height: calc(100% - 18px); flex-direction: column;">
@@ -52054,6 +52038,16 @@ async function fetchFeaturedGames() {
         const leagueInfo = LEAGUE_DATA_CONFIG[leagueKey];
         if (!leagueInfo) return;
         if (leagueHeader) leagueHeader.innerText = leagueKey;
+        
+        // Soccer page only: show VIEW ALL GAMES bar; other leagues show SCHEDULE tab
+        const leagueSpecificColumn = document.getElementById('league-specific-column');
+        if (leagueSpecificColumn) {
+            if (leagueKey === 'Soccer') {
+                leagueSpecificColumn.classList.add('soccer-active');
+            } else {
+                leagueSpecificColumn.classList.remove('soccer-active');
+            }
+        }
         
         // Clean up previous listener if exists
         if (leagueTodayGamesUnsubscribe) {
