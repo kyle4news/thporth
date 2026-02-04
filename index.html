@@ -41439,7 +41439,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'PGATourChampions': { displayName: 'PGA Champions', logoUrl: 'https://thporth.com/PGATourChampions.png', url: 'https://www.pgatour.com/pgatour-champions/news', socialUrl: 'https://x.com/ChampionsTour', mediaUrl: 'https://www.youtube.com/@PGATOURChampions' },
         'Unrivaled': { displayName: 'Unrivaled', logoUrl: 'https://thporth.com/Unrivaled.png', url: 'https://www.unrivaled.basketball/news', socialUrl: 'https://x.com/Unrivaledwbb', mediaUrl: 'https://www.youtube.com/@UnrivaledBasketball', highlightsUrl: 'https://www.youtube.com/playlist?list=PL_HppZy-GwSwDvgc8h-QxgsPxgtmIJEw_', highlightsIcon: 'https://thporth.com/highlights.png' },
         'Cricket': { displayName: 'Cricket', logoUrl: 'https://thporth.com/cricket.png', url: 'https://www.espncricinfo.com/', scheduleUrl: 'https://www.cricbuzz.com/', scheduleIcon: 'https://thporth.com/schedule.png' },
-        'NCAABaseball': { displayName: 'NCAA Baseball', logoUrl: 'https://thporth.com/NCAABaseball.png', url: 'https://d1baseball.com/', scheduleUrl: 'https://www.espn.com/college-baseball/scoreboard', scheduleIcon: 'https://thporth.com/schedule.png', socialUrl: 'https://x.com/d1baseball?lang=en', highlightsUrl: 'https://youtube.com/playlist?list=PLBBzZXcG8cYCQ3lmDu17GHYi2MAomA-aH&si=LMrqjgj28aCMDuln', highlightsIcon: 'https://thporth.com/highlights.png' },
+        'NCAABaseball': { displayName: 'NCAA Baseball', logoUrl: 'https://thporth.com/NCAABaseball.png', url: 'https://d1baseball.com/', scheduleUrl: 'https://www.espn.com/college-baseball/scoreboard', scheduleLabel: 'Scoreboard', scheduleIcon: 'https://thporth.com/schedule.png', socialUrl: 'https://x.com/d1baseball?lang=en', mediaUrl: 'https://www.youtube.com/@D1Baseball/videos', highlightsUrl: 'https://youtube.com/playlist?list=PLBBzZXcG8cYCQ3lmDu17GHYi2MAomA-aH&si=LMrqjgj28aCMDuln', highlightsIcon: 'https://thporth.com/highlights.png' },
     };
     window.MAIN_MENU_URL_ONLY_LEAGUES = MAIN_MENU_URL_ONLY_LEAGUES;
 
@@ -41464,7 +41464,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const league = leagues[section];
             const rows = [ { action: 'news', label: 'News', icon: newsIcon } ];
             if (league.scheduleUrl) {
-                rows.push({ action: 'schedule', label: 'Schedule', icon: league.scheduleIcon || scheduleIcon });
+                rows.push({ action: 'schedule', label: league.scheduleLabel || 'Schedule', icon: league.scheduleIcon || scheduleIcon });
             }
             rows.push({ action: 'social', label: 'Social', icon: socialIcon }, { action: 'media', label: 'Media', icon: mediaIcon });
             if (league.highlightsUrl) {
@@ -59706,7 +59706,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ul.className = 'url-only-nested';
                 const rows = [{ action: 'news', label: 'News', icon: newsIcon }];
                 if (urlOnly.scheduleUrl) {
-                    rows.push({ action: 'schedule', label: 'Schedule', icon: urlOnly.scheduleIcon || scheduleIcon });
+                    rows.push({ action: 'schedule', label: urlOnly.scheduleLabel || 'Schedule', icon: urlOnly.scheduleIcon || scheduleIcon });
                 }
                 rows.push({ action: 'social', label: 'Social', icon: socialIcon }, { action: 'media', label: 'Media', icon: mediaIcon });
                 if (urlOnly.highlightsUrl) {
