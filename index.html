@@ -1779,7 +1779,8 @@ body {
 */
 
 /* 5) The horizontal tabs container (used for the Home page). */
-#headlines-tabs {
+#headlines-tabs,
+#headlines-tabs-row2 {
     position: sticky !important;
     top: 2px !important;
     z-index: 28 !important;
@@ -1789,9 +1790,13 @@ body {
     margin: 0 !important;
     padding: 0 !important;
 }
+#headlines-tabs {
+    border-bottom: 1px solid #1f1f1f;
+}
 
 /* 11) New styles for the tabs themselves (Home page style). */
-#headlines-tabs .headlines-tab {
+#headlines-tabs .headlines-tab,
+#headlines-tabs-row2 .headlines-tab {
     flex: 1 !important;
     text-align: center !important;
     font-size: 10px !important;
@@ -1804,11 +1809,13 @@ body {
     padding: 0 !important;
 }
 
-#headlines-tabs .headlines-tab:last-child {
+#headlines-tabs .headlines-tab:last-child,
+#headlines-tabs-row2 .headlines-tab:last-child {
     border-right: none !important;
 }
 
-#headlines-tabs .headlines-tab.active {
+#headlines-tabs .headlines-tab.active,
+#headlines-tabs-row2 .headlines-tab.active {
     background-color: #3c3c3c !important;
     color: #fff !important;
 }
@@ -3486,6 +3493,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="news-section headlines-section" style="flex: 0 0 60%; min-height: 0;">
       <div class="news-header news-header-home" style="width: 100%; height: 18px; min-height: 18px; background-color: #3c3c3c; font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: bold; display: flex; align-items: center; padding-left: 10px; z-index: 11; border-bottom: 1px solid #1f1f1f;">Headlines</div>
       <div id="headlines-tabs">
+        <div class="headlines-tab active" data-source="espn">ESPN</div>
+        <div class="headlines-tab" data-source="br">B/R</div>
+        <div class="headlines-tab" data-source="cbs">CBS</div>
+        <div class="headlines-tab" data-source="yahoo">Yahoo</div>
+        <div class="headlines-tab" data-source="fox">FOX</div>
+      </div>
+      <div id="headlines-tabs-row2">
         <div class="headlines-tab active" data-source="espn">ESPN</div>
         <div class="headlines-tab" data-source="br">B/R</div>
         <div class="headlines-tab" data-source="cbs">CBS</div>
@@ -5479,10 +5493,11 @@ function loadCustomRSSFeed(feedUrl, container) {
             socialColumn.style.backgroundColor = '#1a1a1a';
         }
         
-        // Set news header height to match social header in game mode (remove border-bottom)
-        const newsHeader = document.querySelector('.news-header');
-        if (newsHeader) {
-            newsHeader.style.borderBottom = 'none';
+        // Show News header in game mode (it may be hidden when coming from Home page)
+        const newsHeaderShared = document.getElementById('news-header-shared');
+        if (newsHeaderShared) {
+            newsHeaderShared.style.display = 'flex';
+            newsHeaderShared.style.borderBottom = 'none';
         }
         
         // Clear News column content (keep header)
