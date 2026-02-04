@@ -52192,8 +52192,10 @@ async function fetchFeaturedGames() {
             }
             
             if (standingsMainTab) {
-                // Hide for FA Cup and generic Soccer page (only show Schedule tab)
-                if (leagueKey === 'Soccer' || leagueKey === 'FACup') {
+                // FA Cup: remove standings tab so column matches commented-out HTML (Schedule + Today/Upcoming only)
+                if (leagueKey === 'FACup') {
+                    standingsMainTab.remove();
+                } else if (leagueKey === 'Soccer') {
                     standingsMainTab.style.display = 'none';
                     if (standingsTabContentEl) {
                         standingsTabContentEl.style.display = 'none';
