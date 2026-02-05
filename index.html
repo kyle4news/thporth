@@ -2493,6 +2493,13 @@ div[id^="breaking-content-"] a:hover {
     overflow-x: auto !important; /* Allows horizontal scrolling if content still overflows */
   }
   
+  /* Hide all columns by default on mobile */
+  @media (max-width: 768px) {
+    .column {
+      display: none !important;
+    }
+  }
+  
   /* Show only the active column */
   .column.mobile-active {
     display: flex !important;
@@ -2503,7 +2510,6 @@ div[id^="breaking-content-"] a:hover {
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
-    z-index: 10 !important;
   }
   
   /* Top bar adjustments */
