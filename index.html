@@ -44832,7 +44832,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 logo.style.flexShrink = "0";
                 left.appendChild(logo);
                 const nameSpan = document.createElement("span");
-                nameSpan.textContent = leagueNameKey;
+                nameSpan.textContent = String(leagueNameKey).trim();
                 nameSpan.style.overflow = "hidden";
                 nameSpan.style.textOverflow = "ellipsis";
                 nameSpan.style.whiteSpace = "nowrap";
@@ -44904,11 +44904,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     title.style.fontWeight = "normal";
                     title.style.paddingLeft = "5px";
                     title.style.paddingRight = "0px";
-                } else {
-                    // Add left padding to FEATURED title to match logo spacing
-                    if (leagueNameKey === 'FEATURED') {
-                        title.style.paddingLeft = '5px';
-                    }
                 }
                 
                 // Add league logo if applicable (skip for Tennis sections)
@@ -44927,6 +44922,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     logo.style.display = "inline-block";
                     logo.style.flexShrink = "0";
                     titleContent.appendChild(logo);
+                } else if (leagueNameKey === "FEATURED") {
+                  const logo = document.createElement("img");
+                  logo.src = "https://thporth.com/star.png";
+                  logo.alt = "Featured";
+                  logo.style.width = "12px";
+                  logo.style.height = "12px";
+                  logo.style.objectFit = "contain";
+                  logo.style.marginLeft = "5px";
+                  logo.style.marginRight = "8px";
+                  logo.style.verticalAlign = "middle";
+                  logo.style.display = "inline-block";
+                  logo.style.marginTop = "-2px";
+                  titleContent.appendChild(logo);
                 } else if (leagueNameKey === "NFL") {
                     const logo = document.createElement("img");
                     logo.src = "https://www.flashscore.com/res/image/data/W6t8omXI-prCDKdX1.png";
