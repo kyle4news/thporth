@@ -6118,7 +6118,6 @@ function loadCustomRSSFeed(feedUrl, container) {
          */
         async function loadGameContent(gameId, contentType, container) {
             try {
-            console.log(`[loadGameContent] called: gameId=${gameId}, contentType=${contentType}`);
                 // 1. Try to get game data from cache (populated from today.json/yesterday.json)
                 let gameData = window.getGameDataFromCache ? window.getGameDataFromCache(gameId) : null;
                 
