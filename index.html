@@ -5236,7 +5236,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                 leagueName.includes('Champions League') || 
                 leagueName.includes('Europa League') || 
                 leagueName.includes('Conference League') ||
-                ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'USL Championship', "Women's UCL", 'Campeones Cup'].includes(leagueName) ||
+                ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Eredivisie', 'Liga Portugal', 'Taça de Portugal', 'Taca de Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'USL Championship', "Women's UCL", 'Campeones Cup'].includes(leagueName) || 
                 leagueField.includes('Champions League') ||
                 leagueField.includes('Europa League') ||
                 leagueField.includes('Conference League') ||
@@ -5248,7 +5248,9 @@ function loadCustomRSSFeed(feedUrl, container) {
                 leagueField.includes('MLS') ||
                 leagueField.includes('NWSL') ||
                 leagueField.includes('FA Cup') ||
-                leagueField.includes('Liga MX');
+                leagueField.includes('Liga MX') ||
+                leagueField.includes('Taça de Portugal') ||
+                leagueField.includes('Taca de Portugal');
             
             // Use display names from DOM if available, otherwise fall back to game data
             let awayTeam = awayTeamDisplayFromDOM;
@@ -6116,6 +6118,7 @@ function loadCustomRSSFeed(feedUrl, container) {
          */
         async function loadGameContent(gameId, contentType, container) {
             try {
+            console.log(`[loadGameContent] called: gameId=${gameId}, contentType=${contentType}`);
                 // 1. Try to get game data from cache (populated from today.json/yesterday.json)
                 let gameData = window.getGameDataFromCache ? window.getGameDataFromCache(gameId) : null;
                 
@@ -6214,7 +6217,7 @@ function loadCustomRSSFeed(feedUrl, container) {
                     leagueName.includes('Champions League') || 
                     leagueName.includes('Europa League') || 
                     leagueName.includes('Conference League') ||
-                    ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'USL Championship', "Women's UCL", 'Campeones Cup'].includes(leagueName) ||
+                    ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Eredivisie', 'Liga Portugal', 'Taça de Portugal', 'Taca de Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'USL Championship', "Women's UCL", 'Campeones Cup'].includes(leagueName) || 
                     league.includes('Champions League') ||
                     league.includes('Europa League') ||
                     league.includes('Conference League') ||
@@ -6226,7 +6229,9 @@ function loadCustomRSSFeed(feedUrl, container) {
                     league.includes('MLS') ||
                     league.includes('NWSL') ||
                     league.includes('FA Cup') ||
-                    league.includes('Liga MX');
+                    league.includes('Liga MX') ||
+                    league.includes('Taça de Portugal') ||
+                    league.includes('Taca de Portugal');
                 
                 console.log(`[loadGameContent] Game: ${awayTeam} vs ${homeTeam} (${leagueName}) - Soccer: ${isSoccer}`);
                 
@@ -46711,7 +46716,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // Get displayLeagueForCheck early for use in granular time logic
                     const displayLeagueForCheck = getLeagueDisplayName(data.League, data.Sport);
-                    const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'CONCACAF Champions Cup', 'Club Friendly', 'International Friendly', 'AFCON', 'USMNT', 'USWNT'].includes(displayLeagueForCheck);
+                    const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'Taça de Portugal', 'Taca de Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'CONCACAF Champions Cup', 'Club Friendly', 'International Friendly', 'AFCON', 'USMNT', 'USWNT'].includes(displayLeagueForCheck);
                     
                     // Apply granular time logic for featured games (same as regular games)
                     // Skip granular time logic for hardcoded games that already have time status set
@@ -47550,7 +47555,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Check if this is a soccer league - soccer leagues show home on top, away on bottom
                 // displayLeague already declared above
-                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'Copa Libertadores', 'Copa Sudamericana', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'CONCACAF Champions Cup', 'Club Friendly', 'AFCON', 'USMNT', 'USWNT'].includes(displayLeague);
+                const isSoccerLeague = ['Premier League', 'LaLiga', 'Serie A', 'Serie B', 'Bundesliga', 'Ligue 1', 'MLS', 'UEFA Champions League', 'AFC Champions League', 'UEFA Europa League', 'UEFA Conference League', 'NWSL', 'FA Cup', 'Coppa Italia', 'Coupe de France', 'DFB-Pokal', 'Carabao Cup', 'Super Cup', 'Eredivisie', 'Liga Portugal', 'Taça de Portugal', 'Taca de Portugal', 'EFL Championship', 'Brasileirão', 'Belgian Pro League', "Women's Super League", 'LPF Playoffs', 'Argentine Primera', 'Scottish Cup', 'Liga MX', 'Saudi Pro League', 'Scottish Premiership', 'Copa del Rey', 'Super Lig', 'Greek Super League', 'FIFA U-20 World Cup', 'FIFA U-17 World Cup', 'Campeones Cup', 'USL Championship', "Women's UCL", 'CAF Qualifiers', 'UEFA Qualifiers', 'AFC Asian Cup Qualifiers', 'Copa Libertadores', 'Copa Sudamericana', 'AFC Qualifiers', 'CONCACAF Qualifiers', 'CONCACAF Champions Cup', 'Club Friendly', 'AFCON', 'USMNT', 'USWNT'].includes(displayLeague);
                 
                 // Check if we're rendering in the league-specific column (for font size adjustment)
                 const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
@@ -55262,7 +55267,7 @@ async function fetchFeaturedGames() {
                     let lastDisplayedTimeLabel = null;
                     
                     // Determine display order based on league type (same for all games in this date)
-                    const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia', 'USMNT', 'USWNT'].includes(leagueKey);
+                    const isSoccerLeague = ['LaLiga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1', 'Ligue1', 'MLS', 'LigaMX', 'TacaDePortugal', 'FA Cup', 'Copa del Rey', 'DFB-Pokal', 'Coppa Italia', 'USMNT', 'USWNT'].includes(leagueKey);
                     
                     datesToShow.forEach((game, gameIndex) => {
                     // Parse time as EST and convert to user's local time (or keep TBD)
