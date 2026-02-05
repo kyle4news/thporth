@@ -41134,7 +41134,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 // Find League display order here:
-    const LEAGUE_DISPLAY_ORDER = ["Olympics", "FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "NCAAF", "USMNT", "Formula 1", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "Tennis", "PGA Tour", "USWNT", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "Unrivaled", "CFB", "NASCAR Cup Series", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "DFB-Pokal", "CONCACAF Champions Cup", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "Cricket Live", "Coupe de France", "Copa Libertadores", "Copa Sudamericana", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
+    const LEAGUE_DISPLAY_ORDER = ["Olympics", "FEATURED", "MLB", "NFL", "Ryder Cup", "U.S. Open - Men's", "U.S. Open - Women's", "NBA", "NHL", "Premier League", "NCAAF", "USMNT", "Formula 1", "Boxing", "UFC", "ATP Finals (Singles)", "ATP Finals (Doubles)", "UEFA Champions League", "Tennis", "PGA Tour", "USWNT", "DP World Tour", "LPGA Tour", "PGA Champions", "NCAAM", "NCAAW", "NCAA Baseball", "NCAA Softball", "LIV Golf", "ATP", "WTA", "MLS", "FA Cup", "LaLiga", "Bundesliga", "AFCON", "Serie A", "NCAA Women's Volleyball", "Ligue 1", "WNBA", "Unrivaled", "CFB", "NASCAR Cup Series", "MotoGP", "NBA Preseason", "UEFA Europa League", "UEFA Conference League", "NWSL", "UEFA Qualifiers", "CONCACAF Qualifiers", "AFC Qualifiers", "Davis Cup (Singles)", "Davis Cup (Doubles)", "Campeones Cup", "Carabao Cup", "Copa del Rey", "Leagues Cup", "FIBA AmeriCup", "Liga MX", "Coppa Italia", "DFB-Pokal", "CONCACAF Champions Cup", "Saudi Pro League", "CFL", "EFL Championship", "LPF Playoffs", "Argentine Primera", "Super Lig", "Italian Super Cup", "Liga Portugal", "Brasileirão", "Belgian Pro League", "Scottish Premiership", "Eredivisie", "IMSA SportsCar", "AFC Champions League", "Women's UCL", "FIFA U-17 World Cup", "Women's Cricket World Cup", "FIFA U-20 World Cup", "CAF Qualifiers", "NHL Preseason", "Scottish Cup", "Women's Super League", "ICC Test Series", "ODI", "T20 International", "Cricket Live", "Coupe de France", "Copa Libertadores", "Copa Sudamericana", "USL Championship", "OHL", "NCAA Men's Hockey", "International Friendly", "Club Friendly", "England: League One", "England: League Two", "England: National League", "2. Bundesliga", "Serie B", "Ligue 2", "Greek Super League", "LaLiga 2"]; 
 
     const LEAGUE_LIVE_SCORES_MAP = {
         // NFL: "https://www.nfl.com/scores",
@@ -42576,7 +42576,34 @@ document.addEventListener('DOMContentLoaded', function () {
         { date: '2026-02-04', name: 'Cricket', url: 'https://www.flashscoreusa.com/cricket/', startTime: '11:00', endTime: '15:00', time: '11:00 am' },
  { date: '2026-02-04', name: 'Cricket', url: 'https://www.flashscoreusa.com/cricket/', startTime: '18:00', endTime: '23:59', time: '6:00 pm' },
  { date: '2026-02-05', name: 'Cricket', url: 'https://www.flashscoreusa.com/cricket/', startTime: '02:30', endTime: '12:00', time: '2:30 am' },
- { date: '2026-02-05', name: 'Cricket', url: 'https://www.flashscoreusa.com/cricket/', startTime: '18:30', endTime: '23:59', time: '6:30 pm' },
+  // NCAA Softball (URL-only schedule)
+  { date: '2026-02-05', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '12:00', endTime: '23:59', time: '12:00 pm' },
+  { date: '2026-02-06', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '00:00', endTime: '01:30', time: '12:00 am' },
+  { date: '2026-02-06', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '09:00', endTime: '21:00', time: '9:00 am' },
+  { date: '2026-02-07', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '09:00', endTime: '16:30', time: '9:00 am' },
+  { date: '2026-02-08', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '09:00', endTime: '19:00', time: '9:00 am' },
+  { date: '2026-02-10', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '15:00', endTime: '21:00', time: '3:00 pm' },
+  { date: '2026-02-11', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '13:00', endTime: '21:00', time: '1:00 pm' },
+  { date: '2026-02-12', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '10:00', endTime: '23:59', time: '10:00 am' },
+  { date: '2026-02-13', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '09:00', endTime: '20:30', time: '9:00 am' },
+  { date: '2026-02-14', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '09:00', endTime: '20:00', time: '9:00 am' },
+  { date: '2026-02-15', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '09:00', endTime: '23:00', time: '9:00 am' },
+  { date: '2026-02-16', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '13:30', endTime: '16:30', time: '1:30 pm' },
+  { date: '2026-02-16', name: 'NCAA Softball', url: 'https://www.espn.com/college-softball/scoreboard/_/date/20260216', startTime: '21:00', endTime: '23:59', time: '9:00 pm' },
+
+  // NCAA Baseball (URL-only schedule)
+  { date: '2026-02-13', name: 'NCAA Baseball', url: 'https://www.espn.com/college-baseball/scoreboard', startTime: '09:30', endTime: '23:59', time: '9:30 am' },
+  { date: '2026-02-14', name: 'NCAA Baseball', url: 'https://www.espn.com/college-baseball/scoreboard', startTime: '09:30', endTime: '21:00', time: '9:30 am' },
+  { date: '2026-02-15', name: 'NCAA Baseball', url: 'https://www.espn.com/college-baseball/scoreboard', startTime: '09:30', endTime: '21:00', time: '9:30 am' },
+  { date: '2026-02-16', name: 'NCAA Baseball', url: 'https://www.espn.com/college-baseball/scoreboard', startTime: '12:00', endTime: '23:59', time: '12:00 pm' },
+  { date: '2026-02-17', name: 'NCAA Baseball', url: 'https://www.espn.com/college-baseball/scoreboard', startTime: '00:00', endTime: '02:35', time: '12:00 am' },
+  { date: '2026-02-17', name: 'NCAA Baseball', url: 'https://www.espn.com/college-baseball/scoreboard', startTime: '14:00', endTime: '23:59', time: '2:00 pm' },
+  { date: '2026-02-18', name: 'NCAA Baseball', url: 'https://www.espn.com/college-baseball/scoreboard', startTime: '00:00', endTime: '00:30', time: '12:00 am' },
+  { date: '2026-02-18', name: 'NCAA Baseball', url: 'https://www.espn.com/college-baseball/scoreboard', startTime: '13:30', endTime: '23:00', time: '1:30 pm' },
+  { date: '2026-02-19', name: 'NCAA Baseball', url: 'https://www.espn.com/college-baseball/scoreboard', startTime: '15:00', endTime: '23:59', time: '3:00 pm' },
+  { date: '2026-02-20', name: 'NCAA Baseball', url: 'https://www.espn.com/college-baseball/scoreboard', startTime: '00:00', endTime: '02:35', time: '12:00 am' },
+
+  { date: '2026-01-30', name: 'Unrivaled', url: 'https://www.unrivaled.basketball/schedule', startTime: '19:30', endTime: '23:15', time: '7:30 pm', home: '', away: '' },
  { date: '2026-02-06', name: 'Cricket', url: 'https://www.flashscoreusa.com/cricket/', startTime: '00:00', endTime: '07:00', time: '12:00 am' },
  { date: '2026-02-06', name: 'Cricket', url: 'https://www.flashscoreusa.com/cricket/', startTime: '11:00', endTime: '23:59', time: '11:00 am' },
  { date: '2026-02-07', name: 'Cricket', url: 'https://www.flashscoreusa.com/cricket/', startTime: '00:00', endTime: '11:00', time: '12:00 am' },
