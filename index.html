@@ -45043,7 +45043,7 @@ document.addEventListener('DOMContentLoaded', function () {
             : [];
         const urlOnlyMapByDate = {};
         urlOnlyForDate.forEach(function(e) {
-            // If multiple entries exist for same league/date, pick the one that's currently LIVE
+            // If multiple entries exist for same league/date, pick the one that's currently LIVE or next upcoming
             // Otherwise keep the existing one (first one wins if none are live)
             if (!urlOnlyMapByDate[e.name]) {
                 urlOnlyMapByDate[e.name] = e;
@@ -45057,6 +45057,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     : 'before';
                 // Replace if new entry is live and existing is not
                 if (newStatus === 'live' && existingStatus !== 'live') {
+                    urlOnlyMapByDate[e.name] = e;
+                } else if (newStatus === 'before' && existingStatus === 'after') {
+                    // If existing is finished but new is upcoming, show the next upcoming time
                     urlOnlyMapByDate[e.name] = e;
                 }
             }
