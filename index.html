@@ -5945,6 +5945,19 @@ function loadCustomRSSFeed(feedUrl, container) {
                                                     console.warn(`[handleGameClick] Mobile: league-schedule-today-content element not found!`);
                                                 }
                                             }, 1000); // Longer delay to allow games to render
+                                                // After loading league data, switch News column to league mode
+                                                try {
+                                                  if (window.renderNews) {
+                                                    console.log(`[handleGameClick] Mobile: Switching News column to league view for ${leagueKey}`);
+                                                    window.renderNews(leagueKey, 'league');
+                                                  }
+                                                  if (typeof initializeVideosColumn === 'function') {
+                                                    console.log(`[handleGameClick] Mobile: Initializing Videos column for ${leagueKey}`);
+                                                    initializeVideosColumn(leagueKey);
+                                                  }
+                                                } catch (err) {
+                                                  console.warn('[handleGameClick] Mobile: Error switching News/Videos to league view:', err);
+                                                }
                                         } catch (err) {
                                             console.error(`[handleGameClick] Mobile: Error loading league data:`, err);
                                             console.error(`[handleGameClick] Mobile: Error stack:`, err.stack);
