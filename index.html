@@ -46447,9 +46447,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         featuredChannelToDisplay = 'Tennis Channel';
                     }
                     let featuredChannelDisplay = normalizeChannel((!isFinal && featuredChannelToDisplay) ? featuredChannelToDisplay : '');
-                    // Hardcode AFC Champions League to YouTube
-                    if ((data && (data.League === 'AFC Champions League' || data.League === 'Asia: AFC Elite')) || displayLeagueForCheck === 'AFC Champions League') {
-                      featuredChannelDisplay = 'YouTube';
+                    // Special case: AFC Champions League - only show YouTube if NOT Final (not "F")
+                    const isAfcChampionsLeague = (data && (data.League === 'AFC Champions League' || data.League === 'Asia: AFC Elite')) || displayLeagueForCheck === 'AFC Champions League';
+                    if (isAfcChampionsLeague) {
+                      // Check if time shows "F" (Final) in any form
+                      const timePlainText = String(displayTimeLabel || '').replace(/<[^>]*>/g, '').trim();
+                      const hasF = timePlainText === 'F' || isFinal;
+                      featuredChannelDisplay = hasF ? '' : 'YouTube';
                     }
                     
                     // For UFC and Boxing: if no channel, make team names gray (#C0C0C0)
@@ -46709,9 +46713,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         : '';
                     
                     let channelDisplay = normalizeChannel(data.channel || data.Channel || '');
-                    // Hardcode AFC Champions League to YouTube
+                    // Hardcode AFC Champions League to YouTube (but NOT if game is Final)
                     if ((data && (data.League === 'AFC Champions League' || data.League === 'Asia: AFC Elite')) || displayLeague === 'AFC Champions League') {
-                      channelDisplay = 'YouTube';
+                      if (gameStatusClass === 'final-game') {
+                        channelDisplay = '';
+                      } else {
+                        channelDisplay = 'YouTube';
+                      }
                     }
                     const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
                     const timeFontSize = isLeagueSpecificColumn ? '10px' : '11px';
@@ -46998,9 +47006,13 @@ document.addEventListener('DOMContentLoaded', function () {
                   channelToDisplay = 'Tennis Channel';
                 }
                 let channelDisplay = normalizeChannel((channelToDisplay && !isFinal) ? channelToDisplay : '');
-                // Hardcode AFC Champions League to YouTube
+                // Hardcode AFC Champions League to YouTube (but NOT if game is Final)
                 if ((data && (data.League === 'AFC Champions League' || data.League === 'Asia: AFC Elite')) || displayLeague === 'AFC Champions League') {
-                  channelDisplay = 'YouTube';
+                  if (!isFinal) {
+                    channelDisplay = 'YouTube';
+                  } else {
+                    channelDisplay = '';
+                  }
                 }
                 
                 // For UFC and Boxing: handle sub-items (gray text, no time) vs main items (white text, shows time)
@@ -54013,9 +54025,13 @@ async function fetchFeaturedGames() {
                       channelToDisplay = 'Tennis Channel';
                     }
                     let channelDisplay = normalizeChannel((channelToDisplay && !isFinal) ? channelToDisplay : '');
-                    // Hardcode AFC Champions League to YouTube
+                    // Hardcode AFC Champions League to YouTube (but NOT if game is Final)
                     if ((game && (game.League === 'AFC Champions League' || game.League === 'Asia: AFC Elite')) || displayLeague === 'AFC Champions League') {
-                      channelDisplay = 'YouTube';
+                      if (!isFinal) {
+                        channelDisplay = 'YouTube';
+                      } else {
+                        channelDisplay = '';
+                      }
                     }
                     
                     // Check if game is clickable (has at least one team with feed mappings). RULE: NCAAM and NCAAW games are never clickable.
