@@ -52536,6 +52536,32 @@ async function fetchFeaturedGames() {
             if (todayDefaultContent) todayDefaultContent.style.display = 'block';
         }
         
+        // Special handling for NFL - no Today/Upcoming sub-tabs; Schedule tab shows only the message
+        if (leagueKey === 'NFL') {
+          // Show a static message and ad in the Schedule tab for NFL
+          if (scheduleTabsContainer) scheduleTabsContainer.style.display = 'none';
+          if (todayScheduleContent) {
+            todayScheduleContent.style.display = 'block';
+            todayScheduleContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;">2025-26 season concluded</p><div id="nfl-ad-slot" style="margin-top: 60px; display: flex; justify-content: center;"></div>';
+            var nflAdSlot = document.getElementById('nfl-ad-slot');
+            if (nflAdSlot) {
+              if (window.innerWidth <= 767) {
+                window.atOptions = { 'key': 'e00bbe01841fd50aa83e25c95e0291dc', 'format': 'iframe', 'height': 250, 'width': 300, 'params': {} };
+                var adScript = document.createElement('script');
+                adScript.src = 'https://www.highperformanceformat.com/e00bbe01841fd50aa83e25c95e0291dc/invoke.js';
+                nflAdSlot.appendChild(adScript);
+              } else {
+                window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
+                var adScript = document.createElement('script');
+                adScript.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
+                nflAdSlot.appendChild(adScript);
+              }
+            }
+          }
+          if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
+          return;
+        }
+        
         // Reset schedule sub-tabs (Today/Yesterday/Upcoming) - reset ALL tabs to inactive state
         if (scheduleTabsContainer) {
             const todayScheduleTab = scheduleTabsContainer.querySelector('.schedule-tab[data-schedule-tab="today"]');
