@@ -52459,31 +52459,32 @@ async function fetchFeaturedGames() {
         const todayDefaultContent = document.getElementById('league-schedule-today-default-content');
         
         if (leagueKey === 'Tennis') {
-            if (scheduleTabsContainer) scheduleTabsContainer.style.display = 'none';
-            if (todayScheduleContent) todayScheduleContent.style.display = 'block';
-            if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
-            if (tennisTodayTabs) tennisTodayTabs.style.display = 'none';
-            if (tennisTodayAtpContent) tennisTodayAtpContent.style.display = 'none';
-            if (tennisTodayWtaContent) tennisTodayWtaContent.style.display = 'none';
-            if (todayDefaultContent) {
-                todayDefaultContent.style.display = 'block';
-                todayDefaultContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.flashscoreusa.com/tennis/" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View tennis schedule</a></p><div id="tennis-ad-slot" style="margin-top: 60px; display: flex; justify-content: center;"></div>';
-                var tennisAdSlot = document.getElementById('tennis-ad-slot');
-                if (tennisAdSlot) {
-                    if (window.innerWidth <= 767) {
-                        window.atOptions = { 'key': 'e00bbe01841fd50aa83e25c95e0291dc', 'format': 'iframe', 'height': 250, 'width': 300, 'params': {} };
-                        var adScript = document.createElement('script');
-                        adScript.src = 'https://www.highperformanceformat.com/e00bbe01841fd50aa83e25c95e0291dc/invoke.js';
-                        tennisAdSlot.appendChild(adScript);
-                    } else {
-                        window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
-                        var adScript = document.createElement('script');
-                        adScript.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
-                        tennisAdSlot.appendChild(adScript);
-                    }
-                }
+          // Show a static message and ad in the Schedule tab for Tennis
+          if (scheduleTabsContainer) scheduleTabsContainer.style.display = 'none';
+          if (todayScheduleContent) {
+            todayScheduleContent.style.display = 'block';
+            todayScheduleContent.innerHTML = '<p style="padding-left: 10px; margin-bottom: 12px;"><a href="https://www.flashscoreusa.com/tennis/" target="_blank" rel="noopener noreferrer" style="text-decoration: underline; color: #9ca3af;">View tennis schedule</a></p><div id="tennis-ad-slot" style="margin-top: 60px; display: flex; justify-content: center;"></div>';
+            var tennisAdSlot = document.getElementById('tennis-ad-slot');
+            if (tennisAdSlot) {
+              if (window.innerWidth <= 767) {
+                window.atOptions = { 'key': 'e00bbe01841fd50aa83e25c95e0291dc', 'format': 'iframe', 'height': 250, 'width': 300, 'params': {} };
+                var adScript = document.createElement('script');
+                adScript.src = 'https://www.highperformanceformat.com/e00bbe01841fd50aa83e25c95e0291dc/invoke.js';
+                tennisAdSlot.appendChild(adScript);
+              } else {
+                window.atOptions = { 'key': 'd04c2a6cd8ba857d66b91c312cb9454f', 'format': 'iframe', 'height': 600, 'width': 160, 'params': {} };
+                var adScript = document.createElement('script');
+                adScript.src = 'https://www.highperformanceformat.com/d04c2a6cd8ba857d66b91c312cb9454f/invoke.js';
+                tennisAdSlot.appendChild(adScript);
+              }
             }
-            return;
+          }
+          if (upcomingScheduleContent) upcomingScheduleContent.style.display = 'none';
+          // Hide Tennis-specific sub-containers (ATP/WTA) to avoid conflicting content
+          if (tennisTodayTabs) tennisTodayTabs.style.display = 'none';
+          if (tennisTodayAtpContent) tennisTodayAtpContent.style.display = 'none';
+          if (tennisTodayWtaContent) tennisTodayWtaContent.style.display = 'none';
+          return;
         }
         
         if (isTennis && tennisTodayTabs && tennisTodayAtpContent && tennisTodayWtaContent) {
