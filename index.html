@@ -46623,6 +46623,13 @@ document.addEventListener('DOMContentLoaded', function () {
                       const hasF = timePlainText === 'F' || isFinal;
                       featuredChannelDisplay = hasF ? '' : 'Fanatiz, beIN';
                     }
+                    // Special case: Argentine Primera - only show Fanatiz if NOT Final
+                    const isArgentinePrimera = (data && data.League === 'Argentine Primera') || displayLeagueForCheck === 'Argentine Primera';
+                    if (isArgentinePrimera) {
+                      const timePlainText = String(displayTimeLabel || '').replace(/<[^>]*>/g, '').trim();
+                      const hasF = timePlainText === 'F' || isFinal;
+                      featuredChannelDisplay = hasF ? '' : 'Fanatiz';
+                    }
                     
                     // For UFC and Boxing: if no channel, make team names gray (#C0C0C0)
                     const isFeaturedUFCOrBoxing = displayLeagueForCheck === 'UFC' || displayLeagueForCheck === 'Boxing';
@@ -46895,6 +46902,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         channelDisplay = '';
                       } else {
                         channelDisplay = 'Fanatiz, beIN';
+                      }
+                    }
+                    // Hardcode Argentine Primera to Fanatiz (but NOT if game is Final)
+                    if ((data && data.League === 'Argentine Primera') || displayLeague === 'Argentine Primera') {
+                      if (gameStatusClass === 'final-game') {
+                        channelDisplay = '';
+                      } else {
+                        channelDisplay = 'Fanatiz';
                       }
                     }
                     const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
@@ -47194,6 +47209,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if ((data && data.League === 'Ligue 1') || displayLeague === 'Ligue 1') {
                   if (!isFinal) {
                     channelDisplay = 'Fanatiz, beIN';
+                  } else {
+                    channelDisplay = '';
+                  }
+                }
+                // Hardcode Argentine Primera to Fanatiz (but NOT if game is Final)
+                if ((data && data.League === 'Argentine Primera') || displayLeague === 'Argentine Primera') {
+                  if (!isFinal) {
+                    channelDisplay = 'Fanatiz';
                   } else {
                     channelDisplay = '';
                   }
@@ -54233,6 +54256,14 @@ async function fetchFeaturedGames() {
                     if ((game && game.League === 'Ligue 1') || displayLeague === 'Ligue 1') {
                       if (!isFinal) {
                         channelDisplay = 'Fanatiz, beIN';
+                      } else {
+                        channelDisplay = '';
+                      }
+                    }
+                    // Hardcode Argentine Primera to Fanatiz (but NOT if game is Final)
+                    if ((game && game.League === 'Argentine Primera') || displayLeague === 'Argentine Primera') {
+                      if (!isFinal) {
+                        channelDisplay = 'Fanatiz';
                       } else {
                         channelDisplay = '';
                       }
