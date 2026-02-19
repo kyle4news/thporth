@@ -37981,17 +37981,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Rugby URL_ONLY_LEAGUES
 
-         { date: '2026-02-12', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '15:00', endTime: '17:00', time: '3:00 pm' },
-
-{ date: '2026-02-13', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '01:05', endTime: '06:00', time: '1:05 am' },
-{ date: '2026-02-13', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '13:30', endTime: '17:00', time: '1:30 pm' },
-{ date: '2026-02-13', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '20:00', endTime: '23:59', time: '8:00 pm' },
-
-{ date: '2026-02-14', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '00:00', endTime: '12:40', time: '12:00 am' },
-{ date: '2026-02-14', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '13:00', endTime: '17:00', time: '1:00 pm' },
-
-{ date: '2026-02-15', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '00:30', endTime: '02:30', time: '12:30 am' },
-{ date: '2026-02-15', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '05:00', endTime: '17:05', time: '5:00 am' },
+        { date: '2026-02-20', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '01:05', endTime: '09:00', time: '1:05 am' },
+{ date: '2026-02-20', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '13:00', endTime: '05:00', time: '1:00 pm' },
+{ date: '2026-02-20', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '23:00', endTime: '23:59', time: '11:00 pm' },
+{ date: '2026-02-20', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '00:00', endTime: '17:00', time: '12:00 am' },
+{ date: '2026-02-20', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '21:35', endTime: '23:59', time: '9:35 pm' },
+{ date: '2026-02-21', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '00:00', endTime: '02:30', time: '12:00 am' },
+{ date: '2026-02-21', name: 'Rugby', url: 'https://www.flashscoreusa.com/rugby-union/', startTime: '05:00', endTime: '14:30', time: '5:00 am' },
        
 
 // Olympics
@@ -43281,6 +43277,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 // Hardcode Argentine Primera to Fanatiz (but NOT if game is Final)
                 if ((data && data.League === 'Argentine Primera') || displayLeague === 'Argentine Primera') {
+                  if (!isFinal) {
+                    channelDisplay = 'Fanatiz';
+                  } else {
+                    channelDisplay = '';
+                  }
+                }
+                // Hardcode Copa Libertadores to Fanatiz (but NOT if game is Final)
+                if ((data && (data.League === 'South America: Copa Libertadores' || data.League.includes('Copa Libertadores'))) || displayLeague === 'Copa Libertadores') {
+                  if (!isFinal) {
+                    channelDisplay = 'Fanatiz';
+                  } else {
+                    channelDisplay = '';
+                  }
+                }
+                // Hardcode Brasileirão to Fanatiz (but NOT if game is Final)
+                if ((data && (data.League === 'Brazil: Serie A Betano' || data.League === 'Brasileirao' || data.League === 'Brasileirão' || data.League.includes('Brasileirao') || data.League.includes('Brasileirão'))) || displayLeague === 'Brasileirão') {
                   if (!isFinal) {
                     channelDisplay = 'Fanatiz';
                   } else {
