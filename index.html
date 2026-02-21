@@ -43016,10 +43016,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         channelDisplay = 'Fanatiz';
                       }
                     }
-                    // Hide channel for Saudi Pro League
-                    if ((data && data.League === 'Saudi Pro League') || displayLeague === 'Saudi Pro League') {
-                      channelDisplay = '';
-                    }
                     const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
                     const timeFontSize = isLeagueSpecificColumn ? '10px' : '11px';
                     const isDoublesMatch = isHomeDoubles && isAwayDoubles;
@@ -43344,10 +43340,6 @@ document.addEventListener('DOMContentLoaded', function () {
                   } else {
                     channelDisplay = '';
                   }
-                }
-                // Hide channel for Saudi Pro League
-                if ((data && data.League === 'Saudi Pro League') || displayLeague === 'Saudi Pro League') {
-                  channelDisplay = '';
                 }
                 
                 // For UFC and Boxing: handle sub-items (gray text, no time) vs main items (white text, shows time)
@@ -50395,10 +50387,6 @@ async function fetchFeaturedGames() {
                       } else {
                         channelDisplay = '';
                       }
-                    }
-                    // Hide channel for Saudi Pro League
-                    if ((game && game.League === 'Saudi Pro League') || displayLeague === 'Saudi Pro League') {
-                      channelDisplay = '';
                     }
                     
                     // Check if game is clickable (has at least one team with feed mappings). RULE: NCAAM and NCAAW games are never clickable.
