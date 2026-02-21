@@ -36216,11 +36216,8 @@ document.addEventListener('DOMContentLoaded', function () {
 ], 
 
 'NASCARCupSeries': [
-{ date: '2026-02-04', time: '6:00 PM', home: 'Bowman Gray', away: 'Clash at', channel: 'FOX', startTime: '18:00', endTime: '22:00', url: 'https://www.nascar.com/live-results/nascar-cup-series/2026-cook-out-clash-at-bowman-gray-stadium/' },
-  { date: '2026-02-12', time: '7:00 PM', home: 'Duel #1', away: 'Daytona', channel: 'FS1', startTime: '19:00', endTime: '20:45', url: 'https://www.nascar.com/followlive/' },
-  { date: '2026-02-12', time: '8:45 PM', home: 'Duel #2', away: 'Daytona', channel: 'FS1', startTime: '20:45', endTime: '23:59', url: 'https://www.nascar.com/followlive/' },
-  { date: '2026-02-15', time: '2:30 PM', home: 'Daytona 500', away: '', channel: 'FOX', startTime: '14:30', endTime: '19:00', url: 'https://www.nascar.com/live-results/nascar-cup-series/2026-daytona-500/' },
-  { date: '2026-02-22', time: '3:00 PM', home: 'Atlanta', away: '', channel: 'FOX', startTime: '15:00', endTime: '19:30', url: 'https://www.nascar.com/followlive/' },
+
+  { date: '2026-02-22', time: '3:00 PM', home: 'Atlanta', away: '', channel: 'FOX', startTime: '15:00', endTime: '19:30', url: 'https://www.nascar.com/live-results/nascar-cup-series/2026-autotrader-400/' },
   { date: '2026-03-01', time: '3:30 PM', home: 'Circuit of the Americas', away: 'COTA', channel: 'FOX', startTime: '15:30', endTime: '20:00', url: 'https://www.nascar.com/followlive/' },
   { date: '2026-03-08', time: '3:30 PM', home: 'Phoenix', away: '', channel: 'FS1', startTime: '15:30', endTime: '20:00', url: 'https://www.nascar.com/followlive/' },
   { date: '2026-03-15', time: '4:00 PM', home: 'Las Vegas', away: '', channel: 'FS1', startTime: '16:00', endTime: '20:30', url: 'https://www.nascar.com/followlive/' },
@@ -42453,6 +42450,57 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     
                     if (!isSoccerLeague && isLive && !(isHardcodedToday && hardcodedTimeStatus === 'live')) {
+                        // MLB SPECIAL HANDLING: For baseball, show innings (Top 1, Bot 2, etc.) instead of periods/quarters
+                        if (displayLeagueForCheck === 'MLB') {
+                            // Try to extract inning information from various possible fields
+                            const inningHalf = data.inningHalf || data.inning_half || data.half || "";
+                            const currentInning = data.currentInning || data.current_inning || data.inning || "";
+                            
+                            if (inningHalf && currentInning) {
+                                // Format: "Top" or "Bot" + inning number
+                                const halfText = inningHalf.toLowerCase().startsWith('top') ? 'Top' : 'Bot';
+                                timeColumnTop = `<span style="color: red;">${halfText} ${currentInning}</span>`;
+                                timeColumnBottom = '';
+                            } else if (data.Stage && data.Stage.includes('INNING')) {
+                                // Try to parse from Stage field (e.g., "TOP_2ND_INNING" or "BOTTOM_3RD_INNING")
+                                const parts = data.Stage.split('_');
+                                if (parts.length >= 2) {
+                                    const half = parts[0]; // TOP or BOTTOM
+                                    const inning = parts[1]; // 2ND, 3RD, etc.
+                                    const halfText = half.toLowerCase() === 'top' ? 'Top' : 'Bot';
+                                    // Clean up inning text (remove "ND", "RD", "TH" to get just the number)
+                                    const inningNum = inning.replace(/[A-Z]/g, '') || inning;
+                                    timeColumnTop = `<span style="color: red;">${halfText} ${inningNum}</span>`;
+                                    timeColumnBottom = '';
+                                }
+                            } else if (displayTimeLabel) {
+                                // Try to parse from displayTimeLabel
+                                const innerContent = displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '');
+                                if (innerContent.includes('<br>')) {
+                                    const parts = innerContent.split('<br>');
+                                    if (parts.length >= 2) {
+                                        // Format is "Top<br>1" or "Bot<br>2"
+                                        const halfText = parts[0].trim();
+                                        const inningNum = parts[1].trim();
+                                        timeColumnTop = `<span style="color: red;">${halfText} ${inningNum}</span>`;
+                                        timeColumnBottom = '';
+                                    }
+                                } else if (innerContent.match(/^(Top|Bot|top|bot)\s+\d+$/i)) {
+                                    // Format is "Top 1" or "Bot 2"
+                                    timeColumnTop = `<span style="color: red;">${innerContent}</span>`;
+                                    timeColumnBottom = '';
+                                } else {
+                                    // Fallback: show whatever is in displayTimeLabel
+                                    timeColumnTop = displayTimeLabel;
+                                    timeColumnBottom = '';
+                                }
+                            } else {
+                                // Last resort: show generic "LIVE"
+                                timeColumnTop = '<span style="color: red;">LIVE</span>';
+                                timeColumnBottom = '';
+                            }
+                        } else {
+                        // NON-MLB SPORTS: Handle quarters/halves/periods with time remaining
                         // RULE: For live games with quarters/halves/periods that have time remaining:
                         // Top line: ONLY "1st", "2nd", "3rd", "4th", or "OT" (period/quarter only)
                         // Bottom line: ONLY time format like "9:59", "0:40" (numbers with colon)
@@ -42586,10 +42634,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 timeColumnBottom = `<span style="color: red;">${timeRemaining}</span>`;
                             }
                         }
+                        } // End of else block for non-MLB sports
                     }
 
                     // RULE: Top line = period only (OT, 1st, etc.). Bottom line = clock only (MM:SS). Never show clock on top.
-                    if (!isSoccerLeague && isLive && !(isHardcodedToday && hardcodedTimeStatus !== null)) {
+                    // Skip this for MLB games - they already have inning display set
+                    if (!isSoccerLeague && isLive && !(isHardcodedToday && hardcodedTimeStatus !== null) && displayLeagueForCheck !== 'MLB') {
                         const split = splitPeriodAndClock(displayTimeLabel);
                         if (split.clockPart) {
                             timeColumnTop = split.periodPart ? `<span style="color: red;">${split.periodPart}</span>` : '';
@@ -42966,6 +43016,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         channelDisplay = 'Fanatiz';
                       }
                     }
+                    // Hide channel for Saudi Pro League
+                    if ((data && data.League === 'Saudi Pro League') || displayLeague === 'Saudi Pro League') {
+                      channelDisplay = '';
+                    }
                     const isLeagueSpecificColumn = container.closest('#league-specific-column') !== null;
                     const timeFontSize = isLeagueSpecificColumn ? '10px' : '11px';
                     const isDoublesMatch = isHomeDoubles && isAwayDoubles;
@@ -43290,6 +43344,10 @@ document.addEventListener('DOMContentLoaded', function () {
                   } else {
                     channelDisplay = '';
                   }
+                }
+                // Hide channel for Saudi Pro League
+                if ((data && data.League === 'Saudi Pro League') || displayLeague === 'Saudi Pro League') {
+                  channelDisplay = '';
                 }
                 
                 // For UFC and Boxing: handle sub-items (gray text, no time) vs main items (white text, shows time)
@@ -50337,6 +50395,10 @@ async function fetchFeaturedGames() {
                       } else {
                         channelDisplay = '';
                       }
+                    }
+                    // Hide channel for Saudi Pro League
+                    if ((game && game.League === 'Saudi Pro League') || displayLeague === 'Saudi Pro League') {
+                      channelDisplay = '';
                     }
                     
                     // Check if game is clickable (has at least one team with feed mappings). RULE: NCAAM and NCAAW games are never clickable.
