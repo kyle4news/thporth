@@ -40185,6 +40185,8 @@ document.addEventListener('DOMContentLoaded', function () {
           if (!half) return '';
           if (half.startsWith('top') || half === 't') return 'Top';
           if (half.startsWith('bot') || half.startsWith('bottom') || half === 'b') return 'Bot';
+          if (half.startsWith('mid')) return 'Top';
+          if (half.startsWith('end')) return 'Bot';
           return '';
         };
 
@@ -40215,9 +40217,9 @@ document.addEventListener('DOMContentLoaded', function () {
           const text = String(candidate || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
           if (!text) continue;
 
-          let match = text.match(/\b(TOP|BOT|BOTTOM)\b[^\d]{0,8}(\d{1,2})\b/i);
+          let match = text.match(/\b(TOP|BOT|BOTTOM|MID(?:DLE)?|END)\b[^\d]{0,8}(\d{1,2})\b/i);
           if (!match) {
-            match = text.match(/\b(\d{1,2})(?:ST|ND|RD|TH)?\b[^A-Z0-9]{0,8}\b(TOP|BOT|BOTTOM)\b/i);
+            match = text.match(/\b(\d{1,2})(?:ST|ND|RD|TH)?\b[^A-Z0-9]{0,8}\b(TOP|BOT|BOTTOM|MID(?:DLE)?|END)\b/i);
             if (match) {
               const half = normalizeHalf(match[2]);
               const inning = match[1];
@@ -40231,6 +40233,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const inning = match[2];
             if (half && inning) return `${half} ${inning}`;
           }
+        }
+
+        const periodFallback = extractInningNum(game.period || game['Current Period'] || game.Stage);
+        if (periodFallback) {
+          return `Top ${periodFallback}`;
         }
 
         return '';
@@ -42355,9 +42362,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             let parsedStatus = '';
                             const displayLeague = getLeagueDisplayName(data.League, data.Sport);
                             if (displayLeague === "MLB") {
-                                const inningHalf = data.inningHalf || "";
-                                const currentInning = data.currentInning || "";
-                                if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
+                            parsedStatus = getMlbInningDisplay(data);
                             } else {
                                 // Use granular live status for ALL sports (including NFL, MLS, etc.)
                                 parsedStatus = getGranularLiveStatus(data);
@@ -42519,53 +42524,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!isSoccerLeague && isLive && !(isHardcodedToday && hardcodedTimeStatus === 'live')) {
                         // MLB SPECIAL HANDLING: For baseball, show innings (Top 1, Bot 2, etc.) instead of periods/quarters
                         if (displayLeagueForCheck === 'MLB') {
-                            // Try to extract inning information from various possible fields
-                            const inningHalf = data.inningHalf || data.inning_half || data.half || "";
-                            const currentInning = data.currentInning || data.current_inning || data.inning || "";
-                            
-                            if (inningHalf && currentInning) {
-                                // Format: "Top" or "Bot" + inning number
-                                const halfText = inningHalf.toLowerCase().startsWith('top') ? 'Top' : 'Bot';
-                                timeColumnTop = `<span style="color: red;">${halfText} ${currentInning}</span>`;
-                                timeColumnBottom = '';
-                            } else if (data.Stage && data.Stage.includes('INNING')) {
-                                // Try to parse from Stage field (e.g., "TOP_2ND_INNING" or "BOTTOM_3RD_INNING")
-                                const parts = data.Stage.split('_');
-                                if (parts.length >= 2) {
-                                    const half = parts[0]; // TOP or BOTTOM
-                                    const inning = parts[1]; // 2ND, 3RD, etc.
-                                    const halfText = half.toLowerCase() === 'top' ? 'Top' : 'Bot';
-                                    // Clean up inning text (remove "ND", "RD", "TH" to get just the number)
-                                    const inningNum = inning.replace(/[A-Z]/g, '') || inning;
-                                    timeColumnTop = `<span style="color: red;">${halfText} ${inningNum}</span>`;
-                                    timeColumnBottom = '';
-                                }
-                            } else if (displayTimeLabel) {
-                                // Try to parse from displayTimeLabel
-                                const innerContent = displayTimeLabel.replace(/<span[^>]*>|<\/span>/g, '');
-                                if (innerContent.includes('<br>')) {
-                                    const parts = innerContent.split('<br>');
-                                    if (parts.length >= 2) {
-                                        // Format is "Top<br>1" or "Bot<br>2"
-                                        const halfText = parts[0].trim();
-                                        const inningNum = parts[1].trim();
-                                        timeColumnTop = `<span style="color: red;">${halfText} ${inningNum}</span>`;
-                                        timeColumnBottom = '';
-                                    }
-                                } else if (innerContent.match(/^(Top|Bot|top|bot)\s+\d+$/i)) {
-                                    // Format is "Top 1" or "Bot 2"
-                                    timeColumnTop = `<span style="color: red;">${innerContent}</span>`;
-                                    timeColumnBottom = '';
-                                } else {
-                                    // Fallback: show whatever is in displayTimeLabel
-                                    timeColumnTop = displayTimeLabel;
-                                    timeColumnBottom = '';
-                                }
-                            } else {
-                                // Last resort: show generic "LIVE"
-                                timeColumnTop = '<span style="color: red;">LIVE</span>';
-                                timeColumnBottom = '';
-                            }
+                        const inningDisplay = getMlbInningDisplay(data);
+                        timeColumnTop = inningDisplay ? `<span style="color: red;">${inningDisplay}</span>` : '<span style="color: red;">LIVE</span>';
+                        timeColumnBottom = '';
                         } else {
                         // NON-MLB SPORTS: Handle quarters/halves/periods with time remaining
                         // RULE: For live games with quarters/halves/periods that have time remaining:
