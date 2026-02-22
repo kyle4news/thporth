@@ -40177,6 +40177,65 @@ document.addEventListener('DOMContentLoaded', function () {
         return { periodPart: periodPart || '', clockPart };
     }
 
+      function getMlbInningDisplay(game) {
+        if (!game) return '';
+
+        const normalizeHalf = (halfRaw) => {
+          const half = String(halfRaw || '').trim().toLowerCase();
+          if (!half) return '';
+          if (half.startsWith('top') || half === 't') return 'Top';
+          if (half.startsWith('bot') || half.startsWith('bottom') || half === 'b') return 'Bot';
+          return '';
+        };
+
+        const extractInningNum = (inningRaw) => {
+          if (inningRaw === null || inningRaw === undefined) return '';
+          const inningText = String(inningRaw).trim();
+          if (!inningText) return '';
+          const numMatch = inningText.match(/\d+/);
+          return numMatch ? numMatch[0] : '';
+        };
+
+        const directHalf = normalizeHalf(game.inningHalf || game.inning_half || game.half || game.inningState);
+        const directInning = extractInningNum(game.currentInning || game.current_inning || game.inning || game.currentInningOrdinal);
+        if (directHalf && directInning) {
+          return `${directHalf} ${directInning}`;
+        }
+
+        const candidates = [
+          game.Stage,
+          game.StageType,
+          game['Match Status'],
+          game.matchStatus,
+          game.displayTime,
+          game.inningHalf
+        ];
+
+        for (const candidate of candidates) {
+          const text = String(candidate || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+          if (!text) continue;
+
+          let match = text.match(/\b(TOP|BOT|BOTTOM)\b[^\d]{0,8}(\d{1,2})\b/i);
+          if (!match) {
+            match = text.match(/\b(\d{1,2})(?:ST|ND|RD|TH)?\b[^A-Z0-9]{0,8}\b(TOP|BOT|BOTTOM)\b/i);
+            if (match) {
+              const half = normalizeHalf(match[2]);
+              const inning = match[1];
+              if (half && inning) return `${half} ${inning}`;
+              continue;
+            }
+          }
+
+          if (match) {
+            const half = normalizeHalf(match[1]);
+            const inning = match[2];
+            if (half && inning) return `${half} ${inning}`;
+          }
+        }
+
+        return '';
+      }
+
     function normalizeChannel(ch) {
       if (!ch) return '';
       if (typeof ch !== 'string') ch = String(ch);
@@ -43195,9 +43254,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     let parsedStatus = '';
                     const displayLeague = getLeagueDisplayName(data.League, data.Sport);
                     if (displayLeague === "MLB") {
-                        const inningHalf = data.inningHalf || "";
-                        const currentInning = data.currentInning || "";
-                        if (inningHalf && currentInning) parsedStatus = `${inningHalf.slice(0,3)} ${currentInning}`;
+                    parsedStatus = getMlbInningDisplay(data);
                     } else {
                         // Use granular live status for ALL sports (including EFL Cup, Coppa Italia, etc.)
                         parsedStatus = getGranularLiveStatus(data);
@@ -43420,6 +43477,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 let timeColumnBottom = ''; // Default: empty
                 
                 if (!isSoccerLeague && isLive) {
+                  if (displayLeague === 'MLB' || displayLeague === 'MLB Spring Training') {
+                    const mlbInningDisplay = getMlbInningDisplay(data);
+                    timeColumnTop = mlbInningDisplay
+                      ? `<span style="color: red;">${mlbInningDisplay}</span>`
+                      : '<span style="color: red;">LIVE</span>';
+                    timeColumnBottom = '';
+                  } else {
                     // RULE: For live games with quarters/halves/periods that have time remaining:
                     // Top line: ONLY "1st", "2nd", "3rd", "4th", or "OT" (period/quarter only)
                     // Bottom line: ONLY time format like "9:59", "0:40" (numbers with colon)
@@ -43559,6 +43623,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             timeColumnTop = split.periodPart ? `<span style="color: red;">${split.periodPart}</span>` : '';
                             timeColumnBottom = `<span style="color: red;">${split.clockPart}</span>`;
                         }
+                    }
                     }
                 }
                 
@@ -50233,9 +50298,7 @@ async function fetchFeaturedGames() {
                         let parsedStatus = '';
                         const displayLeague = getLeagueDisplayName(game.League, game.Sport);
                         if (displayLeague === "MLB") {
-                            const inningHalf = game.inningHalf || "";
-                            const currentInning = game.currentInning || "";
-                            parsedStatus = `${inningHalf} ${currentInning}`.trim();
+                        parsedStatus = getMlbInningDisplay(game);
                         } else {
                             // Use granular live status for ALL sports (including soccer)
                             parsedStatus = getGranularLiveStatus(game);
@@ -50330,10 +50393,17 @@ async function fetchFeaturedGames() {
                             }
                         }
                     }
-                    // RULE: Minutes and seconds only on bottom line in start time column
-                    const splitTime = splitPeriodAndClock(displayTimeLabel);
-                    const timeColumnTop = splitTime.clockPart ? (splitTime.periodPart ? (isLive ? `<span style="color: red;">${splitTime.periodPart}</span>` : splitTime.periodPart) : '') : displayTimeLabel;
-                    const timeColumnBottom = splitTime.clockPart ? (isLive ? `<span style="color: red;">${splitTime.clockPart}</span>` : splitTime.clockPart) : '';
+                    // RULE: MLB live games must show Top/Bot + inning only (no clock split)
+                    const mlbLiveInningDisplay = (isLive && (displayLeague === 'MLB' || displayLeague === 'MLB Spring Training'))
+                      ? getMlbInningDisplay(game)
+                      : '';
+                    const splitTime = mlbLiveInningDisplay ? { periodPart: '', clockPart: '' } : splitPeriodAndClock(displayTimeLabel);
+                    const timeColumnTop = mlbLiveInningDisplay
+                      ? `<span style="color: red;">${mlbLiveInningDisplay}</span>`
+                      : (splitTime.clockPart ? (splitTime.periodPart ? (isLive ? `<span style="color: red;">${splitTime.periodPart}</span>` : splitTime.periodPart) : '') : displayTimeLabel);
+                    const timeColumnBottom = mlbLiveInningDisplay
+                      ? ''
+                      : (splitTime.clockPart ? (isLive ? `<span style="color: red;">${splitTime.clockPart}</span>` : splitTime.clockPart) : '');
                     
                     // Determine if it's today or upcoming for formatting
                     const isGameToday = game.isToday;
@@ -50435,9 +50505,7 @@ async function fetchFeaturedGames() {
                             let parsedStatus = '';
                             const nextDisplayLeague = getLeagueDisplayName(nextGame.League, nextGame.Sport);
                             if (nextDisplayLeague === "MLB") {
-                                const inningHalf = nextGame.inningHalf || "";
-                                const currentInning = nextGame.currentInning || "";
-                                parsedStatus = `${inningHalf} ${currentInning}`.trim();
+                            parsedStatus = getMlbInningDisplay(nextGame);
                             } else {
                                 parsedStatus = getGranularLiveStatus(nextGame);
                             }
