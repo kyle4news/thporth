@@ -39395,6 +39395,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // Remove " W" suffix if present (for NWSL)
         let p = name.endsWith(" W") ? name.slice(0, -2) : name;
         
+      // Display abbreviation override for game columns
+      if (p === 'Diamondbacks' || p === 'Arizona Diamondbacks') {
+        return 'D-backs';
+      }
+        
         // Check if this is a tennis league (ATP, WTA, Davis Cup, or any league containing "ATP" or "WTA")
         const isTennisLeague = league && (league.includes('ATP') || league.includes('WTA') || league.includes('Davis Cup') || league === 'Tennis');
         
