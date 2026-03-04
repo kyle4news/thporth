@@ -87,8 +87,7 @@ def read_json(path: str) -> Optional[Dict[str, Any]]:
 
 
 def clean_text(t: str) -> str:
-    t = re.sub(r"\s+", " ", (t or "")).strip()
-    return t
+    return re.sub(r"\s+", " ", (t or "")).strip()
 
 
 def extract_main_text_from_html(html: str) -> str:
@@ -490,14 +489,19 @@ def build_league_day(
         except Exception:
             game_obj["highlight"] = None
 
-        if not recap_url:
+        # -------------------------
+        # FIX #1: If recapUrl is missing, fall back to ESPN game page (gamecastUrl)
+        # -------------------------
+        fetch_url = recap_url or gamecast_url
+        if not fetch_url:
             game_obj["status"] = "no_recap_url"
             games_out.append(game_obj)
             continue
+        game_obj["source"]["usedTextFrom"] = fetch_url
 
-        # Fetch & extract article text
+        # Fetch & extract article text (from recapUrl if present, otherwise from gamecastUrl)
         try:
-            html = get_html_url(recap_url, session)
+            html = get_html_url(fetch_url, session)
             article_text = extract_main_text_from_html(html)
         except Exception:
             game_obj["status"] = "recap_fetch_failed"
@@ -525,7 +529,8 @@ def build_league_day(
                 "league": league_key,
                 "event_title": f"{away_name} @ {home_name}" if (away_name and home_name) else None,
                 "scoreline": scoreline,
-                "recapUrl": recap_url
+                "recapUrl": recap_url,
+                "usedTextFrom": fetch_url,
             }, ensure_ascii=False) +
             "\n\nArticle text:\n" +
             article_text
@@ -585,8 +590,7 @@ def build_league_day(
 
     # write files
     ensure_dir(out_dir)
-    out_date = f"{date_iso}.json"
-    write_json(os.path.join(out_dir, out_date), day_json)
+    write_json(os.path.join(out_dir, f"{date_iso}.json"), day_json)
     write_json(os.path.join(out_dir, "latest.json"), day_json)
 
     # index.json
