@@ -108,7 +108,7 @@
         <img class="logo" src="THPORTH logo.png" alt="THPORTH" />
         <div>
           <div class="brand-title">THPORTH — index-test</div>
-          <div class="brand-sub">All leagues • official-channel highlights only</div>
+          <div class="brand-sub">Two-stage recaps + official highlights only</div>
         </div>
       </div>
 
@@ -122,14 +122,14 @@
       <div class="panel">
         <h2>Morning briefing</h2>
         <div class="muted" style="font-size:12px;margin-bottom:10px;">
-          From <code>/briefings/latest.json</code> (generated in GitHub Actions).
+          From <code>/briefings/latest.json</code> (generated in GitHub Actions from facts JSON).
         </div>
 
         <div id="briefingTabs" class="tabs"></div>
         <pre id="briefingText" class="briefing muted">No briefing loaded yet.</pre>
 
         <div class="note">
-          <b>Tip:</b> If you run the workflow in <code>inputs</code> mode, recaps/briefings won’t populate until you switch to <code>openai</code>.
+          <b>Tip:</b> Run the workflow in <code>openai</code> mode to populate recaps + briefings.
         </div>
       </div>
 
@@ -143,8 +143,7 @@
         <div id="gamesContainer" class="muted">No games loaded yet.</div>
 
         <div class="note">
-          <b>Highlights policy:</b> We only attach highlights when we can search inside the league’s official YouTube channel (channelId).
-          No “random uploader” videos.
+          <b>Highlights policy:</b> We attach highlights only if we find a match inside the league’s official YouTube channel.
         </div>
       </div>
     </div>
@@ -285,7 +284,6 @@
     async function loadAll(){
       setStatus("Loading manifest…");
 
-      // manifest drives tabs for both panels
       let manifest;
       try {
         manifest = await fetchJson("/recaps/manifest.json");
@@ -296,12 +294,9 @@
         return;
       }
 
-      const leagues = (manifest.leagues || []).map(l => ({
-        key: l.key,
-        label: l.key.toUpperCase()
-      }));
+      const leagues = (manifest.leagues || []).map(l => ({ key: l.key, label: l.key.toUpperCase() }))
+        .sort((a,b) => a.key.localeCompare(b.key));
 
-      // briefings
       let briefings = null;
       try { briefings = await fetchJson("/briefings/latest.json"); } catch (e) { briefings = null; }
 
@@ -313,7 +308,6 @@
       });
       renderBriefing(briefings, window.__activeBriefLeague);
 
-      // recaps
       if (!window.__activeRecapLeague) window.__activeRecapLeague = leagues[0]?.key;
       renderTabs("recapTabs", leagues, window.__activeRecapLeague, async (k) => {
         window.__activeRecapLeague = k;
@@ -331,7 +325,6 @@
         }
       });
 
-      // load first league
       setStatus(`Loading ${window.__activeRecapLeague.toUpperCase()}…`);
       try {
         const data = await fetchJson(`/recaps/${window.__activeRecapLeague}/latest.json`);
