@@ -1,0 +1,178 @@
+{
+  "league": "ncaam",
+  "date": "20260303",
+  "generatedAt": "2026-03-04T22:19:28.628061",
+  "mode": "openai",
+  "leagueBriefing": null,
+  "games": [
+    {
+      "eventId": "401808274",
+      "teams": {
+        "away": "Mississippi State Bulldogs",
+        "home": "Florida Gators"
+      },
+      "scoreLine": "MSST 74 — FLA 108",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401808274/mississippi-st-florida"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401825554",
+      "teams": {
+        "away": "Nebraska Cornhuskers",
+        "home": "UCLA Bruins"
+      },
+      "scoreLine": "NEB 52 — UCLA 72",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401825554/nebraska-ucla"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401827719",
+      "teams": {
+        "away": "TCU Horned Frogs",
+        "home": "Texas Tech Red Raiders"
+      },
+      "scoreLine": "TCU 73 — TTU 65",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401827719/tcu-texas-tech"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401825553",
+      "teams": {
+        "away": "Oregon Ducks",
+        "home": "Illinois Fighting Illini"
+      },
+      "scoreLine": "ORE 54 — ILL 80",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401825553/oregon-illinois"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401820785",
+      "teams": {
+        "away": "Wake Forest Demon Deacons",
+        "home": "Virginia Cavaliers"
+      },
+      "scoreLine": "WAKE 70 — UVA 75",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401820785/wake-forest-virginia"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401827715",
+      "teams": {
+        "away": "Kansas Jayhawks",
+        "home": "Arizona State Sun Devils"
+      },
+      "scoreLine": "KU 60 — ASU 70",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401827715/kansas-arizona-st"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401808277",
+      "teams": {
+        "away": "Alabama Crimson Tide",
+        "home": "Georgia Bulldogs"
+      },
+      "scoreLine": "ALA 88 — UGA 98",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401808277/alabama-georgia"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401820779",
+      "teams": {
+        "away": "Clemson Tigers",
+        "home": "North Carolina Tar Heels"
+      },
+      "scoreLine": "CLEM 63 — UNC 67",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401820779/clemson-north-carolina"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401822967",
+      "teams": {
+        "away": "Georgetown Hoyas",
+        "home": "St. John's Red Storm"
+      },
+      "scoreLine": "GTWN 69 — SJU 72",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401822967/georgetown-st-johns"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401814597",
+      "teams": {
+        "away": "Toledo Rockets",
+        "home": "Miami (OH) RedHawks"
+      },
+      "scoreLine": "TOL 72 — M-OH 74",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401814597/toledo-miami-oh"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401808278",
+      "teams": {
+        "away": "Tennessee Volunteers",
+        "home": "South Carolina Gamecocks"
+      },
+      "scoreLine": "TENN 78 — SC 59",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401808278/tennessee-south-carolina"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401808279",
+      "teams": {
+        "away": "Vanderbilt Commodores",
+        "home": "Ole Miss Rebels"
+      },
+      "scoreLine": "VAN 89 — MISS 86",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mens-college-basketball/game/_/gameId/401808279/vanderbilt-ole-miss"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    }
+  ],
+  "status": "ok"
+}

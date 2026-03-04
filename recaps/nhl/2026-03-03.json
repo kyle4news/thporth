@@ -1,0 +1,164 @@
+{
+  "league": "nhl",
+  "date": "20260303",
+  "generatedAt": "2026-03-04T22:19:40.389031",
+  "mode": "openai",
+  "leagueBriefing": null,
+  "games": [
+    {
+      "eventId": "401803310",
+      "teams": {
+        "away": "Pittsburgh Penguins",
+        "home": "Boston Bruins"
+      },
+      "scoreLine": "PIT 1 — BOS 2",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803310/penguins-bruins"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401803311",
+      "teams": {
+        "away": "Vegas Golden Knights",
+        "home": "Buffalo Sabres"
+      },
+      "scoreLine": "VGK 2 — BUF 3",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803311/golden-knights-sabres"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401803312",
+      "teams": {
+        "away": "Florida Panthers",
+        "home": "New Jersey Devils"
+      },
+      "scoreLine": "FLA 1 — NJ 5",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803312/panthers-devils"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401803313",
+      "teams": {
+        "away": "Utah Mammoth",
+        "home": "Washington Capitals"
+      },
+      "scoreLine": "UTA 3 — WSH 2",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803313/mammoth-capitals"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401803314",
+      "teams": {
+        "away": "Nashville Predators",
+        "home": "Columbus Blue Jackets"
+      },
+      "scoreLine": "NSH 2 — CBJ 3",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803314/predators-blue-jackets"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401803315",
+      "teams": {
+        "away": "Chicago Blackhawks",
+        "home": "Winnipeg Jets"
+      },
+      "scoreLine": "CHI 2 — WPG 3",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803315/blackhawks-jets"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401803316",
+      "teams": {
+        "away": "Dallas Stars",
+        "home": "Calgary Flames"
+      },
+      "scoreLine": "DAL 6 — CGY 1",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803316/stars-flames"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401803317",
+      "teams": {
+        "away": "Ottawa Senators",
+        "home": "Edmonton Oilers"
+      },
+      "scoreLine": "OTT 4 — EDM 5",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803317/senators-oilers"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401803318",
+      "teams": {
+        "away": "Tampa Bay Lightning",
+        "home": "Minnesota Wild"
+      },
+      "scoreLine": "TB 1 — MIN 5",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803318/lightning-wild"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401803319",
+      "teams": {
+        "away": "Colorado Avalanche",
+        "home": "Anaheim Ducks"
+      },
+      "scoreLine": "COL 5 — ANA 1",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803319/avalanche-ducks"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401803320",
+      "teams": {
+        "away": "Montreal Canadiens",
+        "home": "San Jose Sharks"
+      },
+      "scoreLine": "MTL 5 — SJ 7",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/nhl/game/_/gameId/401803320/canadiens-sharks"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    }
+  ],
+  "status": "ok"
+}

@@ -1,0 +1,304 @@
+{
+  "league": "ncaawb",
+  "date": "20260303",
+  "generatedAt": "2026-03-04T22:19:33.519014",
+  "mode": "openai",
+  "leagueBriefing": null,
+  "games": [
+    {
+      "eventId": "401851230",
+      "teams": {
+        "away": "Lipscomb Bisons",
+        "home": "Austin Peay Governors"
+      },
+      "scoreLine": "LIP 56 — APSU 63",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401851230/lipscomb-austin-peay"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401807893",
+      "teams": {
+        "away": "East Texas A&M Lions",
+        "home": "Nicholls Colonels"
+      },
+      "scoreLine": "ETAM 49 — NICH 69",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401807893/e-texas-am-nicholls"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401851737",
+      "teams": {
+        "away": "App State Mountaineers",
+        "home": "South Alabama Jaguars"
+      },
+      "scoreLine": "APP 57 — USA 68",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401851737/app-state-south-alabama"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401851231",
+      "teams": {
+        "away": "Bellarmine Knights",
+        "home": "Florida Gulf Coast Eagles"
+      },
+      "scoreLine": "BELL 28 — FGCU 94",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401851231/bellarmine-fgcu"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401851740",
+      "teams": {
+        "away": "Louisiana Ragin' Cajuns",
+        "home": "Georgia State Panthers"
+      },
+      "scoreLine": "UL 71 — GAST 66",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401851740/louisiana-georgia-st"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401851232",
+      "teams": {
+        "away": "North Florida Ospreys",
+        "home": "West Georgia Wolves"
+      },
+      "scoreLine": "UNF 71 — WGA 76",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401851232/north-florida-west-georgia"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401827590",
+      "teams": {
+        "away": "San Diego State Aztecs",
+        "home": "Air Force Falcons"
+      },
+      "scoreLine": "SDSU 74 — AF 57",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401827590/san-diego-st-air-force"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401824426",
+      "teams": {
+        "away": "Arkansas-Pine Bluff Golden Lions",
+        "home": "Jackson State Lady Tigers"
+      },
+      "scoreLine": "UAPB 59 — JKST 63",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401824426/ar-pine-bluff-jackson-st"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401824300",
+      "teams": {
+        "away": "Southern Jaguars",
+        "home": "Alabama State Lady Hornets"
+      },
+      "scoreLine": "SOU 63 — ALST 65",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401824300/southern-alabama-st"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401828138",
+      "teams": {
+        "away": "Rice Owls",
+        "home": "Charlotte 49ers"
+      },
+      "scoreLine": "RICE 63 — CLT 56",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401828138/rice-charlotte"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401824278",
+      "teams": {
+        "away": "Grambling Lady Tigers",
+        "home": "Alabama A&M Bulldogs"
+      },
+      "scoreLine": "GRAM 50 — AAMU 55",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401824278/grambling-alabama-am"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401830105",
+      "teams": {
+        "away": "Mississippi Valley State Devilettes",
+        "home": "Alcorn State Lady Braves"
+      },
+      "scoreLine": "MVSU 56 — ALCN 67",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401830105/miss-valley-st-alcorn-st"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401829637",
+      "teams": {
+        "away": "Grand Canyon Lopes",
+        "home": "Wyoming Cowgirls"
+      },
+      "scoreLine": "GCU 57 — WYO 59",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401829637/grand-canyon-wyoming"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401828141",
+      "teams": {
+        "away": "North Texas Mean Green",
+        "home": "Wichita State Shockers"
+      },
+      "scoreLine": "UNT 55 — WICH 60",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401828141/north-texas-wichita-st"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401828140",
+      "teams": {
+        "away": "Temple Owls",
+        "home": "South Florida Bulls"
+      },
+      "scoreLine": "TEM 36 — USF 82",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401828140/temple-south-florida"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401828139",
+      "teams": {
+        "away": "Tulane Green Wave",
+        "home": "Florida Atlantic Owls"
+      },
+      "scoreLine": "TULN 57 — FAU 61",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401828139/tulane-fau"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401851233",
+      "teams": {
+        "away": "Queens University Royals",
+        "home": "North Alabama Lions"
+      },
+      "scoreLine": "QUC 55 — UNA 57",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401851233/queens-north-alabama"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401807963",
+      "teams": {
+        "away": "New Orleans Privateers",
+        "home": "Northwestern State Lady Demons"
+      },
+      "scoreLine": "UNO 65 — NWST 81",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401807963/new-orleans-nwestern-st"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401829615",
+      "teams": {
+        "away": "Nevada Wolf Pack",
+        "home": "Utah State Aggies"
+      },
+      "scoreLine": "NEV 72 — USU 69",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401829615/nevada-utah-state"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401831337",
+      "teams": {
+        "away": "Fresno State Bulldogs",
+        "home": "New Mexico Lobos"
+      },
+      "scoreLine": "FRES 64 — UNM 86",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401831337/fresno-st-new-mexico"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401831336",
+      "teams": {
+        "away": "Colorado State Rams",
+        "home": "San José State Spartans"
+      },
+      "scoreLine": "CSU 67 — SJSU 44",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/womens-college-basketball/game/_/gameId/401831336/colorado-st-san-jose-st"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    }
+  ],
+  "status": "ok"
+}

@@ -1,0 +1,80 @@
+{
+  "league": "mlb",
+  "date": "20260303",
+  "generatedAt": "2026-03-04T22:19:20.613520",
+  "mode": "openai",
+  "leagueBriefing": null,
+  "games": [
+    {
+      "eventId": "401833048",
+      "teams": {
+        "away": "Tampa Bay Rays",
+        "home": "Minnesota Twins"
+      },
+      "scoreLine": "TB 5 — MIN 3",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mlb/game/_/gameId/401833048/rays-twins"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401833050",
+      "teams": {
+        "away": "Philadelphia Phillies",
+        "home": "Tampa Bay Rays"
+      },
+      "scoreLine": "PHI 1 — TB 3",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mlb/game/_/gameId/401833050/phillies-rays"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401833046",
+      "teams": {
+        "away": "San Diego Padres",
+        "home": "Chicago White Sox"
+      },
+      "scoreLine": "SD 4 — CHW 3",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mlb/game/_/gameId/401833046/padres-white-sox"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401833047",
+      "teams": {
+        "away": "Los Angeles Dodgers",
+        "home": "Cleveland Guardians"
+      },
+      "scoreLine": "LAD 5 — CLE 4",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mlb/game/_/gameId/401833047/dodgers-guardians"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    },
+    {
+      "eventId": "401833049",
+      "teams": {
+        "away": "Los Angeles Angels",
+        "home": "Seattle Mariners"
+      },
+      "scoreLine": "LAA 7 — SEA 6",
+      "source": {
+        "recapUrl": null,
+        "gamecastUrl": "https://www.espn.com/mlb/game/_/gameId/401833049/angels-mariners"
+      },
+      "status": "no_recap_url",
+      "highlight": null
+    }
+  ],
+  "status": "ok"
+}

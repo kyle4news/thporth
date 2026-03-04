@@ -1,0 +1,115 @@
+{
+  "generatedAt": "2026-03-04T22:19:41.340329",
+  "leagues": [
+    {
+      "league": "bund",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "epl",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "f1",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "laliga",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "ligue1",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "lpga",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "mlb",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "mls",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "nascar",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "nba",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "ncaaf",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "ncaam",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "ncaawb",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "nfl",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "nhl",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "pga",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "seriea",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "ucl",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "uecl",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "uel",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "ufc",
+      "date": "20260303",
+      "briefing": null
+    },
+    {
+      "league": "wnba",
+      "date": "20260303",
+      "briefing": null
+    }
+  ]
+}
