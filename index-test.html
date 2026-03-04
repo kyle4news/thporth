@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>THPORTH — index-test</title>
+
+  <link rel="icon" type="image/png" href="https://thporth.com/thporth-red-logo.png" />
+
+  <style>
+    :root{
+      --bg: rgba(0,0,0,.62);
+      --panel: rgba(12,12,12,.72);
+      --border: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --accent: rgba(255,70,70,.95);
+      --ok: rgba(120,255,160,.95);
+      --warn: rgba(255,210,90,.95);
+      --radius: 14px;
+    }
+
+    html, body { margin:0; padding:0; min-height:100%; color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+
+    body{
+      background-image: url('THPORTH.webp');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    .page{ width:min(1280px, calc(100vw - 32px)); margin:16px auto 36px auto; }
+    .topbar{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:12px 14px; border:1px solid var(--border); border-radius:var(--radius);
+      background:var(--bg); backdrop-filter: blur(10px);
+    }
+    .brand{ display:flex; gap:10px; align-items:center; }
+    .logo{ width:34px; height:34px; border-radius:8px; object-fit:cover; border:1px solid var(--border); background:rgba(255,255,255,.06); }
+    .brand-title{ font-weight:900; letter-spacing:.5px; font-size:18px; line-height:1.1; }
+    .brand-sub{ color:var(--muted); font-size:12px; margin-top:2px; }
+
+    .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    .pill{ display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border:1px solid var(--border); border-radius:999px;
+      background:rgba(0,0,0,.35); color:var(--muted); font-size:12px; user-select:none; }
+    .btn{ cursor:pointer; border:1px solid var(--border); border-radius:999px; padding:8px 12px;
+      background:rgba(255,255,255,.06); color:var(--text); font-weight:700; font-size:12px; }
+    .btn:hover{ background:rgba(255,255,255,.10); }
+    .btn-accent{ background: rgba(255,70,70,.14); border-color: rgba(255,70,70,.30); }
+
+    .grid{ display:grid; grid-template-columns: 1fr; gap:14px; margin-top:14px; }
+    @media (min-width: 980px){ .grid{ grid-template-columns: 1.05fr .95fr; } }
+
+    .panel{
+      border:1px solid var(--border); border-radius:var(--radius);
+      background:var(--panel); backdrop-filter: blur(12px); padding:14px;
+    }
+    .panel h2{ margin:0 0 10px 0; font-size:16px; font-weight:900; letter-spacing:.2px; }
+    .muted{ color:var(--muted); }
+
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 0 0; }
+    .tab{
+      cursor:pointer; border:1px solid var(--border); border-radius:999px; padding:7px 11px;
+      background:rgba(0,0,0,.25); color:var(--muted); font-size:12px; font-weight:800; user-select:none;
+    }
+    .tab.active{ background:rgba(255,70,70,.16); border-color:rgba(255,70,70,.32); color:var(--text); }
+
+    .briefing{ white-space:pre-wrap; line-height:1.4; font-size:13px; margin:0; }
+
+    .game{
+      border:1px solid var(--border); border-radius:12px; padding:12px; background:rgba(0,0,0,.20); margin-top:10px;
+    }
+    .game-top{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap; }
+    .game-title{ font-weight:950; font-size:14px; margin:0; }
+    .scoreline{ font-weight:900; font-size:12px; margin-top:4px; color:rgba(255,255,255,.88); }
+
+    .badge{ display:inline-flex; gap:6px; align-items:center; padding:6px 9px; border-radius:999px; border:1px solid var(--border);
+      font-size:11px; color:var(--muted); background:rgba(255,255,255,.05); user-select:none; }
+    .badge.ok{ border-color: rgba(120,255,160,.25); }
+    .badge.warn{ border-color: rgba(255,210,90,.25); }
+
+    .recap{ margin-top:10px; white-space:pre-wrap; line-height:1.45; font-size:13px; color:rgba(255,255,255,.90); }
+    .links{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; font-size:12px; }
+    .links a{ color:rgba(255,255,255,.82); text-decoration: underline; text-decoration-color: rgba(255,255,255,.25); }
+
+    .hl-wrap{ margin-top:10px; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:rgba(0,0,0,.35); }
+    .hl-head{ display:flex; gap:10px; align-items:center; padding:10px; border-bottom:1px solid var(--border); }
+    .hl-thumb{ width:68px; height:38px; object-fit:cover; border-radius:8px; border:1px solid var(--border); background:rgba(255,255,255,.06); flex:0 0 auto; }
+    .hl-meta{ min-width:0; }
+    .hl-title{ font-size:12px; font-weight:900; margin:0; line-height:1.2; }
+    .hl-channel{ margin-top:3px; font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:520px; }
+    .hl-iframe{ width:100%; aspect-ratio:16/9; border:0; display:block; background:#000; }
+
+    .note{ margin-top:14px; padding:10px 12px; border-radius:12px; border:1px solid var(--border);
+      background:rgba(0,0,0,.28); color:var(--muted); font-size:12px; line-height:1.35; }
+    code{ color:rgba(255,255,255,.84); }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">
+        <img class="logo" src="THPORTH logo.png" alt="THPORTH" />
+        <div>
+          <div class="brand-title">THPORTH — index-test</div>
+          <div class="brand-sub">All leagues • official-channel highlights only</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="pill" id="statusPill">Loading…</div>
+        <button class="btn btn-accent" id="refreshBtn">Refresh</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2>Morning briefing</h2>
+        <div class="muted" style="font-size:12px;margin-bottom:10px;">
+          From <code>/briefings/latest.json</code> (generated in GitHub Actions).
+        </div>
+
+        <div id="briefingTabs" class="tabs"></div>
+        <pre id="briefingText" class="briefing muted">No briefing loaded yet.</pre>
+
+        <div class="note">
+          <b>Tip:</b> If you run the workflow in <code>inputs</code> mode, recaps/briefings won’t populate until you switch to <code>openai</code>.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>League recaps + highlights</h2>
+        <div class="muted" style="font-size:12px;margin-bottom:10px;">
+          Loads <code>/recaps/manifest.json</code>, then each league’s <code>latest.json</code>.
+        </div>
+
+        <div id="recapTabs" class="tabs"></div>
+        <div id="gamesContainer" class="muted">No games loaded yet.</div>
+
+        <div class="note">
+          <b>Highlights policy:</b> We only attach highlights when we can search inside the league’s official YouTube channel (channelId).
+          No “random uploader” videos.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function esc(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;");
+    }
+
+    function setStatus(text){
+      const el = document.getElementById("statusPill");
+      if (el) el.textContent = text;
+    }
+
+    async function fetchJson(path){
+      const res = await fetch(path, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
+      return await res.json();
+    }
+
+    function renderTabs(containerId, items, activeKey, onClick){
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = items.map(it => {
+        const key = it.key;
+        const label = it.label || it.key.toUpperCase();
+        const active = key === activeKey ? "tab active" : "tab";
+        return `<div class="${active}" data-key="${esc(key)}">${esc(label)}</div>`;
+      }).join("");
+      container.querySelectorAll(".tab").forEach(el => {
+        el.addEventListener("click", () => onClick(el.getAttribute("data-key")));
+      });
+    }
+
+    function renderBriefing(briefingsJson, activeLeague){
+      const pre = document.getElementById("briefingText");
+      if (!pre) return;
+
+      const arr = (briefingsJson?.leagues || []);
+      const out = arr.find(x => x.league === activeLeague);
+
+      if (!out || !out.briefing){
+        pre.classList.add("muted");
+        pre.textContent = "No league briefing available yet for this league.";
+        return;
+      }
+
+      pre.classList.remove("muted");
+      pre.textContent = out.briefing;
+    }
+
+    function renderGames(leagueJson){
+      const container = document.getElementById("gamesContainer");
+      if (!container) return;
+
+      const date = leagueJson?.date;
+      const mode = leagueJson?.mode;
+      const games = leagueJson?.games || [];
+
+      if (!games.length){
+        container.innerHTML = `<div class="muted">No games found in latest.json for this league/date.</div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="muted" style="font-size:12px;margin-bottom:8px;">
+          Date: <b>${esc(date)}</b> • Mode: <b>${esc(mode)}</b> • Games: <b>${games.length}</b>
+        </div>
+        ${games.map(g => {
+          const scoreLine = g.scoreLine || "";
+          const status = g.status || "unknown";
+          const badgeClass = status === "ok" ? "badge ok" : "badge warn";
+          const recapText = g.recap || "";
+          const recapMissing = (!recapText && status !== "ok");
+
+          const recapUrl = g?.source?.recapUrl || "";
+          const gamecastUrl = g?.source?.gamecastUrl || "";
+
+          const hl = g.highlight || null;
+
+          const highlightBlock = (hl && hl.embedUrl) ? `
+            <div class="hl-wrap">
+              <div class="hl-head">
+                <img class="hl-thumb" src="${esc(hl.thumbnail || '')}" alt="thumb" />
+                <div class="hl-meta">
+                  <p class="hl-title">${esc(hl.title || "Highlights")}</p>
+                  <div class="hl-channel">${esc(hl.channelTitle || "")}</div>
+                </div>
+              </div>
+              <iframe
+                class="hl-iframe"
+                src="${esc(hl.embedUrl)}"
+                title="YouTube highlights"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
+            </div>
+          ` : `
+            <div class="muted" style="font-size:12px;margin-top:10px;">
+              No official-channel highlight matched.
+            </div>
+          `;
+
+          return `
+            <div class="game">
+              <div class="game-top">
+                <div>
+                  <div class="game-title">${esc((g.teams?.away || "Away") + " @ " + (g.teams?.home || "Home"))}</div>
+                  ${scoreLine ? `<div class="scoreline">${esc(scoreLine)}</div>` : ``}
+                </div>
+                <div class="${badgeClass}">${esc(status)}</div>
+              </div>
+
+              <div class="recap">
+                ${recapMissing
+                  ? esc("Recap not generated yet (or recap URL missing).")
+                  : esc(recapText)}
+              </div>
+
+              <div class="links">
+                ${recapUrl ? `<a href="${esc(recapUrl)}" target="_blank" rel="noopener">Recap source</a>` : ``}
+                ${gamecastUrl ? `<a href="${esc(gamecastUrl)}" target="_blank" rel="noopener">Gamecast</a>` : ``}
+                ${(hl && hl.watchUrl) ? `<a href="${esc(hl.watchUrl)}" target="_blank" rel="noopener">YouTube</a>` : ``}
+              </div>
+
+              ${highlightBlock}
+            </div>
+          `;
+        }).join("")}
+      `;
+    }
+
+    async function loadAll(){
+      setStatus("Loading manifest…");
+
+      // manifest drives tabs for both panels
+      let manifest;
+      try {
+        manifest = await fetchJson("/recaps/manifest.json");
+      } catch (e) {
+        document.getElementById("gamesContainer").innerHTML =
+          `<div class="muted">Missing <code>/recaps/manifest.json</code>. Run the GitHub Action once.</div>`;
+        setStatus("Manifest missing");
+        return;
+      }
+
+      const leagues = (manifest.leagues || []).map(l => ({
+        key: l.key,
+        label: l.key.toUpperCase()
+      }));
+
+      // briefings
+      let briefings = null;
+      try { briefings = await fetchJson("/briefings/latest.json"); } catch (e) { briefings = null; }
+
+      if (!window.__activeBriefLeague) window.__activeBriefLeague = leagues[0]?.key;
+      renderTabs("briefingTabs", leagues, window.__activeBriefLeague, (k) => {
+        window.__activeBriefLeague = k;
+        renderTabs("briefingTabs", leagues, window.__activeBriefLeague, arguments.callee);
+        renderBriefing(briefings, window.__activeBriefLeague);
+      });
+      renderBriefing(briefings, window.__activeBriefLeague);
+
+      // recaps
+      if (!window.__activeRecapLeague) window.__activeRecapLeague = leagues[0]?.key;
+      renderTabs("recapTabs", leagues, window.__activeRecapLeague, async (k) => {
+        window.__activeRecapLeague = k;
+        renderTabs("recapTabs", leagues, window.__activeRecapLeague, arguments.callee);
+
+        setStatus(`Loading ${k.toUpperCase()}…`);
+        try {
+          const data = await fetchJson(`/recaps/${k}/latest.json`);
+          renderGames(data);
+          setStatus("Loaded");
+        } catch (e) {
+          document.getElementById("gamesContainer").innerHTML =
+            `<div class="muted">Could not load <code>/recaps/${esc(k)}/latest.json</code> yet.</div>`;
+          setStatus("Loaded (partial)");
+        }
+      });
+
+      // load first league
+      setStatus(`Loading ${window.__activeRecapLeague.toUpperCase()}…`);
+      try {
+        const data = await fetchJson(`/recaps/${window.__activeRecapLeague}/latest.json`);
+        renderGames(data);
+        setStatus("Loaded");
+      } catch (e) {
+        document.getElementById("gamesContainer").innerHTML =
+          `<div class="muted">Could not load <code>/recaps/${esc(window.__activeRecapLeague)}/latest.json</code> yet.</div>`;
+        setStatus("Loaded (partial)");
+      }
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", loadAll);
+    loadAll();
+  </script>
+</body>
+</html>
