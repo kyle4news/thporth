@@ -62,18 +62,22 @@ HIGHLIGHT_NEGATIVE_KEYWORDS = [
     "postgame", "interview", "highlights live",
 ]
 
+
 def ensure_dir(p: str) -> None:
     if p:
         os.makedirs(p, exist_ok=True)
+
 
 def read_text(path: str) -> str:
     with open(path, "r", encoding="utf-8") as f:
         return f.read().strip()
 
+
 def write_json(path: str, data: Dict[str, Any]) -> None:
     ensure_dir(os.path.dirname(path))
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
 
 def read_json(path: str) -> Optional[Dict[str, Any]]:
     if not os.path.exists(path):
@@ -81,9 +85,11 @@ def read_json(path: str) -> Optional[Dict[str, Any]]:
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
 def clean_text(t: str) -> str:
     t = re.sub(r"\s+", " ", (t or "")).strip()
     return t
+
 
 def extract_main_text_from_html(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
@@ -100,21 +106,33 @@ def extract_main_text_from_html(html: str) -> str:
 
     return clean_text(soup.get_text(" "))
 
-def get_json_url(url: str, session: requests.Session) -> Dict[str, Any]:
+
+def get_json_url(url: str, session: requests.Session) -> Optional[Dict[str, Any]]:
+    """
+    ESPN Site API is not consistent across all sports. Some paths (esp. motorsports)
+    can return 400/404 for the standard dated scoreboard endpoint. We treat those
+    as "unsupported/empty" and skip the league cleanly rather than failing the run.
+    """
     r = session.get(url, timeout=40)
+    if r.status_code in (400, 404):
+        return None
     r.raise_for_status()
     return r.json()
+
 
 def get_html_url(url: str, session: requests.Session) -> str:
     r = session.get(url, timeout=40)
     r.raise_for_status()
     return r.text
 
+
 def scoreboard_url(sport_path: str, yyyymmdd: str) -> str:
     return f"{ESPN_SITE_API}/sports/{sport_path}/scoreboard?dates={yyyymmdd}"
 
+
 def summary_url(sport_path: str, event_id: str) -> str:
     return f"{ESPN_SITE_API}/sports/{sport_path}/summary?event={event_id}"
+
 
 def extract_team_display_names(summary: Dict[str, Any]) -> Tuple[Optional[str], Optional[str]]:
     header = summary.get("header") or {}
@@ -137,6 +155,7 @@ def extract_team_display_names(summary: Dict[str, Any]) -> Tuple[Optional[str], 
     home_name = home_team.get("displayName") or home_team.get("shortDisplayName")
     away_name = away_team.get("displayName") or away_team.get("shortDisplayName")
     return (away_name, home_name)
+
 
 def extract_scoreline(summary: Dict[str, Any]) -> Optional[str]:
     header = summary.get("header") or {}
@@ -166,6 +185,7 @@ def extract_scoreline(summary: Dict[str, Any]) -> Optional[str]:
 
     return f"{away_abbr} {away_score} — {home_abbr} {home_score}"
 
+
 def extract_gamecast_url(summary: Dict[str, Any]) -> Optional[str]:
     header = summary.get("header") or {}
     links = header.get("links") or []
@@ -177,12 +197,14 @@ def extract_gamecast_url(summary: Dict[str, Any]) -> Optional[str]:
             return lk.get("href")
     return None
 
+
 def extract_recap_article_url(summary: Dict[str, Any]) -> Optional[str]:
     articles = summary.get("articles") or []
     if not articles:
         return None
     first = articles[0] or {}
     return (((first.get("links") or {}).get("web") or {}).get("href"))
+
 
 # -----------------------------
 # OpenAI API calls
@@ -204,11 +226,13 @@ def openai_chat_completion(user_text: str, model: str, temperature: float = 0.7)
     data = r.json()
     return data["choices"][0]["message"]["content"].strip()
 
+
 def safe_json_loads(text: str) -> Optional[Dict[str, Any]]:
     try:
         return json.loads(text)
     except Exception:
         return None
+
 
 # -----------------------------
 # YouTube API helpers (official channel only)
@@ -217,9 +241,11 @@ def yt_cache_load() -> Dict[str, str]:
     ensure_dir(CACHE_DIR)
     return read_json(YT_CHANNEL_CACHE_PATH) or {}
 
+
 def yt_cache_save(cache: Dict[str, str]) -> None:
     ensure_dir(CACHE_DIR)
     write_json(YT_CHANNEL_CACHE_PATH, cache)
+
 
 def youtube_resolve_channel_id(channel_query: str) -> Optional[str]:
     yt_key = os.environ.get("YOUTUBE_API_KEY")
@@ -255,12 +281,14 @@ def youtube_resolve_channel_id(channel_query: str) -> Optional[str]:
     yt_cache_save(cache)
     return ch_id
 
+
 def _norm_tokens(s: str) -> List[str]:
     s = (s or "").lower()
     s = re.sub(r"[^a-z0-9\s]", " ", s)
     parts = [p for p in s.split() if p]
     stop = {"the", "vs", "v", "and", "at", "highlights", "highlight", "game", "full", "recap"}
     return [p for p in parts if p not in stop]
+
 
 def _contains_both_teams(title: str, desc: str, away: str, home: str) -> bool:
     hay = f"{title} {desc}".lower()
@@ -270,6 +298,7 @@ def _contains_both_teams(title: str, desc: str, away: str, home: str) -> bool:
     home_ok = any(t in hay for t in home_tokens[:3])
     return away_ok and home_ok
 
+
 def _looks_like_highlights(title: str, desc: str) -> bool:
     hay = f"{title} {desc}".lower()
     if "highlights" in hay or "game recap" in hay or "recap" in hay:
@@ -278,6 +307,7 @@ def _looks_like_highlights(title: str, desc: str) -> bool:
                 return False
         return True
     return False
+
 
 def youtube_search_highlight_official(
     away_team: str,
@@ -367,6 +397,7 @@ def youtube_search_highlight_official(
         return best
     return None
 
+
 # -----------------------------
 # Build logic
 # -----------------------------
@@ -388,10 +419,38 @@ def build_league_day(
     session = requests.Session()
     session.headers.update({"User-Agent": DEFAULT_UA})
 
-    sb = get_json_url(scoreboard_url(sport_path, yyyymmdd), session)
-    events = sb.get("events", []) or []
+    sb_url = scoreboard_url(sport_path, yyyymmdd)
+    sb = get_json_url(sb_url, session)
 
     date_iso = f"{yyyymmdd[:4]}-{yyyymmdd[4:6]}-{yyyymmdd[6:]}"
+
+    # If the league doesn't support dated scoreboard endpoint, skip cleanly
+    if not sb:
+        day_json: Dict[str, Any] = {
+            "league": league_key,
+            "date": yyyymmdd,
+            "generatedAt": datetime.now().isoformat(),
+            "mode": mode,
+            "leagueBriefing": None,
+            "games": [],
+            "status": "skipped_no_scoreboard",
+            "scoreboardUrl": sb_url,
+        }
+        ensure_dir(out_dir)
+        write_json(os.path.join(out_dir, f"{date_iso}.json"), day_json)
+        write_json(os.path.join(out_dir, "latest.json"), day_json)
+        # also maintain index.json
+        dates = []
+        for fn in os.listdir(out_dir):
+            if re.fullmatch(r"\d{4}-\d{2}-\d{2}\.json", fn):
+                dates.append(fn.replace(".json", ""))
+        dates.sort(reverse=True)
+        dates = dates[:14]
+        write_json(os.path.join(out_dir, "index.json"), {"dates": dates})
+        return day_json
+
+    events = sb.get("events", []) or []
+
     games_out: List[Dict[str, Any]] = []
     facts_for_briefing: List[Dict[str, Any]] = []
 
@@ -401,6 +460,13 @@ def build_league_day(
             continue
 
         summ = get_json_url(summary_url(sport_path, event_id), session)
+        if not summ:
+            # summary endpoint should exist; if not, skip this event
+            games_out.append({
+                "eventId": event_id,
+                "status": "summary_missing",
+            })
+            continue
 
         away_name, home_name = extract_team_display_names(summ)
         scoreline = extract_scoreline(summ)
@@ -441,7 +507,6 @@ def build_league_day(
         game_obj["articleText"] = article_text  # keep for debugging; remove later if you want smaller files
 
         if mode == "inputs":
-            # No OpenAI calls: output ready-to-paste input
             game_obj["status"] = "needs_manual_summary"
             game_obj["recapInput"] = (
                 thporth_prompt +
@@ -470,7 +535,6 @@ def build_league_day(
         facts_json = safe_json_loads(facts_text)
 
         if not facts_json:
-            # fallback: still store raw extractor output so you can debug
             game_obj["status"] = "extractor_json_parse_failed"
             game_obj["factsRaw"] = facts_text
             games_out.append(game_obj)
@@ -516,6 +580,7 @@ def build_league_day(
         "mode": mode,
         "leagueBriefing": league_briefing,
         "games": games_out,
+        "status": "ok",
     }
 
     # write files
@@ -535,6 +600,7 @@ def build_league_day(
 
     return day_json
 
+
 def write_manifest() -> None:
     manifest = {
         "generatedAt": datetime.now().isoformat(),
@@ -551,6 +617,7 @@ def write_manifest() -> None:
     ensure_dir("recaps")
     write_json("recaps/manifest.json", manifest)
 
+
 def write_briefings_latest(all_days: List[Dict[str, Any]]) -> None:
     ensure_dir("briefings")
     out = {
@@ -561,6 +628,7 @@ def write_briefings_latest(all_days: List[Dict[str, Any]]) -> None:
         ],
     }
     write_json("briefings/latest.json", out)
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -614,6 +682,7 @@ def main():
     )
     write_manifest()
     write_briefings_latest([day])
+
 
 if __name__ == "__main__":
     main()
