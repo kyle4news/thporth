@@ -1,4 +1,4 @@
-name: THPORTH Recaps + Official Highlights (2-stage)
+name: THPORTH NBA Recaps + Official Highlights (2-stage)
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ on:
         required: true
         default: "openai"
   schedule:
-    - cron: "10 6 * * *"
+    - cron: "20 6 * * *"
 
 permissions:
   contents: write
@@ -41,7 +41,7 @@ jobs:
             echo "date=$(date -u -d 'yesterday' +%Y%m%d)" >> $GITHUB_OUTPUT
           fi
 
-      - name: Build all leagues
+      - name: Build NBA only
         run: |
           MODE="${{ github.event.inputs.mode }}"
           if [ "$MODE" = "" ]; then MODE="openai"; fi
@@ -49,12 +49,12 @@ jobs:
           OPENAI_EXTRACTOR_MODEL="gpt-5-mini" \
           OPENAI_WRITER_MODEL="gpt-5-mini" \
           YOUTUBE_API_KEY="${{ secrets.YOUTUBE_API_KEY }}" \
-          python scripts/build_recaps.py --league all --date "${{ steps.d.outputs.date }}" --mode "$MODE"
+          python scripts/build_recaps.py --league nba --date "${{ steps.d.outputs.date }}" --mode "$MODE"
 
       - name: Commit and push
         run: |
           git config user.name "thporth-bot"
           git config user.email "actions@users.noreply.github.com"
           git add recaps briefings .cache || true
-          git commit -m "Daily recaps + highlights" || echo "No changes"
+          git commit -m "NBA recaps + highlights" || echo "No changes"
           git push
