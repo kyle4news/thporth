@@ -21,40 +21,39 @@ DEFAULT_UA = (
 CACHE_DIR = ".cache"
 YT_CHANNEL_CACHE_PATH = os.path.join(CACHE_DIR, "youtube_channels.json")
 
-# ---- Official YouTube channels (strict: highlight searches ONLY inside these channels) ----
-# For leagues where rights are complex, you may still get "no highlight matched" (by design).
+# =========================
+# NBA ONLY (all other leagues commented out)
+# =========================
 LEAGUES: Dict[str, Dict[str, Any]] = {
-    # US
-    "nba":  {"sport_path": "basketball/nba", "out_dir": "recaps/nba",  "yt_official": {"channelId": "UCWJ2lWNubArHWmf3FIHbfcQ"}},
-    "nhl":  {"sport_path": "hockey/nhl",     "out_dir": "recaps/nhl",  "yt_official": {"channelId": "UCqFMzb-4AUf6WAIbl132QKA"}},
-    "mlb":  {"sport_path": "baseball/mlb",   "out_dir": "recaps/mlb",  "yt_official": {"channelId": "UCoLrcjPV5PbUrUyXq5mjc_A"}},
-    "nfl":  {"sport_path": "football/nfl",   "out_dir": "recaps/nfl",  "yt_official": {"channelId": "UCDVYQ4Zhbm3S2dlz7P1GBDg"}},
-    "wnba": {"sport_path": "basketball/wnba","out_dir": "recaps/wnba", "yt_official": {"channelQuery": "WNBA"}},
+    "nba": {
+        "sport_path": "basketball/nba",
+        "out_dir": "recaps/nba",
+        # Official NBA YouTube channel
+        "yt_official": {"channelId": "UCWJ2lWNubArHWmf3FIHbfcQ"},
+    },
 
-    # NCAA (no reliable single official highlights channel; set to None for strict mode)
-    "ncaam":  {"sport_path": "basketball/mens-college-basketball",   "out_dir": "recaps/ncaam",  "yt_official": None},
-    "ncaawb": {"sport_path": "basketball/womens-college-basketball", "out_dir": "recaps/ncaawb", "yt_official": None},
-    "ncaaf":  {"sport_path": "football/college-football",           "out_dir": "recaps/ncaaf",  "yt_official": None},
-
-    # Soccer (many leagues have official channels; rights may still limit match highlights)
-    "epl":    {"sport_path": "soccer/eng.1",            "out_dir": "recaps/epl",    "yt_official": {"channelQuery": "Premier League"}},
-    "mls":    {"sport_path": "soccer/usa.1",            "out_dir": "recaps/mls",    "yt_official": {"channelId": "UCSZbXT5TLLW_i-5W8FZpFsg"}},
-    "laliga": {"sport_path": "soccer/esp.1",            "out_dir": "recaps/laliga", "yt_official": {"channelQuery": "LALIGA"}},
-    "seriea": {"sport_path": "soccer/ita.1",            "out_dir": "recaps/seriea", "yt_official": {"channelQuery": "Serie A"}},
-    "bund":   {"sport_path": "soccer/ger.1",            "out_dir": "recaps/bund",   "yt_official": {"channelQuery": "Bundesliga"}},
-    "ligue1": {"sport_path": "soccer/fra.1",            "out_dir": "recaps/ligue1", "yt_official": {"channelQuery": "Ligue 1"}},
-    "ucl":    {"sport_path": "soccer/uefa.champions",   "out_dir": "recaps/ucl",    "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
-    "uel":    {"sport_path": "soccer/uefa.europa",      "out_dir": "recaps/uel",    "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
-    "uecl":   {"sport_path": "soccer/uefa.europa.conf", "out_dir": "recaps/uecl",   "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
-
-    # Motorsports / MMA
-    "f1":     {"sport_path": "racing/f1",     "out_dir": "recaps/f1",     "yt_official": {"channelId": "UCB_qr75-ydFVKSF9Dmo6izg"}},
-    "nascar": {"sport_path": "racing/nascar", "out_dir": "recaps/nascar", "yt_official": {"channelQuery": "NASCAR"}},
-    "ufc":    {"sport_path": "mma/ufc",       "out_dir": "recaps/ufc",    "yt_official": {"channelId": "UCvgfXK4nTYKudb0rFR6noLA"}},
-
-    # Golf (strict: no official channel configured by default)
-    "pga":  {"sport_path": "golf/pga",  "out_dir": "recaps/pga",  "yt_official": None},
-    "lpga": {"sport_path": "golf/lpga", "out_dir": "recaps/lpga", "yt_official": None},
+    # ---- COMMENTED OUT FOR NOW ----
+    # "nhl":  {"sport_path": "hockey/nhl",     "out_dir": "recaps/nhl",  "yt_official": {"channelId": "UCqFMzb-4AUf6WAIbl132QKA"}},
+    # "mlb":  {"sport_path": "baseball/mlb",   "out_dir": "recaps/mlb",  "yt_official": {"channelId": "UCoLrcjPV5PbUrUyXq5mjc_A"}},
+    # "nfl":  {"sport_path": "football/nfl",   "out_dir": "recaps/nfl",  "yt_official": {"channelId": "UCDVYQ4Zhbm3S2dlz7P1GBDg"}},
+    # "wnba": {"sport_path": "basketball/wnba","out_dir": "recaps/wnba", "yt_official": {"channelQuery": "WNBA"}},
+    # "ncaam":  {"sport_path": "basketball/mens-college-basketball",   "out_dir": "recaps/ncaam",  "yt_official": None},
+    # "ncaawb": {"sport_path": "basketball/womens-college-basketball", "out_dir": "recaps/ncaawb", "yt_official": None},
+    # "ncaaf":  {"sport_path": "football/college-football",           "out_dir": "recaps/ncaaf",  "yt_official": None},
+    # "epl":    {"sport_path": "soccer/eng.1",            "out_dir": "recaps/epl",    "yt_official": {"channelQuery": "Premier League"}},
+    # "mls":    {"sport_path": "soccer/usa.1",            "out_dir": "recaps/mls",    "yt_official": {"channelId": "UCSZbXT5TLLW_i-5W8FZpFsg"}},
+    # "laliga": {"sport_path": "soccer/esp.1",            "out_dir": "recaps/laliga", "yt_official": {"channelQuery": "LALIGA"}},
+    # "seriea": {"sport_path": "soccer/ita.1",            "out_dir": "recaps/seriea", "yt_official": {"channelQuery": "Serie A"}},
+    # "bund":   {"sport_path": "soccer/ger.1",            "out_dir": "recaps/bund",   "yt_official": {"channelQuery": "Bundesliga"}},
+    # "ligue1": {"sport_path": "soccer/fra.1",            "out_dir": "recaps/ligue1", "yt_official": {"channelQuery": "Ligue 1"}},
+    # "ucl":    {"sport_path": "soccer/uefa.champions",   "out_dir": "recaps/ucl",    "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
+    # "uel":    {"sport_path": "soccer/uefa.europa",      "out_dir": "recaps/uel",    "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
+    # "uecl":   {"sport_path": "soccer/uefa.europa.conf", "out_dir": "recaps/uecl",   "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
+    # "f1":     {"sport_path": "racing/f1",     "out_dir": "recaps/f1",     "yt_official": {"channelId": "UCB_qr75-ydFVKSF9Dmo6izg"}},
+    # "nascar": {"sport_path": "racing/nascar", "out_dir": "recaps/nascar", "yt_official": {"channelQuery": "NASCAR"}},
+    # "ufc":    {"sport_path": "mma/ufc",       "out_dir": "recaps/ufc",    "yt_official": {"channelId": "UCvgfXK4nTYKudb0rFR6noLA"}},
+    # "pga":  {"sport_path": "golf/pga",  "out_dir": "recaps/pga",  "yt_official": None},
+    # "lpga": {"sport_path": "golf/lpga", "out_dir": "recaps/lpga", "yt_official": None},
 }
 
 HIGHLIGHT_NEGATIVE_KEYWORDS = [
@@ -107,11 +106,6 @@ def extract_main_text_from_html(html: str) -> str:
 
 
 def get_json_url(url: str, session: requests.Session) -> Optional[Dict[str, Any]]:
-    """
-    ESPN Site API is not consistent across all sports. Some paths (esp. motorsports)
-    can return 400/404 for the standard dated scoreboard endpoint. We treat those
-    as "unsupported/empty" and skip the league cleanly rather than failing the run.
-    """
     r = session.get(url, timeout=40)
     if r.status_code in (400, 404):
         return None
@@ -206,7 +200,7 @@ def extract_recap_article_url(summary: Dict[str, Any]) -> Optional[str]:
 
 
 # -----------------------------
-# OpenAI API calls
+# OpenAI API calls (simple; you can add backoff later)
 # -----------------------------
 def openai_chat_completion(user_text: str, model: str, temperature: float = 0.7) -> str:
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -220,7 +214,7 @@ def openai_chat_completion(user_text: str, model: str, temperature: float = 0.7)
         "messages": [{"role": "user", "content": user_text}],
         "temperature": temperature,
     }
-    r = requests.post(url, headers=headers, json=payload, timeout=120)
+    r = requests.post(url, headers=headers, json=payload, timeout=180)
     r.raise_for_status()
     data = r.json()
     return data["choices"][0]["message"]["content"].strip()
@@ -391,15 +385,11 @@ def youtube_search_highlight_official(
                 "score": score,
             }
 
-    # strict threshold so you don't embed garbage
     if best and best["score"] >= 10:
         return best
     return None
 
 
-# -----------------------------
-# Build logic
-# -----------------------------
 def build_league_day(
     league_key: str,
     yyyymmdd: str,
@@ -423,7 +413,6 @@ def build_league_day(
 
     date_iso = f"{yyyymmdd[:4]}-{yyyymmdd[4:6]}-{yyyymmdd[6:]}"
 
-    # If the league doesn't support dated scoreboard endpoint, skip cleanly
     if not sb:
         day_json: Dict[str, Any] = {
             "league": league_key,
@@ -438,18 +427,10 @@ def build_league_day(
         ensure_dir(out_dir)
         write_json(os.path.join(out_dir, f"{date_iso}.json"), day_json)
         write_json(os.path.join(out_dir, "latest.json"), day_json)
-        # also maintain index.json
-        dates = []
-        for fn in os.listdir(out_dir):
-            if re.fullmatch(r"\d{4}-\d{2}-\d{2}\.json", fn):
-                dates.append(fn.replace(".json", ""))
-        dates.sort(reverse=True)
-        dates = dates[:14]
-        write_json(os.path.join(out_dir, "index.json"), {"dates": dates})
+        write_json(os.path.join(out_dir, "index.json"), {"dates": [date_iso]})
         return day_json
 
     events = sb.get("events", []) or []
-
     games_out: List[Dict[str, Any]] = []
     facts_for_briefing: List[Dict[str, Any]] = []
 
@@ -460,11 +441,7 @@ def build_league_day(
 
         summ = get_json_url(summary_url(sport_path, event_id), session)
         if not summ:
-            # summary endpoint should exist; if not, skip this event
-            games_out.append({
-                "eventId": event_id,
-                "status": "summary_missing",
-            })
+            games_out.append({"eventId": event_id, "status": "summary_missing"})
             continue
 
         away_name, home_name = extract_team_display_names(summ)
@@ -480,7 +457,7 @@ def build_league_day(
             "status": "init",
         }
 
-        # Highlights (official channel only)
+        # Highlights
         try:
             if away_name and home_name:
                 game_obj["highlight"] = youtube_search_highlight_official(away_name, home_name, date_iso, official)
@@ -489,9 +466,7 @@ def build_league_day(
         except Exception:
             game_obj["highlight"] = None
 
-        # -------------------------
-        # FIX #1: If recapUrl is missing, fall back to ESPN game page (gamecastUrl)
-        # -------------------------
+        # FIX #1 fallback: use recapUrl if present else gamecastUrl
         fetch_url = recap_url or gamecast_url
         if not fetch_url:
             game_obj["status"] = "no_recap_url"
@@ -499,7 +474,7 @@ def build_league_day(
             continue
         game_obj["source"]["usedTextFrom"] = fetch_url
 
-        # Fetch & extract article text (from recapUrl if present, otherwise from gamecastUrl)
+        # Fetch text
         try:
             html = get_html_url(fetch_url, session)
             article_text = extract_main_text_from_html(html)
@@ -508,20 +483,14 @@ def build_league_day(
             games_out.append(game_obj)
             continue
 
-        game_obj["articleText"] = article_text  # keep for debugging; remove later if you want smaller files
+        game_obj["articleText"] = article_text
 
         if mode == "inputs":
             game_obj["status"] = "needs_manual_summary"
-            game_obj["recapInput"] = (
-                thporth_prompt +
-                "\n\nHere is the article:\n\n" +
-                article_text +
-                "\n"
-            )
+            game_obj["recapInput"] = thporth_prompt + "\n\nHere is the article:\n\n" + article_text + "\n"
             games_out.append(game_obj)
             continue
 
-        # Stage 1: Extractor → facts JSON
         extractor_input = (
             extractor_prompt +
             "\n\nKnown metadata:\n" +
@@ -538,7 +507,6 @@ def build_league_day(
 
         facts_text = openai_chat_completion(extractor_input, model=extractor_model, temperature=0.2)
         facts_json = safe_json_loads(facts_text)
-
         if not facts_json:
             game_obj["status"] = "extractor_json_parse_failed"
             game_obj["factsRaw"] = facts_text
@@ -547,7 +515,6 @@ def build_league_day(
 
         game_obj["facts"] = facts_json
 
-        # Stage 2: Writer → THPORTH recap FROM facts only
         writer_input = (
             thporth_prompt +
             "\n\nIMPORTANT: Use ONLY the extracted facts JSON below. Do not invent details.\n\n" +
@@ -563,10 +530,8 @@ def build_league_day(
         games_out.append(game_obj)
         facts_for_briefing.append(facts_json)
 
-        # be kind to upstream services
-        time.sleep(0.35)
+        time.sleep(1.0)
 
-    # League briefing from facts only (cheap)
     league_briefing = None
     if mode == "openai" and facts_for_briefing:
         briefing_input = (
@@ -588,19 +553,10 @@ def build_league_day(
         "status": "ok",
     }
 
-    # write files
     ensure_dir(out_dir)
     write_json(os.path.join(out_dir, f"{date_iso}.json"), day_json)
     write_json(os.path.join(out_dir, "latest.json"), day_json)
-
-    # index.json
-    dates = []
-    for fn in os.listdir(out_dir):
-        if re.fullmatch(r"\d{4}-\d{2}-\d{2}\.json", fn):
-            dates.append(fn.replace(".json", ""))
-    dates.sort(reverse=True)
-    dates = dates[:14]
-    write_json(os.path.join(out_dir, "index.json"), {"dates": dates})
+    write_json(os.path.join(out_dir, "index.json"), {"dates": [date_iso]})
 
     return day_json
 
@@ -644,7 +600,6 @@ def main():
     ap.add_argument("--extractor_prompt", default="scripts/extractor_prompt.txt")
     ap.add_argument("--briefing_prompt", default="scripts/briefing_prompt.txt")
 
-    # Models (set defaults; you can change anytime)
     ap.add_argument("--extractor_model", default=os.environ.get("OPENAI_EXTRACTOR_MODEL", "gpt-5-mini"))
     ap.add_argument("--writer_model", default=os.environ.get("OPENAI_WRITER_MODEL", "gpt-5-mini"))
 
@@ -654,9 +609,9 @@ def main():
     extractor_prompt = read_text(args.extractor_prompt)
     briefing_prompt = read_text(args.briefing_prompt)
 
-    all_days: List[Dict[str, Any]] = []
-
     if args.league == "all":
+        # With NBA-only config, "all" == nba
+        all_days: List[Dict[str, Any]] = []
         for league_key in sorted(LEAGUES.keys()):
             day = build_league_day(
                 league_key=league_key,
@@ -669,7 +624,6 @@ def main():
                 writer_model=args.writer_model,
             )
             all_days.append(day)
-
         write_manifest()
         write_briefings_latest(all_days)
         return
