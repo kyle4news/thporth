@@ -1,9 +1,19 @@
-name: THPORTH Recaps
+name: THPORTH Recaps + Official Highlights
 
 on:
   workflow_dispatch:
+    inputs:
+      date:
+        description: "YYYYMMDD (leave blank to use yesterday in UTC)"
+        required: false
+        default: ""
+      mode:
+        description: "inputs or openai"
+        required: true
+        default: "openai"
   schedule:
-    - cron: "30 12 * * *"   # 12:30 UTC daily (adjust anytime)
+    # daily 06:10 UTC (adjust whenever)
+    - cron: "10 6 * * *"
 
 permissions:
   contents: write
@@ -23,76 +33,41 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install requests beautifulsoup4
 
-      - name: Compute "yesterday" date (UTC)
+      - name: Compute date (YYYYMMDD)
         id: d
         run: |
-          echo "yyyymmdd=$(date -u -d 'yesterday' +%Y%m%d)" >> $GITHUB_OUTPUT
+          if [ "${{ github.event.inputs.date }}" != "" ]; then
+            echo "date=${{ github.event.inputs.date }}" >> $GITHUB_OUTPUT
+          else
+            # default: yesterday UTC
+            python - << 'PY'
+from datetime import datetime, timedelta, timezone
+d = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y%m%d")
+print(f"date={d}")
+PY
+            python - << 'PY' > /tmp/date.txt
+from datetime import datetime, timedelta, timezone
+print((datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y%m%d"))
+PY
+            echo "date=$(cat /tmp/date.txt)" >> $GITHUB_OUTPUT
+          fi
 
-      # ---- FREE MODE (no OpenAI) ----
-      # Produces recapInput fields you can paste into ChatGPT.
-      - name: Build NBA (inputs)
+      - name: Build all leagues
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-4o-mini
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: |
-          python scripts/build_recaps.py --league nba --date "${{ steps.d.outputs.yyyymmdd }}" --mode inputs
+          MODE="${{ github.event.inputs.mode }}"
+          if [ "$MODE" = "" ]; then MODE="openai"; fi
+          python scripts/build_recaps.py --league all --date "${{ steps.d.outputs.date }}" --mode "$MODE" --prompt scripts/thporth_prompt.txt
 
-      - name: Build NHL (inputs)
-        run: |
-          python scripts/build_recaps.py --league nhl --date "${{ steps.d.outputs.yyyymmdd }}" --mode inputs
-
-      # ---- AUTOMATED MODE (OpenAI) ----
-      # Uncomment when you add OPENAI_API_KEY in repo settings > Secrets.
-      # - name: Build NBA (openai)
-      #   env:
-      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      #     OPENAI_MODEL: gpt-4o-mini
-      #   run: |
-      #     python scripts/build_recaps.py --league nba --date "${{ steps.d.outputs.yyyymmdd }}" --mode openai
-      #
-      # - name: Build NHL (openai)
-      #   env:
-      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      #     OPENAI_MODEL: gpt-4o-mini
-      #   run: |
-      #     python scripts/build_recaps.py --league nhl --date "${{ steps.d.outputs.yyyymmdd }}" --mode openai
-
-      - name: Build briefings/latest.json from league latest.json files
-        run: |
-          python - << 'PY'
-          import json, os, datetime
-
-          def read(path):
-            with open(path, "r", encoding="utf-8") as f:
-              return json.load(f)
-
-          out = {
-            "generatedAt": datetime.datetime.now().isoformat(),
-            "leagues": []
-          }
-
-          for league in ["nba", "nhl"]:
-            p = f"recaps/{league}/latest.json"
-            if not os.path.exists(p):
-              continue
-            data = read(p)
-            out["leagues"].append({
-              "league": league,
-              "date": data.get("date"),
-              "briefing": data.get("leagueBriefing"),
-              "link": f"/recaps/{league}/latest.json"
-            })
-
-          os.makedirs("briefings", exist_ok=True)
-          with open("briefings/latest.json", "w", encoding="utf-8") as f:
-            json.dump(out, f, ensure_ascii=False, indent=2)
-
-          # keep a tiny index of recent briefing dates if you want later
-          PY
-
-      - name: Commit generated JSON
+      - name: Commit and push
         run: |
           git config user.name "thporth-bot"
-          git config user.email "thporth-bot@users.noreply.github.com"
-          git add recaps briefings || true
-          git commit -m "Daily recaps: ${{ steps.d.outputs.yyyymmdd }}" || echo "Nothing to commit"
+          git config user.email "actions@users.noreply.github.com"
+          git add recaps briefings .cache || true
+          git commit -m "Update recaps/briefings" || echo "No changes"
           git push
