@@ -4,11 +4,11 @@ import re
 import json
 import time
 import argparse
-from datetime import datetime
+import random
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional, Tuple
 
 import requests
-from bs4 import BeautifulSoup
 
 ESPN_SITE_API = "https://site.api.espn.com/apis/site/v2"
 
@@ -22,7 +22,7 @@ CACHE_DIR = ".cache"
 YT_CHANNEL_CACHE_PATH = os.path.join(CACHE_DIR, "youtube_channels.json")
 
 # =========================
-# NBA ONLY (all other leagues commented out)
+# NBA ONLY
 # =========================
 LEAGUES: Dict[str, Dict[str, Any]] = {
     "nba": {
@@ -30,35 +30,12 @@ LEAGUES: Dict[str, Dict[str, Any]] = {
         "out_dir": "recaps/nba",
         # Official NBA YouTube channel
         "yt_official": {"channelId": "UCWJ2lWNubArHWmf3FIHbfcQ"},
-    },
-
-    # ---- COMMENTED OUT FOR NOW ----
-    # "nhl":  {"sport_path": "hockey/nhl",     "out_dir": "recaps/nhl",  "yt_official": {"channelId": "UCqFMzb-4AUf6WAIbl132QKA"}},
-    # "mlb":  {"sport_path": "baseball/mlb",   "out_dir": "recaps/mlb",  "yt_official": {"channelId": "UCoLrcjPV5PbUrUyXq5mjc_A"}},
-    # "nfl":  {"sport_path": "football/nfl",   "out_dir": "recaps/nfl",  "yt_official": {"channelId": "UCDVYQ4Zhbm3S2dlz7P1GBDg"}},
-    # "wnba": {"sport_path": "basketball/wnba","out_dir": "recaps/wnba", "yt_official": {"channelQuery": "WNBA"}},
-    # "ncaam":  {"sport_path": "basketball/mens-college-basketball",   "out_dir": "recaps/ncaam",  "yt_official": None},
-    # "ncaawb": {"sport_path": "basketball/womens-college-basketball", "out_dir": "recaps/ncaawb", "yt_official": None},
-    # "ncaaf":  {"sport_path": "football/college-football",           "out_dir": "recaps/ncaaf",  "yt_official": None},
-    # "epl":    {"sport_path": "soccer/eng.1",            "out_dir": "recaps/epl",    "yt_official": {"channelQuery": "Premier League"}},
-    # "mls":    {"sport_path": "soccer/usa.1",            "out_dir": "recaps/mls",    "yt_official": {"channelId": "UCSZbXT5TLLW_i-5W8FZpFsg"}},
-    # "laliga": {"sport_path": "soccer/esp.1",            "out_dir": "recaps/laliga", "yt_official": {"channelQuery": "LALIGA"}},
-    # "seriea": {"sport_path": "soccer/ita.1",            "out_dir": "recaps/seriea", "yt_official": {"channelQuery": "Serie A"}},
-    # "bund":   {"sport_path": "soccer/ger.1",            "out_dir": "recaps/bund",   "yt_official": {"channelQuery": "Bundesliga"}},
-    # "ligue1": {"sport_path": "soccer/fra.1",            "out_dir": "recaps/ligue1", "yt_official": {"channelQuery": "Ligue 1"}},
-    # "ucl":    {"sport_path": "soccer/uefa.champions",   "out_dir": "recaps/ucl",    "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
-    # "uel":    {"sport_path": "soccer/uefa.europa",      "out_dir": "recaps/uel",    "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
-    # "uecl":   {"sport_path": "soccer/uefa.europa.conf", "out_dir": "recaps/uecl",   "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
-    # "f1":     {"sport_path": "racing/f1",     "out_dir": "recaps/f1",     "yt_official": {"channelId": "UCB_qr75-ydFVKSF9Dmo6izg"}},
-    # "nascar": {"sport_path": "racing/nascar", "out_dir": "recaps/nascar", "yt_official": {"channelQuery": "NASCAR"}},
-    # "ufc":    {"sport_path": "mma/ufc",       "out_dir": "recaps/ufc",    "yt_official": {"channelId": "UCvgfXK4nTYKudb0rFR6noLA"}},
-    # "pga":  {"sport_path": "golf/pga",  "out_dir": "recaps/pga",  "yt_official": None},
-    # "lpga": {"sport_path": "golf/lpga", "out_dir": "recaps/lpga", "yt_official": None},
+    }
 }
 
 HIGHLIGHT_NEGATIVE_KEYWORDS = [
     "podcast", "reaction", "reacts", "full game", "full match", "press conference",
-    "postgame", "interview", "highlights live",
+    "postgame", "interview", "highlights live", "final", "final minutes"
 ]
 
 
@@ -85,38 +62,12 @@ def read_json(path: str) -> Optional[Dict[str, Any]]:
         return json.load(f)
 
 
-def clean_text(t: str) -> str:
-    return re.sub(r"\s+", " ", (t or "")).strip()
-
-
-def extract_main_text_from_html(html: str) -> str:
-    soup = BeautifulSoup(html, "html.parser")
-    for tag in soup(["script", "style", "noscript"]):
-        tag.decompose()
-
-    article = soup.find("article")
-    if article:
-        return clean_text(article.get_text(" "))
-
-    body = soup.find("body")
-    if body:
-        return clean_text(body.get_text(" "))
-
-    return clean_text(soup.get_text(" "))
-
-
 def get_json_url(url: str, session: requests.Session) -> Optional[Dict[str, Any]]:
     r = session.get(url, timeout=40)
     if r.status_code in (400, 404):
         return None
     r.raise_for_status()
     return r.json()
-
-
-def get_html_url(url: str, session: requests.Session) -> str:
-    r = session.get(url, timeout=40)
-    r.raise_for_status()
-    return r.text
 
 
 def scoreboard_url(sport_path: str, yyyymmdd: str) -> str:
@@ -191,17 +142,111 @@ def extract_gamecast_url(summary: Dict[str, Any]) -> Optional[str]:
     return None
 
 
-def extract_recap_article_url(summary: Dict[str, Any]) -> Optional[str]:
-    articles = summary.get("articles") or []
-    if not articles:
-        return None
-    first = articles[0] or {}
-    return (((first.get("links") or {}).get("web") or {}).get("href"))
+# =========================
+# FACTS BUILDER (NO ARTICLES)
+# =========================
+def build_nba_facts_from_summary(summary: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Build a compact "facts JSON" from ESPN summary JSON.
+    This is what we feed to OpenAI so we only need 1 call per game.
+    """
+    facts: Dict[str, Any] = {}
+
+    header = summary.get("header") or {}
+    comps = header.get("competitions") or []
+    comp = comps[0] if comps else {}
+
+    competitors = comp.get("competitors") or []
+    home = next((c for c in competitors if c.get("homeAway") == "home"), None)
+    away = next((c for c in competitors if c.get("homeAway") == "away"), None)
+
+    def team_blob(c):
+        if not c:
+            return None
+        t = (c.get("team") or {})
+        return {
+            "displayName": t.get("displayName"),
+            "shortDisplayName": t.get("shortDisplayName"),
+            "abbreviation": t.get("abbreviation"),
+            "score": c.get("score"),
+            "winner": c.get("winner"),
+            "homeAway": c.get("homeAway"),
+            "records": c.get("records"),
+        }
+
+    facts["eventId"] = summary.get("id") or header.get("id")
+    facts["shortHeadline"] = header.get("shortHeadline")
+    facts["gameNote"] = header.get("gameNote")
+
+    facts["teams"] = {
+        "away": team_blob(away),
+        "home": team_blob(home),
+    }
+
+    status = (comp.get("status") or {}).get("type") or {}
+    facts["status"] = {
+        "state": status.get("state"),
+        "completed": status.get("completed"),
+        "description": status.get("description"),
+        "detail": status.get("detail"),
+    }
+
+    # Linescore
+    def lines(c):
+        if not c:
+            return None
+        ls = c.get("linescores") or []
+        out = []
+        for x in ls:
+            if isinstance(x, dict) and "value" in x:
+                out.append(x["value"])
+        return out
+
+    facts["linescore"] = {
+        "away": lines(away),
+        "home": lines(home),
+    }
+
+    # Team totals + player totals in boxscore (trimmed)
+    box = summary.get("boxscore") or {}
+    facts["boxscore"] = {
+        "teams": box.get("teams"),
+        "players": None,  # we’ll add a trimmed version below
+    }
+
+    # Leaders (often present)
+    facts["leaders"] = summary.get("leaders")
+
+    # Notes (sometimes include streak/milestones)
+    facts["notes"] = summary.get("notes")
+
+    # Trim players (boxscore.players can be huge)
+    players = box.get("players") or []
+    trimmed_players = []
+    for team_entry in players:
+        try:
+            t = team_entry.get("team") or {}
+            stats_cats = team_entry.get("statistics") or []
+            # Keep only the first 2 categories to reduce size (usually "starters"/"bench" or similar)
+            keep_cats = stats_cats[:2]
+            trimmed_players.append({
+                "team": {
+                    "displayName": t.get("displayName"),
+                    "abbreviation": t.get("abbreviation"),
+                },
+                "statistics": keep_cats,
+            })
+        except Exception:
+            continue
+
+    facts["boxscore"]["players"] = trimmed_players
+
+    return facts
 
 
-# -----------------------------
-# OpenAI API calls (simple; you can add backoff later)
-# -----------------------------
+# =========================
+# OPENAI WITH RETRY/BACKOFF
+# =========================
 def openai_chat_completion(user_text: str, model: str, temperature: float = 0.7) -> str:
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
@@ -214,22 +259,55 @@ def openai_chat_completion(user_text: str, model: str, temperature: float = 0.7)
         "messages": [{"role": "user", "content": user_text}],
         "temperature": temperature,
     }
-    r = requests.post(url, headers=headers, json=payload, timeout=180)
-    r.raise_for_status()
-    data = r.json()
-    return data["choices"][0]["message"]["content"].strip()
+
+    max_attempts = 10
+    base_sleep = 2.0
+
+    last_status = None
+    last_body = None
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            r = requests.post(url, headers=headers, json=payload, timeout=180)
+            last_status = r.status_code
+            last_body = r.text[:500] if r.text else None
+
+            if r.status_code == 200:
+                data = r.json()
+                return data["choices"][0]["message"]["content"].strip()
+
+            # Retry on rate limit / transient server errors
+            if r.status_code in (429, 500, 502, 503, 504):
+                retry_after = r.headers.get("Retry-After")
+                if retry_after:
+                    try:
+                        sleep_s = float(retry_after)
+                    except Exception:
+                        sleep_s = base_sleep * (2 ** (attempt - 1))
+                else:
+                    sleep_s = base_sleep * (2 ** (attempt - 1))
+
+                # jitter
+                sleep_s = min(120.0, sleep_s) + random.random()
+                print(f"OpenAI {r.status_code} - retrying in {sleep_s:.1f}s (attempt {attempt}/{max_attempts})")
+                time.sleep(sleep_s)
+                continue
+
+            # Non-retriable
+            r.raise_for_status()
+
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+            sleep_s = min(120.0, base_sleep * (2 ** (attempt - 1))) + random.random()
+            print(f"OpenAI network error: {e}. Retrying in {sleep_s:.1f}s (attempt {attempt}/{max_attempts})")
+            time.sleep(sleep_s)
+            continue
+
+    raise RuntimeError(f"OpenAI failed after retries. last_status={last_status} last_body={last_body}")
 
 
-def safe_json_loads(text: str) -> Optional[Dict[str, Any]]:
-    try:
-        return json.loads(text)
-    except Exception:
-        return None
-
-
-# -----------------------------
-# YouTube API helpers (official channel only)
-# -----------------------------
+# =========================
+# YOUTUBE (OFFICIAL CHANNEL ONLY)
+# =========================
 def yt_cache_load() -> Dict[str, str]:
     ensure_dir(CACHE_DIR)
     return read_json(YT_CHANNEL_CACHE_PATH) or {}
@@ -279,7 +357,7 @@ def _norm_tokens(s: str) -> List[str]:
     s = (s or "").lower()
     s = re.sub(r"[^a-z0-9\s]", " ", s)
     parts = [p for p in s.split() if p]
-    stop = {"the", "vs", "v", "and", "at", "highlights", "highlight", "game", "full", "recap"}
+    stop = {"the", "vs", "v", "and", "at", "highlights", "highlight", "game", "recap"}
     return [p for p in parts if p not in stop]
 
 
@@ -294,12 +372,23 @@ def _contains_both_teams(title: str, desc: str, away: str, home: str) -> bool:
 
 def _looks_like_highlights(title: str, desc: str) -> bool:
     hay = f"{title} {desc}".lower()
-    if "highlights" in hay or "game recap" in hay or "recap" in hay:
-        for neg in HIGHLIGHT_NEGATIVE_KEYWORDS:
-            if neg in hay:
-                return False
-        return True
-    return False
+    if "highlights" not in hay:
+        return False
+    for neg in HIGHLIGHT_NEGATIVE_KEYWORDS:
+        if neg in hay:
+            return False
+    return True
+
+
+def _published_within_days(published_at: Optional[str], date_iso: str, days: int = 30) -> bool:
+    if not published_at:
+        return False
+    try:
+        pub = datetime.fromisoformat(published_at.replace("Z", "+00:00"))
+        game = datetime.fromisoformat(date_iso + "T00:00:00+00:00")
+        return abs((pub - game).days) <= days
+    except Exception:
+        return False
 
 
 def youtube_search_highlight_official(
@@ -309,20 +398,16 @@ def youtube_search_highlight_official(
     official: Optional[Dict[str, str]],
 ) -> Optional[Dict[str, Any]]:
     yt_key = os.environ.get("YOUTUBE_API_KEY")
-    if not yt_key:
-        return None
-
-    if not official:
+    if not yt_key or not official:
         return None
 
     channel_id = official.get("channelId")
     if not channel_id and official.get("channelQuery"):
         channel_id = youtube_resolve_channel_id(official["channelQuery"])
-
     if not channel_id:
         return None
 
-    q = f"{away_team} vs {home_team} highlights {date_iso}"
+    q = f"{away_team} vs {home_team} highlights"
 
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {
@@ -330,10 +415,10 @@ def youtube_search_highlight_official(
         "part": "snippet",
         "q": q,
         "type": "video",
-        "maxResults": 8,
+        "maxResults": 10,
         "safeSearch": "none",
         "videoEmbeddable": "true",
-        "order": "relevance",
+        "order": "date",
         "channelId": channel_id,
     }
 
@@ -367,8 +452,8 @@ def youtube_search_highlight_official(
             score += 6
         if _contains_both_teams(title, desc, away_team, home_team):
             score += 8
-        if " vs " in title.lower() or " v " in title.lower():
-            score += 1
+        if _published_within_days(published, date_iso, days=30):
+            score += 4
 
         if score > best_score and vid:
             best_score = score
@@ -385,19 +470,21 @@ def youtube_search_highlight_official(
                 "score": score,
             }
 
-    if best and best["score"] >= 10:
+    # strict threshold: must look like highlights + match both teams, ideally date-close
+    if best and best["score"] >= 14:
         return best
     return None
 
 
+# =========================
+# BUILD LOGIC
+# =========================
 def build_league_day(
     league_key: str,
     yyyymmdd: str,
     mode: str,
     thporth_prompt: str,
-    extractor_prompt: str,
     briefing_prompt: str,
-    extractor_model: str,
     writer_model: str,
 ) -> Dict[str, Any]:
     cfg = LEAGUES[league_key]
@@ -431,6 +518,7 @@ def build_league_day(
         return day_json
 
     events = sb.get("events", []) or []
+
     games_out: List[Dict[str, Any]] = []
     facts_for_briefing: List[Dict[str, Any]] = []
 
@@ -446,18 +534,21 @@ def build_league_day(
 
         away_name, home_name = extract_team_display_names(summ)
         scoreline = extract_scoreline(summ)
-        recap_url = extract_recap_article_url(summ)
         gamecast_url = extract_gamecast_url(summ)
+
+        # Build facts locally from summary JSON
+        facts_json = build_nba_facts_from_summary(summ)
 
         game_obj: Dict[str, Any] = {
             "eventId": event_id,
             "teams": {"away": away_name, "home": home_name},
             "scoreLine": scoreline,
-            "source": {"recapUrl": recap_url, "gamecastUrl": gamecast_url},
+            "source": {"gamecastUrl": gamecast_url},
+            "facts": facts_json,
             "status": "init",
         }
 
-        # Highlights
+        # Highlights (official channel only)
         try:
             if away_name and home_name:
                 game_obj["highlight"] = youtube_search_highlight_official(away_name, home_name, date_iso, official)
@@ -466,82 +557,52 @@ def build_league_day(
         except Exception:
             game_obj["highlight"] = None
 
-        # FIX #1 fallback: use recapUrl if present else gamecastUrl
-        fetch_url = recap_url or gamecast_url
-        if not fetch_url:
-            game_obj["status"] = "no_recap_url"
-            games_out.append(game_obj)
-            continue
-        game_obj["source"]["usedTextFrom"] = fetch_url
-
-        # Fetch text
-        try:
-            html = get_html_url(fetch_url, session)
-            article_text = extract_main_text_from_html(html)
-        except Exception:
-            game_obj["status"] = "recap_fetch_failed"
-            games_out.append(game_obj)
-            continue
-
-        game_obj["articleText"] = article_text
-
         if mode == "inputs":
             game_obj["status"] = "needs_manual_summary"
-            game_obj["recapInput"] = thporth_prompt + "\n\nHere is the article:\n\n" + article_text + "\n"
+            game_obj["recapInput"] = (
+                thporth_prompt
+                + "\n\nFacts JSON:\n"
+                + json.dumps(facts_json, ensure_ascii=False)
+            )
             games_out.append(game_obj)
+            facts_for_briefing.append(facts_json)
             continue
 
-        extractor_input = (
-            extractor_prompt +
-            "\n\nKnown metadata:\n" +
-            json.dumps({
-                "league": league_key,
-                "event_title": f"{away_name} @ {home_name}" if (away_name and home_name) else None,
-                "scoreline": scoreline,
-                "recapUrl": recap_url,
-                "usedTextFrom": fetch_url,
-            }, ensure_ascii=False) +
-            "\n\nArticle text:\n" +
-            article_text
-        )
-
-        facts_text = openai_chat_completion(extractor_input, model=extractor_model, temperature=0.2)
-        facts_json = safe_json_loads(facts_text)
-        if not facts_json:
-            game_obj["status"] = "extractor_json_parse_failed"
-            game_obj["factsRaw"] = facts_text
-            games_out.append(game_obj)
-            continue
-
-        game_obj["facts"] = facts_json
-
+        # ONE OpenAI call per game: generate recap from facts JSON
         writer_input = (
-            thporth_prompt +
-            "\n\nIMPORTANT: Use ONLY the extracted facts JSON below. Do not invent details.\n\n" +
-            "Extracted facts (JSON):\n" +
-            json.dumps(facts_json, ensure_ascii=False) +
-            "\n"
+            thporth_prompt
+            + "\n\nFacts JSON:\n"
+            + json.dumps(facts_json, ensure_ascii=False)
         )
 
-        recap_text = openai_chat_completion(writer_input, model=writer_model, temperature=0.7)
-        game_obj["recap"] = recap_text
-        game_obj["status"] = "ok"
+        try:
+            recap_text = openai_chat_completion(writer_input, model=writer_model, temperature=0.7)
+            game_obj["recap"] = recap_text
+            game_obj["status"] = "ok"
+            facts_for_briefing.append(facts_json)
+        except Exception as e:
+            game_obj["status"] = "openai_failed"
+            game_obj["openaiError"] = str(e)
 
         games_out.append(game_obj)
-        facts_for_briefing.append(facts_json)
 
-        time.sleep(1.0)
+        # Throttle (light) to reduce bursts; backoff handles real rate limiting
+        time.sleep(1.25)
 
+    # League briefing: ONE OpenAI call per league day
     league_briefing = None
     if mode == "openai" and facts_for_briefing:
         briefing_input = (
-            briefing_prompt +
-            "\n\nLeague: " + league_key +
-            "\nDate: " + date_iso +
-            "\n\nGames facts JSON list:\n" +
-            json.dumps(facts_for_briefing, ensure_ascii=False)
+            briefing_prompt
+            + "\n\nLeague: " + league_key
+            + "\nDate: " + date_iso
+            + "\n\nGames facts JSON list:\n"
+            + json.dumps(facts_for_briefing, ensure_ascii=False)
         )
-        league_briefing = openai_chat_completion(briefing_input, model=writer_model, temperature=0.6)
+        try:
+            league_briefing = openai_chat_completion(briefing_input, model=writer_model, temperature=0.6)
+        except Exception:
+            league_briefing = None
 
     day_json: Dict[str, Any] = {
         "league": league_key,
@@ -597,30 +658,25 @@ def main():
     ap.add_argument("--mode", choices=["inputs", "openai"], default="openai")
 
     ap.add_argument("--thporth_prompt", default="scripts/thporth_prompt.txt")
-    ap.add_argument("--extractor_prompt", default="scripts/extractor_prompt.txt")
     ap.add_argument("--briefing_prompt", default="scripts/briefing_prompt.txt")
 
-    ap.add_argument("--extractor_model", default=os.environ.get("OPENAI_EXTRACTOR_MODEL", "gpt-5-mini"))
     ap.add_argument("--writer_model", default=os.environ.get("OPENAI_WRITER_MODEL", "gpt-5-mini"))
 
     args = ap.parse_args()
 
     thporth_prompt = read_text(args.thporth_prompt)
-    extractor_prompt = read_text(args.extractor_prompt)
     briefing_prompt = read_text(args.briefing_prompt)
 
+    all_days: List[Dict[str, Any]] = []
+
     if args.league == "all":
-        # With NBA-only config, "all" == nba
-        all_days: List[Dict[str, Any]] = []
         for league_key in sorted(LEAGUES.keys()):
             day = build_league_day(
                 league_key=league_key,
                 yyyymmdd=args.date,
                 mode=args.mode,
                 thporth_prompt=thporth_prompt,
-                extractor_prompt=extractor_prompt,
                 briefing_prompt=briefing_prompt,
-                extractor_model=args.extractor_model,
                 writer_model=args.writer_model,
             )
             all_days.append(day)
@@ -633,9 +689,7 @@ def main():
         yyyymmdd=args.date,
         mode=args.mode,
         thporth_prompt=thporth_prompt,
-        extractor_prompt=extractor_prompt,
         briefing_prompt=briefing_prompt,
-        extractor_model=args.extractor_model,
         writer_model=args.writer_model,
     )
     write_manifest()
