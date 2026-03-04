@@ -4,7 +4,7 @@ import re
 import json
 import time
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, Any, List, Optional, Tuple
 
 import requests
@@ -18,75 +18,62 @@ DEFAULT_UA = (
     "Chrome/120.0.0.0 Safari/537.36"
 )
 
-# -----------------------------
-# THPORTH leagues (ESPN scoreboard paths)
-# -----------------------------
-# Notes:
-# - Soccer uses ESPN league codes like eng.1 (EPL) (commonly used in ESPN endpoints). :contentReference[oaicite:8]{index=8}
-# - Not every league you care about will have a reliable ESPN recap article; we still store gamecast/recap URL if present.
+CACHE_DIR = ".cache"
+YT_CHANNEL_CACHE_PATH = os.path.join(CACHE_DIR, "youtube_channels.json")
+
+# ---- Official YouTube channels (strict: highlight searches ONLY inside these channels) ----
+# For leagues where rights are complex, you may still get "no highlight matched" (by design).
 LEAGUES: Dict[str, Dict[str, Any]] = {
-    # Big 4 US
-    "nba":  {"sport_path": "basketball/nba", "out_dir": "recaps/nba",  "yt_official": {"channelId": "UCWJ2lWNubArHWmf3FIHbfcQ"}},  # :contentReference[oaicite:9]{index=9}
-    "nhl":  {"sport_path": "hockey/nhl",     "out_dir": "recaps/nhl",  "yt_official": {"channelId": "UCqFMzb-4AUf6WAIbl132QKA"}},  # :contentReference[oaicite:10]{index=10}
-    "mlb":  {"sport_path": "baseball/mlb",   "out_dir": "recaps/mlb",  "yt_official": {"channelId": "UCoLrcjPV5PbUrUyXq5mjc_A"}},   # :contentReference[oaicite:11]{index=11}
-    "nfl":  {"sport_path": "football/nfl",   "out_dir": "recaps/nfl",  "yt_official": {"channelId": "UCDVYQ4Zhbm3S2dlz7P1GBDg"}},   # :contentReference[oaicite:12]{index=12}
+    # US
+    "nba":  {"sport_path": "basketball/nba", "out_dir": "recaps/nba",  "yt_official": {"channelId": "UCWJ2lWNubArHWmf3FIHbfcQ"}},
+    "nhl":  {"sport_path": "hockey/nhl",     "out_dir": "recaps/nhl",  "yt_official": {"channelId": "UCqFMzb-4AUf6WAIbl132QKA"}},
+    "mlb":  {"sport_path": "baseball/mlb",   "out_dir": "recaps/mlb",  "yt_official": {"channelId": "UCoLrcjPV5PbUrUyXq5mjc_A"}},
+    "nfl":  {"sport_path": "football/nfl",   "out_dir": "recaps/nfl",  "yt_official": {"channelId": "UCDVYQ4Zhbm3S2dlz7P1GBDg"}},
+    "wnba": {"sport_path": "basketball/wnba","out_dir": "recaps/wnba", "yt_official": {"channelQuery": "WNBA"}},
 
-    # Basketball
-    "wnba": {"sport_path": "basketball/wnba", "out_dir": "recaps/wnba", "yt_official": {"channelQuery": "WNBA"}},
-
-    # NCAA (ESPN has these scoreboards; recaps may be inconsistent)
+    # NCAA (no reliable single official highlights channel; set to None for strict mode)
     "ncaam":  {"sport_path": "basketball/mens-college-basketball",   "out_dir": "recaps/ncaam",  "yt_official": None},
     "ncaawb": {"sport_path": "basketball/womens-college-basketball", "out_dir": "recaps/ncaawb", "yt_official": None},
     "ncaaf":  {"sport_path": "football/college-football",           "out_dir": "recaps/ncaaf",  "yt_official": None},
 
-    # Soccer / UEFA / MLS (highlights rights vary; we still attempt official channels)
-    "epl":   {"sport_path": "soccer/eng.1",           "out_dir": "recaps/epl",   "yt_official": {"channelQuery": "Premier League"}},  # :contentReference[oaicite:13]{index=13}
-    "mls":   {"sport_path": "soccer/usa.1",           "out_dir": "recaps/mls",   "yt_official": {"channelId": "UCSZbXT5TLLW_i-5W8FZpFsg"}},  # :contentReference[oaicite:14]{index=14}
-    "laliga":{"sport_path": "soccer/esp.1",           "out_dir": "recaps/laliga","yt_official": {"channelQuery": "LALIGA"}},  # resolve via API
-    "seriea":{"sport_path": "soccer/ita.1",           "out_dir": "recaps/seriea","yt_official": {"channelQuery": "Serie A"}},  # resolve via API
-    "bund":  {"sport_path": "soccer/ger.1",           "out_dir": "recaps/bund",  "yt_official": {"channelQuery": "Bundesliga"}},  # resolve via API
-    "ligue1":{"sport_path": "soccer/fra.1",           "out_dir": "recaps/ligue1","yt_official": {"channelQuery": "Ligue 1"}},  # resolve via API
-    "ucl":   {"sport_path": "soccer/uefa.champions",  "out_dir": "recaps/ucl",   "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},  # UEFA :contentReference[oaicite:15]{index=15}
-    "uel":   {"sport_path": "soccer/uefa.europa",     "out_dir": "recaps/uel",   "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},  # UEFA :contentReference[oaicite:16]{index=16}
-    "uecl":  {"sport_path": "soccer/uefa.europa.conf","out_dir": "recaps/uecl",  "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},  # UEFA :contentReference[oaicite:17]{index=17}
+    # Soccer (many leagues have official channels; rights may still limit match highlights)
+    "epl":    {"sport_path": "soccer/eng.1",            "out_dir": "recaps/epl",    "yt_official": {"channelQuery": "Premier League"}},
+    "mls":    {"sport_path": "soccer/usa.1",            "out_dir": "recaps/mls",    "yt_official": {"channelId": "UCSZbXT5TLLW_i-5W8FZpFsg"}},
+    "laliga": {"sport_path": "soccer/esp.1",            "out_dir": "recaps/laliga", "yt_official": {"channelQuery": "LALIGA"}},
+    "seriea": {"sport_path": "soccer/ita.1",            "out_dir": "recaps/seriea", "yt_official": {"channelQuery": "Serie A"}},
+    "bund":   {"sport_path": "soccer/ger.1",            "out_dir": "recaps/bund",   "yt_official": {"channelQuery": "Bundesliga"}},
+    "ligue1": {"sport_path": "soccer/fra.1",            "out_dir": "recaps/ligue1", "yt_official": {"channelQuery": "Ligue 1"}},
+    "ucl":    {"sport_path": "soccer/uefa.champions",   "out_dir": "recaps/ucl",    "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
+    "uel":    {"sport_path": "soccer/uefa.europa",      "out_dir": "recaps/uel",    "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
+    "uecl":   {"sport_path": "soccer/uefa.europa.conf", "out_dir": "recaps/uecl",   "yt_official": {"channelId": "UCyGa1YEx9ST66rYrJTGIKOw"}},
 
-    # Motorsports (ESPN coverage varies; highlights are easy/official)
-    "f1":     {"sport_path": "racing/f1",       "out_dir": "recaps/f1",     "yt_official": {"channelId": "UCB_qr75-ydFVKSF9Dmo6izg"}},  # :contentReference[oaicite:18]{index=18}
-    "nascar": {"sport_path": "racing/nascar",   "out_dir": "recaps/nascar", "yt_official": {"channelQuery": "NASCAR"}},
-    "ufc":    {"sport_path": "mma/ufc",         "out_dir": "recaps/ufc",    "yt_official": {"channelId": "UCvgfXK4nTYKudb0rFR6noLA"}},  # :contentReference[oaicite:19]{index=19}
+    # Motorsports / MMA
+    "f1":     {"sport_path": "racing/f1",     "out_dir": "recaps/f1",     "yt_official": {"channelId": "UCB_qr75-ydFVKSF9Dmo6izg"}},
+    "nascar": {"sport_path": "racing/nascar", "out_dir": "recaps/nascar", "yt_official": {"channelQuery": "NASCAR"}},
+    "ufc":    {"sport_path": "mma/ufc",       "out_dir": "recaps/ufc",    "yt_official": {"channelId": "UCvgfXK4nTYKudb0rFR6noLA"}},
 
-    # Golf (ESPN has golf scoreboards; highlights rights vary, so default None)
+    # Golf (strict: no official channel configured by default)
     "pga":  {"sport_path": "golf/pga",  "out_dir": "recaps/pga",  "yt_official": None},
     "lpga": {"sport_path": "golf/lpga", "out_dir": "recaps/lpga", "yt_official": None},
 }
-
-# -----------------------------
-# YouTube highlight matching
-# -----------------------------
-PREFERRED_CHANNEL_KEYWORDS = [
-    "NBA", "NHL", "NFL", "MLB", "UEFA", "Premier League", "LALIGA", "Bundesliga", "Serie A", "Ligue 1",
-    "Major League Soccer", "MLS", "UFC", "Formula 1", "NASCAR",
-]
 
 HIGHLIGHT_NEGATIVE_KEYWORDS = [
     "podcast", "reaction", "reacts", "full game", "full match", "press conference",
     "postgame", "interview", "highlights live",
 ]
 
-CACHE_DIR = ".cache"
-YT_CHANNEL_CACHE_PATH = os.path.join(CACHE_DIR, "youtube_channels.json")
-
 def ensure_dir(p: str) -> None:
-    os.makedirs(p, exist_ok=True)
+    if p:
+        os.makedirs(p, exist_ok=True)
+
+def read_text(path: str) -> str:
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read().strip()
 
 def write_json(path: str, data: Dict[str, Any]) -> None:
     ensure_dir(os.path.dirname(path))
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-
-def read_text(path: str) -> str:
-    with open(path, "r", encoding="utf-8") as f:
-        return f.read().strip()
 
 def read_json(path: str) -> Optional[Dict[str, Any]]:
     if not os.path.exists(path):
@@ -94,18 +81,8 @@ def read_json(path: str) -> Optional[Dict[str, Any]]:
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def get_json(url: str, session: requests.Session) -> Dict[str, Any]:
-    r = session.get(url, timeout=40)
-    r.raise_for_status()
-    return r.json()
-
-def get_html(url: str, session: requests.Session) -> str:
-    r = session.get(url, timeout=40)
-    r.raise_for_status()
-    return r.text
-
 def clean_text(t: str) -> str:
-    t = re.sub(r"\s+", " ", t).strip()
+    t = re.sub(r"\s+", " ", (t or "")).strip()
     return t
 
 def extract_main_text_from_html(html: str) -> str:
@@ -123,13 +100,45 @@ def extract_main_text_from_html(html: str) -> str:
 
     return clean_text(soup.get_text(" "))
 
+def get_json_url(url: str, session: requests.Session) -> Dict[str, Any]:
+    r = session.get(url, timeout=40)
+    r.raise_for_status()
+    return r.json()
+
+def get_html_url(url: str, session: requests.Session) -> str:
+    r = session.get(url, timeout=40)
+    r.raise_for_status()
+    return r.text
+
 def scoreboard_url(sport_path: str, yyyymmdd: str) -> str:
     return f"{ESPN_SITE_API}/sports/{sport_path}/scoreboard?dates={yyyymmdd}"
 
 def summary_url(sport_path: str, event_id: str) -> str:
     return f"{ESPN_SITE_API}/sports/{sport_path}/summary?event={event_id}"
 
-def extract_scoreline_from_summary(summary: Dict[str, Any]) -> Optional[str]:
+def extract_team_display_names(summary: Dict[str, Any]) -> Tuple[Optional[str], Optional[str]]:
+    header = summary.get("header") or {}
+    comps = header.get("competitions") or []
+    if not comps:
+        return (None, None)
+
+    competitors = comps[0].get("competitors") or []
+    if len(competitors) < 2:
+        return (None, None)
+
+    home = next((c for c in competitors if c.get("homeAway") == "home"), None)
+    away = next((c for c in competitors if c.get("homeAway") == "away"), None)
+    if not home or not away:
+        return (None, None)
+
+    home_team = (home.get("team") or {})
+    away_team = (away.get("team") or {})
+
+    home_name = home_team.get("displayName") or home_team.get("shortDisplayName")
+    away_name = away_team.get("displayName") or away_team.get("shortDisplayName")
+    return (away_name, home_name)
+
+def extract_scoreline(summary: Dict[str, Any]) -> Optional[str]:
     header = summary.get("header") or {}
     comps = header.get("competitions") or []
     if not comps:
@@ -157,28 +166,6 @@ def extract_scoreline_from_summary(summary: Dict[str, Any]) -> Optional[str]:
 
     return f"{away_abbr} {away_score} — {home_abbr} {home_score}"
 
-def extract_team_display_names(summary: Dict[str, Any]) -> Tuple[Optional[str], Optional[str]]:
-    header = summary.get("header") or {}
-    comps = header.get("competitions") or []
-    if not comps:
-        return (None, None)
-
-    competitors = comps[0].get("competitors") or []
-    if len(competitors) < 2:
-        return (None, None)
-
-    home = next((c for c in competitors if c.get("homeAway") == "home"), None)
-    away = next((c for c in competitors if c.get("homeAway") == "away"), None)
-    if not home or not away:
-        return (None, None)
-
-    home_team = (home.get("team") or {})
-    away_team = (away.get("team") or {})
-
-    home_name = home_team.get("displayName") or home_team.get("shortDisplayName")
-    away_name = away_team.get("displayName") or away_team.get("shortDisplayName")
-    return (away_name, home_name)
-
 def extract_gamecast_url(summary: Dict[str, Any]) -> Optional[str]:
     header = summary.get("header") or {}
     links = header.get("links") or []
@@ -195,33 +182,79 @@ def extract_recap_article_url(summary: Dict[str, Any]) -> Optional[str]:
     if not articles:
         return None
     first = articles[0] or {}
-    href = (((first.get("links") or {}).get("web") or {}).get("href"))
-    return href
+    return (((first.get("links") or {}).get("web") or {}).get("href"))
 
 # -----------------------------
-# OpenAI summarization
+# OpenAI API calls
 # -----------------------------
-def openai_chat_completion(user_text: str) -> str:
+def openai_chat_completion(user_text: str, model: str, temperature: float = 0.7) -> str:
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY not set")
 
-    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     url = "https://api.openai.com/v1/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": user_text}],
-        "temperature": 0.7,
+        "temperature": temperature,
     }
-    r = requests.post(url, headers=headers, json=payload, timeout=90)
+    r = requests.post(url, headers=headers, json=payload, timeout=120)
     r.raise_for_status()
     data = r.json()
     return data["choices"][0]["message"]["content"].strip()
 
+def safe_json_loads(text: str) -> Optional[Dict[str, Any]]:
+    try:
+        return json.loads(text)
+    except Exception:
+        return None
+
 # -----------------------------
-# YouTube helpers
+# YouTube API helpers (official channel only)
 # -----------------------------
+def yt_cache_load() -> Dict[str, str]:
+    ensure_dir(CACHE_DIR)
+    return read_json(YT_CHANNEL_CACHE_PATH) or {}
+
+def yt_cache_save(cache: Dict[str, str]) -> None:
+    ensure_dir(CACHE_DIR)
+    write_json(YT_CHANNEL_CACHE_PATH, cache)
+
+def youtube_resolve_channel_id(channel_query: str) -> Optional[str]:
+    yt_key = os.environ.get("YOUTUBE_API_KEY")
+    if not yt_key:
+        return None
+
+    cache = yt_cache_load()
+    if channel_query in cache:
+        return cache[channel_query]
+
+    url = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        "key": yt_key,
+        "part": "snippet",
+        "q": channel_query,
+        "type": "channel",
+        "maxResults": 1,
+        "safeSearch": "none",
+    }
+    r = requests.get(url, params=params, timeout=40)
+    r.raise_for_status()
+    data = r.json()
+
+    items = data.get("items") or []
+    if not items:
+        return None
+
+    ch_id = ((items[0].get("id") or {}).get("channelId"))
+    if not ch_id:
+        return None
+
+    cache[channel_query] = ch_id
+    yt_cache_save(cache)
+    return ch_id
+
 def _norm_tokens(s: str) -> List[str]:
     s = (s or "").lower()
     s = re.sub(r"[^a-z0-9\s]", " ", s)
@@ -246,76 +279,27 @@ def _looks_like_highlights(title: str, desc: str) -> bool:
         return True
     return False
 
-def yt_cache_load() -> Dict[str, str]:
-    ensure_dir(CACHE_DIR)
-    return read_json(YT_CHANNEL_CACHE_PATH) or {}
-
-def yt_cache_save(cache: Dict[str, str]) -> None:
-    ensure_dir(CACHE_DIR)
-    write_json(YT_CHANNEL_CACHE_PATH, cache)
-
-def youtube_resolve_channel_id(channel_query: str) -> Optional[str]:
-    """
-    Resolve a channelId from a human query (ex: "Premier League", "NASCAR", "WNBA").
-    Caches result in .cache/youtube_channels.json
-    """
-    yt_key = os.environ.get("YOUTUBE_API_KEY")
-    if not yt_key:
-        return None
-
-    cache = yt_cache_load()
-    if channel_query in cache:
-        return cache[channel_query]
-
-    url = "https://www.googleapis.com/youtube/v3/search"
-    params = {
-        "key": yt_key,
-        "part": "snippet",
-        "q": channel_query,
-        "type": "channel",
-        "maxResults": 1,
-        "safeSearch": "none",
-    }
-    r = requests.get(url, params=params, timeout=40)
-    r.raise_for_status()
-    data = r.json()
-    items = data.get("items") or []
-    if not items:
-        return None
-
-    ch_id = ((items[0].get("id") or {}).get("channelId"))
-    if not ch_id:
-        return None
-
-    cache[channel_query] = ch_id
-    yt_cache_save(cache)
-    return ch_id
-
-def youtube_search_highlight(
+def youtube_search_highlight_official(
     away_team: str,
     home_team: str,
     date_iso: str,
-    official_channel: Optional[Dict[str, str]],
+    official: Optional[Dict[str, str]],
 ) -> Optional[Dict[str, Any]]:
-    """
-    Searches ONLY within an official league channel (channelId).
-    If official_channel has channelQuery, we resolve->cache channelId.
-    """
     yt_key = os.environ.get("YOUTUBE_API_KEY")
     if not yt_key:
         return None
 
-    channel_id = None
-    if official_channel:
-        channel_id = official_channel.get("channelId")
-        if not channel_id and official_channel.get("channelQuery"):
-            channel_id = youtube_resolve_channel_id(official_channel["channelQuery"])
+    if not official:
+        return None
+
+    channel_id = official.get("channelId")
+    if not channel_id and official.get("channelQuery"):
+        channel_id = youtube_resolve_channel_id(official["channelQuery"])
 
     if not channel_id:
-        return None  # strict: no official channel => no highlight
+        return None
 
-    nice_date = date_iso
-    q = f"{away_team} vs {home_team} highlights {nice_date}"
+    q = f"{away_team} vs {home_team} highlights {date_iso}"
 
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {
@@ -327,7 +311,7 @@ def youtube_search_highlight(
         "safeSearch": "none",
         "videoEmbeddable": "true",
         "order": "relevance",
-        "channelId": channel_id,  # THIS is the “official account only” filter
+        "channelId": channel_id,
     }
 
     r = requests.get(url, params=params, timeout=40)
@@ -360,8 +344,6 @@ def youtube_search_highlight(
             score += 6
         if _contains_both_teams(title, desc, away_team, home_team):
             score += 8
-        if any(pk.lower() in channel.lower() for pk in PREFERRED_CHANNEL_KEYWORDS):
-            score += 1
         if " vs " in title.lower() or " v " in title.lower():
             score += 1
 
@@ -380,58 +362,66 @@ def youtube_search_highlight(
                 "score": score,
             }
 
-    # keep strict-ish
+    # strict threshold so you don't embed garbage
     if best and best["score"] >= 10:
         return best
     return None
 
 # -----------------------------
-# Build day
+# Build logic
 # -----------------------------
-def build_league_day(league_key: str, yyyymmdd: str, mode: str, prompt_rules: str) -> Dict[str, Any]:
-    league_cfg = LEAGUES[league_key]
-    sport_path = league_cfg["sport_path"]
+def build_league_day(
+    league_key: str,
+    yyyymmdd: str,
+    mode: str,
+    thporth_prompt: str,
+    extractor_prompt: str,
+    briefing_prompt: str,
+    extractor_model: str,
+    writer_model: str,
+) -> Dict[str, Any]:
+    cfg = LEAGUES[league_key]
+    sport_path = cfg["sport_path"]
+    out_dir = cfg["out_dir"]
+    official = cfg.get("yt_official")
 
     session = requests.Session()
     session.headers.update({"User-Agent": DEFAULT_UA})
 
-    sb = get_json(scoreboard_url(sport_path, yyyymmdd), session)
+    sb = get_json_url(scoreboard_url(sport_path, yyyymmdd), session)
     events = sb.get("events", []) or []
 
-    games_out: List[Dict[str, Any]] = []
-    finished_recaps: List[str] = []
-
     date_iso = f"{yyyymmdd[:4]}-{yyyymmdd[4:6]}-{yyyymmdd[6:]}"
+    games_out: List[Dict[str, Any]] = []
+    facts_for_briefing: List[Dict[str, Any]] = []
 
     for ev in events:
         event_id = ev.get("id")
         if not event_id:
             continue
 
-        summ = get_json(summary_url(sport_path, event_id), session)
+        summ = get_json_url(summary_url(sport_path, event_id), session)
 
-        scoreline = extract_scoreline_from_summary(summ)
+        away_name, home_name = extract_team_display_names(summ)
+        scoreline = extract_scoreline(summ)
         recap_url = extract_recap_article_url(summ)
         gamecast_url = extract_gamecast_url(summ)
 
-        away_name, home_name = extract_team_display_names(summ)
-
         game_obj: Dict[str, Any] = {
             "eventId": event_id,
-            "scoreLine": scoreline,
             "teams": {"away": away_name, "home": home_name},
+            "scoreLine": scoreline,
             "source": {"recapUrl": recap_url, "gamecastUrl": gamecast_url},
+            "status": "init",
         }
 
-        # Strict official-channel highlights only
-        official = league_cfg.get("yt_official")
-        if official and away_name and home_name:
-            try:
-                yt = youtube_search_highlight(away_name, home_name, date_iso, official)
-            except Exception:
-                yt = None
-            game_obj["highlight"] = yt
-        else:
+        # Highlights (official channel only)
+        try:
+            if away_name and home_name:
+                game_obj["highlight"] = youtube_search_highlight_official(away_name, home_name, date_iso, official)
+            else:
+                game_obj["highlight"] = None
+        except Exception:
             game_obj["highlight"] = None
 
         if not recap_url:
@@ -439,36 +429,87 @@ def build_league_day(league_key: str, yyyymmdd: str, mode: str, prompt_rules: st
             games_out.append(game_obj)
             continue
 
-        html = get_html(recap_url, session)
-        article_text = extract_main_text_from_html(html)
-        game_obj["articleText"] = article_text  # you can remove later
+        # Fetch & extract article text
+        try:
+            html = get_html_url(recap_url, session)
+            article_text = extract_main_text_from_html(html)
+        except Exception:
+            game_obj["status"] = "recap_fetch_failed"
+            games_out.append(game_obj)
+            continue
+
+        game_obj["articleText"] = article_text  # keep for debugging; remove later if you want smaller files
 
         if mode == "inputs":
+            # No OpenAI calls: output ready-to-paste input
             game_obj["status"] = "needs_manual_summary"
-            game_obj["recapInput"] = f"{prompt_rules}\n\nHere is the article:\n\n{article_text}\n"
-        else:
-            game_obj["status"] = "ok"
-            recap = openai_chat_completion(f"{prompt_rules}\n\nHere is the article:\n\n{article_text}\n")
-            game_obj["recap"] = recap
-            finished_recaps.append(recap)
+            game_obj["recapInput"] = (
+                thporth_prompt +
+                "\n\nHere is the article:\n\n" +
+                article_text +
+                "\n"
+            )
+            games_out.append(game_obj)
+            continue
 
-        games_out.append(game_obj)
-        time.sleep(0.35)
-
-    league_briefing = None
-    if mode == "openai" and finished_recaps:
-        league_briefing = openai_chat_completion(
-            "Create a THPORTH-style 'league in 30 seconds' briefing for this league/day.\n"
-            "Rules:\n"
-            "- Start with a rewritten headline in sentence case.\n"
-            "- ONE short lead sentence.\n"
-            "- 4–6 bullets with the biggest storylines (each bullet includes a key stat).\n"
-            "- No play-by-play.\n\n"
-            "Use these game recaps as your source:\n\n"
-            + "\n\n---\n\n".join(finished_recaps)
+        # Stage 1: Extractor → facts JSON
+        extractor_input = (
+            extractor_prompt +
+            "\n\nKnown metadata:\n" +
+            json.dumps({
+                "league": league_key,
+                "event_title": f"{away_name} @ {home_name}" if (away_name and home_name) else None,
+                "scoreline": scoreline,
+                "recapUrl": recap_url
+            }, ensure_ascii=False) +
+            "\n\nArticle text:\n" +
+            article_text
         )
 
-    return {
+        facts_text = openai_chat_completion(extractor_input, model=extractor_model, temperature=0.2)
+        facts_json = safe_json_loads(facts_text)
+
+        if not facts_json:
+            # fallback: still store raw extractor output so you can debug
+            game_obj["status"] = "extractor_json_parse_failed"
+            game_obj["factsRaw"] = facts_text
+            games_out.append(game_obj)
+            continue
+
+        game_obj["facts"] = facts_json
+
+        # Stage 2: Writer → THPORTH recap FROM facts only
+        writer_input = (
+            thporth_prompt +
+            "\n\nIMPORTANT: Use ONLY the extracted facts JSON below. Do not invent details.\n\n" +
+            "Extracted facts (JSON):\n" +
+            json.dumps(facts_json, ensure_ascii=False) +
+            "\n"
+        )
+
+        recap_text = openai_chat_completion(writer_input, model=writer_model, temperature=0.7)
+        game_obj["recap"] = recap_text
+        game_obj["status"] = "ok"
+
+        games_out.append(game_obj)
+        facts_for_briefing.append(facts_json)
+
+        # be kind to upstream services
+        time.sleep(0.35)
+
+    # League briefing from facts only (cheap)
+    league_briefing = None
+    if mode == "openai" and facts_for_briefing:
+        briefing_input = (
+            briefing_prompt +
+            "\n\nLeague: " + league_key +
+            "\nDate: " + date_iso +
+            "\n\nGames facts JSON list:\n" +
+            json.dumps(facts_for_briefing, ensure_ascii=False)
+        )
+        league_briefing = openai_chat_completion(briefing_input, model=writer_model, temperature=0.6)
+
+    day_json: Dict[str, Any] = {
         "league": league_key,
         "date": yyyymmdd,
         "generatedAt": datetime.now().isoformat(),
@@ -477,21 +518,24 @@ def build_league_day(league_key: str, yyyymmdd: str, mode: str, prompt_rules: st
         "games": games_out,
     }
 
-def write_latest_and_index(out_dir: str, day_json: Dict[str, Any], keep_days: int = 14) -> None:
+    # write files
+    ensure_dir(out_dir)
+    out_date = f"{date_iso}.json"
+    write_json(os.path.join(out_dir, out_date), day_json)
     write_json(os.path.join(out_dir, "latest.json"), day_json)
 
+    # index.json
     dates = []
     for fn in os.listdir(out_dir):
         if re.fullmatch(r"\d{4}-\d{2}-\d{2}\.json", fn):
             dates.append(fn.replace(".json", ""))
     dates.sort(reverse=True)
-    dates = dates[:keep_days]
+    dates = dates[:14]
     write_json(os.path.join(out_dir, "index.json"), {"dates": dates})
 
+    return day_json
+
 def write_manifest() -> None:
-    """
-    A single manifest so the front-end can render ALL leagues without hardcoding.
-    """
     manifest = {
         "generatedAt": datetime.now().isoformat(),
         "leagues": [
@@ -504,17 +548,16 @@ def write_manifest() -> None:
             for k, v in LEAGUES.items()
         ],
     }
+    ensure_dir("recaps")
     write_json("recaps/manifest.json", manifest)
 
-def write_briefings_latest(league_days: List[Dict[str, Any]]) -> None:
-    """
-    briefings/latest.json aggregates per-league briefings for the day.
-    """
+def write_briefings_latest(all_days: List[Dict[str, Any]]) -> None:
+    ensure_dir("briefings")
     out = {
         "generatedAt": datetime.now().isoformat(),
         "leagues": [
             {"league": d["league"], "date": d["date"], "briefing": d.get("leagueBriefing")}
-            for d in league_days
+            for d in all_days
         ],
     }
     write_json("briefings/latest.json", out)
@@ -523,47 +566,54 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--league", required=True, choices=sorted(LEAGUES.keys()) + ["all"])
     ap.add_argument("--date", required=True, help="YYYYMMDD")
-    ap.add_argument("--mode", choices=["inputs", "openai"], default="inputs")
-    ap.add_argument("--prompt", default="scripts/thporth_prompt.txt")
+    ap.add_argument("--mode", choices=["inputs", "openai"], default="openai")
+
+    ap.add_argument("--thporth_prompt", default="scripts/thporth_prompt.txt")
+    ap.add_argument("--extractor_prompt", default="scripts/extractor_prompt.txt")
+    ap.add_argument("--briefing_prompt", default="scripts/briefing_prompt.txt")
+
+    # Models (set defaults; you can change anytime)
+    ap.add_argument("--extractor_model", default=os.environ.get("OPENAI_EXTRACTOR_MODEL", "gpt-5-mini"))
+    ap.add_argument("--writer_model", default=os.environ.get("OPENAI_WRITER_MODEL", "gpt-5-mini"))
+
     args = ap.parse_args()
 
-    prompt_rules = read_text(args.prompt)
+    thporth_prompt = read_text(args.thporth_prompt)
+    extractor_prompt = read_text(args.extractor_prompt)
+    briefing_prompt = read_text(args.briefing_prompt)
 
-    league_days: List[Dict[str, Any]] = []
+    all_days: List[Dict[str, Any]] = []
 
     if args.league == "all":
         for league_key in sorted(LEAGUES.keys()):
-            day = build_league_day(league_key, args.date, args.mode, prompt_rules)
-            out_dir = LEAGUES[league_key]["out_dir"]
-            ensure_dir(out_dir)
-
-            date_iso = f"{args.date[:4]}-{args.date[4:6]}-{args.date[6:]}"
-            out_path = os.path.join(out_dir, f"{date_iso}.json")
-            write_json(out_path, day)
-            write_latest_and_index(out_dir, day, keep_days=14)
-
-            league_days.append(day)
-            print(f"Wrote {out_path} and updated latest.json/index.json")
+            day = build_league_day(
+                league_key=league_key,
+                yyyymmdd=args.date,
+                mode=args.mode,
+                thporth_prompt=thporth_prompt,
+                extractor_prompt=extractor_prompt,
+                briefing_prompt=briefing_prompt,
+                extractor_model=args.extractor_model,
+                writer_model=args.writer_model,
+            )
+            all_days.append(day)
 
         write_manifest()
-        write_briefings_latest(league_days)
-        print("Wrote recaps/manifest.json and briefings/latest.json")
+        write_briefings_latest(all_days)
         return
 
-    # single league
-    day = build_league_day(args.league, args.date, args.mode, prompt_rules)
-    out_dir = LEAGUES[args.league]["out_dir"]
-    ensure_dir(out_dir)
-
-    date_iso = f"{args.date[:4]}-{args.date[4:6]}-{args.date[6:]}"
-    out_path = os.path.join(out_dir, f"{date_iso}.json")
-    write_json(out_path, day)
-    write_latest_and_index(out_dir, day, keep_days=14)
-
+    day = build_league_day(
+        league_key=args.league,
+        yyyymmdd=args.date,
+        mode=args.mode,
+        thporth_prompt=thporth_prompt,
+        extractor_prompt=extractor_prompt,
+        briefing_prompt=briefing_prompt,
+        extractor_model=args.extractor_model,
+        writer_model=args.writer_model,
+    )
     write_manifest()
     write_briefings_latest([day])
-
-    print(f"Wrote {out_path} and updated latest.json/index.json + manifest + briefings")
 
 if __name__ == "__main__":
     main()
