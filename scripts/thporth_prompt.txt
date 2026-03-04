@@ -4,54 +4,42 @@ Summarize the following sports article in a THPORTH-style "watercooler recap."
 
 Rules:
 
-Start with a rewritten headline that summarizes the main story of the article.
+1. Start with a rewritten headline that summarizes the main story of the article.
 
-Do not copy or closely paraphrase the original headline.
+   * Do not copy or closely paraphrase the original headline.
+   * Write a fresh headline capturing the core storyline.
+   * Write in sentence case, not title case.
+   * Make the headline story-driven and journalistic, similar to ESPN or The Athletic headlines.
+   * Prefer the most surprising or interesting storyline when choosing the headline.
 
-Write a fresh headline capturing the core storyline. Use sentence case, not title case.
-
-Make the headline story-driven and journalistic, similar to ESPN or The Athletic headlines.
-
-Prefer the most surprising or interesting storyline when choosing the headline.
-
-If the event includes two teams and a final score (NHL, NBA, MLB, NFL, soccer, etc.), place the score directly under the headline as a sub-header in the format:
+2. If the event includes two teams and a final score (NHL, NBA, MLB, NFL, soccer, etc.), place the score directly under the headline as a sub-header in the format:
 
 TEAM A X — TEAM B Y
 
 If the event does not have a score (golf, motorsports, tennis tournaments, etc.), skip the score line.
 
-Write ONE short lead sentence describing the main storyline of the game/event.
+3. Write ONE short lead sentence describing the main storyline of the game/event.
 
-Provide 3–5 bullet points with the most interesting "watercooler" talking points fans would discuss the next day.
+4. Provide 3–5 bullet points with the most interesting "watercooler" talking points fans would discuss the next day.
 
-Each bullet must include the key stat(s) that prove the point (records, streaks, standings position, laps led, saves, goals, win streaks, etc.).
+5. Each bullet must include the key stat(s) that prove the point (records, streaks, standings position, laps led, saves, goals, win streaks, etc.).
 
-Choose the 3–5 most interesting storylines from the article — not necessarily the most obvious ones.
+6. Choose the 3–5 most interesting storylines from the article — not necessarily the most obvious ones.
 
-Do NOT include:
+7. Do NOT include:
+- play-by-play narration
+- timestamps of goals or laps
+- chronological recap of the game
 
-play-by-play narration
+8. Focus on storylines such as:
+- streaks
+- standings impact
+- notable performances
+- records or milestones
+- strategy (fuel, tires, coaching decisions, etc.)
+- controversy or unusual moments
+- major context affecting the season
 
-timestamps of goals or laps
+9. End with a short Context section if there is a meaningful broader storyline (playoff race, championship standings, injuries, historic significance, etc.).
 
-chronological recap of the game
-
-Focus on storylines such as:
-
-streaks
-
-standings impact
-
-notable performances
-
-records or milestones
-
-strategy (fuel, tires, coaching decisions, etc.)
-
-controversy or unusual moments
-
-major context affecting the season
-
-End with a short Context section if there is a meaningful broader storyline (playoff race, championship standings, injuries, historic significance, etc.).
-
-Keep the entire summary tight, punchy, and highly scannable, like a morning sports briefing for fans.
+10. Keep the entire summary tight, punchy, and highly scannable, like a morning sports briefing for fans.
