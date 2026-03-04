@@ -1,4 +1,4 @@
-name: THPORTH NBA Recaps + Official Highlights (2-stage)
+name: THPORTH NBA Recaps + Official Highlights (facts-first)
 
 on:
   workflow_dispatch:
@@ -46,7 +46,6 @@ jobs:
           MODE="${{ github.event.inputs.mode }}"
           if [ "$MODE" = "" ]; then MODE="openai"; fi
           OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" \
-          OPENAI_EXTRACTOR_MODEL="gpt-5-mini" \
           OPENAI_WRITER_MODEL="gpt-5-mini" \
           YOUTUBE_API_KEY="${{ secrets.YOUTUBE_API_KEY }}" \
           python scripts/build_recaps.py --league nba --date "${{ steps.d.outputs.date }}" --mode "$MODE"
@@ -56,5 +55,5 @@ jobs:
           git config user.name "thporth-bot"
           git config user.email "actions@users.noreply.github.com"
           git add recaps briefings .cache || true
-          git commit -m "NBA recaps + highlights" || echo "No changes"
+          git commit -m "NBA recaps + highlights (facts-first)" || echo "No changes"
           git push
