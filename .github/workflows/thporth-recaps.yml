@@ -1,19 +1,18 @@
-name: THPORTH Recaps + Official Highlights
+name: THPORTH Recaps + Official Highlights (2-stage)
 
 on:
   workflow_dispatch:
     inputs:
       date:
-        description: "YYYYMMDD (leave blank to use yesterday in UTC)"
+        description: "YYYYMMDD (leave blank to use yesterday UTC)"
         required: false
         default: ""
       mode:
-        description: "inputs or openai"
+        description: "openai or inputs"
         required: true
         default: "openai"
   schedule:
-    # daily 06:10 UTC (adjust whenever)
-    - cron: "10 6 * * *"
+    - cron: "10 6 * * *"  # daily 06:10 UTC
 
 permissions:
   contents: write
@@ -33,7 +32,7 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+          pip install -r requirements.txt
 
       - name: Compute date (YYYYMMDD)
         id: d
@@ -41,12 +40,6 @@ jobs:
           if [ "${{ github.event.inputs.date }}" != "" ]; then
             echo "date=${{ github.event.inputs.date }}" >> $GITHUB_OUTPUT
           else
-            # default: yesterday UTC
-            python - << 'PY'
-from datetime import datetime, timedelta, timezone
-d = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y%m%d")
-print(f"date={d}")
-PY
             python - << 'PY' > /tmp/date.txt
 from datetime import datetime, timedelta, timezone
 print((datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y%m%d"))
@@ -57,17 +50,19 @@ PY
       - name: Build all leagues
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: gpt-4o-mini
+          # Choose models here if you want:
+          OPENAI_EXTRACTOR_MODEL: gpt-5-mini
+          OPENAI_WRITER_MODEL: gpt-5-mini
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: |
           MODE="${{ github.event.inputs.mode }}"
           if [ "$MODE" = "" ]; then MODE="openai"; fi
-          python scripts/build_recaps.py --league all --date "${{ steps.d.outputs.date }}" --mode "$MODE" --prompt scripts/thporth_prompt.txt
+          python scripts/build_recaps.py --league all --date "${{ steps.d.outputs.date }}" --mode "$MODE"
 
       - name: Commit and push
         run: |
           git config user.name "thporth-bot"
           git config user.email "actions@users.noreply.github.com"
           git add recaps briefings .cache || true
-          git commit -m "Update recaps/briefings" || echo "No changes"
+          git commit -m "Daily recaps + highlights" || echo "No changes"
           git push
