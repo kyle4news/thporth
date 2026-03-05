@@ -216,12 +216,11 @@
       if (!card) return;
 
       const highlightClasses = [
-        "border-2",
-        "border-amber-400",
-        "bg-amber-50/50",
-        "ring-2",
-        "ring-amber-200",
-        "shadow-md",
+        "border-amber-300/60",
+        "bg-amber-50/20",
+        "ring-1",
+        "ring-amber-200/50",
+        "shadow-sm",
       ];
 
       if (isFeatured) {
@@ -230,18 +229,8 @@
         card.classList.remove(...highlightClasses);
       }
 
-      let badge = card.querySelector("[data-top10-badge='1']");
-      if (isFeatured) {
-        if (!badge) {
-          badge = document.createElement("div");
-          badge.dataset.top10Badge = "1";
-          badge.className = "mb-3 inline-flex items-center rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white";
-          badge.textContent = "Featured In Top 10";
-          card.insertBefore(badge, card.firstChild);
-        }
-      } else if (badge) {
-        badge.remove();
-      }
+      const badge = card.querySelector("[data-top10-badge='1']");
+      if (badge) badge.remove();
     }
 
     function syncLeagueSectionTop10Styles() {
