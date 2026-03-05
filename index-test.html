@@ -249,16 +249,29 @@
     }
 
     async function loadManualPicksFromFile() {
+      console.log(`[loadManualPicksFromFile] Attempting to fetch: ${MANUAL_TOP10_FILE_URL}`);
       try {
         const res = await fetch(`${MANUAL_TOP10_FILE_URL}?t=${Date.now()}`, { cache: "no-store" });
-        if (!res.ok) return false;
+        console.log(`[loadManualPicksFromFile] Fetch response status: ${res.status}`);
+        if (!res.ok) {
+          console.warn(`[loadManualPicksFromFile] File not found or fetch failed (${res.status})`);
+          return false;
+        }
         const data = await res.json();
-        const date = String(data?.date || "");
-        if (date !== getTodayDateKey()) return false;
+        const fileDate = String(data?.date || "");
+        const today = getTodayDateKey();
+        console.log(`[loadManualPicksFromFile] File date: ${fileDate}, Today: ${today}`);
+        if (fileDate !== today) {
+          console.warn(`[loadManualPicksFromFile] Date mismatch! File is for ${fileDate}, but today is ${today}`);
+          return false;
+        }
+        const picksCount = Array.isArray(data?.picks) ? data.picks.length : 0;
+        console.log(`[loadManualPicksFromFile] ✓ Successfully loaded ${picksCount} manual picks from file`);
         applyManualPicks(data?.picks || []);
         state.lastManualSavedAt = String(data?.updatedAt || "");
         return true;
       } catch (e) {
+        console.error(`[loadManualPicksFromFile] Error loading file:`, e);
         return false;
       }
     }
@@ -373,11 +386,18 @@
       const used = new Set();
       const out = [];
 
+      const manualCount = state.manualPicksByRank.size;
+      console.log(`[composeFinalTop10] Building Top 10 with ${manualCount} manual picks`);
+
       for (let rank = 1; rank <= 10; rank += 1) {
         const key = state.manualPicksByRank.get(rank);
         if (!key) continue;
         const game = byKey.get(key);
-        if (!game) continue;
+        if (!game) {
+          console.warn(`[composeFinalTop10] Manual pick rank ${rank} references missing game: ${key}`);
+          continue;
+        }
+        console.log(`[composeFinalTop10] Rank ${rank}: ${game.text} (${game.leagueKey})`);
         out.push({ ...game, rank });
         used.add(key);
       }
@@ -390,6 +410,7 @@
         used.add(key);
       });
 
+      console.log(`[composeFinalTop10] Final Top 10 has ${out.length} items (${manualCount} manual, ${out.length - manualCount} auto-fill)`);
       return out.slice(0, 10).map((item, idx) => ({ ...item, rank: idx + 1 }));
     }
 
