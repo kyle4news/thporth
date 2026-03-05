@@ -1,6 +1,6 @@
 {
   "date": "2026-03-05",
-  "generatedAt": "2026-03-05T00:43:32.454Z",
+  "generatedAt": "2026-03-05T00:49:49.066Z",
   "leagues": [
     {
       "leagueName": "NBA",
@@ -175,6 +175,260 @@
           "source": {
             "gamecastUrl": null,
             "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810747/suns-kings"
+          }
+        }
+      ]
+    },
+    {
+      "leagueName": "NHL",
+      "sourceType": "recap_links",
+      "leagueBriefing": "Tuesday had a little of everything around the NHL: a franchise record in Minnesota, Dallas stretching its heater to 10, Edmonton surviving a wild one in overtime, and Florida’s playoff outlook getting uglier after another lopsided loss — while a couple games turned into full-on track meets.",
+      "games": [
+        {
+          "headline": "Bruins’ early burst holds up as Boston keeps rolling at home",
+          "scoreLine": "BOS 2 — PIT 1",
+          "lead": "Boston scored twice in a blink and spent the rest of the night making it miserable on Pittsburgh, leaning on Jeremy Swayman and a house that keeps turning into a problem for visitors.",
+          "bullets": [
+            "Marat Khusnutdinov and Casey Mittelstadt scored 50 seconds apart in the first period, and those two quick strikes were the entire difference in a 2-1 game.",
+            "Jeremy Swayman was the story after that early flurry, stopping 34 shots to help Boston hang on through long Penguins pressure stretches.",
+            "Boston has now won 11 straight home games, a streak keeping them firmly in the wild-card hunt despite having lost three of four entering the night.",
+            "Pittsburgh got an instant jolt with Erik Karlsson scoring 42 seconds in, but the Bruins answered immediately and didn’t give much back after."
+          ],
+          "context": "Charlie McAvoy’s nine-game point streak ended; he’d recently become only the second Bruins defenseman in 40 years (joining Ray Bourque) to run a nine-game point streak.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803310/penguins-bruins"
+          }
+        },
+        {
+          "headline": "Sabres keep surging as Thompson’s gold-medal night turns into another win",
+          "scoreLine": "BUF 3 — VGK 2",
+          "lead": "Buffalo turned a celebratory night into another statement win, with Tage Thompson scoring after being honored and the Sabres continuing one of the league’s best runs.",
+          "bullets": [
+            "Buffalo won its fourth straight and improved to 25-5-2 over its last 32 games — a heater that’s pushed the Sabres into one of the NHL’s hottest teams.",
+            "Tage Thompson scored his team-leading 33rd goal after a pregame Olympic gold ceremony, and Buffalo built a 3-0 lead before things got tense.",
+            "Alex Lyon stayed locked in with 29 saves, improving to 13-2 in his last 15 starts — a huge stabilizer during Buffalo’s surge.",
+            "Vegas’ slide deepened: three straight regulation losses, 4-8-2 in its last 14, and they played without captain Mark Stone (day to day)."
+          ],
+          "context": "Buffalo’s 35 wins through 61 games are its most at that point of a season since 2006-07.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803311/golden-knights-sabres"
+          }
+        },
+        {
+          "headline": "Devils hammer Panthers as Florida’s playoff math gets uglier",
+          "scoreLine": "NJ 5 — FLA 1",
+          "lead": "New Jersey handled the two-time defending champs with ease, and Florida’s path to the postseason is starting to look like a long shot.",
+          "bullets": [
+            "Jack Hughes extended his post-Olympics points streak to four games and now has 4 assists since returning — one in each game — as the Devils rolled.",
+            "Dougie Hamilton (a name tied to trade buzz) had a goal and an assist, while New Jersey got depth pop with Cody Glass scoring his 14th of the season.",
+            "Florida has lost three of four since the Olympics ended — all in regulation — and is now 10 points back of the East’s second wild card with 21 games left.",
+            "Sergei Bobrovsky faced 31 shots and allowed 5 goals, a rough night in a stretch where Florida badly needs points."
+          ],
+          "context": "Aleksander Barkov (ACL/MCL) isn’t expected back until at least late March, and Florida is staring at the possibility of becoming the first reigning Cup winner to miss the playoffs since the 2014-15 Kings.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803312/panthers-devils"
+          }
+        },
+        {
+          "headline": "Utah hangs on in Washington after a truly weird go-ahead bounce",
+          "scoreLine": "UTA 3 — WSH 2",
+          "lead": "Utah grabbed two early goals, got a bizarre insurance marker, and did just enough late as two bubble-adjacent teams fought for oxygen in the standings.",
+          "bullets": [
+            "JJ Peterka’s go-ahead goal was the kind of thing you’ll see on every highlight show: a bounce off the post and goalie Logan Thompson, then Thompson’s glove knocked it in — Peterka’s 21st made it 3-1.",
+            "Utah came in tied with Edmonton for the top wild card in the West, and this win was the type of two-point swing you bank when you’re living on the cutoff line.",
+            "Washington’s power play actually produced both goals — from Pierre-Luc Dubois and Ryan Leonard — but the Caps couldn’t find an equalizer after getting within one.",
+            "The Capitals dropped again and now sit four points behind Boston for the East’s second wild card, with the Bruins also holding three games in hand."
+          ],
+          "context": "Washington is still sniffing around a trade-deadline addition up front, and back-to-back losses (Montreal, Utah) may force a hard look at how aggressive they get.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803313/mammoth-capitals"
+          }
+        },
+        {
+          "headline": "Blue Jackets steal it late with short-handed jolt and third-period winner",
+          "scoreLine": "CBJ 3 — NSH 2",
+          "lead": "Columbus turned a tired back-to-back into a win by getting a short-handed equalizer and a traffic-point shot that decided it in the third.",
+          "bullets": [
+            "Damon Severson broke a 2-2 tie at 6:07 of the third with a snap shot from the point through traffic — the clean ‘find-a-lane’ winner.",
+            "Sean Monahan tied it short-handed at 1:52 of the third and now has short-handed goals in back-to-back games (also scored one Monday at the Rangers).",
+            "Jet Greaves made 20 saves but missed 8:16 in the first due to concussion protocol after an elbow; he returned and finished the job.",
+            "Nashville’s day also included a roster shake-up: the Predators traded center Michael McCarron to Minnesota for a 2028 second-round pick."
+          ],
+          "context": null,
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803314/predators-blue-jackets"
+          }
+        },
+        {
+          "headline": "Jets steal two points late again as Scheifele wins it in overtime",
+          "scoreLine": "WPG 3 — CHI 2",
+          "lead": "Winnipeg bailed itself out with a last-minute equalizer and then finished the job in OT, continuing a stretch of games that keep going right to the wire.",
+          "bullets": [
+            "Cole Perfetti tied it with 38.6 seconds left in regulation, then Mark Scheifele ended it at 2:06 of overtime — a gut punch for Chicago.",
+            "The Jets have now gone to overtime in four straight games, and this one mattered as they opened a critical eight-game homestand with two points.",
+            "Connor Bedard had two assists, and Chicago has a power-play goal in four straight games — special teams continuing to drive their offense.",
+            "Winnipeg improved to 4-10 in overtime games this season (yes, they’re finally starting to bank some of these), and won its seventh straight home game vs. Chicago."
+          ],
+          "context": null,
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803315/blackhawks-jets"
+          }
+        },
+        {
+          "headline": "Stars turn win streak into a franchise record as Calgary gets steamrolled",
+          "scoreLine": "DAL 6 — CGY 1",
+          "lead": "Dallas is officially in ‘everything is working’ mode right now, and Calgary was the latest team to get buried under the wave.",
+          "bullets": [
+            "The Stars extended their franchise-record winning streak to 10 games with a 6-1 blowout, improving to 38-14-9.",
+            "Sam Steel had two goals and an assist, while Matt Duchene piled up 4 assists — and now has 17 points (8 goals, 9 assists) during the streak.",
+            "Duchene and Steel each tied career highs for points in a game, and Steel matched his career-high 10th goal of a season.",
+            "Calgary pulled starter Dustin Wolf after he allowed 4 goals on 17 shots, a sign of how quickly this one got away."
+          ],
+          "context": null,
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803316/stars-flames"
+          }
+        },
+        {
+          "headline": "Oilers survive chaos in overtime as Draisaitl puts on a five-point show",
+          "scoreLine": "EDM 5 — OTT 4",
+          "lead": "Edmonton finally gave its home crowd a thriller, rallying late and cashing the overtime power play after a wild sequence involving McDavid and Tkachuk.",
+          "bullets": [
+            "Leon Draisaitl went nuclear with 2 goals and 3 assists (5 points), and Edmonton needed every bit of it to claw back.",
+            "Zach Hyman tied it with 1:25 left in the third for his 25th goal, scoring with the goalie pulled to force overtime.",
+            "Evan Bouchard ended it 1:50 into OT on the power play — his 18th — after Brady Tkachuk took a penalty for tackling Connor McDavid in overtime.",
+            "Ottawa still looks dangerous: Drake Batherson scored twice (second straight game with two), and the Senators are 6-1-2 in their last nine."
+          ],
+          "context": "This was Edmonton’s first home game in a month, and they’d lost five of their previous six before snapping that funk in dramatic fashion.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803317/senators-oilers"
+          }
+        },
+        {
+          "headline": "Kaprizov breaks Wild goals record as Minnesota thumps slumping Lightning",
+          "scoreLine": "MIN 5 — TB 1",
+          "lead": "Minnesota got a record moment and a statement win, while Tampa Bay’s post-heater wobble keeps getting louder.",
+          "bullets": [
+            "Kirill Kaprizov set the Wild franchise record with his 220th career goal, passing Marian Gaborik — and he did it with a center-ice empty-netter for his 35th of the season.",
+            "Matt Boldy posted a season-high 3 assists and extended his point streak to a career-high-tying 10 games, while Filip Gustavsson made 26 saves and is 5-1-0 in his last six starts.",
+            "Minnesota has owned this matchup at home for years: the Wild are now 16-3-0 at home against the Lightning.",
+            "Tampa Bay lost its third straight after going 20-1-1, a sudden turn after an almost unstoppable stretch."
+          ],
+          "context": "Minnesota has scored on the power play in eight straight games, including a 4-on-3 goal from Mats Zuccarello early in the second.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803318/lightning-wild"
+          }
+        },
+        {
+          "headline": "Avalanche end Ducks’ streak as MacKinnon hits 100 points again",
+          "scoreLine": "COL 5 — ANA 1",
+          "lead": "Colorado flexed on a rising Anaheim team, snapping the Ducks’ win streak and adding another milestone to Nathan MacKinnon’s ridiculous season résumé.",
+          "bullets": [
+            "Nathan MacKinnon secured his fourth straight 100-point season with an assist — his 59th — to go with an NHL-leading 41 goals.",
+            "Cale Makar was everywhere with a goal and 2 assists, while Parker Kelly scored twice in a 5-1 win that ended Anaheim’s five-game streak.",
+            "Anaheim’s eight-game home winning streak since Jan. 2 is over, and they missed a chance to grab a point that would’ve moved them into first in the Pacific; Vegas stays one point ahead.",
+            "Colorado’s power play is still a weird subplot: they scored twice with the man advantage, but the recap notes they’ve inexplicably had the NHL’s worst PP unit despite their overall dominance."
+          ],
+          "context": "Gabriel Landeskog scored in his second straight game as Colorado continued rolling (3 straight wins; 4 of 5 since the Olympic break).",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803319/avalanche-ducks"
+          }
+        },
+        {
+          "headline": "Sharks outgun Canadiens 7-5 in a wild one as Celebrini racks up four points",
+          "scoreLine": "SJ 7 — MTL 5",
+          "lead": "San Jose and Montreal played a full-on track meet, and Macklin Celebrini was at the center of basically everything as the Sharks survived a late Canadiens push.",
+          "bullets": [
+            "Macklin Celebrini posted 1 goal and 3 assists, including his 30th goal of the season, as the Sharks poured in 7 goals and won their third straight.",
+            "The game swung hard in the middle: San Jose scored three times in 8:20 in the second to go up 5-2, then Montreal stormed back with three third-period goals to tie it 5-5.",
+            "Kiefer Sherwood scored the power-play go-ahead goal with 3:26 left, the late dagger after the Canadiens had erased the deficit.",
+            "Montreal finally lost in regulation for the first time since Jan. 24, despite Alex Newhook scoring two power-play goals and Mike Matheson adding three assists."
+          ],
+          "context": null,
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803320/canadiens-sharks"
+          }
+        },
+        {
+          "headline": "Missing article text for this recap link",
+          "scoreLine": null,
+          "lead": "The recap URL was provided, but no article text came through in the JSON input, so a full THPORTH recap can’t be generated yet.",
+          "bullets": [],
+          "context": null,
+          "recapStatus": "fetch_failed",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803321"
+          }
+        },
+        {
+          "headline": "Missing article text for this recap link",
+          "scoreLine": null,
+          "lead": "The recap URL was provided, but no article text came through in the JSON input, so a full THPORTH recap can’t be generated yet.",
+          "bullets": [],
+          "context": null,
+          "recapStatus": "fetch_failed",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803322"
+          }
+        },
+        {
+          "headline": "Missing article text for this recap link",
+          "scoreLine": null,
+          "lead": "The recap URL was provided, but no article text came through in the JSON input, so a full THPORTH recap can’t be generated yet.",
+          "bullets": [],
+          "context": null,
+          "recapStatus": "fetch_failed",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803323/hurricanes-canucks"
+          }
+        },
+        {
+          "headline": "Missing article text for this recap link",
+          "scoreLine": null,
+          "lead": "The recap URL was provided, but no article text came through in the JSON input, so a full THPORTH recap can’t be generated yet.",
+          "bullets": [],
+          "context": null,
+          "recapStatus": "fetch_failed",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803324/islanders-ducks"
+          }
+        },
+        {
+          "headline": "Missing article text for this recap link",
+          "scoreLine": null,
+          "lead": "The recap URL was provided, but no article text came through in the JSON input, so a full THPORTH recap can’t be generated yet.",
+          "bullets": [],
+          "context": null,
+          "recapStatus": "fetch_failed",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803325/blues-kraken"
           }
         }
       ]
