@@ -146,6 +146,7 @@
     const ALL_LEAGUE = { leagueName: "ALL", leagueKey: "all", fileUrl: "generated://top10" };
     const MANUAL_TOP10_STORAGE_KEY = "thporth.manual-top10.v1";
     const MANUAL_TOP10_FILE_URL = "/recaps-manual/daily/manual-top10.json";
+    const MASCOT_SCORE_LEAGUES = new Set(["nba", "nfl", "mlb", "nhl"]);
 
     // ===== State =====
     const state = {
@@ -258,6 +259,18 @@
       return picks;
     }
 
+    function collectManualPicksForExport() {
+      return collectManualPicksArray().map((pick) => {
+        const key = makeGameKey(pick.leagueKey, pick.gameId);
+        const game = state.allGamesByKey.get(key);
+        return {
+          ...pick,
+          headline: String(game?.text || ""),
+          scoreLine: String(game?.scoreLine || ""),
+        };
+      });
+    }
+
     function applyManualPicks(picks) {
       state.manualPicksByRank.clear();
       state.manualRankByGame.clear();
@@ -316,7 +329,7 @@
     }
 
     function downloadManualPicksAsJSON() {
-      const picks = collectManualPicksArray();
+      const picks = collectManualPicksForExport();
       console.log("Downloading manual picks:", picks);
       
       if (picks.length === 0) {
@@ -328,6 +341,7 @@
         date: getTodayDateKey(),
         mode: "manual",
         picks: picks,
+        top10: picks.map((p) => String(p.headline || "")).filter(Boolean),
         updatedAt: new Date().toISOString(),
       };
       
@@ -343,7 +357,7 @@
       setTimeout(() => URL.revokeObjectURL(url), 100);
       
       console.log("Download triggered for manual-top10.json");
-      alert(`Downloaded manual-top10.json with ${picks.length} picks. Check your Downloads folder, then upload this file to /recaps-manual/daily/ in your repo.`);
+      alert(`Downloaded manual-top10.json with ${picks.length} picks and headlines. Check your Downloads folder, then upload this file to /recaps-manual/daily/ in your repo.`);
       return true;
     }
 
@@ -615,6 +629,44 @@
       return `game-${lk}-${gid}`;
     }
 
+    function getTeamNameValue(team) {
+      if (typeof team === "string") return team;
+      if (team && typeof team === "object") {
+        return String(team.displayName || team.name || team.teamName || "");
+      }
+      return "";
+    }
+
+    function extractMascotName(team) {
+      const name = getTeamNameValue(team).trim();
+      if (!name) return "";
+      const parts = name.split(/\s+/).filter(Boolean);
+      if (!parts.length) return "";
+      if (parts.length === 1) return parts[0];
+
+      const secondLast = parts[parts.length - 2];
+      const last = parts[parts.length - 1];
+      const twoWordPrefixes = new Set(["Red", "White", "Blue", "Maple", "Golden", "Trail"]);
+      if (twoWordPrefixes.has(secondLast)) {
+        return `${secondLast} ${last}`;
+      }
+      return last;
+    }
+
+    function formatScoreLineWithMascots(game, leagueKey) {
+      const lk = String(leagueKey || "").toLowerCase();
+      const raw = String(game?.scoreLine || game?.score || "").trim();
+      if (!MASCOT_SCORE_LEAGUES.has(lk) || !raw) return raw;
+
+      const awayMascot = extractMascotName(game?.teams?.away);
+      const homeMascot = extractMascotName(game?.teams?.home);
+      if (!awayMascot || !homeMascot) return raw;
+
+      const m = raw.match(/^(.+?)\s+(\d+)\s*[—-]\s*(.+?)\s+(\d+)$/);
+      if (!m) return raw;
+      return `${awayMascot} ${m[2]} — ${homeMascot} ${m[4]}`;
+    }
+
     function scoreGame(game, leagueKey, leagueBriefing) {
       const headline = normalizeText(game?.headline);
       const brief = normalizeText(game?.brief || game?.lead);
@@ -751,10 +803,12 @@
         const source = state.allGamesByKey.get(gameKey) || item;
         return {
           id: `top-${item.rank}-${item.leagueKey}-${item.gameId}`,
+          sourceLeagueKey: String(source.leagueKey || item.leagueKey || ""),
           headline: String(source.text || item.text || ""),
           scoreLine: String(source.scoreLine || ""),
           lead: String(source.lead || ""),
           brief: String(source.brief || ""),
+          teams: source.teams || null,
           bullets: Array.isArray(source.bullets) ? source.bullets : [],
           context: String(source.context || ""),
           highlights: Array.isArray(source.highlights) ? source.highlights : [],
@@ -806,6 +860,7 @@
               gameId,
               text: String(game?.headline || `Game ${i + 1}`),
               scoreLine: String(game?.scoreLine || game?.score || ""),
+              teams: game?.teams || null,
               scoreValue: scoreGame(game, leagueKey, league.leagueBriefing),
               lead: String(game?.lead || ""),
               brief: String(game?.brief || game?.lead || ""),
@@ -973,7 +1028,10 @@
       headline.textContent = g.headline ? String(g.headline) : "Recap";
       card.appendChild(headline);
 
-      const scoreLine = g.scoreLine || g.score;
+      const scoreLeagueKey = leagueKey === "all"
+        ? String(g.sourceLeagueKey || "")
+        : String(leagueKey || "");
+      const scoreLine = formatScoreLineWithMascots(g, scoreLeagueKey);
       if (scoreLine) {
         const score = document.createElement("div");
         score.className = "mt-1 text-sm font-semibold text-gray-700";
