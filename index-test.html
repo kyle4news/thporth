@@ -708,19 +708,17 @@
 
     function buildAllLeagueData() {
       const games = state.top10Items.map((item) => {
-        const sourceTag = `${item.leagueName}${item.scoreLine ? ` • ${item.scoreLine}` : ""}`;
-        const bullets = [`Rank score: ${Math.round(item.scoreValue)} pts`, `Source league: ${item.leagueName}`];
-        if (Array.isArray(item.bullets) && item.bullets.length) {
-          bullets.push(...item.bullets.slice(0, 2).map((b) => String(b)));
-        }
+        const gameKey = makeGameKey(item.leagueKey, item.gameId);
+        const source = state.allGamesByKey.get(gameKey) || item;
         return {
           id: `top-${item.rank}-${item.leagueKey}-${item.gameId}`,
-          headline: `${item.rank}. ${item.text}`,
-          scoreLine: sourceTag,
-          brief: item.brief || "",
-          bullets,
-          context: item.context || "",
-          highlights: Array.isArray(item.highlights) ? item.highlights : [],
+          headline: String(source.text || item.text || ""),
+          scoreLine: String(source.scoreLine || ""),
+          lead: String(source.lead || ""),
+          brief: String(source.brief || ""),
+          bullets: Array.isArray(source.bullets) ? source.bullets : [],
+          context: String(source.context || ""),
+          highlights: Array.isArray(source.highlights) ? source.highlights : [],
         };
       });
 
@@ -770,8 +768,9 @@
               text: String(game?.headline || `Game ${i + 1}`),
               scoreLine: String(game?.scoreLine || game?.score || ""),
               scoreValue: scoreGame(game, leagueKey, league.leagueBriefing),
+              lead: String(game?.lead || ""),
               brief: String(game?.brief || game?.lead || ""),
-              bullets: Array.isArray(game?.bullets) ? game.bullets.slice(0, 4) : [],
+              bullets: Array.isArray(game?.bullets) ? game.bullets : [],
               context: String(game?.context || ""),
               highlights: Array.isArray(game?.highlights) ? game.highlights : [],
             });
