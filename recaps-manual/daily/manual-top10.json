@@ -5,53 +5,85 @@
     {
       "rank": 1,
       "leagueKey": "nba",
-      "gameId": "401810748"
+      "gameId": "401810748",
+      "headline": "Chet Holmgren's career night carried Oklahoma City past New York.",
+      "scoreLine": "OKC 103 - NYK 100"
     },
     {
       "rank": 2,
       "leagueKey": "nhl",
-      "gameId": "401803321"
+      "gameId": "401803321",
+      "headline": "Vegas erased a two-goal deficit and beat Detroit in overtime.",
+      "scoreLine": "VGK 4 - DET 3"
     },
     {
       "rank": 3,
       "leagueKey": "nba",
-      "gameId": "401810749"
+      "gameId": "401810749",
+      "headline": "Charlotte routed Boston to extend its winning streak to six games.",
+      "scoreLine": "CHA 118 - BOS 89"
     },
     {
       "rank": 4,
       "leagueKey": "premierleague",
-      "gameId": "740883"
+      "gameId": "740883",
+      "headline": "Ten-man Newcastle beat Manchester United late, ending Michael Carrick's unbeaten start.",
+      "scoreLine": "NEW 2 - MUN 1"
     },
     {
       "rank": 5,
       "leagueKey": "nhl",
-      "gameId": "401803324"
+      "gameId": "401803324",
+      "headline": "Ville Husso made 42 saves as Anaheim routed the Islanders.",
+      "scoreLine": "ANA 5 - NYI 1"
     },
     {
       "rank": 6,
       "leagueKey": "nba",
-      "gameId": "401810752"
+      "gameId": "401810752",
+      "headline": "Atlanta rallied from a big deficit and handed Milwaukee another lopsided loss.",
+      "scoreLine": "ATL 131 - MIL 113"
     },
     {
       "rank": 7,
       "leagueKey": "nhl",
-      "gameId": "401803322"
+      "gameId": "401803322",
+      "headline": "New Jersey rallied late and beat Toronto in a shootout, extending the Leafs' skid.",
+      "scoreLine": "NJD 4 - TOR 3"
     },
     {
       "rank": 8,
       "leagueKey": "premierleague",
-      "gameId": "740878"
+      "gameId": "740878",
+      "headline": "Arsenal ground out a win at Brighton to widen its lead in the title race.",
+      "scoreLine": "ARS 1 - BHA 0"
     },
     {
       "rank": 9,
       "leagueKey": "premierleague",
-      "gameId": "740882"
+      "gameId": "740882",
+      "headline": "Nottingham Forest held Manchester City to a draw, costing City more title-chase points.",
+      "scoreLine": "MCI 2 - NFO 2"
     },
     {
       "rank": 10,
       "leagueKey": "premierleague",
-      "gameId": "740876"
+      "gameId": "740876",
+      "headline": "Joao Pedro scored a hat trick as Chelsea beat Aston Villa to strengthen its top-five push.",
+      "scoreLine": "CHE 4 - AVL 1"
     }
   ],
-  "updatedAt": "2026-03-05T19:00:14.600Z"
+  "top10": [
+    "Chet Holmgren's career night carried Oklahoma City past New York.",
+    "Vegas erased a two-goal deficit and beat Detroit in overtime.",
+    "Charlotte routed Boston to extend its winning streak to six games.",
+    "Ten-man Newcastle beat Manchester United late, ending Michael Carrick's unbeaten start.",
+    "Ville Husso made 42 saves as Anaheim routed the Islanders.",
+    "Atlanta rallied from a big deficit and handed Milwaukee another lopsided loss.",
+    "New Jersey rallied late and beat Toronto in a shootout, extending the Leafs' skid.",
+    "Arsenal ground out a win at Brighton to widen its lead in the title race.",
+    "Nottingham Forest held Manchester City to a draw, costing City more title-chase points.",
+    "Joao Pedro scored a hat trick as Chelsea beat Aston Villa to strengthen its top-five push."
+  ],
+  "updatedAt": "2026-03-05T21:28:10.246Z"
 }
