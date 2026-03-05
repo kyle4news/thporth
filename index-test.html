@@ -741,7 +741,7 @@
             const data = await loadLeagueData(lg);
             return {
               ...data,
-              leagueKey: data.leagueKey || lg.leagueKey,
+              leagueKey: lg.leagueKey,
               leagueName: data.leagueName || lg.leagueName,
             };
           })
