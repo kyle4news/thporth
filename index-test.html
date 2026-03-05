@@ -2,343 +2,515 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>THPORTH — index-test</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>THPORTH — index-test (manual daily recaps)</title>
 
-  <link rel="icon" type="image/png" href="https://thporth.com/thporth-red-logo.png" />
+  <!-- Tailwind CDN (fine for now; we can replace later with your real CSS) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-  <style>
-    :root{
-      --bg: rgba(0,0,0,.62);
-      --panel: rgba(12,12,12,.72);
-      --border: rgba(255,255,255,.10);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.68);
-      --accent: rgba(255,70,70,.95);
-      --ok: rgba(120,255,160,.95);
-      --warn: rgba(255,210,90,.95);
-      --radius: 14px;
-    }
-
-    html, body { margin:0; padding:0; min-height:100%; color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
-
-    body{
-      background-image: url('THPORTH.webp');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      min-height: 100vh;
-      min-height: 100dvh;
-    }
-
-    .page{ width:min(1280px, calc(100vw - 32px)); margin:16px auto 36px auto; }
-    .topbar{
-      display:flex; gap:12px; align-items:center; justify-content:space-between;
-      padding:12px 14px; border:1px solid var(--border); border-radius:var(--radius);
-      background:var(--bg); backdrop-filter: blur(10px);
-    }
-    .brand{ display:flex; gap:10px; align-items:center; }
-    .logo{ width:34px; height:34px; border-radius:8px; object-fit:cover; border:1px solid var(--border); background:rgba(255,255,255,.06); }
-    .brand-title{ font-weight:900; letter-spacing:.5px; font-size:18px; line-height:1.1; }
-    .brand-sub{ color:var(--muted); font-size:12px; margin-top:2px; }
-
-    .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
-    .pill{ display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border:1px solid var(--border); border-radius:999px;
-      background:rgba(0,0,0,.35); color:var(--muted); font-size:12px; user-select:none; }
-    .btn{ cursor:pointer; border:1px solid var(--border); border-radius:999px; padding:8px 12px;
-      background:rgba(255,255,255,.06); color:var(--text); font-weight:700; font-size:12px; }
-    .btn:hover{ background:rgba(255,255,255,.10); }
-    .btn-accent{ background: rgba(255,70,70,.14); border-color: rgba(255,70,70,.30); }
-
-    .grid{ display:grid; grid-template-columns: 1fr; gap:14px; margin-top:14px; }
-    @media (min-width: 980px){ .grid{ grid-template-columns: 1.05fr .95fr; } }
-
-    .panel{
-      border:1px solid var(--border); border-radius:var(--radius);
-      background:var(--panel); backdrop-filter: blur(12px); padding:14px;
-    }
-    .panel h2{ margin:0 0 10px 0; font-size:16px; font-weight:900; letter-spacing:.2px; }
-    .muted{ color:var(--muted); }
-
-    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 0 0; }
-    .tab{
-      cursor:pointer; border:1px solid var(--border); border-radius:999px; padding:7px 11px;
-      background:rgba(0,0,0,.25); color:var(--muted); font-size:12px; font-weight:800; user-select:none;
-    }
-    .tab.active{ background:rgba(255,70,70,.16); border-color:rgba(255,70,70,.32); color:var(--text); }
-
-    .briefing{ white-space:pre-wrap; line-height:1.4; font-size:13px; margin:0; }
-
-    .game{
-      border:1px solid var(--border); border-radius:12px; padding:12px; background:rgba(0,0,0,.20); margin-top:10px;
-    }
-    .game-top{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap; }
-    .game-title{ font-weight:950; font-size:14px; margin:0; }
-    .scoreline{ font-weight:900; font-size:12px; margin-top:4px; color:rgba(255,255,255,.88); }
-
-    .badge{ display:inline-flex; gap:6px; align-items:center; padding:6px 9px; border-radius:999px; border:1px solid var(--border);
-      font-size:11px; color:var(--muted); background:rgba(255,255,255,.05); user-select:none; }
-    .badge.ok{ border-color: rgba(120,255,160,.25); }
-    .badge.warn{ border-color: rgba(255,210,90,.25); }
-
-    .recap{ margin-top:10px; white-space:pre-wrap; line-height:1.45; font-size:13px; color:rgba(255,255,255,.90); }
-    .links{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; font-size:12px; }
-    .links a{ color:rgba(255,255,255,.82); text-decoration: underline; text-decoration-color: rgba(255,255,255,.25); }
-
-    .hl-wrap{ margin-top:10px; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:rgba(0,0,0,.35); }
-    .hl-head{ display:flex; gap:10px; align-items:center; padding:10px; border-bottom:1px solid var(--border); }
-    .hl-thumb{ width:68px; height:38px; object-fit:cover; border-radius:8px; border:1px solid var(--border); background:rgba(255,255,255,.06); flex:0 0 auto; }
-    .hl-meta{ min-width:0; }
-    .hl-title{ font-size:12px; font-weight:900; margin:0; line-height:1.2; }
-    .hl-channel{ margin-top:3px; font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:520px; }
-    .hl-iframe{ width:100%; aspect-ratio:16/9; border:0; display:block; background:#000; }
-
-    .note{ margin-top:14px; padding:10px 12px; border-radius:12px; border:1px solid var(--border);
-      background:rgba(0,0,0,.28); color:var(--muted); font-size:12px; line-height:1.35; }
-    code{ color:rgba(255,255,255,.84); }
-  </style>
+  <meta name="robots" content="noindex,nofollow" />
 </head>
-
-<body>
-  <div class="page">
-    <div class="topbar">
-      <div class="brand">
-        <img class="logo" src="THPORTH logo.png" alt="THPORTH" />
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <header class="sticky top-0 z-20 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center font-black tracking-tight">T</div>
         <div>
-          <div class="brand-title">THPORTH — index-test</div>
-          <div class="brand-sub">Two-stage recaps + official highlights only</div>
+          <div class="text-lg font-extrabold leading-tight">THPORTH — index-test</div>
+          <div class="text-xs text-slate-400 leading-tight">Manual daily recaps (one JSON file)</div>
         </div>
       </div>
 
-      <div class="controls">
-        <div class="pill" id="statusPill">Loading…</div>
-        <button class="btn btn-accent" id="refreshBtn">Refresh</button>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="panel">
-        <h2>Morning briefing</h2>
-        <div class="muted" style="font-size:12px;margin-bottom:10px;">
-          From <code>/briefings/latest.json</code> (generated in GitHub Actions from facts JSON).
-        </div>
-
-        <div id="briefingTabs" class="tabs"></div>
-        <pre id="briefingText" class="briefing muted">No briefing loaded yet.</pre>
-
-        <div class="note">
-          <b>Tip:</b> Run the workflow in <code>openai</code> mode to populate recaps + briefings.
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>League recaps + highlights</h2>
-        <div class="muted" style="font-size:12px;margin-bottom:10px;">
-          Loads <code>/recaps/manifest.json</code>, then each league’s <code>latest.json</code>.
-        </div>
-
-        <div id="recapTabs" class="tabs"></div>
-        <div id="gamesContainer" class="muted">No games loaded yet.</div>
-
-        <div class="note">
-          <b>Highlights policy:</b> We attach highlights only if we find a match inside the league’s official YouTube channel.
-        </div>
+      <div class="flex items-center gap-2">
+        <button id="refreshBtn"
+          class="px-3 py-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-sm font-semibold">
+          Refresh
+        </button>
+        <span id="metaPill"
+          class="hidden sm:inline-flex px-3 py-2 rounded-xl border border-slate-800 bg-slate-900 text-xs text-slate-300">
+          Loading…
+        </span>
       </div>
     </div>
-  </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-5">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+      <!-- LEFT: league list -->
+      <aside class="lg:col-span-3">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+            <div class="text-sm font-bold">Leagues</div>
+            <div id="leagueCount" class="text-xs text-slate-400"></div>
+          </div>
+
+          <div class="p-2">
+            <input id="leagueFilter" type="text" placeholder="Filter leagues…"
+              class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950 text-sm outline-none focus:ring-2 focus:ring-slate-600"
+            />
+          </div>
+
+          <nav id="leagueNav" class="px-2 pb-2 space-y-1 max-h-[70vh] overflow-auto"></nav>
+
+          <div class="px-4 py-3 border-t border-slate-800 text-xs text-slate-400">
+            Data file: <span class="font-mono">/recaps-manual/daily/latest.json</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: league content -->
+      <section class="lg:col-span-9">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div id="leagueTitle" class="text-base font-extrabold truncate">Loading…</div>
+              <div id="leagueSource" class="text-xs text-slate-400 truncate"></div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button id="prevLeagueBtn"
+                class="px-3 py-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-sm font-semibold">
+                Prev
+              </button>
+              <button id="nextLeagueBtn"
+                class="px-3 py-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-sm font-semibold">
+                Next
+              </button>
+            </div>
+          </div>
+
+          <!-- Briefing -->
+          <div id="briefingBox" class="hidden px-4 py-4 border-b border-slate-800 bg-slate-950/40">
+            <div class="text-sm font-bold mb-2">League-wide briefing</div>
+            <div id="briefingText" class="text-sm text-slate-200 leading-relaxed whitespace-pre-line"></div>
+          </div>
+
+          <!-- Games list -->
+          <div id="gamesWrap" class="p-4 space-y-3"></div>
+
+          <!-- Empty / error -->
+          <div id="emptyState" class="hidden p-6">
+            <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-5">
+              <div class="text-sm font-bold mb-2">No recaps loaded</div>
+              <div class="text-sm text-slate-300 leading-relaxed">
+                Make sure <span class="font-mono">recaps-manual/daily/latest.json</span> exists in your repo and contains a top-level
+                <span class="font-mono">{"leagues":[...]}</span> array.
+              </div>
+            </div>
+          </div>
+
+          <div id="errorState" class="hidden p-6">
+            <div class="rounded-2xl border border-red-900 bg-red-950/40 p-5">
+              <div class="text-sm font-bold text-red-200 mb-2">Error loading recaps</div>
+              <div id="errorText" class="text-sm text-red-200/90 leading-relaxed"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 text-xs text-slate-500">
+          Tip: after you paste new JSON and push to GitHub, hard refresh if needed (Cmd+Shift+R).
+          You can deep-link to a league with <span class="font-mono">#NBA</span> or <span class="font-mono">#PGA%20Tour</span>.
+        </div>
+      </section>
+    </div>
+  </main>
 
   <script>
-    function esc(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;");
+    // ===== Config =====
+    const DAILY_JSON_URL = "/recaps-manual/daily/latest.json";
+
+    // ===== State =====
+    const state = {
+      data: null,
+      leagues: [],
+      filteredLeagues: [],
+      selectedIndex: 0
+    };
+
+    // ===== Elements =====
+    const refreshBtn = document.getElementById("refreshBtn");
+    const metaPill = document.getElementById("metaPill");
+
+    const leagueCount = document.getElementById("leagueCount");
+    const leagueFilter = document.getElementById("leagueFilter");
+    const leagueNav = document.getElementById("leagueNav");
+
+    const leagueTitle = document.getElementById("leagueTitle");
+    const leagueSource = document.getElementById("leagueSource");
+
+    const prevLeagueBtn = document.getElementById("prevLeagueBtn");
+    const nextLeagueBtn = document.getElementById("nextLeagueBtn");
+
+    const briefingBox = document.getElementById("briefingBox");
+    const briefingText = document.getElementById("briefingText");
+
+    const gamesWrap = document.getElementById("gamesWrap");
+    const emptyState = document.getElementById("emptyState");
+    const errorState = document.getElementById("errorState");
+    const errorText = document.getElementById("errorText");
+
+    // ===== Helpers =====
+    function escapeText(s) {
+      return String(s ?? "");
     }
 
-    function setStatus(text){
-      const el = document.getElementById("statusPill");
-      if (el) el.textContent = text;
+    function clear(node) {
+      while (node.firstChild) node.removeChild(node.firstChild);
     }
 
-    async function fetchJson(path){
-      const res = await fetch(path, { cache: "no-store" });
-      if (!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
-      return await res.json();
+    function setHashToLeagueName(name) {
+      if (!name) return;
+      location.hash = encodeURIComponent(name);
     }
 
-    function renderTabs(containerId, items, activeKey, onClick){
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      container.innerHTML = items.map(it => {
-        const key = it.key;
-        const label = it.label || it.key.toUpperCase();
-        const active = key === activeKey ? "tab active" : "tab";
-        return `<div class="${active}" data-key="${esc(key)}">${esc(label)}</div>`;
-      }).join("");
-      container.querySelectorAll(".tab").forEach(el => {
-        el.addEventListener("click", () => onClick(el.getAttribute("data-key")));
+    function getLeagueNameFromHash() {
+      const h = decodeURIComponent((location.hash || "").replace("#", "")).trim();
+      return h || null;
+    }
+
+    function normalizeLeagues(leagues) {
+      const arr = Array.isArray(leagues) ? leagues.slice() : [];
+      // enforce sort by leagueName (your requirement)
+      arr.sort((a, b) => String(a.leagueName || "").localeCompare(String(b.leagueName || "")));
+      return arr;
+    }
+
+    function renderMeta(data) {
+      const date = data?.date ?? "—";
+      const gen = data?.generatedAt ?? "—";
+      metaPill.textContent = `Date: ${date} • Generated: ${gen}`;
+      metaPill.classList.remove("hidden");
+    }
+
+    function showError(msg) {
+      errorText.textContent = msg;
+      errorState.classList.remove("hidden");
+      emptyState.classList.add("hidden");
+      briefingBox.classList.add("hidden");
+      clear(gamesWrap);
+    }
+
+    function showEmpty() {
+      emptyState.classList.remove("hidden");
+      errorState.classList.add("hidden");
+      briefingBox.classList.add("hidden");
+      clear(gamesWrap);
+    }
+
+    function hideStates() {
+      emptyState.classList.add("hidden");
+      errorState.classList.add("hidden");
+    }
+
+    function makePill(text) {
+      const span = document.createElement("span");
+      span.className = "inline-flex items-center px-2 py-0.5 rounded-full border border-slate-700 bg-slate-950 text-xs text-slate-300";
+      span.textContent = text;
+      return span;
+    }
+
+    function makeLink(label, href) {
+      const a = document.createElement("a");
+      a.href = href;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.className = "text-sky-300 hover:text-sky-200 underline underline-offset-2";
+      a.textContent = label;
+      return a;
+    }
+
+    // ===== Rendering =====
+    function buildLeagueNav() {
+      clear(leagueNav);
+
+      const leagues = state.filteredLeagues;
+
+      leagueCount.textContent = `${leagues.length}`;
+
+      leagues.forEach((lg, idx) => {
+        const btn = document.createElement("button");
+        const isSelected = idx === state.selectedIndex;
+
+        btn.className =
+          "w-full text-left px-3 py-2 rounded-xl border " +
+          (isSelected
+            ? "border-slate-500 bg-slate-800/60"
+            : "border-slate-800 bg-slate-950/30 hover:bg-slate-900/60");
+
+        btn.addEventListener("click", () => {
+          state.selectedIndex = idx;
+          setHashToLeagueName(lg.leagueName);
+          renderSelectedLeague();
+          buildLeagueNav();
+        });
+
+        const row = document.createElement("div");
+        row.className = "flex items-center justify-between gap-2";
+
+        const left = document.createElement("div");
+        left.className = "min-w-0";
+
+        const name = document.createElement("div");
+        name.className = "text-sm font-bold truncate";
+        name.textContent = lg.leagueName || "League";
+
+        const sub = document.createElement("div");
+        sub.className = "text-xs text-slate-400 truncate";
+
+        const type = lg.sourceType ? `source: ${lg.sourceType}` : "source: —";
+        const count = Array.isArray(lg.games) ? `${lg.games.length} recaps` : "0 recaps";
+        sub.textContent = `${type} • ${count}`;
+
+        left.appendChild(name);
+        left.appendChild(sub);
+
+        row.appendChild(left);
+
+        const right = document.createElement("div");
+        right.className = "flex items-center gap-1 shrink-0";
+
+        if (lg.sourceType) right.appendChild(makePill(lg.sourceType));
+        row.appendChild(right);
+
+        btn.appendChild(row);
+        leagueNav.appendChild(btn);
       });
     }
 
-    function renderBriefing(briefingsJson, activeLeague){
-      const pre = document.getElementById("briefingText");
-      if (!pre) return;
+    function renderSelectedLeague() {
+      hideStates();
+      clear(gamesWrap);
 
-      const arr = (briefingsJson?.leagues || []);
-      const out = arr.find(x => x.league === activeLeague);
+      const leagues = state.filteredLeagues;
+      const lg = leagues[state.selectedIndex];
 
-      if (!out || !out.briefing){
-        pre.classList.add("muted");
-        pre.textContent = "No league briefing available yet for this league.";
+      if (!lg) {
+        showEmpty();
+        leagueTitle.textContent = "No league selected";
+        leagueSource.textContent = "";
         return;
       }
 
-      pre.classList.remove("muted");
-      pre.textContent = out.briefing;
-    }
+      leagueTitle.textContent = lg.leagueName || "League";
+      leagueSource.textContent = lg.sourceUrl ? lg.sourceUrl : "";
 
-    function renderGames(leagueJson){
-      const container = document.getElementById("gamesContainer");
-      if (!container) return;
+      // Briefing
+      if (lg.leagueBriefing) {
+        briefingText.textContent = String(lg.leagueBriefing);
+        briefingBox.classList.remove("hidden");
+      } else {
+        briefingBox.classList.add("hidden");
+        briefingText.textContent = "";
+      }
 
-      const date = leagueJson?.date;
-      const mode = leagueJson?.mode;
-      const games = leagueJson?.games || [];
-
-      if (!games.length){
-        container.innerHTML = `<div class="muted">No games found in latest.json for this league/date.</div>`;
+      const games = Array.isArray(lg.games) ? lg.games : [];
+      if (!games.length) {
+        const box = document.createElement("div");
+        box.className = "rounded-2xl border border-slate-800 bg-slate-950/60 p-5";
+        const h = document.createElement("div");
+        h.className = "text-sm font-bold mb-2";
+        h.textContent = "No recaps found for this league";
+        const p = document.createElement("div");
+        p.className = "text-sm text-slate-300";
+        p.textContent = "This league has zero items in games[].";
+        box.appendChild(h);
+        box.appendChild(p);
+        gamesWrap.appendChild(box);
         return;
       }
 
-      container.innerHTML = `
-        <div class="muted" style="font-size:12px;margin-bottom:8px;">
-          Date: <b>${esc(date)}</b> • Mode: <b>${esc(mode)}</b> • Games: <b>${games.length}</b>
-        </div>
-        ${games.map(g => {
-          const scoreLine = g.scoreLine || "";
-          const status = g.status || "unknown";
-          const badgeClass = status === "ok" ? "badge ok" : "badge warn";
-          const recapText = g.recap || "";
-          const recapMissing = (!recapText && status !== "ok");
+      games.forEach((g) => {
+        const card = document.createElement("article");
+        card.className = "rounded-2xl border border-slate-800 bg-slate-950/40 p-5";
 
-          const recapUrl = g?.source?.recapUrl || "";
-          const gamecastUrl = g?.source?.gamecastUrl || "";
+        const headline = document.createElement("div");
+        headline.className = "text-base sm:text-lg font-extrabold leading-snug";
+        headline.textContent = g.headline ? String(g.headline) : "Recap";
+        card.appendChild(headline);
 
-          const hl = g.highlight || null;
-
-          const highlightBlock = (hl && hl.embedUrl) ? `
-            <div class="hl-wrap">
-              <div class="hl-head">
-                <img class="hl-thumb" src="${esc(hl.thumbnail || '')}" alt="thumb" />
-                <div class="hl-meta">
-                  <p class="hl-title">${esc(hl.title || "Highlights")}</p>
-                  <div class="hl-channel">${esc(hl.channelTitle || "")}</div>
-                </div>
-              </div>
-              <iframe
-                class="hl-iframe"
-                src="${esc(hl.embedUrl)}"
-                title="YouTube highlights"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen
-              ></iframe>
-            </div>
-          ` : `
-            <div class="muted" style="font-size:12px;margin-top:10px;">
-              No official-channel highlight matched.
-            </div>
-          `;
-
-          return `
-            <div class="game">
-              <div class="game-top">
-                <div>
-                  <div class="game-title">${esc((g.teams?.away || "Away") + " @ " + (g.teams?.home || "Home"))}</div>
-                  ${scoreLine ? `<div class="scoreline">${esc(scoreLine)}</div>` : ``}
-                </div>
-                <div class="${badgeClass}">${esc(status)}</div>
-              </div>
-
-              <div class="recap">
-                ${recapMissing
-                  ? esc("Recap not generated yet (or recap URL missing).")
-                  : esc(recapText)}
-              </div>
-
-              <div class="links">
-                ${recapUrl ? `<a href="${esc(recapUrl)}" target="_blank" rel="noopener">Recap source</a>` : ``}
-                ${gamecastUrl ? `<a href="${esc(gamecastUrl)}" target="_blank" rel="noopener">Gamecast</a>` : ``}
-                ${(hl && hl.watchUrl) ? `<a href="${esc(hl.watchUrl)}" target="_blank" rel="noopener">YouTube</a>` : ``}
-              </div>
-
-              ${highlightBlock}
-            </div>
-          `;
-        }).join("")}
-      `;
-    }
-
-    async function loadAll(){
-      setStatus("Loading manifest…");
-
-      let manifest;
-      try {
-        manifest = await fetchJson("/recaps/manifest.json");
-      } catch (e) {
-        document.getElementById("gamesContainer").innerHTML =
-          `<div class="muted">Missing <code>/recaps/manifest.json</code>. Run the GitHub Action once.</div>`;
-        setStatus("Manifest missing");
-        return;
-      }
-
-      const leagues = (manifest.leagues || []).map(l => ({ key: l.key, label: l.key.toUpperCase() }))
-        .sort((a,b) => a.key.localeCompare(b.key));
-
-      let briefings = null;
-      try { briefings = await fetchJson("/briefings/latest.json"); } catch (e) { briefings = null; }
-
-      if (!window.__activeBriefLeague) window.__activeBriefLeague = leagues[0]?.key;
-      renderTabs("briefingTabs", leagues, window.__activeBriefLeague, (k) => {
-        window.__activeBriefLeague = k;
-        renderTabs("briefingTabs", leagues, window.__activeBriefLeague, arguments.callee);
-        renderBriefing(briefings, window.__activeBriefLeague);
-      });
-      renderBriefing(briefings, window.__activeBriefLeague);
-
-      if (!window.__activeRecapLeague) window.__activeRecapLeague = leagues[0]?.key;
-      renderTabs("recapTabs", leagues, window.__activeRecapLeague, async (k) => {
-        window.__activeRecapLeague = k;
-        renderTabs("recapTabs", leagues, window.__activeRecapLeague, arguments.callee);
-
-        setStatus(`Loading ${k.toUpperCase()}…`);
-        try {
-          const data = await fetchJson(`/recaps/${k}/latest.json`);
-          renderGames(data);
-          setStatus("Loaded");
-        } catch (e) {
-          document.getElementById("gamesContainer").innerHTML =
-            `<div class="muted">Could not load <code>/recaps/${esc(k)}/latest.json</code> yet.</div>`;
-          setStatus("Loaded (partial)");
+        if (g.scoreLine) {
+          const score = document.createElement("div");
+          score.className = "mt-1 text-sm font-bold text-slate-200";
+          score.textContent = String(g.scoreLine);
+          card.appendChild(score);
         }
-      });
 
-      setStatus(`Loading ${window.__activeRecapLeague.toUpperCase()}…`);
+        if (g.lead) {
+          const lead = document.createElement("div");
+          lead.className = "mt-3 text-sm text-slate-200 leading-relaxed";
+          lead.textContent = String(g.lead);
+          card.appendChild(lead);
+        }
+
+        // bullets
+        const bullets = Array.isArray(g.bullets) ? g.bullets : [];
+        if (bullets.length) {
+          const ul = document.createElement("ul");
+          ul.className = "mt-3 space-y-2 list-disc pl-5 text-sm text-slate-100";
+          bullets.forEach((b) => {
+            const li = document.createElement("li");
+            li.className = "leading-relaxed";
+            li.textContent = String(b);
+            ul.appendChild(li);
+          });
+          card.appendChild(ul);
+        }
+
+        // context
+        if (g.context) {
+          const ctx = document.createElement("div");
+          ctx.className = "mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400 leading-relaxed";
+          ctx.textContent = "Context: " + String(g.context);
+          card.appendChild(ctx);
+        }
+
+        // sources
+        const src = g.source || {};
+        const hasRecap = !!src.recapUrl;
+        const hasGamecast = !!src.gamecastUrl;
+
+        if (hasRecap || hasGamecast) {
+          const srcRow = document.createElement("div");
+          srcRow.className = "mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-300";
+
+          if (hasRecap) {
+            const wrap = document.createElement("div");
+            wrap.className = "flex items-center gap-2";
+            wrap.appendChild(makePill("recap"));
+            wrap.appendChild(makeLink("Open recap", src.recapUrl));
+            srcRow.appendChild(wrap);
+          }
+
+          if (hasGamecast) {
+            const wrap = document.createElement("div");
+            wrap.className = "flex items-center gap-2";
+            wrap.appendChild(makePill("gamecast"));
+            wrap.appendChild(makeLink("Open gamecast", src.gamecastUrl));
+            srcRow.appendChild(wrap);
+          }
+
+          card.appendChild(srcRow);
+        }
+
+        gamesWrap.appendChild(card);
+      });
+    }
+
+    function applyLeagueFilter() {
+      const q = leagueFilter.value.trim().toLowerCase();
+      if (!q) {
+        state.filteredLeagues = state.leagues.slice();
+      } else {
+        state.filteredLeagues = state.leagues.filter(lg => String(lg.leagueName || "").toLowerCase().includes(q));
+      }
+
+      // clamp selectedIndex
+      if (state.selectedIndex >= state.filteredLeagues.length) state.selectedIndex = 0;
+
+      buildLeagueNav();
+      renderSelectedLeague();
+    }
+
+    function selectLeagueByName(name) {
+      if (!name) return false;
+      const idx = state.filteredLeagues.findIndex(lg => String(lg.leagueName || "").toLowerCase() === name.toLowerCase());
+      if (idx >= 0) {
+        state.selectedIndex = idx;
+        return true;
+      }
+      return false;
+    }
+
+    function selectLeagueInitial() {
+      // try hash (#NBA)
+      const hashName = getLeagueNameFromHash();
+      if (hashName) {
+        // first filter is empty, so all leagues included
+        const ok = selectLeagueByName(hashName);
+        if (ok) return;
+      }
+      state.selectedIndex = 0;
+    }
+
+    // ===== Load JSON =====
+    async function loadDailyJSON() {
       try {
-        const data = await fetchJson(`/recaps/${window.__activeRecapLeague}/latest.json`);
-        renderGames(data);
-        setStatus("Loaded");
+        metaPill.textContent = "Loading…";
+        hideStates();
+        clear(gamesWrap);
+
+        // cache-bust to see updates immediately
+        const url = DAILY_JSON_URL + "?t=" + Date.now();
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status + " when fetching " + DAILY_JSON_URL);
+        }
+
+        const data = await res.json();
+        state.data = data;
+
+        const leagues = normalizeLeagues(data.leagues);
+        state.leagues = leagues;
+        state.filteredLeagues = leagues.slice();
+
+        renderMeta(data);
+
+        if (!state.leagues.length) {
+          showEmpty();
+          leagueTitle.textContent = "No leagues found";
+          leagueSource.textContent = "";
+          buildLeagueNav();
+          return;
+        }
+
+        // reset filter input each refresh? keep it (don’t reset)
+        applyLeagueFilter();
+        selectLeagueInitial();
+        buildLeagueNav();
+        renderSelectedLeague();
+
       } catch (e) {
-        document.getElementById("gamesContainer").innerHTML =
-          `<div class="muted">Could not load <code>/recaps/${esc(window.__activeRecapLeague)}/latest.json</code> yet.</div>`;
-        setStatus("Loaded (partial)");
+        showError(String(e.message || e));
       }
     }
 
-    document.getElementById("refreshBtn").addEventListener("click", loadAll);
-    loadAll();
+    // ===== Events =====
+    refreshBtn.addEventListener("click", () => loadDailyJSON());
+    leagueFilter.addEventListener("input", () => applyLeagueFilter());
+
+    prevLeagueBtn.addEventListener("click", () => {
+      const n = state.filteredLeagues.length;
+      if (!n) return;
+      state.selectedIndex = (state.selectedIndex - 1 + n) % n;
+      const lg = state.filteredLeagues[state.selectedIndex];
+      setHashToLeagueName(lg?.leagueName);
+      buildLeagueNav();
+      renderSelectedLeague();
+    });
+
+    nextLeagueBtn.addEventListener("click", () => {
+      const n = state.filteredLeagues.length;
+      if (!n) return;
+      state.selectedIndex = (state.selectedIndex + 1) % n;
+      const lg = state.filteredLeagues[state.selectedIndex];
+      setHashToLeagueName(lg?.leagueName);
+      buildLeagueNav();
+      renderSelectedLeague();
+    });
+
+    window.addEventListener("hashchange", () => {
+      const name = getLeagueNameFromHash();
+      if (!name) return;
+      const ok = selectLeagueByName(name);
+      if (ok) {
+        buildLeagueNav();
+        renderSelectedLeague();
+      }
+    });
+
+    // ===== Start =====
+    loadDailyJSON();
   </script>
 </body>
 </html>
