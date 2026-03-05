@@ -1,0 +1,31 @@
+{
+  "leagueName": "LIV Golf",
+  "leagueKey": "LIV",
+  "sourceType": "plain_text",
+  "leagueBriefing": "Carlos Ortiz went nuclear with a career-best 10-under 60 to grab the early lead in Hong Kong, setting the tone on a softened Fanling track that saw scores pile up fast. Torque GC rode Ortiz’s round into the team lead, while a packed chase group and a Victor Perez ace added to a wide-open Round 1 story.",
+  "games": [
+    {
+      "id": null,
+      "teams": {
+        "away": null,
+        "home": null
+      },
+      "headline": "Ortiz fires career-best 60 to take two-shot lead as Torque tops teams in Hong Kong",
+      "score": null,
+      "brief": "Carlos Ortiz flirted with something even sillier late, but a tap-in birdie on his final hole completed a 10-under 60 and a two-shot cushion after Round 1 at Hong Kong Golf Club. It was the lowest round of his pro tournament career and one of the rare 60s in LIV history, built on a blistering back nine that included a chip-in birdie and an eagle after sticking a par-5 approach to five feet. With the course softened by rain, scoring was there for the taking - and Torque GC took it, riding Ortiz’s round into the team lead while Dean Burmester, Sergio Garcia and others stacked behind.",
+      "bullets": [
+        "Carlos Ortiz shot 10-under 60 to lead by two shots over Dean Burmester (62).",
+        "Ortiz’s 60 was the lowest round of his professional tournament career and the third 60 in LIV Golf history; only a 58 (Bryson DeChambeau) and two 59s (Joaquin Niemann, Sebastian Munoz) have been lower in league play.",
+        "Ortiz played his final nine holes at 8 under, highlighted by three straight birdies on holes 10-12 (including a chip-in at 11) and an eagle on the par-5 13th after hitting his second shot to 5 feet.",
+        "Torque GC led the team standings at 21 under (Ortiz 60, Munoz 65, Niemann 66, Ancer 68), two shots ahead of Smash GC at 19 under.",
+        "Victor Perez made the first ace of the LIV season by holing his tee shot at the 149-yard 2nd hole; it was the 13th ace in LIV Golf history."
+      ],
+      "context": "With 28 players at 67 or better on a rain-softened Fanling course, Round 1 set up a weekend where rising wind is expected to toughen scoring - and the chase behind Ortiz is already crowded.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": null
+      },
+      "highlights": []
+    }
+  ]
+}
