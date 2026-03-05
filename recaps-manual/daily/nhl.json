@@ -1,0 +1,173 @@
+{
+  "leagueName": "National Hockey League",
+  "leagueKey": "NHL",
+  "sourceType": "console_recaps",
+  "leagueBriefing": "A wild night across the NHL featured a dramatic Vegas comeback in Detroit, a hat trick from Nikolaj Ehlers in Vancouver, and a dominant Anaheim performance behind 42 saves from Ville Husso. New Jersey also extended Toronto’s skid with a shootout win as several streaks shifted around the league.",
+  "games": [
+    {
+      "id": "401803321",
+      "teams": {
+        "away": "Vegas Golden Knights",
+        "home": "Detroit Red Wings"
+      },
+      "headline": "Golden Knights storm back from two-goal deficit and win in overtime",
+      "score": "VGK 4 — DET 3",
+      "brief": "Vegas looked headed for another loss deep into the third period before a late surge flipped the game in Detroit. The Golden Knights erased a two-goal deficit in the final minutes, with Mitch Marner tying the game late before Tomas Hertl finished the comeback in overtime. Detroit controlled much of the night but couldn’t close it out, allowing Vegas to snap its three-game losing streak.",
+      "bullets": [
+        "Tomas Hertl scored the overtime winner on the power play with 2:49 remaining.",
+        "Mitch Marner had a goal and two assists, including the tying goal with 3:24 left in regulation.",
+        "Vegas erased a 3-1 deficit with two goals in the final nine minutes of the third.",
+        "Simon Edvinsson and Alex DeBrincat each had a goal and an assist for Detroit.",
+        "Detroit fell to 24-1-3 when leading after two periods."
+      ],
+      "context": "Vegas snapped a three-game skid while handing Detroit a rare loss when leading after two periods.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803321/golden-knights-red-wings"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "9_5gWYwibyE",
+          "title": "Golden Knights vs. Red Wings | NHL Highlights | March 04, 2026",
+          "url": "https://www.youtube.com/watch?v=9_5gWYwibyE",
+          "embedUrl": "https://www.youtube.com/embed/9_5gWYwibyE",
+          "publishedAt": "2026-03-05T03:11:11Z",
+          "matchScore": 125
+        }
+      ]
+    },
+    {
+      "id": "401803322",
+      "teams": {
+        "away": "Toronto Maple Leafs",
+        "home": "New Jersey Devils"
+      },
+      "headline": "Devils rally late and win shootout to extend Maple Leafs losing streak",
+      "score": "NJD 4 — TOR 3",
+      "brief": "New Jersey forced overtime in the final minutes and then finished the job in the shootout to beat Toronto in Newark. Connor Brown’s late equalizer kept the Devils alive before Paul Cotter and Jesper Bratt delivered in the shootout. Toronto’s slide continued despite strong goaltending from Anthony Stolarz, who kept the Maple Leafs in the game under heavy pressure.",
+      "bullets": [
+        "Connor Brown tied the game with 2:21 left in regulation.",
+        "Paul Cotter and Jesper Bratt both scored in the shootout for New Jersey.",
+        "Jacob Markstrom stopped 24 shots for the Devils.",
+        "Anthony Stolarz made 44 saves for Toronto.",
+        "The Devils outshot the Maple Leafs 47–27 in regulation."
+      ],
+      "context": "Toronto has now lost five straight games while New Jersey extended its winning streak to three.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803322/maple-leafs-devils"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "kPwCf5zAJgU",
+          "title": "Maple Leafs vs. Devils | NHL Highlights | March 04, 2026",
+          "url": "https://www.youtube.com/watch?v=kPwCf5zAJgU",
+          "embedUrl": "https://www.youtube.com/embed/kPwCf5zAJgU",
+          "publishedAt": "2026-03-05T03:11:31Z",
+          "matchScore": 125
+        }
+      ]
+    },
+    {
+      "id": "401803323",
+      "teams": {
+        "away": "Carolina Hurricanes",
+        "home": "Vancouver Canucks"
+      },
+      "headline": "Ehlers records hat trick as Hurricanes hand Canucks another loss",
+      "score": "CAR 6 — VAN 4",
+      "brief": "Nikolaj Ehlers powered Carolina with a hat trick as the Hurricanes weathered a late Vancouver push to secure a high-scoring win. Carolina seized control with a four-goal burst in the second period and never fully let go despite the Canucks trimming the deficit in the third. Vancouver’s struggles continued as another loss deepened its prolonged slump.",
+      "bullets": [
+        "Nikolaj Ehlers recorded his seventh career hat trick, sealing it with an empty-net goal.",
+        "Sebastian Aho, Sean Walker and Andrei Svechnikov each had a goal and an assist.",
+        "Filip Hronek posted a goal and two assists for Vancouver.",
+        "Carolina scored four consecutive goals in the second period to take control.",
+        "The Canucks have just two wins in their last 23 games (2-17-4)."
+      ],
+      "context": "Vancouver’s losing streak reached seven games as its season-long slump deepened.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803323/hurricanes-canucks"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "jj54r4MFezs",
+          "title": "Hurricanes vs. Canucks | NHL Highlights | March 04, 2026",
+          "url": "https://www.youtube.com/watch?v=jj54r4MFezs",
+          "embedUrl": "https://www.youtube.com/embed/jj54r4MFezs",
+          "publishedAt": "2026-03-05T06:12:29Z",
+          "matchScore": 125
+        }
+      ]
+    },
+    {
+      "id": "401803324",
+      "teams": {
+        "away": "New York Islanders",
+        "home": "Anaheim Ducks"
+      },
+      "headline": "Husso stops 42 shots as Ducks rout Islanders",
+      "score": "ANA 5 — NYI 1",
+      "brief": "Anaheim overwhelmed the Islanders behind an explosive first period and a standout performance in goal from Ville Husso. The Ducks erased an early deficit with three goals late in the opening period and never looked back, controlling the game despite being heavily outshot. Husso’s 42 saves anchored the win and helped Anaheim continue one of the league’s hottest stretches.",
+      "bullets": [
+        "Ville Husso made 42 saves in the victory.",
+        "Cutter Gauthier scored twice in the first period.",
+        "Anaheim has won 13 of its last 16 games.",
+        "Anders Lee scored his 304th career goal, tying Clark Gillies for fourth in Islanders history.",
+        "The Islanders outshot Anaheim 43–25."
+      ],
+      "context": "Anaheim continued its surge with its 13th win in 16 games while ending New York’s five-game winning streak.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803324/islanders-ducks"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "8mRUORYIdjQ",
+          "title": "Islanders vs. Ducks | NHL Highlights | March 04, 2026",
+          "url": "https://www.youtube.com/watch?v=8mRUORYIdjQ",
+          "embedUrl": "https://www.youtube.com/embed/8mRUORYIdjQ",
+          "publishedAt": "2026-03-05T06:07:46Z",
+          "matchScore": 125
+        }
+      ]
+    },
+    {
+      "id": "401803325",
+      "teams": {
+        "away": "St. Louis Blues",
+        "home": "Seattle Kraken"
+      },
+      "headline": "Holloway’s go-ahead goal lifts Blues past Kraken",
+      "score": "STL 3 — SEA 2",
+      "brief": "St. Louis earned a gritty road win in Seattle behind timely scoring and strong goaltending from Joel Hofer. Dylan Holloway’s second-period goal gave the Blues the lead for good, and Robert Thomas extended the advantage early in the third. Seattle pushed late but couldn’t fully recover as the Blues secured consecutive road wins.",
+      "bullets": [
+        "Dylan Holloway scored the go-ahead goal in the second period.",
+        "Brayden Schenn recorded three assists for St. Louis.",
+        "Robert Thomas had a goal and an assist.",
+        "Joel Hofer made 34 saves for the Blues.",
+        "Vince Dunn had a goal and an assist for Seattle."
+      ],
+      "context": "The Blues picked up their second straight road victory against a playoff contender.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nhl/recap/_/gameId/401803325/blues-kraken"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "9r_HC7PbfA8",
+          "title": "Blues vs. Kraken | NHL Highlights | March 04, 2026",
+          "url": "https://www.youtube.com/watch?v=9r_HC7PbfA8",
+          "embedUrl": "https://www.youtube.com/embed/9r_HC7PbfA8",
+          "publishedAt": "2026-03-05T06:03:39Z",
+          "matchScore": 125
+        }
+      ]
+    }
+  ]
+}
