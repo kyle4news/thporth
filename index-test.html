@@ -5,158 +5,398 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>THPORTH — index-test (manual daily recaps)</title>
 
-  <!-- Tailwind CDN (fine for now; we can replace later with your real CSS) -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 
   <meta name="robots" content="noindex,nofollow" />
+  <style></style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen">
-  <header class="sticky top-0 z-20 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center font-black tracking-tight">T</div>
-        <div>
-          <div class="text-lg font-extrabold leading-tight">THPORTH — index-test</div>
-          <div class="text-xs text-slate-400 leading-tight">Manual daily recaps (one JSON file)</div>
-        </div>
+<body class="min-h-screen bg-gray-100 font-sans text-gray-800 antialiased">
+  <div class="flex bg-white text-gray-800">
+    <aside class="sticky top-0 flex h-screen w-[34rem] shrink-0 flex-col overflow-hidden border-r border-gray-200 bg-white shadow-sm">
+      <div class="flex shrink-0 items-center justify-between border-b border-gray-200 p-3">
+        <img
+          src="https://thporth.com/thporth-red-logo.png"
+          alt="THPORTH"
+          class="h-[25px] w-auto"
+        />
+        <div id="leagueCount" class="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600"></div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <button id="refreshBtn"
-          class="px-3 py-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-sm font-semibold">
-          Refresh
-        </button>
-        <span id="metaPill"
-          class="hidden sm:inline-flex px-3 py-2 rounded-xl border border-slate-800 bg-slate-900 text-xs text-slate-300">
-          Loading…
-        </span>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto px-4 py-5">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-
-      <!-- LEFT: league list -->
-      <aside class="lg:col-span-3">
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 overflow-hidden">
-          <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-            <div class="text-sm font-bold">Leagues</div>
-            <div id="leagueCount" class="text-xs text-slate-400"></div>
-          </div>
-
-          <div class="p-2">
-            <input id="leagueFilter" type="text" placeholder="Filter leagues…"
-              class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950 text-sm outline-none focus:ring-2 focus:ring-slate-600"
+      <div class="grid min-h-0 flex-1 grid-cols-2">
+        <section class="flex min-h-0 flex-col border-r border-gray-200">
+          <div class="border-b border-gray-200 p-3">
+            <label for="leagueFilter" class="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">Leagues</label>
+            <input id="leagueFilter" type="text" placeholder="Filter leagues..."
+              class="h-11 w-full rounded-md border border-gray-300 bg-white px-3 text-sm outline-none transition focus:border-black focus:ring-0"
             />
           </div>
+          <nav id="leagueNav" class="flex-1 space-y-1 overflow-y-auto p-2"></nav>
+        </section>
 
-          <nav id="leagueNav" class="px-2 pb-2 space-y-1 max-h-[70vh] overflow-auto"></nav>
+        <section class="flex min-h-0 flex-col">
+          <div class="border-b border-gray-200 px-3 py-[1.06rem]">
+            <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">Headlines</div>
+          </div>
+          <nav id="headlineNav" class="flex-1 space-y-1 overflow-y-auto p-2"></nav>
+        </section>
+      </div>
 
-          <div class="px-4 py-3 border-t border-slate-800 text-xs text-slate-400">
-            Data file: <span class="font-mono">/recaps-manual/daily/latest.json</span>
+      <div class="border-t border-gray-200 p-3 text-xs text-gray-500">
+        League files: <span class="font-mono">/recaps-manual/daily/nba.json</span>, <span class="font-mono">/recaps-manual/daily/nhl.json</span>, <span class="font-mono">/recaps-manual/daily/premierleague.json</span>
+      </div>
+    </aside>
+
+    <div class="flex min-h-screen flex-1 flex-col">
+      <header class="sticky top-0 z-10 shrink-0 border-b border-gray-200 bg-white px-4 py-3 sm:px-6">
+        <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
+          <div>
+            <h1 class="text-xl font-semibold">Dashboard</h1>
+            <p class="text-xs text-gray-500">Manual daily recaps</p>
+            <div id="modePill" class="mt-1 inline-flex rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-[11px] font-semibold text-gray-600"></div>
+            <div id="manualStatus" class="mt-1 text-[11px] text-gray-500"></div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="prevLeagueBtn"
+              class="inline-flex select-none items-center justify-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none">
+              Prev
+            </button>
+            <button id="nextLeagueBtn"
+              class="inline-flex select-none items-center justify-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none">
+              Next
+            </button>
+            <button id="refreshBtn"
+              class="inline-flex select-none items-center justify-center gap-2 rounded-md bg-black px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:bg-gray-800 hover:text-white focus:outline-none">
+              Refresh
+            </button>
+            <button id="clearTop10Btn"
+              class="hidden inline-flex select-none items-center justify-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none">
+              Clear Top 10
+            </button>
+            <button id="saveTop10Btn"
+              class="hidden inline-flex select-none items-center justify-center gap-2 rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-800 focus:outline-none">
+              Save Top 10
+            </button>
           </div>
         </div>
-      </aside>
+      </header>
 
-      <!-- RIGHT: league content -->
-      <section class="lg:col-span-9">
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 overflow-hidden">
-          <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <div id="leagueTitle" class="text-base font-extrabold truncate">Loading…</div>
-              <div id="leagueSource" class="text-xs text-slate-400 truncate"></div>
+      <main class="flex-1 p-4 sm:p-6">
+        <div class="mx-auto grid max-w-7xl gap-4">
+          <section class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
+            <div id="rightScroll" class="max-h-[calc(100vh-280px)] overflow-y-auto">
+              <div id="leagueStream" class="space-y-[250px] p-4 pb-[250px]"></div>
             </div>
 
-            <div class="flex items-center gap-2">
-              <button id="prevLeagueBtn"
-                class="px-3 py-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-sm font-semibold">
-                Prev
-              </button>
-              <button id="nextLeagueBtn"
-                class="px-3 py-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-sm font-semibold">
-                Next
-              </button>
-            </div>
-          </div>
-
-          <!-- Briefing -->
-          <div id="briefingBox" class="hidden px-4 py-4 border-b border-slate-800 bg-slate-950/40">
-            <div class="text-sm font-bold mb-2">League-wide briefing</div>
-            <div id="briefingText" class="text-sm text-slate-200 leading-relaxed whitespace-pre-line"></div>
-          </div>
-
-          <!-- Games list -->
-          <div id="gamesWrap" class="p-4 space-y-3"></div>
-
-          <!-- Empty / error -->
-          <div id="emptyState" class="hidden p-6">
-            <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-5">
-              <div class="text-sm font-bold mb-2">No recaps loaded</div>
-              <div class="text-sm text-slate-300 leading-relaxed">
-                Make sure <span class="font-mono">recaps-manual/daily/latest.json</span> exists in your repo and contains a top-level
-                <span class="font-mono">{"leagues":[...]}</span> array.
+            <div id="emptyState" class="hidden p-6">
+              <div class="rounded-md border border-gray-200 bg-gray-50 p-5">
+                <div class="mb-2 text-sm font-semibold">No recaps loaded</div>
+                <div class="text-sm leading-relaxed text-gray-600">
+                  Make sure <span class="font-mono">recaps-manual/daily/nba.json</span>, <span class="font-mono">recaps-manual/daily/nhl.json</span>, and <span class="font-mono">recaps-manual/daily/premierleague.json</span> exist in your repo and contain
+                  <span class="font-mono">leagueName</span> and <span class="font-mono">games</span>.
+                </div>
               </div>
             </div>
-          </div>
 
-          <div id="errorState" class="hidden p-6">
-            <div class="rounded-2xl border border-red-900 bg-red-950/40 p-5">
-              <div class="text-sm font-bold text-red-200 mb-2">Error loading recaps</div>
-              <div id="errorText" class="text-sm text-red-200/90 leading-relaxed"></div>
+            <div id="errorState" class="hidden p-6">
+              <div class="rounded-md border border-red-200 bg-red-50 p-5">
+                <div class="mb-2 text-sm font-semibold text-red-700">Error loading recaps</div>
+                <div id="errorText" class="text-sm leading-relaxed text-red-700"></div>
+              </div>
             </div>
-          </div>
-        </div>
+          </section>
 
-        <div class="mt-4 text-xs text-slate-500">
-          Tip: after you paste new JSON and push to GitHub, hard refresh if needed (Cmd+Shift+R).
-          You can deep-link to a league with <span class="font-mono">#NBA</span> or <span class="font-mono">#PGA%20Tour</span>.
+          <footer class="rounded-md border border-gray-200 bg-white px-4 py-3 text-xs text-gray-500">
+            Tip: after you paste new JSON and push to GitHub, hard refresh if needed (Cmd+Shift+R). Deep-link with
+            <span class="font-mono">#ALL</span>, <span class="font-mono">#NBA</span>, <span class="font-mono">#NHL</span>, or <span class="font-mono">#Premier%20League</span>.
+          </footer>
         </div>
-      </section>
+      </main>
     </div>
-  </main>
+  </div>
 
   <script>
     // ===== Config =====
-    const DAILY_JSON_URL = "/recaps-manual/daily/latest.json";
+    const LEAGUE_FILES = [
+      { leagueName: "NBA", leagueKey: "nba", fileUrl: "/recaps-manual/daily/nba.json" },
+      { leagueName: "NHL", leagueKey: "nhl", fileUrl: "/recaps-manual/daily/nhl.json" },
+      { leagueName: "Premier League", leagueKey: "premierleague", fileUrl: "/recaps-manual/daily/premierleague.json" }
+    ];
+
+    const LEAGUE_DISPLAY_ORDER = [
+      "NFL", "NBA", "MLB", "NHL", "Soccer", "Formula One", "NCAAM", "NCAAW", "PGA Tour", "UFC", "Boxing",
+      "NASCAR Cup Series", "Tennis", "NCAAF", "WNBA", "LIV Golf", "IndyCar", "LPGA Tour", "MotoGP"
+    ];
+
+    const SOCCER_LEAGUE_DISPLAY_ORDER = [
+      "Premier League", "UEFA Champions League", "MLS", "LALiga", "Serie A", "Bundesliga", "FA Cup",
+      "Liga MX", "NWSL", "Ligue 1", "UEFA Europa League", "UEFA Conference League"
+    ];
+
+    const LEAGUE_ORDER_INDEX = Object.fromEntries(LEAGUE_DISPLAY_ORDER.map((name, idx) => [name.toLowerCase(), idx]));
+    const SOCCER_ORDER_INDEX = Object.fromEntries(SOCCER_LEAGUE_DISPLAY_ORDER.map((name, idx) => [name.toLowerCase(), idx]));
+    const ALL_LEAGUE = { leagueName: "ALL", leagueKey: "all", fileUrl: "generated://top10" };
+    const MANUAL_TOP10_STORAGE_KEY = "thporth.manual-top10.v1";
 
     // ===== State =====
     const state = {
-      data: null,
       leagues: [],
       filteredLeagues: [],
-      selectedIndex: 0
+      cache: new Map(),
+      loading: new Map(),
+      loadedIndices: [],
+      sectionByLeagueKey: new Map(),
+      currentLeagueKey: null,
+      activeGameByLeague: new Map(),
+      appendingGuard: false,
+      manualNavLockUntil: 0,
+      scrollTicking: false,
+      lastScrollTop: 0,
+      top10Token: 0,
+      top10Items: [],
+      autoTop10Items: [],
+      allGamesByKey: new Map(),
+      isAdminMode: false,
+      manualPicksByRank: new Map(),
+      manualRankByGame: new Map(),
+      hasUnsavedManualChanges: false,
+      lastManualSavedAt: "",
     };
 
     // ===== Elements =====
     const refreshBtn = document.getElementById("refreshBtn");
-    const metaPill = document.getElementById("metaPill");
-
+    const saveTop10Btn = document.getElementById("saveTop10Btn");
+    const clearTop10Btn = document.getElementById("clearTop10Btn");
+    const modePill = document.getElementById("modePill");
+    const manualStatus = document.getElementById("manualStatus");
     const leagueCount = document.getElementById("leagueCount");
     const leagueFilter = document.getElementById("leagueFilter");
     const leagueNav = document.getElementById("leagueNav");
-
-    const leagueTitle = document.getElementById("leagueTitle");
-    const leagueSource = document.getElementById("leagueSource");
-
+    const headlineNav = document.getElementById("headlineNav");
     const prevLeagueBtn = document.getElementById("prevLeagueBtn");
     const nextLeagueBtn = document.getElementById("nextLeagueBtn");
-
-    const briefingBox = document.getElementById("briefingBox");
-    const briefingText = document.getElementById("briefingText");
-
-    const gamesWrap = document.getElementById("gamesWrap");
+    const rightScroll = document.getElementById("rightScroll");
+    const leagueStream = document.getElementById("leagueStream");
     const emptyState = document.getElementById("emptyState");
     const errorState = document.getElementById("errorState");
     const errorText = document.getElementById("errorText");
 
-    // ===== Helpers =====
-    function escapeText(s) {
-      return String(s ?? "");
+    function now() {
+      return Date.now();
+    }
+
+    function getTodayDateKey() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function detectAdminMode() {
+      const path = String(location.pathname || "").toLowerCase();
+      const params = new URLSearchParams(location.search || "");
+      return path.endsWith("/admin") || params.get("admin") === "1";
+    }
+
+    function makeGameKey(leagueKey, gameId) {
+      return `${String(leagueKey)}::${String(gameId)}`;
+    }
+
+    function collectManualPicksArray() {
+      const picks = [];
+      for (let rank = 1; rank <= 10; rank += 1) {
+        const key = state.manualPicksByRank.get(rank);
+        if (!key) continue;
+        const [leagueKey, gameId] = key.split("::");
+        if (!leagueKey || !gameId) continue;
+        picks.push({ rank, leagueKey, gameId });
+      }
+      return picks;
+    }
+
+    function applyManualPicks(picks) {
+      state.manualPicksByRank.clear();
+      state.manualRankByGame.clear();
+      (Array.isArray(picks) ? picks : []).forEach((p) => {
+        const rank = Number(p?.rank);
+        if (!Number.isInteger(rank) || rank < 1 || rank > 10) return;
+        const leagueKey = String(p?.leagueKey || "").trim();
+        const gameId = String(p?.gameId || "").trim();
+        if (!leagueKey || !gameId) return;
+        const key = makeGameKey(leagueKey, gameId);
+        state.manualPicksByRank.set(rank, key);
+        state.manualRankByGame.set(key, rank);
+      });
+    }
+
+    function loadManualPicksFromStorage() {
+      try {
+        const raw = localStorage.getItem(MANUAL_TOP10_STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        const date = String(data?.date || "");
+        if (date !== getTodayDateKey()) return;
+        applyManualPicks(data?.picks || []);
+        state.lastManualSavedAt = String(data?.updatedAt || "");
+      } catch (e) {
+        // Ignore malformed local storage entries.
+      }
+    }
+
+    function saveManualPicksToStorage() {
+      const payload = {
+        date: getTodayDateKey(),
+        mode: "manual",
+        picks: collectManualPicksArray(),
+        updatedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(MANUAL_TOP10_STORAGE_KEY, JSON.stringify(payload));
+      state.hasUnsavedManualChanges = false;
+      state.lastManualSavedAt = payload.updatedAt;
+      updateModeAndStatus();
+    }
+
+    function clearManualPicks() {
+      state.manualPicksByRank.clear();
+      state.manualRankByGame.clear();
+      state.hasUnsavedManualChanges = true;
+      updateModeAndStatus();
+    }
+
+    function setManualRankForGame(leagueKey, gameId, rank) {
+      const key = makeGameKey(leagueKey, gameId);
+      const currentRank = state.manualRankByGame.get(key);
+
+      if (currentRank) {
+        state.manualPicksByRank.delete(currentRank);
+        state.manualRankByGame.delete(key);
+      }
+
+      if (!rank) {
+        state.hasUnsavedManualChanges = true;
+        return;
+      }
+
+      const desired = Number(rank);
+      if (!Number.isInteger(desired) || desired < 1 || desired > 10) {
+        state.hasUnsavedManualChanges = true;
+        return;
+      }
+
+      const existingKeyAtRank = state.manualPicksByRank.get(desired);
+      if (existingKeyAtRank && existingKeyAtRank !== key) {
+        state.manualRankByGame.delete(existingKeyAtRank);
+      }
+
+      state.manualPicksByRank.set(desired, key);
+      state.manualRankByGame.set(key, desired);
+      state.hasUnsavedManualChanges = true;
+    }
+
+    function updateModeAndStatus() {
+      const modeText = state.isAdminMode ? "Admin Mode (/admin)" : "Public Mode";
+      modePill.textContent = modeText;
+
+      if (!state.isAdminMode) {
+        manualStatus.textContent = "Top 10 editing controls are hidden in public mode.";
+        saveTop10Btn.classList.add("hidden");
+        clearTop10Btn.classList.add("hidden");
+        return;
+      }
+
+      saveTop10Btn.classList.remove("hidden");
+      clearTop10Btn.classList.remove("hidden");
+      const count = collectManualPicksArray().length;
+      const unsaved = state.hasUnsavedManualChanges ? " • Unsaved changes" : " • Saved";
+      const savedAt = state.lastManualSavedAt
+        ? ` • Last saved ${new Date(state.lastManualSavedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+        : "";
+      manualStatus.textContent = `Manual Top 10 slots filled: ${count}/10${unsaved}${savedAt}`;
+    }
+
+    function composeFinalTop10() {
+      const byKey = state.allGamesByKey;
+      const used = new Set();
+      const out = [];
+
+      for (let rank = 1; rank <= 10; rank += 1) {
+        const key = state.manualPicksByRank.get(rank);
+        if (!key) continue;
+        const game = byKey.get(key);
+        if (!game) continue;
+        out.push({ ...game, rank });
+        used.add(key);
+      }
+
+      state.autoTop10Items.forEach((item) => {
+        if (out.length >= 10) return;
+        const key = makeGameKey(item.leagueKey, item.gameId);
+        if (used.has(key)) return;
+        out.push({ ...item, rank: out.length + 1 });
+        used.add(key);
+      });
+
+      return out.slice(0, 10).map((item, idx) => ({ ...item, rank: idx + 1 }));
+    }
+
+    function syncAdminRankDropdownOptions() {
+      if (!state.isAdminMode) return;
+
+      const selects = [...document.querySelectorAll("select[data-rank-select='1']")];
+      selects.forEach((select) => {
+        const leagueKey = String(select.dataset.leagueKey || "");
+        const gameId = String(select.dataset.gameId || "");
+        const gameKey = makeGameKey(leagueKey, gameId);
+        const currentRank = state.manualRankByGame.get(gameKey) || null;
+
+        const existing = select.value;
+        while (select.firstChild) select.removeChild(select.firstChild);
+
+        const noneOpt = document.createElement("option");
+        noneOpt.value = "";
+        noneOpt.textContent = "Unranked";
+        select.appendChild(noneOpt);
+
+        for (let rank = 1; rank <= 10; rank += 1) {
+          const takenBy = state.manualPicksByRank.get(rank) || null;
+          const isUsedByOtherGame = Boolean(takenBy && takenBy !== gameKey);
+          if (isUsedByOtherGame) continue;
+
+          const opt = document.createElement("option");
+          opt.value = String(rank);
+          opt.textContent = String(rank);
+          select.appendChild(opt);
+        }
+
+        const nextValue = currentRank ? String(currentRank) : "";
+        select.value = nextValue;
+        if (select.value !== nextValue) {
+          select.value = existing || "";
+        }
+      });
     }
 
     function clear(node) {
       while (node.firstChild) node.removeChild(node.firstChild);
+    }
+
+    function hideStates() {
+      emptyState.classList.add("hidden");
+      errorState.classList.add("hidden");
+    }
+
+    function showEmpty(msg) {
+      hideStates();
+      if (msg) {
+        const p = emptyState.querySelector(".text-sm.leading-relaxed");
+        if (p) p.textContent = msg;
+      }
+      emptyState.classList.remove("hidden");
+    }
+
+    function showError(msg) {
+      hideStates();
+      errorText.textContent = msg;
+      errorState.classList.remove("hidden");
     }
 
     function setHashToLeagueName(name) {
@@ -169,348 +409,971 @@
       return h || null;
     }
 
+    function getLeagueSortRank(league) {
+      const name = String(league?.leagueName || "").trim().toLowerCase();
+      if (Object.prototype.hasOwnProperty.call(LEAGUE_ORDER_INDEX, name)) {
+        return LEAGUE_ORDER_INDEX[name] * 1000;
+      }
+      if (Object.prototype.hasOwnProperty.call(SOCCER_ORDER_INDEX, name)) {
+        const soccerBase = Object.prototype.hasOwnProperty.call(LEAGUE_ORDER_INDEX, "soccer")
+          ? LEAGUE_ORDER_INDEX.soccer
+          : 100000;
+        return soccerBase * 1000 + SOCCER_ORDER_INDEX[name] + 1;
+      }
+      return Number.MAX_SAFE_INTEGER;
+    }
+
     function normalizeLeagues(leagues) {
       const arr = Array.isArray(leagues) ? leagues.slice() : [];
-      // enforce sort by leagueName (your requirement)
-      arr.sort((a, b) => String(a.leagueName || "").localeCompare(String(b.leagueName || "")));
+      arr.sort((a, b) => {
+        const rankDiff = getLeagueSortRank(a) - getLeagueSortRank(b);
+        if (rankDiff !== 0) return rankDiff;
+        return String(a.leagueName || "").localeCompare(String(b.leagueName || ""));
+      });
       return arr;
     }
 
-    function renderMeta(data) {
-      const date = data?.date ?? "—";
-      const gen = data?.generatedAt ?? "—";
-      metaPill.textContent = `Date: ${date} • Generated: ${gen}`;
-      metaPill.classList.remove("hidden");
-    }
+    function getYouTubeVideoFromGame(game) {
+      const list = Array.isArray(game?.highlights) ? game.highlights : [];
+      const first = list.find(Boolean);
+      if (!first) return null;
 
-    function showError(msg) {
-      errorText.textContent = msg;
-      errorState.classList.remove("hidden");
-      emptyState.classList.add("hidden");
-      briefingBox.classList.add("hidden");
-      clear(gamesWrap);
-    }
+      if (typeof first === "string") {
+        const m = first.match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/i);
+        const videoId = m ? m[1] : null;
+        return videoId
+          ? { videoId, url: `https://www.youtube.com/watch?v=${videoId}`, embedUrl: `https://www.youtube.com/embed/${videoId}` }
+          : null;
+      }
 
-    function showEmpty() {
-      emptyState.classList.remove("hidden");
-      errorState.classList.add("hidden");
-      briefingBox.classList.add("hidden");
-      clear(gamesWrap);
-    }
+      if (typeof first === "object") {
+        const videoId = first.videoId || null;
+        const embedUrl = first.embedUrl || (videoId ? `https://www.youtube.com/embed/${videoId}` : null);
+        const url = first.url || (videoId ? `https://www.youtube.com/watch?v=${videoId}` : null);
+        if (!embedUrl) return null;
+        return { videoId, url, embedUrl, title: first.title || "Game Highlights" };
+      }
 
-    function hideStates() {
-      emptyState.classList.add("hidden");
-      errorState.classList.add("hidden");
+      return null;
     }
 
     function makePill(text) {
       const span = document.createElement("span");
-      span.className = "inline-flex items-center px-2 py-0.5 rounded-full border border-slate-700 bg-slate-950 text-xs text-slate-300";
+      span.className = "inline-flex items-center rounded-md border border-gray-300 bg-gray-100 px-2 py-0.5 text-xs text-gray-700";
       span.textContent = text;
       return span;
     }
 
-    function makeLink(label, href) {
-      const a = document.createElement("a");
-      a.href = href;
-      a.target = "_blank";
-      a.rel = "noopener";
-      a.className = "text-sky-300 hover:text-sky-200 underline underline-offset-2";
-      a.textContent = label;
-      return a;
+    function findLeagueByKey(leagueKey) {
+      return getVisibleLeagues().find((lg) => lg.leagueKey === leagueKey) || null;
     }
 
-    // ===== Rendering =====
+    function getIndexByLeagueKey(leagueKey) {
+      return getVisibleLeagues().findIndex((lg) => lg.leagueKey === leagueKey);
+    }
+
+    function getVisibleLeagues() {
+      return [ALL_LEAGUE, ...state.filteredLeagues];
+    }
+
+    function normalizeText(s) {
+      return String(s || "").toLowerCase();
+    }
+
+    function extractBigNumbers(text) {
+      const nums = (String(text || "").match(/\b\d{1,3}\b/g) || []).map((n) => Number.parseInt(n, 10));
+      const filtered = nums.filter((n) => Number.isFinite(n) && n >= 3 && n <= 250);
+      return [...new Set(filtered)];
+    }
+
+    function slugifyIdPart(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function makeGameAnchorId(leagueKey, gameId) {
+      const lk = slugifyIdPart(leagueKey) || "league";
+      const gid = slugifyIdPart(gameId) || "game";
+      return `game-${lk}-${gid}`;
+    }
+
+    function scoreGame(game, leagueKey, leagueBriefing) {
+      const headline = normalizeText(game?.headline);
+      const brief = normalizeText(game?.brief || game?.lead);
+      const context = normalizeText(game?.context);
+      const bullets = Array.isArray(game?.bullets) ? game.bullets.map(normalizeText).join(" ") : "";
+      const blob = `${headline} ${brief} ${bullets} ${context}`;
+
+      const signals = [
+        { re: /\bovertime\b|\bot\b|\bshootout\b|\bwalk[- ]off\b|\bbuzzer[- ]beater\b|\bgame[- ]winner\b|\blate\b|\bfinal minute\b|\bwith \d+ seconds\b/, w: 10 },
+        { re: /\bcomeback\b|\brall(y|ied)\b|\berased\b|\bstormed back\b|\bdown \d+\b|\bblew\b|\bchoked\b/, w: 9 },
+        { re: /\brecord\b|\bfranchise[- ]record\b|\bcareer[- ]high\b|\bmilestone\b|\bfirst\b|\bmost\b|\bpassed\b|\bbroke\b/, w: 10 },
+        { re: /\bstreak\b|\bwon \d+ straight\b|\bconsecutive\b|\bextended\b/, w: 8 },
+        { re: /\bplayoff\b|\bwild[- ]card\b|\bdivision\b|\bstandings\b|\bseed\b|\bclinched\b|\beliminat(ed|ion)\b|\brace\b/, w: 9 },
+        { re: /\binjury\b|\bday[- ]to[- ]day\b|\bout\b|\bsidelined\b|\bsuspension\b|\btrade\b|\bdeadline\b|\breturn\b/, w: 7 },
+        { re: /\bblowout\b|\bromp\b|\brouted\b|\bcrushed\b|\bsteamrolled\b|\bdominant\b|\bnever trailed\b|\bled by \d+\b/, w: 6 },
+        { re: /\brival(ry|ries)\b|\bchirp\b|\btrash talk\b|\brematch\b|\bgrudge\b/, w: 5 },
+        { re: /\bbizarre\b|\bfluky\b|\bceremonial\b|\bchants?\b|\btechnical\b|\bcontrovers(y|ial)\b|\bchirp(ed|ing)?\b/, w: 6 },
+      ];
+
+      let score = 0;
+      let distinctHits = 0;
+      signals.forEach((s) => {
+        if (s.re.test(blob)) {
+          score += s.w;
+          distinctHits += 1;
+        }
+      });
+      score += distinctHits * 2;
+
+      extractBigNumbers(blob).forEach((n) => {
+        if (n >= 40) score += 6;
+        else if (n >= 30) score += 4;
+        else if (n >= 10) score += 2;
+      });
+
+      const briefing = normalizeText(leagueBriefing);
+      if (briefing) {
+        const briefingTokens = briefing
+          .split(/[^a-z0-9]+/)
+          .map((t) => t.trim())
+          .filter((t) => t.length >= 5);
+        const briefingSet = new Set(briefingTokens);
+        let briefingMatches = 0;
+        briefingSet.forEach((token) => {
+          if (blob.includes(token)) briefingMatches += 1;
+        });
+        score += Math.min(8, briefingMatches);
+      }
+
+      const leagueWeight = {
+        nfl: 1.2,
+        nba: 1.1,
+        nhl: 1.0,
+        mlb: 1.0,
+        soccer: 1.0,
+        premierleague: 1.0,
+      };
+
+      return score * (leagueWeight[leagueKey] || 1.0);
+    }
+
+    function buildTop10(leaguesData, options = {}) {
+      const { maxItems = 10, maxPerLeague = 6, minPerLeague = 0 } = options;
+      const candidates = [];
+
+      leaguesData.forEach((league) => {
+        const leagueKey = league.leagueKey || slugifyIdPart(league.leagueName) || "league";
+        const games = Array.isArray(league.games) ? league.games : [];
+        games.forEach((game, i) => {
+          const gameId = game?.id != null ? String(game.id) : `${leagueKey}-${i + 1}`;
+          const score = scoreGame(game, leagueKey, league.leagueBriefing);
+          candidates.push({
+            leagueKey,
+            leagueName: league.leagueName || leagueKey.toUpperCase(),
+            gameId,
+            headline: String(game?.headline || `Game ${i + 1}`),
+            scoreLine: String(game?.scoreLine || game?.score || ""),
+            score,
+            anchorId: makeGameAnchorId(leagueKey, gameId),
+            sourceGame: game,
+          });
+        });
+      });
+
+      candidates.sort((a, b) => b.score - a.score);
+
+      const picked = [];
+      const perLeagueCount = {};
+
+      if (minPerLeague > 0) {
+        const byLeague = {};
+        candidates.forEach((c) => {
+          if (!byLeague[c.leagueKey]) byLeague[c.leagueKey] = [];
+          byLeague[c.leagueKey].push(c);
+        });
+
+        Object.keys(byLeague).forEach((lk) => {
+          byLeague[lk].slice(0, minPerLeague).forEach((item) => {
+            if (picked.length >= maxItems) return;
+            if (picked.some((p) => p.leagueKey === item.leagueKey && p.gameId === item.gameId)) return;
+            picked.push(item);
+            perLeagueCount[item.leagueKey] = (perLeagueCount[item.leagueKey] || 0) + 1;
+          });
+        });
+      }
+
+      for (const c of candidates) {
+        if (picked.length >= maxItems) break;
+        if ((perLeagueCount[c.leagueKey] || 0) >= maxPerLeague) continue;
+        if (picked.some((p) => p.leagueKey === c.leagueKey && p.gameId === c.gameId)) continue;
+        picked.push(c);
+        perLeagueCount[c.leagueKey] = (perLeagueCount[c.leagueKey] || 0) + 1;
+      }
+
+      return picked.slice(0, maxItems).map((item, idx) => ({
+        rank: idx + 1,
+        text: item.headline,
+        leagueKey: item.leagueKey,
+        leagueName: item.leagueName,
+        gameId: item.gameId,
+        scoreLine: item.scoreLine,
+        scoreValue: item.score,
+        anchorId: item.anchorId,
+        brief: String(item.sourceGame?.brief || item.sourceGame?.lead || ""),
+        bullets: Array.isArray(item.sourceGame?.bullets) ? item.sourceGame.bullets.slice(0, 4) : [],
+        context: String(item.sourceGame?.context || ""),
+        highlights: Array.isArray(item.sourceGame?.highlights) ? item.sourceGame.highlights : [],
+      }));
+    }
+
+    function buildAllLeagueData() {
+      const games = state.top10Items.map((item) => {
+        const sourceTag = `${item.leagueName}${item.scoreLine ? ` • ${item.scoreLine}` : ""}`;
+        const bullets = [`Rank score: ${Math.round(item.scoreValue)} pts`, `Source league: ${item.leagueName}`];
+        if (Array.isArray(item.bullets) && item.bullets.length) {
+          bullets.push(...item.bullets.slice(0, 2).map((b) => String(b)));
+        }
+        return {
+          id: `top-${item.rank}-${item.leagueKey}-${item.gameId}`,
+          headline: `${item.rank}. ${item.text}`,
+          scoreLine: sourceTag,
+          brief: item.brief || "",
+          bullets,
+          context: item.context || "",
+          highlights: Array.isArray(item.highlights) ? item.highlights : [],
+        };
+      });
+
+      return {
+        leagueName: "ALL",
+        leagueKey: "all",
+        leagueBriefing: "Top 10 ranked storylines across all available league recap JSON files for the current day.",
+        games,
+      };
+    }
+
+    async function refreshTop10() {
+      const token = ++state.top10Token;
+
+      try {
+        const leaguesData = await Promise.all(
+          state.leagues.map(async (lg) => {
+            const data = await loadLeagueData(lg);
+            return {
+              ...data,
+              leagueKey: data.leagueKey || lg.leagueKey,
+              leagueName: data.leagueName || lg.leagueName,
+            };
+          })
+        );
+
+        if (token !== state.top10Token) return;
+
+        const top10 = buildTop10(leaguesData, {
+          maxItems: 10,
+          maxPerLeague: 6,
+          minPerLeague: 0,
+        });
+        state.autoTop10Items = top10;
+
+        const allGamesByKey = new Map();
+        leaguesData.forEach((league) => {
+          const leagueKey = String(league?.leagueKey || "");
+          const games = Array.isArray(league?.games) ? league.games : [];
+          games.forEach((game, i) => {
+            const gameId = game?.id != null ? String(game.id) : `${leagueKey}-${i + 1}`;
+            const key = makeGameKey(leagueKey, gameId);
+            allGamesByKey.set(key, {
+              leagueKey,
+              leagueName: league.leagueName || leagueKey.toUpperCase(),
+              gameId,
+              text: String(game?.headline || `Game ${i + 1}`),
+              scoreLine: String(game?.scoreLine || game?.score || ""),
+              scoreValue: scoreGame(game, leagueKey, league.leagueBriefing),
+              brief: String(game?.brief || game?.lead || ""),
+              bullets: Array.isArray(game?.bullets) ? game.bullets.slice(0, 4) : [],
+              context: String(game?.context || ""),
+              highlights: Array.isArray(game?.highlights) ? game.highlights : [],
+            });
+          });
+        });
+
+        state.allGamesByKey = allGamesByKey;
+        state.top10Items = composeFinalTop10();
+        updateModeAndStatus();
+
+        if (state.sectionByLeagueKey.has("all")) {
+          const oldSection = state.sectionByLeagueKey.get("all");
+          const newSection = renderLeagueSection(ALL_LEAGUE, buildAllLeagueData());
+          oldSection.replaceWith(newSection);
+          state.sectionByLeagueKey.set("all", newSection);
+          if (state.currentLeagueKey === "all") {
+            buildHeadlineNav();
+          }
+        }
+      } catch (e) {
+        if (token !== state.top10Token) return;
+        state.autoTop10Items = [];
+        state.top10Items = [];
+        if (state.sectionByLeagueKey.has("all")) {
+          const oldSection = state.sectionByLeagueKey.get("all");
+          const errData = {
+            leagueName: "ALL",
+            leagueKey: "all",
+            leagueBriefing: `Top 10 generation failed: ${String(e.message || e)}`,
+            games: [],
+          };
+          const newSection = renderLeagueSection(ALL_LEAGUE, errData);
+          oldSection.replaceWith(newSection);
+          state.sectionByLeagueKey.set("all", newSection);
+        }
+      }
+    }
+
+    async function loadLeagueData(lg) {
+      const key = lg.leagueKey;
+      if (state.cache.has(key)) return state.cache.get(key);
+      if (state.loading.has(key)) return state.loading.get(key);
+
+      const p = (async () => {
+        const res = await fetch(`${lg.fileUrl}?t=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status} when fetching ${lg.fileUrl}`);
+        const data = await res.json();
+        if (!data || typeof data !== "object" || Array.isArray(data)) {
+          throw new Error(`Expected JSON object in ${lg.fileUrl}`);
+        }
+        state.cache.set(key, data);
+        return data;
+      })();
+
+      state.loading.set(key, p);
+      try {
+        return await p;
+      } finally {
+        state.loading.delete(key);
+      }
+    }
+
+    function renderGameCard(g, gameIdx, leagueKey) {
+      const card = document.createElement("article");
+      card.className = "game-card rounded-md border border-gray-200 bg-white p-5 shadow-sm";
+      card.dataset.leagueKey = leagueKey;
+      card.dataset.gameIndex = String(gameIdx);
+      card.dataset.gameId = String(g.id || `${leagueKey}-${gameIdx}`);
+      card.dataset.headline = String(g.headline || `Game ${gameIdx + 1}`);
+      card.id = makeGameAnchorId(leagueKey, card.dataset.gameId);
+
+      if (state.isAdminMode && leagueKey !== "all") {
+        const gameKey = makeGameKey(leagueKey, card.dataset.gameId);
+        const currentRank = state.manualRankByGame.get(gameKey) || "";
+
+        const controlWrap = document.createElement("div");
+        controlWrap.className = "mb-3 flex flex-wrap items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-2 text-xs";
+
+        const label = document.createElement("span");
+        label.className = "font-semibold text-amber-800";
+        label.textContent = "Top 10 rank:";
+
+        const select = document.createElement("select");
+        select.className = "rounded-md border border-amber-300 bg-white px-2 py-1 text-xs";
+        select.dataset.rankSelect = "1";
+        select.dataset.leagueKey = leagueKey;
+        select.dataset.gameId = card.dataset.gameId;
+
+        const noneOpt = document.createElement("option");
+        noneOpt.value = "";
+        noneOpt.textContent = "Unranked";
+        select.appendChild(noneOpt);
+
+        for (let i = 1; i <= 10; i += 1) {
+          const opt = document.createElement("option");
+          opt.value = String(i);
+          opt.textContent = String(i);
+          if (String(currentRank) === String(i)) opt.selected = true;
+          select.appendChild(opt);
+        }
+
+        select.addEventListener("change", async () => {
+          const next = select.value ? Number(select.value) : null;
+          setManualRankForGame(leagueKey, card.dataset.gameId, next);
+          syncAdminRankDropdownOptions();
+          updateModeAndStatus();
+          await refreshTop10();
+          buildLeagueNav();
+          if (state.currentLeagueKey === "all") buildHeadlineNav();
+        });
+
+        controlWrap.appendChild(label);
+        controlWrap.appendChild(select);
+        card.appendChild(controlWrap);
+
+        syncAdminRankDropdownOptions();
+      }
+
+      const yt = getYouTubeVideoFromGame(g);
+      if (yt?.embedUrl) {
+        const mediaWrap = document.createElement("div");
+        mediaWrap.className = "float-right mb-3 ml-4 w-full sm:w-[280px]";
+
+        const ratio = document.createElement("div");
+        ratio.className = "overflow-hidden rounded-md border border-gray-200 bg-black";
+        ratio.style.aspectRatio = "16 / 9";
+
+        const iframe = document.createElement("iframe");
+        iframe.src = yt.embedUrl;
+        iframe.title = yt.title || "Game Highlights";
+        iframe.loading = "lazy";
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+        iframe.allowFullscreen = true;
+        iframe.className = "h-full w-full";
+
+        ratio.appendChild(iframe);
+        mediaWrap.appendChild(ratio);
+        card.appendChild(mediaWrap);
+      }
+
+      const headline = document.createElement("div");
+      headline.className = "text-base sm:text-lg font-extrabold leading-snug";
+      headline.textContent = g.headline ? String(g.headline) : "Recap";
+      card.appendChild(headline);
+
+      const scoreLine = g.scoreLine || g.score;
+      if (scoreLine) {
+        const score = document.createElement("div");
+        score.className = "mt-1 text-sm font-semibold text-gray-700";
+        score.textContent = String(scoreLine);
+        card.appendChild(score);
+      }
+
+      const leadText = g.lead || g.brief;
+      if (leadText) {
+        const lead = document.createElement("div");
+        lead.className = "mt-3 text-sm leading-relaxed text-gray-700";
+        lead.textContent = String(leadText);
+        card.appendChild(lead);
+      }
+
+      const bullets = Array.isArray(g.bullets) ? g.bullets : [];
+      if (bullets.length) {
+        const ul = document.createElement("ul");
+        ul.className = "mt-3 list-disc space-y-2 pl-5 text-sm text-gray-800";
+        bullets.forEach((b) => {
+          const li = document.createElement("li");
+          li.className = "leading-relaxed";
+          li.textContent = String(b);
+          ul.appendChild(li);
+        });
+        card.appendChild(ul);
+      }
+
+      if (g.context) {
+        const ctx = document.createElement("div");
+        ctx.className = "mt-4 border-t border-gray-200 pt-3 text-xs leading-relaxed text-gray-500";
+        ctx.textContent = `Context: ${String(g.context)}`;
+        card.appendChild(ctx);
+      }
+
+      return card;
+    }
+
+    function renderLeagueSection(lg, data) {
+      const section = document.createElement("section");
+      section.className = "league-section space-y-4";
+      section.dataset.leagueKey = lg.leagueKey;
+
+      const headerCard = document.createElement("div");
+      headerCard.className = "rounded-md border border-gray-200 bg-white shadow-sm";
+      const headerInner = document.createElement("div");
+      headerInner.className = "flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-4 py-3";
+      const left = document.createElement("div");
+      left.className = "min-w-0";
+      const title = document.createElement("div");
+      title.className = "truncate text-lg font-semibold";
+      title.textContent = lg.leagueName || data.leagueName || "League";
+      const src = document.createElement("div");
+      src.className = "truncate text-xs text-gray-500";
+      src.textContent = lg.leagueKey === "all"
+        ? "Generated from all loaded league JSON files"
+        : `File: ${lg.fileUrl}`;
+      left.appendChild(title);
+      left.appendChild(src);
+      headerInner.appendChild(left);
+
+      const gameCount = Array.isArray(data.games) ? data.games.length : 0;
+      const meta = document.createElement("span");
+      meta.className = "rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600";
+      meta.textContent = lg.leagueKey === "all"
+        ? `${lg.leagueName} • ${gameCount} ranked storylines`
+        : `${lg.leagueName} • ${gameCount} recaps • ${lg.fileUrl}`;
+      headerInner.appendChild(meta);
+      headerCard.appendChild(headerInner);
+
+      const briefing = document.createElement("div");
+      briefing.className = "border-b border-gray-200 px-4 py-4";
+      if (data.leagueBriefing) {
+        const h = document.createElement("div");
+        h.className = "mb-2 text-sm font-semibold";
+        h.textContent = "League-wide briefing";
+        const p = document.createElement("div");
+        p.className = "whitespace-pre-line text-sm leading-relaxed text-gray-700";
+        p.textContent = String(data.leagueBriefing);
+        briefing.appendChild(h);
+        briefing.appendChild(p);
+      } else {
+        briefing.classList.add("hidden");
+      }
+      headerCard.appendChild(briefing);
+      section.appendChild(headerCard);
+
+      const gamesWrap = document.createElement("div");
+      gamesWrap.className = "space-y-[250px]";
+
+      const games = Array.isArray(data.games) ? data.games : [];
+      if (!games.length) {
+        const box = document.createElement("div");
+        box.className = "rounded-md border border-gray-200 bg-gray-50 p-5";
+        const h = document.createElement("div");
+        h.className = "mb-2 text-sm font-bold";
+        h.textContent = "No recaps found for this league";
+        const p = document.createElement("div");
+        p.className = "text-sm text-gray-600";
+        p.textContent = "This league has zero items in games[].";
+        box.appendChild(h);
+        box.appendChild(p);
+        gamesWrap.appendChild(box);
+      } else {
+        games.forEach((g, gameIdx) => {
+          gamesWrap.appendChild(renderGameCard(g, gameIdx, lg.leagueKey));
+        });
+      }
+
+      section.appendChild(gamesWrap);
+
+      const endSentinel = document.createElement("div");
+      endSentinel.className = "end-sentinel h-1";
+      section.appendChild(endSentinel);
+
+      return section;
+    }
+
+    async function appendLeagueByIndex(idx) {
+      const visibleLeagues = getVisibleLeagues();
+      if (idx < 0 || idx >= visibleLeagues.length) return;
+      if (state.loadedIndices.includes(idx)) return;
+
+      const lg = visibleLeagues[idx];
+      const data = lg.leagueKey === "all" ? buildAllLeagueData() : await loadLeagueData(lg);
+      const section = renderLeagueSection(lg, data);
+      leagueStream.appendChild(section);
+      state.loadedIndices.push(idx);
+      state.loadedIndices.sort((a, b) => a - b);
+      state.sectionByLeagueKey.set(lg.leagueKey, section);
+
+      if (!state.currentLeagueKey) {
+        setCurrentLeague(lg.leagueKey, { reason: "init", updateHash: false });
+      }
+    }
+
+    async function ensureThroughIndex(targetIdx) {
+      for (let i = 0; i <= targetIdx; i += 1) {
+        await appendLeagueByIndex(i);
+      }
+    }
+
     function buildLeagueNav() {
       clear(leagueNav);
+      const visibleLeagues = getVisibleLeagues();
+      leagueCount.textContent = String(visibleLeagues.length);
 
-      const leagues = state.filteredLeagues;
-
-      leagueCount.textContent = `${leagues.length}`;
-
-      leagues.forEach((lg, idx) => {
+      visibleLeagues.forEach((lg, idx) => {
+        const isActive = state.currentLeagueKey === lg.leagueKey;
         const btn = document.createElement("button");
-        const isSelected = idx === state.selectedIndex;
-
         btn.className =
-          "w-full text-left px-3 py-2 rounded-xl border " +
-          (isSelected
-            ? "border-slate-500 bg-slate-800/60"
-            : "border-slate-800 bg-slate-950/30 hover:bg-slate-900/60");
-
-        btn.addEventListener("click", () => {
-          state.selectedIndex = idx;
-          setHashToLeagueName(lg.leagueName);
-          renderSelectedLeague();
-          buildLeagueNav();
+          "w-full rounded-md border px-3 py-2 text-left transition-colors " +
+          (isActive
+            ? "border-black bg-black text-white hover:bg-gray-800"
+            : "border-transparent bg-white text-gray-700 hover:bg-gray-100");
+        btn.addEventListener("click", async () => {
+          await goToLeagueByIndex(idx, { smooth: true, updateHash: true });
         });
 
         const row = document.createElement("div");
         row.className = "flex items-center justify-between gap-2";
-
         const left = document.createElement("div");
         left.className = "min-w-0";
 
         const name = document.createElement("div");
-        name.className = "text-sm font-bold truncate";
-        name.textContent = lg.leagueName || "League";
+        name.className = "truncate text-sm font-bold";
+        name.textContent = lg.leagueName;
 
         const sub = document.createElement("div");
-        sub.className = "text-xs text-slate-400 truncate";
-
-        const type = lg.sourceType ? `source: ${lg.sourceType}` : "source: —";
-        const count = Array.isArray(lg.games) ? `${lg.games.length} recaps` : "0 recaps";
-        sub.textContent = `${type} • ${count}`;
+        sub.className = "truncate text-xs text-gray-500";
+        const recaps = lg.leagueKey === "all"
+          ? state.top10Items.length
+          : (Array.isArray(state.cache.get(lg.leagueKey)?.games) ? state.cache.get(lg.leagueKey).games.length : "?");
+        sub.textContent = lg.leagueKey === "all"
+          ? `key: ${lg.leagueKey} • ${recaps} headlines`
+          : `key: ${lg.leagueKey} • ${recaps} recaps`;
 
         left.appendChild(name);
         left.appendChild(sub);
 
-        row.appendChild(left);
-
         const right = document.createElement("div");
-        right.className = "flex items-center gap-1 shrink-0";
+        right.className = "shrink-0";
+        right.appendChild(makePill(lg.leagueKey.toUpperCase()));
 
-        if (lg.sourceType) right.appendChild(makePill(lg.sourceType));
+        row.appendChild(left);
         row.appendChild(right);
-
         btn.appendChild(row);
         leagueNav.appendChild(btn);
       });
     }
 
-    function renderSelectedLeague() {
-      hideStates();
-      clear(gamesWrap);
-
-      const leagues = state.filteredLeagues;
-      const lg = leagues[state.selectedIndex];
-
-      if (!lg) {
-        showEmpty();
-        leagueTitle.textContent = "No league selected";
-        leagueSource.textContent = "";
-        return;
-      }
-
-      leagueTitle.textContent = lg.leagueName || "League";
-      leagueSource.textContent = lg.sourceUrl ? lg.sourceUrl : "";
-
-      // Briefing
-      if (lg.leagueBriefing) {
-        briefingText.textContent = String(lg.leagueBriefing);
-        briefingBox.classList.remove("hidden");
-      } else {
-        briefingBox.classList.add("hidden");
-        briefingText.textContent = "";
-      }
-
-      const games = Array.isArray(lg.games) ? lg.games : [];
-      if (!games.length) {
-        const box = document.createElement("div");
-        box.className = "rounded-2xl border border-slate-800 bg-slate-950/60 p-5";
-        const h = document.createElement("div");
-        h.className = "text-sm font-bold mb-2";
-        h.textContent = "No recaps found for this league";
-        const p = document.createElement("div");
-        p.className = "text-sm text-slate-300";
-        p.textContent = "This league has zero items in games[].";
-        box.appendChild(h);
-        box.appendChild(p);
-        gamesWrap.appendChild(box);
-        return;
-      }
-
-      games.forEach((g) => {
-        const card = document.createElement("article");
-        card.className = "rounded-2xl border border-slate-800 bg-slate-950/40 p-5";
-
-        const headline = document.createElement("div");
-        headline.className = "text-base sm:text-lg font-extrabold leading-snug";
-        headline.textContent = g.headline ? String(g.headline) : "Recap";
-        card.appendChild(headline);
-
-        if (g.scoreLine) {
-          const score = document.createElement("div");
-          score.className = "mt-1 text-sm font-bold text-slate-200";
-          score.textContent = String(g.scoreLine);
-          card.appendChild(score);
-        }
-
-        if (g.lead) {
-          const lead = document.createElement("div");
-          lead.className = "mt-3 text-sm text-slate-200 leading-relaxed";
-          lead.textContent = String(g.lead);
-          card.appendChild(lead);
-        }
-
-        // bullets
-        const bullets = Array.isArray(g.bullets) ? g.bullets : [];
-        if (bullets.length) {
-          const ul = document.createElement("ul");
-          ul.className = "mt-3 space-y-2 list-disc pl-5 text-sm text-slate-100";
-          bullets.forEach((b) => {
-            const li = document.createElement("li");
-            li.className = "leading-relaxed";
-            li.textContent = String(b);
-            ul.appendChild(li);
-          });
-          card.appendChild(ul);
-        }
-
-        // context
-        if (g.context) {
-          const ctx = document.createElement("div");
-          ctx.className = "mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400 leading-relaxed";
-          ctx.textContent = "Context: " + String(g.context);
-          card.appendChild(ctx);
-        }
-
-        // sources
-        const src = g.source || {};
-        const hasRecap = !!src.recapUrl;
-        const hasGamecast = !!src.gamecastUrl;
-
-        if (hasRecap || hasGamecast) {
-          const srcRow = document.createElement("div");
-          srcRow.className = "mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-300";
-
-          if (hasRecap) {
-            const wrap = document.createElement("div");
-            wrap.className = "flex items-center gap-2";
-            wrap.appendChild(makePill("recap"));
-            wrap.appendChild(makeLink("Open recap", src.recapUrl));
-            srcRow.appendChild(wrap);
-          }
-
-          if (hasGamecast) {
-            const wrap = document.createElement("div");
-            wrap.className = "flex items-center gap-2";
-            wrap.appendChild(makePill("gamecast"));
-            wrap.appendChild(makeLink("Open gamecast", src.gamecastUrl));
-            srcRow.appendChild(wrap);
-          }
-
-          card.appendChild(srcRow);
-        }
-
-        gamesWrap.appendChild(card);
+    function highlightHeadlineButtons() {
+      const currentKey = state.currentLeagueKey;
+      const activeId = state.activeGameByLeague.get(currentKey) || null;
+      [...headlineNav.querySelectorAll("button[data-game-id]")].forEach((btn) => {
+        const on = btn.dataset.gameId === activeId;
+        btn.className =
+          "w-full rounded-md px-2 py-2 text-left text-xs leading-snug transition-colors " +
+          (on ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900");
       });
     }
 
-    function applyLeagueFilter() {
-      const q = leagueFilter.value.trim().toLowerCase();
-      if (!q) {
-        state.filteredLeagues = state.leagues.slice();
-      } else {
-        state.filteredLeagues = state.leagues.filter(lg => String(lg.leagueName || "").toLowerCase().includes(q));
+    function buildHeadlineNav() {
+      clear(headlineNav);
+      const currentKey = state.currentLeagueKey;
+      if (!currentKey) {
+        const empty = document.createElement("div");
+        empty.className = "rounded-md border border-gray-200 bg-gray-50 px-2 py-2 text-xs text-gray-500";
+        empty.textContent = "Select a league to view headlines.";
+        headlineNav.appendChild(empty);
+        return;
       }
 
-      // clamp selectedIndex
-      if (state.selectedIndex >= state.filteredLeagues.length) state.selectedIndex = 0;
+      const section = state.sectionByLeagueKey.get(currentKey);
+      const cards = section ? [...section.querySelectorAll(".game-card")] : [];
+      if (!cards.length) {
+        const empty = document.createElement("div");
+        empty.className = "rounded-md border border-gray-200 bg-gray-50 px-2 py-2 text-xs text-gray-500";
+        empty.textContent = "No game headlines available.";
+        headlineNav.appendChild(empty);
+        return;
+      }
 
+      cards.forEach((card, i) => {
+        const gameId = card.dataset.gameId || `${currentKey}-${i}`;
+        const headline = card.dataset.headline || `Game ${i + 1}`;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.gameId = gameId;
+        btn.textContent = headline;
+        btn.addEventListener("click", () => {
+          scrollCardIntoView(card);
+          state.activeGameByLeague.set(currentKey, gameId);
+          highlightHeadlineButtons();
+        });
+        headlineNav.appendChild(btn);
+      });
+
+      if (!state.activeGameByLeague.get(currentKey)) {
+        const firstId = cards[0]?.dataset?.gameId;
+        if (firstId) state.activeGameByLeague.set(currentKey, firstId);
+      }
+      highlightHeadlineButtons();
+    }
+
+    function setCurrentLeague(leagueKey, { reason = "scroll", updateHash = false } = {}) {
+      if (!leagueKey) return;
+      if (state.currentLeagueKey === leagueKey && reason !== "click") return;
+      state.currentLeagueKey = leagueKey;
       buildLeagueNav();
-      renderSelectedLeague();
-    }
+      buildHeadlineNav();
 
-    function selectLeagueByName(name) {
-      if (!name) return false;
-      const idx = state.filteredLeagues.findIndex(lg => String(lg.leagueName || "").toLowerCase() === name.toLowerCase());
-      if (idx >= 0) {
-        state.selectedIndex = idx;
-        return true;
+      if (updateHash) {
+        const lg = findLeagueByKey(leagueKey);
+        if (lg?.leagueName) setHashToLeagueName(lg.leagueName);
       }
-      return false;
     }
 
-    function selectLeagueInitial() {
-      // try hash (#NBA)
-      const hashName = getLeagueNameFromHash();
-      if (hashName) {
-        // first filter is empty, so all leagues included
-        const ok = selectLeagueByName(hashName);
-        if (ok) return;
+    function scrollCardIntoView(card) {
+      const targetTop =
+        card.getBoundingClientRect().top -
+        rightScroll.getBoundingClientRect().top +
+        rightScroll.scrollTop;
+      rightScroll.scrollTo({ top: Math.max(0, targetTop - 16), behavior: "smooth" });
+    }
+
+    async function goToLeagueByIndex(idx, { smooth = true, updateHash = true } = {}) {
+      const visibleLeagues = getVisibleLeagues();
+      if (idx < 0 || idx >= visibleLeagues.length) return;
+      await ensureThroughIndex(idx);
+
+      const lg = visibleLeagues[idx];
+      const section = state.sectionByLeagueKey.get(lg.leagueKey);
+      if (!section) return;
+
+      state.manualNavLockUntil = now() + 900;
+
+      const top =
+        section.getBoundingClientRect().top -
+        rightScroll.getBoundingClientRect().top +
+        rightScroll.scrollTop;
+      rightScroll.scrollTo({ top: Math.max(0, top), behavior: smooth ? "smooth" : "auto" });
+
+      setCurrentLeague(lg.leagueKey, { reason: "click", updateHash });
+
+      const firstCard = section.querySelector(".game-card");
+      if (firstCard?.dataset?.gameId) {
+        state.activeGameByLeague.set(lg.leagueKey, firstCard.dataset.gameId);
+        highlightHeadlineButtons();
       }
-      state.selectedIndex = 0;
+
+      const nextIdx = idx + 1;
+      if (nextIdx < visibleLeagues.length) {
+        appendLeagueByIndex(nextIdx).catch(() => {});
+      }
     }
 
-    // ===== Load JSON =====
-    async function loadDailyJSON() {
+    async function maybeAppendNextLeague() {
+      if (state.appendingGuard) return;
+      const visibleLeagues = getVisibleLeagues();
+      if (!visibleLeagues.length) return;
+      const nearBottom = rightScroll.scrollTop + rightScroll.clientHeight >= rightScroll.scrollHeight - 1200;
+      if (!nearBottom) return;
+
+      const maxLoaded = state.loadedIndices.length ? state.loadedIndices[state.loadedIndices.length - 1] : -1;
+      const nextIdx = maxLoaded + 1;
+      if (nextIdx >= visibleLeagues.length) return;
+
+      state.appendingGuard = true;
       try {
-        metaPill.textContent = "Loading…";
-        hideStates();
-        clear(gamesWrap);
+        await appendLeagueByIndex(nextIdx);
+      } catch (e) {
+        showError(String(e.message || e));
+      } finally {
+        state.appendingGuard = false;
+      }
+    }
 
-        // cache-bust to see updates immediately
-        const url = DAILY_JSON_URL + "?t=" + Date.now();
-        const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) {
-          throw new Error("HTTP " + res.status + " when fetching " + DAILY_JSON_URL);
+    function updateCurrentLeagueFromScroll() {
+      if (!state.loadedIndices.length) return;
+
+      const lock = now() < state.manualNavLockUntil;
+      if (lock) return;
+
+      const containerTop = rightScroll.getBoundingClientRect().top;
+      let bestKey = null;
+      let bestTopLe = -Infinity;
+      let bestPos = Infinity;
+
+      state.loadedIndices.forEach((idx) => {
+        const lg = getVisibleLeagues()[idx];
+        if (!lg) return;
+        const sec = state.sectionByLeagueKey.get(lg.leagueKey);
+        if (!sec) return;
+        const top = sec.getBoundingClientRect().top - containerTop;
+
+        if (top <= 110 && top > bestTopLe) {
+          bestTopLe = top;
+          bestKey = lg.leagueKey;
         }
 
-        const data = await res.json();
-        state.data = data;
-
-        const leagues = normalizeLeagues(data.leagues);
-        state.leagues = leagues;
-        state.filteredLeagues = leagues.slice();
-
-        renderMeta(data);
-
-        if (!state.leagues.length) {
-          showEmpty();
-          leagueTitle.textContent = "No leagues found";
-          leagueSource.textContent = "";
-          buildLeagueNav();
-          return;
+        if (top > 110 && top < bestPos && bestTopLe === -Infinity) {
+          bestPos = top;
+          bestKey = lg.leagueKey;
         }
+      });
 
-        // reset filter input each refresh? keep it (don’t reset)
-        applyLeagueFilter();
-        selectLeagueInitial();
+      if (bestKey) setCurrentLeague(bestKey, { reason: "scroll", updateHash: false });
+    }
+
+    function updateActiveHeadlineFromScroll() {
+      const key = state.currentLeagueKey;
+      if (!key) return;
+      const section = state.sectionByLeagueKey.get(key);
+      if (!section) return;
+      const cards = [...section.querySelectorAll(".game-card")];
+      if (!cards.length) return;
+
+      const containerTop = rightScroll.getBoundingClientRect().top;
+      const band = 140;
+      let chosen = null;
+
+      for (const card of cards) {
+        const rect = card.getBoundingClientRect();
+        const top = rect.top - containerTop;
+        const bottom = rect.bottom - containerTop;
+        if (top <= band && bottom > band) {
+          chosen = card;
+          break;
+        }
+      }
+
+      if (!chosen) {
+        const ahead = cards.find((card) => (card.getBoundingClientRect().top - containerTop) > band);
+        chosen = ahead || cards[cards.length - 1];
+      }
+
+      const gameId = chosen?.dataset?.gameId;
+      if (!gameId) return;
+      if (state.activeGameByLeague.get(key) !== gameId) {
+        state.activeGameByLeague.set(key, gameId);
+        highlightHeadlineButtons();
+      }
+    }
+
+    function onScroll() {
+      if (state.scrollTicking) return;
+      state.scrollTicking = true;
+      requestAnimationFrame(async () => {
+        state.scrollTicking = false;
+        updateCurrentLeagueFromScroll();
+        updateActiveHeadlineFromScroll();
+        await maybeAppendNextLeague();
+        state.lastScrollTop = rightScroll.scrollTop;
+      });
+    }
+
+    async function refreshCurrentLeague() {
+      const key = state.currentLeagueKey;
+      if (!key) return;
+      const idx = getIndexByLeagueKey(key);
+      if (idx < 0) return;
+      const lg = getVisibleLeagues()[idx];
+      if (!lg) return;
+
+      if (key === "all") {
+        await refreshTop10();
         buildLeagueNav();
-        renderSelectedLeague();
+        buildHeadlineNav();
+        return;
+      }
 
+      state.cache.delete(key);
+      state.loading.delete(key);
+
+      const oldSection = state.sectionByLeagueKey.get(key);
+      if (!oldSection) return;
+
+      try {
+        const data = await loadLeagueData(lg);
+        const newSection = renderLeagueSection(lg, data);
+        oldSection.replaceWith(newSection);
+        state.sectionByLeagueKey.set(key, newSection);
+        buildLeagueNav();
+        buildHeadlineNav();
+        await refreshTop10();
       } catch (e) {
         showError(String(e.message || e));
       }
     }
 
+    async function rebuildStream() {
+      clear(leagueStream);
+      state.cache.clear();
+      state.loading.clear();
+      state.loadedIndices = [];
+      state.sectionByLeagueKey.clear();
+      state.currentLeagueKey = null;
+      state.activeGameByLeague.clear();
+      hideStates();
+
+      await refreshTop10();
+      buildLeagueNav();
+      await ensureThroughIndex(Math.min(1, getVisibleLeagues().length - 1));
+
+      const hashName = getLeagueNameFromHash();
+      const hashIdx = hashName
+        ? getVisibleLeagues().findIndex((lg) => String(lg.leagueName || "").toLowerCase() === hashName.toLowerCase())
+        : -1;
+      const startIdx = hashIdx >= 0 ? hashIdx : 0;
+
+      await goToLeagueByIndex(startIdx, { smooth: false, updateHash: false });
+      onScroll();
+    }
+
     // ===== Events =====
-    refreshBtn.addEventListener("click", () => loadDailyJSON());
-    leagueFilter.addEventListener("input", () => applyLeagueFilter());
-
-    prevLeagueBtn.addEventListener("click", () => {
-      const n = state.filteredLeagues.length;
-      if (!n) return;
-      state.selectedIndex = (state.selectedIndex - 1 + n) % n;
-      const lg = state.filteredLeagues[state.selectedIndex];
-      setHashToLeagueName(lg?.leagueName);
-      buildLeagueNav();
-      renderSelectedLeague();
+    refreshBtn.addEventListener("click", () => {
+      refreshCurrentLeague();
     });
 
-    nextLeagueBtn.addEventListener("click", () => {
-      const n = state.filteredLeagues.length;
-      if (!n) return;
-      state.selectedIndex = (state.selectedIndex + 1) % n;
-      const lg = state.filteredLeagues[state.selectedIndex];
-      setHashToLeagueName(lg?.leagueName);
+    saveTop10Btn.addEventListener("click", async () => {
+      if (!state.isAdminMode) return;
+      saveManualPicksToStorage();
+      await refreshTop10();
       buildLeagueNav();
-      renderSelectedLeague();
+      await goToLeagueByIndex(0, { smooth: true, updateHash: true });
+      buildHeadlineNav();
     });
 
-    window.addEventListener("hashchange", () => {
+    clearTop10Btn.addEventListener("click", async () => {
+      if (!state.isAdminMode) return;
+      clearManualPicks();
+      syncAdminRankDropdownOptions();
+      await refreshTop10();
+      buildLeagueNav();
+      buildHeadlineNav();
+    });
+
+    leagueFilter.addEventListener("input", async () => {
+      const q = leagueFilter.value.trim().toLowerCase();
+      state.filteredLeagues = !q
+        ? state.leagues.slice()
+        : state.leagues.filter((lg) => String(lg.leagueName || "").toLowerCase().includes(q));
+      await rebuildStream();
+    });
+
+    prevLeagueBtn.addEventListener("click", async () => {
+      const curIdx = getIndexByLeagueKey(state.currentLeagueKey);
+      if (curIdx <= 0) return;
+      await goToLeagueByIndex(curIdx - 1, { smooth: true, updateHash: true });
+    });
+
+    nextLeagueBtn.addEventListener("click", async () => {
+      const curIdx = getIndexByLeagueKey(state.currentLeagueKey);
+      if (curIdx < 0 || curIdx >= getVisibleLeagues().length - 1) return;
+      await goToLeagueByIndex(curIdx + 1, { smooth: true, updateHash: true });
+    });
+
+    window.addEventListener("hashchange", async () => {
       const name = getLeagueNameFromHash();
       if (!name) return;
-      const ok = selectLeagueByName(name);
-      if (ok) {
-        buildLeagueNav();
-        renderSelectedLeague();
+      const idx = getVisibleLeagues().findIndex((lg) => String(lg.leagueName || "").toLowerCase() === name.toLowerCase());
+      if (idx >= 0) {
+        await goToLeagueByIndex(idx, { smooth: true, updateHash: false });
       }
     });
 
+    window.addEventListener("storage", async (ev) => {
+      if (ev.key !== MANUAL_TOP10_STORAGE_KEY) return;
+      loadManualPicksFromStorage();
+      updateModeAndStatus();
+      await refreshTop10();
+      buildLeagueNav();
+      if (state.currentLeagueKey === "all") buildHeadlineNav();
+    });
+
+    rightScroll.addEventListener("scroll", onScroll, { passive: true });
+
     // ===== Start =====
-    loadDailyJSON();
+    async function init() {
+      state.isAdminMode = detectAdminMode();
+      loadManualPicksFromStorage();
+      updateModeAndStatus();
+      state.leagues = normalizeLeagues(LEAGUE_FILES);
+      state.filteredLeagues = state.leagues.slice();
+      await rebuildStream();
+      updateModeAndStatus();
+    }
+
+    init().catch((e) => {
+      showError(String(e.message || e));
+    });
   </script>
 </body>
 </html>
