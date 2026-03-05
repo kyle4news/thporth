@@ -161,6 +161,7 @@
       lastScrollTop: 0,
       top10Token: 0,
       top10Items: [],
+      top10GameKeys: new Set(),
       autoTop10Items: [],
       allGamesByKey: new Map(),
       isAdminMode: false,
@@ -205,6 +206,53 @@
 
     function makeGameKey(leagueKey, gameId) {
       return `${String(leagueKey)}::${String(gameId)}`;
+    }
+
+    function isTop10GameKey(leagueKey, gameId) {
+      return state.top10GameKeys.has(makeGameKey(leagueKey, gameId));
+    }
+
+    function syncCardTop10Style(card, isFeatured) {
+      if (!card) return;
+
+      const highlightClasses = [
+        "border-2",
+        "border-amber-400",
+        "bg-amber-50/50",
+        "ring-2",
+        "ring-amber-200",
+        "shadow-md",
+      ];
+
+      if (isFeatured) {
+        card.classList.add(...highlightClasses);
+      } else {
+        card.classList.remove(...highlightClasses);
+      }
+
+      let badge = card.querySelector("[data-top10-badge='1']");
+      if (isFeatured) {
+        if (!badge) {
+          badge = document.createElement("div");
+          badge.dataset.top10Badge = "1";
+          badge.className = "mb-3 inline-flex items-center rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white";
+          badge.textContent = "Featured In Top 10";
+          card.insertBefore(badge, card.firstChild);
+        }
+      } else if (badge) {
+        badge.remove();
+      }
+    }
+
+    function syncLeagueSectionTop10Styles() {
+      const cards = [...document.querySelectorAll(".game-card[data-league-key]")];
+      cards.forEach((card) => {
+        const leagueKey = String(card.dataset.leagueKey || "");
+        if (!leagueKey || leagueKey === "all") return;
+        const gameId = String(card.dataset.gameId || "");
+        const isFeatured = isTop10GameKey(leagueKey, gameId);
+        syncCardTop10Style(card, isFeatured);
+      });
     }
 
     function collectManualPicksArray() {
@@ -779,7 +827,9 @@
 
         state.allGamesByKey = allGamesByKey;
         state.top10Items = composeFinalTop10();
+        state.top10GameKeys = new Set(state.top10Items.map((item) => makeGameKey(item.leagueKey, item.gameId)));
         updateModeAndStatus();
+        syncLeagueSectionTop10Styles();
 
         if (state.sectionByLeagueKey.has("all")) {
           const oldSection = state.sectionByLeagueKey.get("all");
@@ -950,6 +1000,11 @@
         ctx.className = "mt-4 border-t border-gray-200 pt-3 text-xs leading-relaxed text-gray-500";
         ctx.textContent = `Context: ${String(g.context)}`;
         card.appendChild(ctx);
+      }
+
+      if (leagueKey !== "all") {
+        const isFeatured = isTop10GameKey(leagueKey, card.dataset.gameId);
+        syncCardTop10Style(card, isFeatured);
       }
 
       return card;
