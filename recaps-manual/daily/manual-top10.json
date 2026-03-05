@@ -1,0 +1,57 @@
+{
+  "date": "2026-03-05",
+  "mode": "manual",
+  "picks": [
+    {
+      "rank": 1,
+      "leagueKey": "nba",
+      "gameId": "401810748"
+    },
+    {
+      "rank": 2,
+      "leagueKey": "nhl",
+      "gameId": "401803321"
+    },
+    {
+      "rank": 3,
+      "leagueKey": "nba",
+      "gameId": "401810749"
+    },
+    {
+      "rank": 4,
+      "leagueKey": "premierleague",
+      "gameId": "740883"
+    },
+    {
+      "rank": 5,
+      "leagueKey": "nhl",
+      "gameId": "401803324"
+    },
+    {
+      "rank": 6,
+      "leagueKey": "nba",
+      "gameId": "401810752"
+    },
+    {
+      "rank": 7,
+      "leagueKey": "nhl",
+      "gameId": "401803322"
+    },
+    {
+      "rank": 8,
+      "leagueKey": "premierleague",
+      "gameId": "740878"
+    },
+    {
+      "rank": 9,
+      "leagueKey": "premierleague",
+      "gameId": "740882"
+    },
+    {
+      "rank": 10,
+      "leagueKey": "premierleague",
+      "gameId": "740876"
+    }
+  ],
+  "updatedAt": "2026-03-05T19:00:14.600Z"
+}
