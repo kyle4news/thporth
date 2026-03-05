@@ -1,0 +1,206 @@
+{
+  "leagueName": "National Basketball Association",
+  "leagueKey": "NBA",
+  "sourceType": "console_recaps",
+  "leagueBriefing": "Several teams used statement wins to extend momentum Wednesday night, with Charlotte’s blowout in Boston and Atlanta’s surge past Milwaukee highlighting shifting playoff dynamics. Oklahoma City continued its roll while Philadelphia and Portland grabbed key victories to stay in the postseason conversation.",
+  "games": [
+    {
+      "id": "401810748",
+      "teams": {
+        "away": "Oklahoma City Thunder",
+        "home": "New York Knicks"
+      },
+      "headline": "Holmgren’s career night helps Thunder hold off Knicks rally",
+      "score": "OKC 103 — NYK 100",
+      "brief": "Chet Holmgren delivered one of the best shooting nights of his young career and Oklahoma City survived a furious New York comeback to edge the Knicks at Madison Square Garden. The Thunder built a comfortable lead before the Knicks erupted for 40 points in the third quarter, but Holmgren and Shai Gilgeous-Alexander steadied things late. New York had a final chance to tie, but missed 3-point attempts from Jalen Brunson and OG Anunoby sealed Oklahoma City’s fourth straight victory.",
+      "bullets": [
+        "Chet Holmgren scored 28 points, tied a career high with six 3-pointers and grabbed eight rebounds.",
+        "Shai Gilgeous-Alexander added 26 points as Oklahoma City won its fourth straight.",
+        "Jalen Brunson finished with 16 points and a season-high 15 assists but shot just 5-of-18.",
+        "Karl-Anthony Towns posted a 17-point, 17-rebound double-double for New York.",
+        "The Knicks scored 40 points in the third quarter to briefly take the lead."
+      ],
+      "context": "Oklahoma City extended its winning streak while snapping New York’s three-game run.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810748/thunder-knicks"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "eIqsiEQlxyk",
+          "title": "THUNDER at KNICKS | FULL GAME HIGHLIGHTS | March 4, 2026",
+          "url": "https://www.youtube.com/watch?v=eIqsiEQlxyk",
+          "embedUrl": "https://www.youtube.com/embed/eIqsiEQlxyk",
+          "publishedAt": "2026-03-05T03:00:58Z",
+          "matchScore": 140
+        }
+      ]
+    },
+    {
+      "id": "401810749",
+      "teams": {
+        "away": "Charlotte Hornets",
+        "home": "Boston Celtics"
+      },
+      "headline": "Hornets dominate Celtics in Boston to extend winning streak to six",
+      "score": "CHA 118 — BOS 89",
+      "brief": "Charlotte delivered one of its most convincing performances of the season, overwhelming Boston from the opening minutes and cruising to a blowout victory at TD Garden. The Hornets jumped ahead early, took care of the ball, and never let the Celtics find any rhythm. With balanced scoring and disciplined play, Charlotte pushed its winning streak to six games and climbed above .500 for the first time since October.",
+      "bullets": [
+        "Kon Knueppel led Charlotte with 20 points.",
+        "LaMelo Ball and Brandon Miller each scored 18 points in the win.",
+        "Charlotte committed only five turnovers the entire game.",
+        "Boston shot just 38% from the field and went 10-of-36 from three.",
+        "Derrick White led the Celtics with 29 points."
+      ],
+      "context": "The win moved Charlotte above .500 for the first time since Oct. 26 while snapping Boston’s three-game streak.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810749/hornets-celtics"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "fatRp1ONPEc",
+          "title": "HORNETS at CELTICS | FULL GAME HIGHLIGHTS | March 4, 2026",
+          "url": "https://www.youtube.com/watch?v=fatRp1ONPEc",
+          "embedUrl": "https://www.youtube.com/embed/fatRp1ONPEc",
+          "publishedAt": "2026-03-05T03:03:09Z",
+          "matchScore": 140
+        }
+      ]
+    },
+    {
+      "id": "401810750",
+      "teams": {
+        "away": "Utah Jazz",
+        "home": "Philadelphia 76ers"
+      },
+      "headline": "Grimes free throws lift short-handed 76ers past Jazz late",
+      "score": "PHI 106 — UTA 102",
+      "brief": "Philadelphia pieced together a gritty late comeback despite being without several key players, rallying past Utah in the final minutes. The Jazz led late before their offense stalled, allowing the 76ers to claw back and tie the game. Quentin Grimes delivered the decisive moment at the line with 16 seconds remaining, sealing a much-needed win for a Philadelphia team fighting to maintain playoff position.",
+      "bullets": [
+        "Tyrese Maxey led Philadelphia with 25 points.",
+        "Quentin Grimes scored 16 points including the game-winning free throws with 16.4 seconds left.",
+        "Jabari Walker added 22 points for the 76ers.",
+        "Keyonte George scored 30 points for Utah.",
+        "The Jazz have now lost seven straight games."
+      ],
+      "context": "Philadelphia stayed in the Eastern Conference playoff race while Utah’s losing streak reached seven games.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810750/jazz-76ers"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "zbbk2wpIWYE",
+          "title": "JAZZ at 76ERS | FULL GAME HIGHLIGHTS | March 4, 2026",
+          "url": "https://www.youtube.com/watch?v=zbbk2wpIWYE",
+          "embedUrl": "https://www.youtube.com/embed/zbbk2wpIWYE",
+          "publishedAt": "2026-03-05T03:20:11Z",
+          "matchScore": 140
+        }
+      ]
+    },
+    {
+      "id": "401810751",
+      "teams": {
+        "away": "Portland Trail Blazers",
+        "home": "Memphis Grizzlies"
+      },
+      "headline": "Holiday’s 35-point night powers Blazers past Grizzlies",
+      "score": "POR 122 — MEM 114",
+      "brief": "Jrue Holiday took control offensively and helped Portland close strong in Memphis as the Trail Blazers boosted their postseason hopes. After a competitive game through much of the night, Portland pulled away down the stretch behind Holiday’s scoring and playmaking along with Jerami Grant’s big offensive contribution. Memphis had balanced scoring but couldn’t overcome another game without Ja Morant.",
+      "bullets": [
+        "Jrue Holiday finished with 35 points and 11 assists.",
+        "Jerami Grant added 30 points for Portland.",
+        "Robert Williams III posted 20 points and 11 rebounds.",
+        "Memphis had seven players score in double figures.",
+        "Ja Morant missed his 18th straight game with an elbow injury."
+      ],
+      "context": "Portland kept itself in the postseason hunt while Memphis continued to struggle amid injuries.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810751/trail-blazers-grizzlies"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "pXPuFzxILRw",
+          "title": "TRAIL BLAZERS at GRIZZLIES | FULL GAME HIGHLIGHTS | March 4, 2026",
+          "url": "https://www.youtube.com/watch?v=pXPuFzxILRw",
+          "embedUrl": "https://www.youtube.com/embed/pXPuFzxILRw",
+          "publishedAt": "2026-03-05T03:46:38Z",
+          "matchScore": 140
+        }
+      ]
+    },
+    {
+      "id": "401810752",
+      "teams": {
+        "away": "Atlanta Hawks",
+        "home": "Milwaukee Bucks"
+      },
+      "headline": "Hawks rally from big deficit and rout slumping Bucks",
+      "score": "ATL 131 — MIL 113",
+      "brief": "Atlanta turned an early deficit into a dominant road win, storming back and overwhelming Milwaukee in the second half. The Hawks flipped the game after halftime with a massive scoring surge, eventually pulling away behind balanced scoring and strong playmaking. The victory extended Atlanta’s winning streak and deepened the Bucks’ struggles during a rough stretch.",
+      "bullets": [
+        "Nickeil Alexander-Walker led Atlanta with 23 points.",
+        "Onyeka Okongwu added 21 points while Jalen Johnson had 20 points and nine assists.",
+        "Atlanta outscored Milwaukee 65-42 in the second half.",
+        "Giannis Antetokounmpo scored 24 points in his second game back from injury.",
+        "Milwaukee has lost four straight games by a combined 97 points."
+      ],
+      "context": "Atlanta’s fifth straight win pushed the Hawks back above .500 while Milwaukee’s slide continued.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810752/hawks-bucks"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "LQHko1BPP-0",
+          "title": "HAWKS at BUCKS | FULL GAME HIGHLIGHTS | March 4, 2026",
+          "url": "https://www.youtube.com/watch?v=LQHko1BPP-0",
+          "embedUrl": "https://www.youtube.com/embed/LQHko1BPP-0",
+          "publishedAt": "2026-03-05T05:31:40Z",
+          "matchScore": 140
+        }
+      ]
+    },
+    {
+      "id": "401810753",
+      "teams": {
+        "away": "Indiana Pacers",
+        "home": "Los Angeles Clippers"
+      },
+      "headline": "Kawhi leads Clippers as Pacers skid reaches seven games",
+      "score": "LAC 130 — IND 107",
+      "brief": "Kawhi Leonard set the tone early and the Clippers cruised past Indiana with a commanding offensive performance in Los Angeles. Leonard’s scoring burst helped build a quick lead that the Pacers never seriously threatened, and the Clippers pulled away even further with a dominant third-quarter run. Indiana, despite a strong game from Pascal Siakam, continued its downward spiral with another defeat.",
+      "bullets": [
+        "Kawhi Leonard scored 29 points to lead the Clippers.",
+        "Bennedict Mathurin added 23 points on 8-of-11 shooting.",
+        "Los Angeles shot 55.1% from the field.",
+        "Pascal Siakam scored 29 points in his return from injury for Indiana.",
+        "The Pacers have now lost seven straight games."
+      ],
+      "context": "The Clippers extended their winning streak to three games while Indiana dropped to the bottom of the Eastern Conference standings.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810753/pacers-clippers"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "yjE3WT4nu8Q",
+          "title": "PACERS at CLIPPERS | FULL GAME HIGHLIGHTS | March 4, 2026",
+          "url": "https://www.youtube.com/watch?v=yjE3WT4nu8Q",
+          "embedUrl": "https://www.youtube.com/embed/yjE3WT4nu8Q",
+          "publishedAt": "2026-03-05T06:12:45Z",
+          "matchScore": 140
+        }
+      ]
+    }
+  ]
+}
