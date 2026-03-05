@@ -1,0 +1,301 @@
+{
+  "leagueName": "Premier League",
+  "leagueKey": "ENG.1",
+  "sourceType": "console_recaps",
+  "leagueBriefing": "Across this two-day Premier League stretch, Arsenal strengthened their title position with a gritty win at Brighton while Manchester City dropped more points in a 2-2 with Forest. Newcastle’s late drama against Manchester United and Chelsea’s emphatic win at Villa shaped the top-end race, while West Ham’s narrow win at Fulham, Wolves’ stoppage-time shock over Liverpool, Sunderland’s VAR-soaked smash-and-grab at Leeds, Everton’s needed home win over Burnley, and Bournemouth’s frustrating stalemate with Brentford all intensified the pressure at the bottom.",
+  "games": [
+    {
+      "id": "740883",
+      "teams": {
+        "away": "Manchester United",
+        "home": "Newcastle United"
+      },
+      "headline": "Osula stuns United late as 10-man Newcastle ends Carrick’s unbeaten start",
+      "score": "NEW 2 — MUN 1",
+      "brief": "St. James’ Park got the kind of finish that lives in the next-morning group chat: Newcastle, down to 10 men, still found a winner in the 90th through Will Osula and took down Manchester United in a wild, emotionally charged night. Anthony Gordon’s penalty and Casemiro’s header had the match locked at 1-1 after a frenzied first-half finale, but Newcastle refused to play like a team a man short and stole it at the death to snap a three-game league skid — and hand Michael Carrick his first loss in charge.",
+      "bullets": [
+        "Will Osula came off the bench and scored the winner in the 90th minute.",
+        "Newcastle played the entire second half with 10 men after Jacob Ramsey was sent off for a second booking in stoppage time of the first half.",
+        "Anthony Gordon scored from the spot in first-half added time after being brought down by Bruno Fernandes.",
+        "Casemiro equalized with a header from Fernandes’ free kick three minutes after Newcastle’s penalty.",
+        "Newcastle made it four straight home wins over Manchester United, in front of 52,184 at St. James’ Park."
+      ],
+      "context": "The result ended Carrick’s eight-game unbeaten run and gave Newcastle a needed win after three straight Premier League losses.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/soccer/report/_/gameId/740883"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "CX__97urBd8",
+          "title": "Newcastle United v. Manchester United | PREMIER LEAGUE HIGHLIGHTS | 3/4/2026 | NBC Sports",
+          "url": "https://www.youtube.com/watch?v=CX__97urBd8",
+          "embedUrl": "https://www.youtube.com/embed/CX__97urBd8",
+          "publishedAt": "2026-03-04T23:26:06Z",
+          "matchScore": 105
+        }
+      ]
+    },
+    {
+      "id": "740876",
+      "teams": {
+        "away": "Chelsea",
+        "home": "Aston Villa"
+      },
+      "headline": "João Pedro hits hat trick as Chelsea rip past Villa to boost top-five push",
+      "score": "CHE 4 — AVL 1",
+      "brief": "Chelsea turned an early punch from Villa into a full-on statement, riding a João Pedro hat trick and a Cole Palmer goal to a 4-1 win that reshuffled the Champions League conversation. Douglas Luiz scored inside three minutes, but Villa’s grip on the match slipped fast as Chelsea’s tempo and transition play overwhelmed them. By the time Pedro completed his treble, it felt less like a road win and more like a warning shot to everyone clustered around the top-four chase.",
+      "bullets": [
+        "João Pedro scored a Premier League hat trick in Chelsea’s 4-1 win.",
+        "Cole Palmer scored to make it 3-1 shortly after halftime.",
+        "Aston Villa scored first through Douglas Luiz after 150 seconds.",
+        "Chelsea went in front before halftime with Pedro’s second goal in stoppage time.",
+        "Villa have now won just one of their last six games, per the recap."
+      ],
+      "context": "Chelsea’s win boosted Champions League qualification hopes while Villa’s recent slide tightened the race for fourth and fifth.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/soccer/report/_/gameId/740876"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "wk1N5iv-1Qg",
+          "title": "Aston Villa v. Chelsea | PREMIER LEAGUE HIGHLIGHTS | 3/4/2026 | NBC Sports",
+          "url": "https://www.youtube.com/watch?v=wk1N5iv-1Qg",
+          "embedUrl": "https://www.youtube.com/embed/wk1N5iv-1Qg",
+          "publishedAt": "2026-03-04T22:32:33Z",
+          "matchScore": 105
+        }
+      ]
+    },
+    {
+      "id": "740878",
+      "teams": {
+        "away": "Arsenal",
+        "home": "Brighton & Hove Albion"
+      },
+      "headline": "Arsenal grind out ugly win at Brighton to widen title gap",
+      "score": "ARS 1 — BHA 0",
+      "brief": "This was the kind of title-race win that doesn’t sparkle but absolutely counts: Arsenal weren’t fluid, weren’t sharp, and spent long stretches soaking up Brighton pressure — yet still walked out with three points. Bukayo Saka’s early strike (helped by a goalkeeping error) was enough as the league leaders dug in, slowed the game when they had to, and survived a handful of Brighton chances to extend their lead at the top.",
+      "bullets": [
+        "Bukayo Saka scored in the 9th minute, in his 300th Arsenal appearance.",
+        "The recap notes Saka has scored in his last three appearances at the Amex Stadium.",
+        "Arsenal were without William Saliba (ankle) and Martin Ødegaard also missed out, per the report.",
+        "Brighton had a major header chance when Mats Wieffer was left free but headed straight at David Raya.",
+        "Arsenal’s win extended their lead at the top of the table to seven points, per the report."
+      ],
+      "context": "A third straight league win kept Arsenal in control of the title race on a night Manchester City dropped points.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/soccer/report/_/gameId/740878"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "Id9CTKJ4Kpk",
+          "title": "Brighton & Hove Albion v. Arsenal | PREMIER LEAGUE HIGHLIGHTS | 3/4/2026 | NBC Sports",
+          "url": "https://www.youtube.com/watch?v=Id9CTKJ4Kpk",
+          "embedUrl": "https://www.youtube.com/embed/Id9CTKJ4Kpk"
+        }
+      ]
+    },
+    {
+      "id": "740880",
+      "teams": {
+        "away": "West Ham United",
+        "home": "Fulham"
+      },
+      "headline": "Summerville pounces on Leno blunder to give West Ham lifeline at Fulham",
+      "score": "WHU 1 — FUL 0",
+      "brief": "West Ham didn’t need a dozen chances — they needed one moment of chaos, and Crysencio Summerville was ready for it. In a tense match at Craven Cottage, Fulham pushed for their European hopes, but a Bernd Leno mistake flipped the script, gifting Summerville a late finish into an empty net. It’s the kind of ugly-but-gorgeous three points that changes how the relegation fight feels the next morning.",
+      "bullets": [
+        "Crysencio Summerville scored the only goal after capitalizing on a mistake by Bernd Leno.",
+        "Summerville’s goal was his seventh in his last 10 appearances, per the report.",
+        "West Ham moved level with 17th-placed Nottingham Forest, staying in the relegation zone only on goal difference.",
+        "Fulham had a penalty awarded and then overturned after VAR showed Tom Cairney had kicked Taty Castellanos’ calf.",
+        "Mads Hermansen made a stoppage-time save to preserve the win."
+      ],
+      "context": "The win pulled West Ham level with Forest and tightened the relegation battle, with Fulham missing a chance to strengthen its European push.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/soccer/report/_/gameId/740880"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "y-kytZOSmcE",
+          "title": "Fulham v. West Ham United | PREMIER LEAGUE HIGHLIGHTS | 3/4/2026 | NBC Sports",
+          "url": "https://www.youtube.com/watch?v=y-kytZOSmcE",
+          "embedUrl": "https://www.youtube.com/embed/y-kytZOSmcE",
+          "publishedAt": "2026-03-04T22:36:38Z",
+          "matchScore": 105
+        }
+      ]
+    },
+    {
+      "id": "740882",
+      "teams": {
+        "away": "Nottingham Forest",
+        "home": "Manchester City"
+      },
+      "headline": "Forest refuse to fold as City drop more points in title chase",
+      "score": "MCI 2 — NFO 2",
+      "brief": "Manchester City twice had the Etihad set up for a routine win — and twice Nottingham Forest yanked it back, exposing the same second-half wobble that’s haunted City all season. Antoine Semenyo and Rodri put City in front, but Forest answered through Morgan Gibbs-White and then Elliot Anderson with a brilliant equalizer from range. City created chances late, Forest nearly stole it, and the biggest takeaway was simple: points keep slipping, and the title door keeps opening for Arsenal.",
+      "bullets": [
+        "Manchester City drew 2-2 after Nottingham Forest equalized twice at the Etihad.",
+        "Antoine Semenyo scored City’s opener; Rodri restored the lead with a header just after the hour.",
+        "Forest’s goals came from Morgan Gibbs-White (backheel finish) and Elliot Anderson (long-range curler).",
+        "Pep Guardiola said City have dropped 13 points from winning positions this season, per the recap.",
+        "The draw left City seven points behind Arsenal, with a game in hand, per the report."
+      ],
+      "context": "City’s draw left them seven points back of Arsenal and gave Forest another morale-boosting result in the relegation fight.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/soccer/report/_/gameId/740882"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "bdehnXUF2yM",
+          "title": "Manchester City v. Nottingham Forest | PREMIER LEAGUE HIGHLIGHTS | 3/4/2026 | NBC Sports",
+          "url": "https://www.youtube.com/watch?v=bdehnXUF2yM",
+          "embedUrl": "https://www.youtube.com/embed/bdehnXUF2yM",
+          "publishedAt": "2026-03-04T23:09:19Z",
+          "matchScore": 105
+        }
+      ]
+    },
+    {
+      "id": "740877",
+      "teams": {
+        "away": "Brentford",
+        "home": "AFC Bournemouth"
+      },
+      "headline": "Bournemouth hit the woodwork twice but can’t break Brentford in stalemate",
+      "score": "BOU 0 — BRE 0",
+      "brief": "Bournemouth did almost everything but score, controlling the game and repeatedly threatening through Marcus Tavernier, only to walk away with another frustrating draw. Tavernier rattled the woodwork twice and the Cherries kept Brentford penned in for long stretches, yet the finishing touch never arrived. For two sides with European hopes, it felt like a night Bournemouth will regret far more than Brentford will celebrate.",
+      "bullets": [
+        "Marcus Tavernier hit the post twice as Bournemouth dominated long spells.",
+        "Bournemouth recorded their fourth draw in five matches, per the report.",
+        "Brentford welcomed back goalkeeper Caoimhín Kelleher, who made key saves late in the first half.",
+        "Brentford’s first shot on target didn’t arrive until 18 minutes from time.",
+        "Evanilson had a goal ruled out for offside late on."
+      ],
+      "context": "Another stalemate slowed Bournemouth’s momentum in the European race while Brentford escaped with a valuable away point.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/soccer/report/_/gameId/740877"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "HG0wIYXeV_o",
+          "title": "Bournemouth v. Brentford | PREMIER LEAGUE HIGHLIGHTS | 3/3/2026 | NBC Sports",
+          "url": "https://www.youtube.com/watch?v=HG0wIYXeV_o",
+          "embedUrl": "https://www.youtube.com/embed/HG0wIYXeV_o",
+          "publishedAt": "2026-03-03T22:05:35Z",
+          "matchScore": 105
+        }
+      ]
+    },
+    {
+      "id": "740879",
+      "teams": {
+        "away": "Burnley",
+        "home": "Everton"
+      },
+      "headline": "Everton finally win at home again as Tarkowski and Dewsbury-Hall sink Burnley",
+      "score": "EVE 2 — BUR 0",
+      "brief": "Everton’s long wait for a home league win ended with a much-needed 2-0 over Burnley — not a masterpiece, but exactly the kind of night that steadies a season. James Tarkowski’s set-piece header eased the tension, and Kiernan Dewsbury-Hall’s calm finish on the hour shut the door before Burnley could make it uncomfortable. Everton still have a brutal run of visitors coming, but this one kept their European hopes alive and left Burnley staring at the drop.",
+      "bullets": [
+        "James Tarkowski scored his first Premier League goal since February 2025 with a header from James Garner’s free kick.",
+        "Kiernan Dewsbury-Hall made it 2-0 on the hour for his sixth goal of the season, per the report.",
+        "Everton moved within three points of sixth-placed Chelsea, according to the recap.",
+        "Burnley remain eight points from safety and have won just once since October, per the report.",
+        "Jordan Pickford produced a late close-range reaction save to deny Lyle Foster with the last kick."
+      ],
+      "context": "Everton’s first home win in three months kept them in touch with the European places while Burnley’s survival odds worsened.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/soccer/report/_/gameId/740879"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "piiT5llcjqw",
+          "title": "Everton v. Burnley | PREMIER LEAGUE HIGHLIGHTS | 3/3/2026 | NBC Sports",
+          "url": "https://www.youtube.com/watch?v=piiT5llcjqw",
+          "embedUrl": "https://www.youtube.com/embed/piiT5llcjqw",
+          "publishedAt": "2026-03-03T22:15:39Z",
+          "matchScore": 105
+        }
+      ]
+    },
+    {
+      "id": "740881",
+      "teams": {
+        "away": "Sunderland",
+        "home": "Leeds United"
+      },
+      "headline": "Sunderland steal it at Elland Road as VAR drama deepens Leeds survival nerves",
+      "score": "LEE 0 — SUN 1",
+      "brief": "Elland Road got a classic bottom-half headache: plenty of possession, plenty of frustration, and one decisive moment that went the other way. Leeds thought they had the breakthrough before VAR ruled it out, then saw a handball decision swing the match as Habib Diarra’s penalty — saved at first glance — still crept over the line. Sunderland happily took the smash-and-grab, while Leeds were left ruing another night where control didn’t translate into points.",
+      "bullets": [
+        "Habib Diarra scored the only goal with a 70th-minute penalty that rebounded over the line after Karl Darlow appeared to save it.",
+        "Leeds had a Joe Rodon header ruled out for offside by VAR in the 64th minute.",
+        "A VAR review deemed Leeds captain Ethan Ampadu handled, leading to the penalty decision.",
+        "Sunderland’s debutant goalkeeper Melker Ellborg made key saves late as Leeds piled on pressure.",
+        "Sunderland’s win was their first in five league matches and their first at Elland Road in nearly 20 years, per the report."
+      ],
+      "context": "Leeds missed a chance to ease relegation pressure while Sunderland climbed into 11th and regained momentum after a five-game winless run.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/soccer/report/_/gameId/740881"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "Y2gCMqAu3RU",
+          "title": "Leeds United v. Sunderland | PREMIER LEAGUE HIGHLIGHTS | 3/3/2026 | NBC Sports",
+          "url": "https://www.youtube.com/watch?v=Y2gCMqAu3RU",
+          "embedUrl": "https://www.youtube.com/embed/Y2gCMqAu3RU",
+          "publishedAt": "2026-03-03T22:27:47Z",
+          "matchScore": 105
+        }
+      ]
+    },
+    {
+      "id": "740885",
+      "teams": {
+        "away": "Liverpool",
+        "home": "Wolverhampton Wanderers"
+      },
+      "headline": "Wolves stun Liverpool with stoppage-time winner to make relegation fight interesting",
+      "score": "WOL 2 — LIV 1",
+      "brief": "Wolves are suddenly playing like a team that believes, and Liverpool found out the hard way at Molineux. After Rodrigo Gomes put the hosts ahead, Salah finally ended his long league drought to level it, and it looked like Liverpool might still muscle their way into a result. Instead, André’s deflected strike deep into added time flipped the stadium — and flipped the storyline — giving bottom club Wolves back-to-back league wins and leaving Liverpool’s top-four chase wobbling.",
+      "bullets": [
+        "André scored a last-gasp winner four minutes into added time for his first goal of the season.",
+        "Rodrigo Gomes opened the scoring with Wolves’ first shot of the match.",
+        "Mohamed Salah scored his first league goal in 10 matches (122 days) to equalize.",
+        "Wolves earned back-to-back Premier League wins for the first time since April 2024, per the report.",
+        "Liverpool’s three-match winning run ended, and they missed the chance to move into fourth, per the recap."
+      ],
+      "context": "The upset dented Liverpool’s Champions League push while giving rock-bottom Wolves a rare surge of belief in the relegation race.",
+      "recapStatus": "ok",
+      "source": {
+        "recapUrl": "https://www.espn.com/soccer/report/_/gameId/740885"
+      },
+      "highlights": [
+        {
+          "provider": "youtube",
+          "videoId": "N4WJHSJDEyI",
+          "title": "Wolverhampton Wanderers v. Liverpool | PREMIER LEAGUE HIGHLIGHTS | 3/3/2026 | NBC Sports",
+          "url": "https://www.youtube.com/watch?v=N4WJHSJDEyI",
+          "embedUrl": "https://www.youtube.com/embed/N4WJHSJDEyI"
+        }
+      ]
+    }
+  ]
+}
