@@ -126,7 +126,9 @@
     const LEAGUE_FILES = [
       { leagueName: "NBA", leagueKey: "nba", fileUrl: "/recaps-manual/daily/nba.json" },
       { leagueName: "NHL", leagueKey: "nhl", fileUrl: "/recaps-manual/daily/nhl.json" },
-      { leagueName: "Premier League", leagueKey: "premierleague", fileUrl: "/recaps-manual/daily/premierleague.json" }
+      { leagueName: "Premier League", leagueKey: "premierleague", fileUrl: "/recaps-manual/daily/premierleague.json" },
+      { leagueName: "LIV Golf", leagueKey: "livgolf", fileUrl: "/recaps-manual/daily/oneperleague.json", sourceLeagueKey: "LIV" },
+      { leagueName: "Tennis", leagueKey: "tennis", fileUrl: "/recaps-manual/daily/oneperleague.json", sourceLeagueKey: "Tennis" }
     ];
 
     const LEAGUE_DISPLAY_ORDER = [
@@ -857,11 +859,27 @@
         const res = await fetch(`${lg.fileUrl}?t=${Date.now()}`, { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status} when fetching ${lg.fileUrl}`);
         const data = await res.json();
-        if (!data || typeof data !== "object" || Array.isArray(data)) {
+        let finalData = data;
+
+        // Supports shared source files that contain multiple league objects.
+        if (Array.isArray(data)) {
+          const targetKey = String(lg.sourceLeagueKey || lg.leagueKey || "").toLowerCase();
+          finalData = data.find((entry) => {
+            const entryLeagueKey = String(entry?.leagueKey || "").toLowerCase();
+            const entryLeagueName = String(entry?.leagueName || "").toLowerCase();
+            return entryLeagueKey === targetKey || entryLeagueName === targetKey;
+          });
+          if (!finalData) {
+            throw new Error(`No matching league found in ${lg.fileUrl} for ${lg.leagueName}`);
+          }
+        }
+
+        if (!finalData || typeof finalData !== "object" || Array.isArray(finalData)) {
           throw new Error(`Expected JSON object in ${lg.fileUrl}`);
         }
-        state.cache.set(key, data);
-        return data;
+
+        state.cache.set(key, finalData);
+        return finalData;
       })();
 
       state.loading.set(key, p);
