@@ -75,6 +75,10 @@
               class="hidden inline-flex select-none items-center justify-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none">
               Clear Top 10
             </button>
+            <button id="downloadTop10Btn"
+              class="hidden inline-flex select-none items-center justify-center gap-2 rounded-md bg-purple-700 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-800 focus:outline-none">
+              Download JSON
+            </button>
             <button id="saveTop10Btn"
               class="hidden inline-flex select-none items-center justify-center gap-2 rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-800 focus:outline-none">
               Save Top 10
@@ -139,6 +143,7 @@
     const SOCCER_ORDER_INDEX = Object.fromEntries(SOCCER_LEAGUE_DISPLAY_ORDER.map((name, idx) => [name.toLowerCase(), idx]));
     const ALL_LEAGUE = { leagueName: "ALL", leagueKey: "all", fileUrl: "generated://top10" };
     const MANUAL_TOP10_STORAGE_KEY = "thporth.manual-top10.v1";
+    const MANUAL_TOP10_FILE_URL = "/recaps-manual/daily/manual-top10.json";
 
     // ===== State =====
     const state = {
@@ -169,6 +174,7 @@
     const refreshBtn = document.getElementById("refreshBtn");
     const saveTop10Btn = document.getElementById("saveTop10Btn");
     const clearTop10Btn = document.getElementById("clearTop10Btn");
+    const downloadTop10Btn = document.getElementById("downloadTop10Btn");
     const modePill = document.getElementById("modePill");
     const manualStatus = document.getElementById("manualStatus");
     const leagueCount = document.getElementById("leagueCount");
@@ -242,6 +248,53 @@
       }
     }
 
+    async function loadManualPicksFromFile() {
+      try {
+        const res = await fetch(`${MANUAL_TOP10_FILE_URL}?t=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) return false;
+        const data = await res.json();
+        const date = String(data?.date || "");
+        if (date !== getTodayDateKey()) return false;
+        applyManualPicks(data?.picks || []);
+        state.lastManualSavedAt = String(data?.updatedAt || "");
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function downloadManualPicksAsJSON() {
+      const picks = collectManualPicksArray();
+      console.log("Downloading manual picks:", picks);
+      
+      if (picks.length === 0) {
+        alert("No manual picks to download. Please rank at least one game first.");
+        return false;
+      }
+
+      const payload = {
+        date: getTodayDateKey(),
+        mode: "manual",
+        picks: picks,
+        updatedAt: new Date().toISOString(),
+      };
+      
+      const jsonStr = JSON.stringify(payload, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `manual-top10.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+      
+      console.log("Download triggered for manual-top10.json");
+      alert(`Downloaded manual-top10.json with ${picks.length} picks. Check your Downloads folder, then upload this file to /recaps-manual/daily/ in your repo.`);
+      return true;
+    }
+
     function saveManualPicksToStorage() {
       const payload = {
         date: getTodayDateKey(),
@@ -300,11 +353,13 @@
         manualStatus.textContent = "Top 10 editing controls are hidden in public mode.";
         saveTop10Btn.classList.add("hidden");
         clearTop10Btn.classList.add("hidden");
+        downloadTop10Btn.classList.add("hidden");
         return;
       }
 
       saveTop10Btn.classList.remove("hidden");
       clearTop10Btn.classList.remove("hidden");
+      downloadTop10Btn.classList.remove("hidden");
       const count = collectManualPicksArray().length;
       const unsaved = state.hasUnsavedManualChanges ? " • Unsaved changes" : " • Saved";
       const savedAt = state.lastManualSavedAt
@@ -1305,6 +1360,8 @@
     saveTop10Btn.addEventListener("click", async () => {
       if (!state.isAdminMode) return;
       saveManualPicksToStorage();
+      const downloaded = downloadManualPicksAsJSON();
+      if (!downloaded) return;
       await refreshTop10();
       buildLeagueNav();
       await goToLeagueByIndex(0, { smooth: true, updateHash: true });
@@ -1318,6 +1375,11 @@
       await refreshTop10();
       buildLeagueNav();
       buildHeadlineNav();
+    });
+
+    downloadTop10Btn.addEventListener("click", () => {
+      if (!state.isAdminMode) return;
+      downloadManualPicksAsJSON();
     });
 
     leagueFilter.addEventListener("input", async () => {
@@ -1363,7 +1425,10 @@
     // ===== Start =====
     async function init() {
       state.isAdminMode = detectAdminMode();
-      loadManualPicksFromStorage();
+      const loadedFromFile = await loadManualPicksFromFile();
+      if (!loadedFromFile) {
+        loadManualPicksFromStorage();
+      }
       updateModeAndStatus();
       state.leagues = normalizeLeagues(LEAGUE_FILES);
       state.filteredLeagues = state.leagues.slice();
