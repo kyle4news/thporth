@@ -147,6 +147,13 @@
     const MANUAL_TOP10_STORAGE_KEY = "thporth.manual-top10.v1";
     const MANUAL_TOP10_FILE_URL = "/recaps-manual/daily/manual-top10.json";
     const MASCOT_SCORE_LEAGUES = new Set(["nba", "nfl", "mlb", "nhl"]);
+    const TOP10_LEAGUE_PILL_LABELS = {
+      nhl: "NHL",
+      nba: "NBA",
+      premierleague: "EPL",
+      mlb: "MLB",
+      nfl: "NFL",
+    };
 
     // ===== State =====
     const state = {
@@ -170,6 +177,7 @@
       isAdminMode: false,
       manualPicksByRank: new Map(),
       manualRankByGame: new Map(),
+      manualHeadlineByGame: new Map(),
       hasUnsavedManualChanges: false,
       lastManualSavedAt: "",
     };
@@ -286,6 +294,27 @@
       });
     }
 
+    function applyManualHeadlineOverrides(picks, top10) {
+      state.manualHeadlineByGame.clear();
+      const top10Lines = Array.isArray(top10) ? top10 : [];
+
+      (Array.isArray(picks) ? picks : []).forEach((p) => {
+        const rank = Number(p?.rank);
+        if (!Number.isInteger(rank) || rank < 1 || rank > 10) return;
+
+        const leagueKey = String(p?.leagueKey || "").trim();
+        const gameId = String(p?.gameId || "").trim();
+        if (!leagueKey || !gameId) return;
+
+        const pickHeadline = String(p?.headline || "").trim();
+        const fallbackHeadline = String(top10Lines[rank - 1] || "").trim();
+        const finalHeadline = pickHeadline || fallbackHeadline;
+        if (!finalHeadline) return;
+
+        state.manualHeadlineByGame.set(makeGameKey(leagueKey, gameId), finalHeadline);
+      });
+    }
+
     function loadManualPicksFromStorage() {
       try {
         const raw = localStorage.getItem(MANUAL_TOP10_STORAGE_KEY);
@@ -294,6 +323,7 @@
         const date = String(data?.date || "");
         if (date !== getTodayDateKey()) return;
         applyManualPicks(data?.picks || []);
+        applyManualHeadlineOverrides(data?.picks || [], data?.top10 || []);
         state.lastManualSavedAt = String(data?.updatedAt || "");
       } catch (e) {
         // Ignore malformed local storage entries.
@@ -320,6 +350,7 @@
         const picksCount = Array.isArray(data?.picks) ? data.picks.length : 0;
         console.log(`[loadManualPicksFromFile] ✓ Successfully loaded ${picksCount} manual picks from file`);
         applyManualPicks(data?.picks || []);
+        applyManualHeadlineOverrides(data?.picks || [], data?.top10 || []);
         state.lastManualSavedAt = String(data?.updatedAt || "");
         return true;
       } catch (e) {
@@ -593,6 +624,11 @@
       return span;
     }
 
+    function getTop10LeaguePillLabel(leagueKey) {
+      const key = String(leagueKey || "").trim().toLowerCase();
+      return TOP10_LEAGUE_PILL_LABELS[key] || "";
+    }
+
     function findLeagueByKey(leagueKey) {
       return getVisibleLeagues().find((lg) => lg.leagueKey === leagueKey) || null;
     }
@@ -854,11 +890,15 @@
           games.forEach((game, i) => {
             const gameId = game?.id != null ? String(game.id) : `${leagueKey}-${i + 1}`;
             const key = makeGameKey(leagueKey, gameId);
+            const sourceHeadline = String(game?.headline || `Game ${i + 1}`);
+            const manualHeadline = state.manualRankByGame.has(key)
+              ? String(state.manualHeadlineByGame.get(key) || "").trim()
+              : "";
             allGamesByKey.set(key, {
               leagueKey,
               leagueName: league.leagueName || leagueKey.toUpperCase(),
               gameId,
-              text: String(game?.headline || `Game ${i + 1}`),
+              text: manualHeadline || sourceHeadline,
               scoreLine: String(game?.scoreLine || game?.score || ""),
               teams: game?.teams || null,
               scoreValue: scoreGame(game, leagueKey, league.leagueBriefing),
@@ -1023,10 +1063,27 @@
         card.appendChild(mediaWrap);
       }
 
+      const headlineRow = document.createElement("div");
+      headlineRow.className = "flex items-start gap-2";
+
       const headline = document.createElement("div");
-      headline.className = "text-base sm:text-lg font-extrabold leading-snug";
+      headline.className = "min-w-0 flex-1 text-base sm:text-lg font-extrabold leading-snug";
       headline.textContent = g.headline ? String(g.headline) : "Recap";
-      card.appendChild(headline);
+      headlineRow.appendChild(headline);
+
+      if (leagueKey === "all") {
+        const sourceLeagueKey = String(g.sourceLeagueKey || "");
+        const pillText = getTop10LeaguePillLabel(sourceLeagueKey);
+        if (pillText) {
+          const leaguePill = document.createElement("span");
+          // Subtle league context tag for top 10 only.
+          leaguePill.className = "mt-0.5 inline-flex shrink-0 items-center rounded-sm bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600";
+          leaguePill.textContent = pillText;
+          headlineRow.appendChild(leaguePill);
+        }
+      }
+
+      card.appendChild(headlineRow);
 
       const scoreLeagueKey = leagueKey === "all"
         ? String(g.sourceLeagueKey || "")
