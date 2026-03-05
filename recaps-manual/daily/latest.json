@@ -1,5 +1,183 @@
 {
-  "date": null,
-  "generatedAt": null,
-  "leagues": []
+  "date": "2026-03-05",
+  "generatedAt": "2026-03-05T00:43:32.454Z",
+  "leagues": [
+    {
+      "leagueName": "NBA",
+      "sourceType": "recap_links",
+      "leagueBriefing": "Several contenders tightened playoff positioning Tuesday as Minnesota continued its surge in the West, Oklahoma City kept rolling even without its MVP, and the Lakers closed strong again behind Luka Dončić and LeBron James.",
+      "games": [
+        {
+          "headline": "Lakers close with furious late run to rally past Pelicans",
+          "scoreLine": "LAL 110 — NO 101",
+          "lead": "Los Angeles erased a late deficit with a dominant closing stretch behind Luka Dončić and LeBron James to secure its third straight victory.",
+          "bullets": [
+            "Luka Dončić finished with 27 points, 10 rebounds and 7 assists while LeBron James added 21 points on 8-of-12 shooting.",
+            "The Lakers overcame 21 turnovers by finishing the game on a 24-7 run, including 14 straight points in the fourth quarter.",
+            "Austin Reaves rebounded from an 0-for-8 start to score 15 points as the Lakers finally took control in the final minutes.",
+            "Zion Williamson scored 24 points in his return for New Orleans, while Trey Murphy III added 21 and Saddiq Bey 18."
+          ],
+          "context": "James moved within two field goals of Kareem Abdul-Jabbar’s NBA career record for made field goals.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810746/pelicans-lakers"
+          }
+        },
+        {
+          "headline": "Hornets roll past struggling Mavericks behind balanced scoring and hot bench shooting",
+          "scoreLine": "CHA 117 — DAL 90",
+          "lead": "Charlotte’s depth overwhelmed Dallas as the Hornets cruised to their fifth straight win and climbed back to .500.",
+          "bullets": [
+            "Brandon Miller led the Hornets with 17 points while LaMelo Ball added 15 points and 9 assists.",
+            "Charlotte’s bench dominated from deep, hitting 12-of-21 three-pointers as multiple reserves knocked down several triples.",
+            "Dallas has now lost 14 of its last 16 games despite Brandon Williams scoring 18 points.",
+            "The Mavericks struggled offensively, shooting just 3-for-22 from three and making only 11 field goals in the second half."
+          ],
+          "context": "Charlotte improved to 31-31, reaching .500 for the first time since late October.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810738/mavericks-hornets"
+          }
+        },
+        {
+          "headline": "Cavaliers hold off Pistons behind Tyson and Harden despite Mitchell’s absence",
+          "scoreLine": "CLE 113 — DET 109",
+          "lead": "Cleveland survived a late Detroit rally to even the season series despite playing without injured star Donovan Mitchell.",
+          "bullets": [
+            "Jaylon Tyson led Cleveland with 22 points while James Harden and Evan Mobley each scored 18.",
+            "Detroit’s Jalen Duren posted 24 points and 14 rebounds while Cade Cunningham added 14 assists.",
+            "The Pistons cut an 11-point deficit to one late in the fourth quarter before Sam Merrill hit a key three to seal the game.",
+            "Cleveland played its fourth straight game without Donovan Mitchell, who remains sidelined with a groin injury."
+          ],
+          "context": "Both teams remain among the Eastern Conference contenders, renewing a growing rivalry as the playoffs approach.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810739/pistons-cavaliers"
+          }
+        },
+        {
+          "headline": "Banchero’s 37 powers Magic past short-handed Wizards",
+          "scoreLine": "ORL 126 — WSH 109",
+          "lead": "Paolo Banchero dominated offensively as Orlando snapped its skid with a comfortable win over Washington.",
+          "bullets": [
+            "Banchero scored 37 points on 15-of-21 shooting to match his season high.",
+            "Desmond Bane added 25 points as Orlando shot 55.3% from the field.",
+            "Washington lost its sixth straight game while playing with only nine healthy players.",
+            "Rookie Will Riley led the Wizards with 19 points while Jaden Hardy added 18."
+          ],
+          "context": "The Magic remain seventh in the Eastern Conference and halted a brief two-game losing streak.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810740/wizards-magic"
+          }
+        },
+        {
+          "headline": "Heat overwhelm Nets behind Adebayo’s all-around performance",
+          "scoreLine": "MIA 124 — BKN 98",
+          "lead": "Miami controlled the game from early on and cruised to a decisive win over Brooklyn.",
+          "bullets": [
+            "Bam Adebayo finished with 23 points, 9 rebounds and 6 steals to lead the Heat.",
+            "Tyler Herro scored 22 points while Jaime Jaquez Jr. added 20 in a balanced offensive effort.",
+            "Miami shot 53% in the first half and built a 69-54 lead before pulling away.",
+            "Brooklyn dropped its ninth straight game as Michael Porter Jr. struggled, shooting 3-for-17 and 0-for-9 from three."
+          ],
+          "context": "The Heat have now won five of their last seven games.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810741/nets-heat"
+          }
+        },
+        {
+          "headline": "Knicks extend Raptors dominance as Brunson leads another win",
+          "scoreLine": "NYK 111 — TOR 95",
+          "lead": "Jalen Brunson and Karl-Anthony Towns powered New York to another comfortable victory over Toronto.",
+          "bullets": [
+            "Brunson recorded 26 points and 10 assists while Towns added 21 points and 12 rebounds.",
+            "The Knicks improved to 40-22, becoming the third Eastern team to reach 40 wins.",
+            "New York has now beaten Toronto 12 straight times, with the Raptors’ last win in the series coming in January 2023.",
+            "Brandon Ingram scored 31 points for Toronto, which lost its fourth straight home game."
+          ],
+          "context": "New York has won five of its last six games and remains firmly in the Eastern Conference playoff race.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810742/knicks-raptors"
+          }
+        },
+        {
+          "headline": "Spurs crush undermanned 76ers to finish dominant road trip",
+          "scoreLine": "SA 131 — PHI 91",
+          "lead": "San Antonio overwhelmed Philadelphia from the opening tip in a lopsided victory.",
+          "bullets": [
+            "Dylan Harper scored 22 points and Devin Vassell added 22 while hitting six three-pointers.",
+            "The Spurs drained 18 threes and led by 49 points by the end of the third quarter.",
+            "San Antonio finished its road trip 8-1 after entering the night with an 11-game winning streak snapped Sunday.",
+            "Tyrese Maxey scored 21 points for Philadelphia, which was missing Joel Embiid, Paul George and Kelly Oubre Jr."
+          ],
+          "context": null,
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810743/spurs-76ers"
+          }
+        },
+        {
+          "headline": "Thunder win again without MVP Gilgeous-Alexander",
+          "scoreLine": "OKC 116 — CHI 108",
+          "lead": "Oklahoma City kept its Western Conference lead intact even with Shai Gilgeous-Alexander resting.",
+          "bullets": [
+            "Jared McCain led Oklahoma City with 20 points while Isaiah Joe added 19.",
+            "Josh Giddey nearly posted a triple-double with 14 points, 9 rebounds and 9 assists.",
+            "The Thunder improved to 48-15 and have won six of their last seven games.",
+            "Collin Sexton scored 20 points for Chicago, which returned to losing after snapping an 11-game skid."
+          ],
+          "context": "The defending champion Thunder continue to lead the Western Conference despite managing injuries to key players.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810744/thunder-bulls"
+          }
+        },
+        {
+          "headline": "Anthony Edwards erupts for 41 as Timberwolves rally past Grizzlies",
+          "scoreLine": "MIN 117 — MEM 110",
+          "lead": "Anthony Edwards took over late to push Minnesota to another win in its strong Western Conference run.",
+          "bullets": [
+            "Edwards scored 41 points including 13 in the fourth quarter and three clutch three-pointers.",
+            "The Timberwolves have won four straight and seven of their last eight games.",
+            "Julius Randle added 23 points and 11 rebounds while Minnesota dominated the boards 51-33.",
+            "Jaylen Wells led Memphis with 19 points as the Grizzlies’ two-game winning streak ended."
+          ],
+          "context": "Edwards recorded his ninth 40-point game of the season as Minnesota climbed to fourth in the Western Conference.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810745/grizzlies-timberwolves"
+          }
+        },
+        {
+          "headline": "Suns sweep Kings season series behind balanced attack",
+          "scoreLine": "PHX 114 — SAC 103",
+          "lead": "Phoenix used a decisive third-quarter run to finish off Sacramento and complete a four-game season sweep.",
+          "bullets": [
+            "Jalen Green scored 20 points and Grayson Allen added 18 to lead the Suns.",
+            "Phoenix used a 14-0 run in the third quarter to flip a one-point deficit into a double-digit lead.",
+            "Devin Booker returned from injury and scored 17 points after missing four games.",
+            "Maxime Raynaud posted 22 points and 10 rebounds for Sacramento, which fell to an NBA-worst 14-49."
+          ],
+          "context": "Phoenix improved to 35-26 and sits seventh in the Western Conference playoff race.",
+          "recapStatus": "ok",
+          "source": {
+            "gamecastUrl": null,
+            "recapUrl": "https://www.espn.com/nba/recap/_/gameId/401810747/suns-kings"
+          }
+        }
+      ]
+    }
+  ]
 }
