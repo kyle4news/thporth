@@ -52,7 +52,7 @@
       </div>
 
       <div class="border-t border-gray-200 p-3 text-xs text-gray-500">
-        League files: <span class="font-mono">/recaps-manual/daily/manyperleague.json</span>, <span class="font-mono">/recaps-manual/daily/oneperleague.json</span>, <span class="font-mono">/recaps-manual/daily/uefachampionsleague.json</span>, <span class="font-mono">/recaps-manual/daily/ncaabaseball.json</span>
+        League files: <span class="font-mono">/recaps-manual/daily/nba.json</span>, <span class="font-mono">/recaps-manual/daily/nhl.json</span>, <span class="font-mono">/recaps-manual/daily/mlb.json</span>, <span class="font-mono">/recaps-manual/daily/premierleague.json</span>, <span class="font-mono">/recaps-manual/daily/uefachampionsleague.json</span>, <span class="font-mono">/recaps-manual/daily/ncaam.json</span>, <span class="font-mono">/recaps-manual/daily/ncaaw.json</span>, <span class="font-mono">/recaps-manual/daily/ncaabaseball.json</span>
       </div>
     </aside>
 
@@ -106,7 +106,7 @@
               <div class="rounded-md border border-gray-200 bg-gray-50 p-5">
                 <div class="mb-2 text-sm font-semibold">No recaps loaded</div>
                 <div class="text-sm leading-relaxed text-gray-600">
-                  Make sure <span class="font-mono">recaps-manual/daily/manyperleague.json</span>, <span class="font-mono">recaps-manual/daily/oneperleague.json</span>, <span class="font-mono">recaps-manual/daily/uefachampionsleague.json</span>, and <span class="font-mono">recaps-manual/daily/ncaabaseball.json</span> exist in your repo and contain
+                  Make sure <span class="font-mono">recaps-manual/daily/nba.json</span>, <span class="font-mono">recaps-manual/daily/nhl.json</span>, <span class="font-mono">recaps-manual/daily/mlb.json</span>, <span class="font-mono">recaps-manual/daily/premierleague.json</span>, <span class="font-mono">recaps-manual/daily/uefachampionsleague.json</span>, <span class="font-mono">recaps-manual/daily/ncaam.json</span>, <span class="font-mono">recaps-manual/daily/ncaaw.json</span>, and <span class="font-mono">recaps-manual/daily/ncaabaseball.json</span> exist in your repo and contain
                   <span class="font-mono">leagueName</span> and <span class="font-mono">games</span>.
                 </div>
               </div>
@@ -132,13 +132,13 @@
   <script>
     // ===== Config =====
     const LEAGUE_FILES = [
-      { leagueName: "NBA", leagueKey: "nba", fileUrl: "/recaps-manual/daily/manyperleague.json", sourceLeagueKey: "NBA" },
-      { leagueName: "NHL", leagueKey: "nhl", fileUrl: "/recaps-manual/daily/manyperleague.json", sourceLeagueKey: "NHL" },
-      { leagueName: "MLB", leagueKey: "mlb", fileUrl: "/recaps-manual/daily/manyperleague.json", sourceLeagueKey: "MLB" },
-      { leagueName: "NCAAM", leagueKey: "ncaam", fileUrl: "/recaps-manual/daily/manyperleague.json", sourceLeagueKey: "NCAAM" },
-      { leagueName: "NCAAW", leagueKey: "ncaaw", fileUrl: "/recaps-manual/daily/manyperleague.json", sourceLeagueKey: "NCAAW" },
+      { leagueName: "NBA", leagueKey: "nba", fileUrl: "/recaps-manual/daily/nba.json" },
+      { leagueName: "NHL", leagueKey: "nhl", fileUrl: "/recaps-manual/daily/nhl.json" },
+      { leagueName: "MLB", leagueKey: "mlb", fileUrl: "/recaps-manual/daily/mlb.json" },
+      { leagueName: "NCAAM", leagueKey: "ncaam", fileUrl: "/recaps-manual/daily/ncaam.json" },
+      { leagueName: "NCAAW", leagueKey: "ncaaw", fileUrl: "/recaps-manual/daily/ncaaw.json" },
       { leagueName: "NCAA Baseball", leagueKey: "ncaabaseball", fileUrl: "/recaps-manual/daily/ncaabaseball.json" },
-      { leagueName: "Premier League", leagueKey: "premierleague", fileUrl: "/recaps-manual/daily/manyperleague.json", sourceLeagueKey: "Premier League" },
+      { leagueName: "Premier League", leagueKey: "premierleague", fileUrl: "/recaps-manual/daily/premierleague.json" },
       { leagueName: "UEFA Champions League", leagueKey: "uefachampionsleague", fileUrl: "/recaps-manual/daily/uefachampionsleague.json" },
       { leagueName: "LIV Golf", leagueKey: "livgolf", fileUrl: "/recaps-manual/daily/oneperleague.json", sourceLeagueKey: "LIV" },
       { leagueName: "Tennis", leagueKey: "tennis", fileUrl: "/recaps-manual/daily/oneperleague.json", sourceLeagueKey: "Tennis" }
