@@ -139,6 +139,7 @@
       { leagueName: "NCAAW", leagueKey: "ncaaw", fileUrl: "/recaps-manual/daily/ncaaw.json" },
       { leagueName: "NCAA Baseball", leagueKey: "ncaabaseball", fileUrl: "/recaps-manual/daily/ncaabaseball.json" },
       { leagueName: "Premier League", leagueKey: "premierleague", fileUrl: "/recaps-manual/daily/premierleague.json" },
+      { leagueName: "WBC", leagueKey: "wbc", fileUrl: "/recaps-manual/daily/wbc.json" },
       { leagueName: "UEFA Champions League", leagueKey: "uefachampionsleague", fileUrl: "/recaps-manual/daily/uefachampionsleague.json" },
       { leagueName: "LIV Golf", leagueKey: "livgolf", fileUrl: "/recaps-manual/daily/oneperleague.json", sourceLeagueKey: "LIV" },
       { leagueName: "Tennis", leagueKey: "tennis", fileUrl: "/recaps-manual/daily/oneperleague.json", sourceLeagueKey: "Tennis" }
@@ -150,7 +151,7 @@
     ];
 
     const SOCCER_LEAGUE_DISPLAY_ORDER = [
-      "Premier League", "UEFA Champions League", "MLS", "LALiga", "Serie A", "Bundesliga", "FA Cup",
+      "Premier League", "WBC", "UEFA Champions League", "MLS", "LALiga", "Serie A", "Bundesliga", "FA Cup",
       "Liga MX", "NWSL", "Ligue 1", "UEFA Europa League", "UEFA Conference League"
     ];
 
@@ -160,12 +161,24 @@
     const MANUAL_TOP10_STORAGE_KEY = "thporth.manual-top10.v1";
     const MANUAL_TOP10_FILE_URL = "/recaps-manual/daily/manual-top10.json";
     const MASCOT_SCORE_LEAGUES = new Set(["nba", "nfl", "mlb", "nhl"]);
+    const COLLEGE_SCORE_LEAGUES = new Set(["ncaam", "ncaaw"]);
     const TOP10_LEAGUE_PILL_LABELS = {
       nhl: "NHL",
       nba: "NBA",
       premierleague: "EPL",
       mlb: "MLB",
       nfl: "NFL",
+      ncaam: "NCAAM",
+      ncaaw: "NCAAW",
+      wbc: "WBC",
+      uefachampionsleague: "UCL",
+      "uefa champions league": "UCL",
+      uefaeuropaleague: "UEL",
+      "uefa europa league": "UEL",
+      uefaconferenceleague: "UECL",
+      "uefa conference league": "UECL",
+      livgolf: "LIV",
+      liv: "LIV",
     };
 
     // ===== State =====
@@ -637,9 +650,14 @@
       return span;
     }
 
-    function getTop10LeaguePillLabel(leagueKey) {
+    function getTop10LeaguePillLabel(leagueKey, leagueName) {
       const key = String(leagueKey || "").trim().toLowerCase();
-      return TOP10_LEAGUE_PILL_LABELS[key] || "";
+      if (TOP10_LEAGUE_PILL_LABELS[key]) return TOP10_LEAGUE_PILL_LABELS[key];
+
+      const name = String(leagueName || "").trim().toLowerCase();
+      if (TOP10_LEAGUE_PILL_LABELS[name]) return TOP10_LEAGUE_PILL_LABELS[name];
+
+      return "";
     }
 
     function findLeagueByKey(leagueKey) {
@@ -650,8 +668,14 @@
       return getVisibleLeagues().findIndex((lg) => lg.leagueKey === leagueKey);
     }
 
+    function hasRenderableGames(leagueKey) {
+      const data = state.cache.get(leagueKey);
+      return Array.isArray(data?.games) && data.games.length > 0;
+    }
+
     function getVisibleLeagues() {
-      return [ALL_LEAGUE, ...state.filteredLeagues];
+      const visible = state.filteredLeagues.filter((lg) => hasRenderableGames(lg.leagueKey));
+      return [ALL_LEAGUE, ...visible];
     }
 
     function normalizeText(s) {
@@ -714,10 +738,34 @@
       return last;
     }
 
+    function extractCollegeSchoolName(team) {
+      if (team && typeof team === "object") {
+        const preferred = [team.shortDisplayName, team.location, team.school, team.displayName, team.teamName, team.name];
+        for (const value of preferred) {
+          const text = String(value || "").trim();
+          if (text) return text;
+        }
+      }
+      return getTeamNameValue(team).trim();
+    }
+
     function formatScoreLineWithMascots(game, leagueKey) {
       const lk = String(leagueKey || "").toLowerCase();
       const raw = String(game?.scoreLine || game?.score || "").trim();
-      if (!MASCOT_SCORE_LEAGUES.has(lk) || !raw) return raw;
+      if (!raw) return raw;
+
+      if (COLLEGE_SCORE_LEAGUES.has(lk)) {
+        const awaySchool = extractCollegeSchoolName(game?.teams?.away);
+        const homeSchool = extractCollegeSchoolName(game?.teams?.home);
+        if (!awaySchool || !homeSchool) return raw;
+
+        const collegeMatch = raw.match(/^(.+?)\s+(\d+)\s*[—-]\s*(.+?)\s+(\d+)$/);
+        if (!collegeMatch) return raw;
+
+        return `${awaySchool} ${collegeMatch[2]} — ${homeSchool} ${collegeMatch[4]}`;
+      }
+
+      if (!MASCOT_SCORE_LEAGUES.has(lk)) return raw;
 
       const awayMascot = extractMascotName(game?.teams?.away);
       const homeMascot = extractMascotName(game?.teams?.home);
@@ -867,6 +915,7 @@
         return {
           id: `top-${item.rank}-${item.leagueKey}-${item.gameId}`,
           sourceLeagueKey: String(source.leagueKey || item.leagueKey || ""),
+          sourceLeagueName: String(source.leagueName || item.leagueName || ""),
           headline: String(source.text || item.text || ""),
           scoreLine: String(source.scoreLine || ""),
           lead: String(source.lead || ""),
@@ -1028,6 +1077,7 @@
       card.dataset.gameId = String(g.id || `${leagueKey}-${gameIdx}`);
       card.dataset.headline = String(g.headline || `Game ${gameIdx + 1}`);
       card.dataset.sourceLeagueKey = String(g.sourceLeagueKey || "");
+      card.dataset.sourceLeagueName = String(g.sourceLeagueName || "");
       card.id = makeGameAnchorId(leagueKey, card.dataset.gameId);
 
       if (state.isAdminMode && leagueKey !== "all") {
@@ -1101,7 +1151,8 @@
 
       if (leagueKey === "all") {
         const sourceLeagueKey = String(g.sourceLeagueKey || "");
-        const pillText = getTop10LeaguePillLabel(sourceLeagueKey);
+        const sourceLeagueName = String(g.sourceLeagueName || "");
+        const pillText = getTop10LeaguePillLabel(sourceLeagueKey, sourceLeagueName);
         if (pillText) {
           const leaguePill = document.createElement("span");
           // Subtle league context tag for top 10 only.
@@ -1377,7 +1428,8 @@
         const gameId = card.dataset.gameId || `${currentKey}-${i}`;
         const headline = card.dataset.headline || `Game ${i + 1}`;
         const sourceLeagueKey = String(card.dataset.sourceLeagueKey || "");
-        const pillText = currentKey === "all" ? getTop10LeaguePillLabel(sourceLeagueKey) : "";
+        const sourceLeagueName = String(card.dataset.sourceLeagueName || "");
+        const pillText = currentKey === "all" ? getTop10LeaguePillLabel(sourceLeagueKey, sourceLeagueName) : "";
         const btn = document.createElement("button");
         btn.type = "button";
         btn.dataset.gameId = gameId;
