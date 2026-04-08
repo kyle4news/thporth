@@ -35,7 +35,7 @@
     #unmute-btn {
       position: fixed;
       right: 16px;
-      bottom: 16px;
+      top: 16px;
       z-index: 10;
       height: 38px;
       padding: 0 14px;
@@ -65,7 +65,7 @@
     // Required for date-aware block filtering (publishedAt metadata).
     const YOUTUBE_DATA_API_KEY = "AIzaSyBBxQEZc7DkKtc-1rlKLk9jvLL2D-XJ4mk";
     const PLAYLIST_IDS = PLAYLISTS.map(normalizePlaylistId).filter(Boolean);
-    const PROGRAM_SLOT_SECONDS = 600;
+    const PROGRAM_SLOT_SECONDS = 300;
 
     let blockIndex = 0;
     let player;
@@ -75,6 +75,7 @@
     let blockLoadToken = 0;
     let shouldStayMuted = true;
     let hasSeededStartFromClock = false;
+    let expectedVideoId = "";
 
     const unmuteButton = document.getElementById("unmute-btn");
 
@@ -126,6 +127,10 @@
 
     function onStateChange(event) {
       if (event.data !== YT.PlayerState.ENDED) {
+        return;
+      }
+
+      if (!didExpectedVideoFinish()) {
         return;
       }
 
@@ -189,12 +194,61 @@
         return;
       }
 
+      expectedVideoId = videoId;
+
       try {
         player.loadVideoById(videoId, 0, "default");
         setTimeout(applyAudioState, 200);
       } catch (error) {
         console.error("Failed loading video:", error);
         onPlayerError();
+      }
+    }
+
+    function didExpectedVideoFinish() {
+      const activeVideoId = safeGetCurrentVideoId();
+      if (!expectedVideoId || !activeVideoId || activeVideoId !== expectedVideoId) {
+        return false;
+      }
+
+      const duration = safeGetDuration();
+      const time = safeGetCurrentTime();
+
+      if (duration <= 0) {
+        return true;
+      }
+
+      return time / duration >= 0.85;
+    }
+
+    function safeGetCurrentVideoId() {
+      try {
+        const data = player && typeof player.getVideoData === "function"
+          ? player.getVideoData()
+          : null;
+        return data && data.video_id ? String(data.video_id) : "";
+      } catch {
+        return "";
+      }
+    }
+
+    function safeGetDuration() {
+      try {
+        return player && typeof player.getDuration === "function"
+          ? Number(player.getDuration())
+          : 0;
+      } catch {
+        return 0;
+      }
+    }
+
+    function safeGetCurrentTime() {
+      try {
+        return player && typeof player.getCurrentTime === "function"
+          ? Number(player.getCurrentTime())
+          : 0;
+      } catch {
+        return 0;
       }
     }
 
