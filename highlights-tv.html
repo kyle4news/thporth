@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Highlights TV</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #player {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 120vw;
+      height: 120vh;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #player iframe {
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="player" aria-hidden="true"></div>
+
+  <script>
+    // Add your block playlist IDs in the order you want them to run.
+    const PLAYLISTS = [
+      "https://youtube.com/playlist?list=PLL-lmlkrmJak3neKKEataBelAVfdkBbDX&si=ZjpOv-CqqiF_GJZW",
+      "https://youtube.com/playlist?list=PL1NbHSfosBuFyu867mbHHhB2G6fx7jtiH&si=y78bpA5AJbfiFgGj",
+      "https://youtube.com/playlist?list=PLlVlyGVtvuVlek5UOvwJaRDtuAI1FgGZf&si=gAqvPL84z218wrNh",
+      "https://youtube.com/playlist?list=PLQ_voP4Q3cfetksvjNLOrMr3h8xtViMuP&si=EpVT2z2j10l-bTud"
+    ];
+
+    // Required for date-aware block filtering (publishedAt metadata).
+    const YOUTUBE_DATA_API_KEY = "AIzaSyBBxQEZc7DkKtc-1rlKLk9jvLL2D-XJ4mk";
+    const PLAYLIST_IDS = PLAYLISTS.map(normalizePlaylistId).filter(Boolean);
+
+    let blockIndex = 0;
+    let player;
+    let pendingAdvance = false;
+    let currentBlockVideoIds = [];
+    let currentVideoIndex = 0;
+    let blockLoadToken = 0;
+
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+
+    function onYouTubeIframeAPIReady() {
+      if (!Array.isArray(PLAYLIST_IDS) || PLAYLIST_IDS.length === 0) {
+        console.error("No playlists configured in PLAYLISTS.");
+        return;
+      }
+
+      player = new YT.Player("player", {
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          modestbranding: 1,
+          rel: 0,
+          playsinline: 1,
+          loop: 0,
+          listType: "playlist",
+          list: PLAYLIST_IDS[blockIndex]
+        },
+        events: {
+          onReady: onPlayerReady,
+          onStateChange: onStateChange,
+          onError: onPlayerError
+        }
+      });
+    }
+
+    function onPlayerReady() {
+      try {
+        player.mute();
+      } catch (error) {
+        console.error("Failed to initialize player:", error);
+      }
+
+      loadCurrentBlock();
+    }
+
+    function onStateChange(event) {
+      if (event.data !== YT.PlayerState.ENDED) {
+        return;
+      }
+
+      playNextVideoOrAdvanceBlock();
+    }
+
+    function onPlayerError() {
+      // Skip bad videos but keep the date-filtered block sequence moving.
+      if (!currentBlockVideoIds.length) {
+        queueAdvanceBlock();
+        return;
+      }
+
+      if (currentVideoIndex < currentBlockVideoIds.length - 1) {
+        currentVideoIndex += 1;
+        loadCurrentVideo();
+      } else {
+        queueAdvanceBlock();
+      }
+    }
+
+    async function loadCurrentBlock() {
+      if (!player || PLAYLIST_IDS.length === 0) {
+        return;
+      }
+
+      const loadToken = ++blockLoadToken;
+      const playlistId = PLAYLIST_IDS[blockIndex];
+
+      try {
+        const dateFilteredIds = await getDateFilteredVideoIds(playlistId);
+
+        if (loadToken !== blockLoadToken) {
+          return;
+        }
+
+        currentBlockVideoIds = dateFilteredIds;
+        currentVideoIndex = 0;
+
+        if (currentBlockVideoIds.length === 0) {
+          queueAdvanceBlock();
+          return;
+        }
+
+        loadCurrentVideo();
+      } catch (error) {
+        console.error("Failed loading date-filtered block:", error);
+        queueAdvanceBlock();
+      }
+    }
+
+    function loadCurrentVideo() {
+      const videoId = currentBlockVideoIds[currentVideoIndex];
+      if (!videoId) {
+        queueAdvanceBlock();
+        return;
+      }
+
+      try {
+        player.loadVideoById(videoId, 0, "default");
+      } catch (error) {
+        console.error("Failed loading video:", error);
+        onPlayerError();
+      }
+    }
+
+    function playNextVideoOrAdvanceBlock() {
+      if (currentVideoIndex < currentBlockVideoIds.length - 1) {
+        currentVideoIndex += 1;
+        loadCurrentVideo();
+        return;
+      }
+
+      advanceBlock();
+    }
+
+    function queueAdvanceBlock() {
+      if (pendingAdvance) {
+        return;
+      }
+
+      pendingAdvance = true;
+      setTimeout(() => {
+        pendingAdvance = false;
+        advanceBlock();
+      }, 300);
+    }
+
+    function advanceBlock() {
+      if (!player || PLAYLIST_IDS.length === 0) {
+        return;
+      }
+
+      blockIndex = (blockIndex + 1) % PLAYLIST_IDS.length;
+
+      loadCurrentBlock();
+    }
+
+    async function getDateFilteredVideoIds(playlistId) {
+      if (!YOUTUBE_DATA_API_KEY || YOUTUBE_DATA_API_KEY === "REPLACE_WITH_YOUR_YOUTUBE_DATA_API_KEY") {
+        throw new Error("Set YOUTUBE_DATA_API_KEY to use date-based block filtering.");
+      }
+
+      const items = await fetchAllPlaylistItems(playlistId);
+      const allowedDateKeys = getAllowedDateKeys();
+
+      return items
+        .filter((item) => {
+          const publishedAt = item?.snippet?.publishedAt;
+          if (!publishedAt) {
+            return false;
+          }
+
+          const key = toLocalDateKey(new Date(publishedAt));
+          return allowedDateKeys.has(key);
+        })
+        .map((item) => item?.snippet?.resourceId?.videoId)
+        .filter(Boolean);
+    }
+
+    async function fetchAllPlaylistItems(playlistId) {
+      const allItems = [];
+      let nextPageToken = "";
+
+      do {
+        const params = new URLSearchParams({
+          part: "snippet",
+          maxResults: "50",
+          playlistId,
+          key: YOUTUBE_DATA_API_KEY
+        });
+
+        if (nextPageToken) {
+          params.set("pageToken", nextPageToken);
+        }
+
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error(`YouTube Data API error ${response.status}`);
+        }
+
+        const payload = await response.json();
+        if (Array.isArray(payload.items)) {
+          allItems.push(...payload.items);
+        }
+
+        nextPageToken = payload.nextPageToken || "";
+      } while (nextPageToken);
+
+      return allItems;
+    }
+
+    function normalizePlaylistId(value) {
+      const raw = String(value || "").trim();
+      if (!raw) {
+        return "";
+      }
+
+      // Already a plain playlist ID (e.g., PLxxxxxx)
+      if (!/^https?:\/\//i.test(raw)) {
+        return raw;
+      }
+
+      try {
+        const parsed = new URL(raw);
+        return parsed.searchParams.get("list") || "";
+      } catch {
+        return "";
+      }
+    }
+
+    function getAllowedDateKeys() {
+      const now = new Date();
+      const today = toLocalDateKey(now);
+
+      const yesterdayDate = new Date(now);
+      yesterdayDate.setDate(now.getDate() - 1);
+      const yesterday = toLocalDateKey(yesterdayDate);
+
+      return new Set([today, yesterday]);
+    }
+
+    function toLocalDateKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+  </script>
+</body>
+</html>
