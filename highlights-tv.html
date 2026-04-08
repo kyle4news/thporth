@@ -21,37 +21,21 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      pointer-events: none;
+      pointer-events: auto;
       z-index: 0;
     }
 
     #player iframe {
       width: 100%;
       height: 100%;
-      pointer-events: none;
+      pointer-events: auto;
       border: 0;
     }
 
-    #unmute-btn {
-      position: fixed;
-      right: 16px;
-      top: 16px;
-      z-index: 10;
-      height: 38px;
-      padding: 0 14px;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.65);
-      color: #fff;
-      font: 600 12px/1.1 system-ui, -apple-system, Segoe UI, sans-serif;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
   <div id="player" aria-hidden="true"></div>
-  <button id="unmute-btn" type="button" aria-label="Enable sound">UNMUTE</button>
 
   <script>
     // Add your block playlist IDs in the order you want them to run.
@@ -73,11 +57,8 @@
     let currentBlockVideoIds = [];
     let currentVideoIndex = 0;
     let blockLoadToken = 0;
-    let shouldStayMuted = true;
     let hasSeededStartFromClock = false;
     let expectedVideoId = "";
-
-    const unmuteButton = document.getElementById("unmute-btn");
 
     const tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
@@ -93,9 +74,9 @@
         playerVars: {
           autoplay: 1,
           mute: 1,
-          controls: 0,
-          disablekb: 1,
-          fs: 0,
+          controls: 1,
+          disablekb: 0,
+          fs: 1,
           iv_load_policy: 3,
           modestbranding: 1,
           rel: 0,
@@ -120,8 +101,6 @@
       }
 
       seedBlockStartFromClock();
-      wireUnmuteButton();
-      syncAudioButtonLabel();
       loadCurrentBlock();
     }
 
@@ -198,7 +177,6 @@
 
       try {
         player.loadVideoById(videoId, 0, "default");
-        setTimeout(applyAudioState, 200);
       } catch (error) {
         console.error("Failed loading video:", error);
         onPlayerError();
@@ -249,49 +227,6 @@
           : 0;
       } catch {
         return 0;
-      }
-    }
-
-    function wireUnmuteButton() {
-      if (!unmuteButton) {
-        return;
-      }
-
-      unmuteButton.addEventListener("click", () => {
-        shouldStayMuted = !shouldStayMuted;
-        applyAudioState();
-      });
-    }
-
-    function applyAudioState() {
-      if (!player) {
-        return;
-      }
-
-      try {
-        if (shouldStayMuted) {
-          player.mute();
-        } else {
-          player.unMute();
-          player.setVolume(100);
-        }
-        syncAudioButtonLabel();
-      } catch (error) {
-        console.error("Failed to update audio state:", error);
-      }
-    }
-
-    function syncAudioButtonLabel() {
-      if (!unmuteButton) {
-        return;
-      }
-
-      if (shouldStayMuted) {
-        unmuteButton.textContent = "UNMUTE";
-        unmuteButton.setAttribute("aria-label", "Enable sound");
-      } else {
-        unmuteButton.textContent = "MUTE";
-        unmuteButton.setAttribute("aria-label", "Mute sound");
       }
     }
 
