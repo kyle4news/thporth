@@ -40,12 +40,16 @@
   <script>
     // Add your block playlist IDs in the order you want them to run.
     const PLAYLISTS = [
-      "https://youtube.com/playlist?list=PLL-lmlkrmJak3neKKEataBelAVfdkBbDX&si=ZjpOv-CqqiF_GJZW",
+       "https://youtube.com/playlist?list=PLL-lmlkrmJak3neKKEataBelAVfdkBbDX&si=ZjpOv-CqqiF_GJZW",
       "https://youtube.com/playlist?list=PL1NbHSfosBuFyu867mbHHhB2G6fx7jtiH&si=y78bpA5AJbfiFgGj",
       "https://youtube.com/playlist?list=PLlVlyGVtvuVlek5UOvwJaRDtuAI1FgGZf&si=gAqvPL84z218wrNh",
-      "https://youtube.com/playlist?list=PLQ_voP4Q3cfetksvjNLOrMr3h8xtViMuP&si=EpVT2z2j10l-bTud"
+      "https://youtube.com/playlist?list=PLQ_voP4Q3cfetksvjNLOrMr3h8xtViMuP&si=EpVT2z2j10l-bTud",
+      "https://youtube.com/playlist?list=PLcj4z4KsbIoXrLpj2pOVr_maRaxhW902-&si=-vw72pwX-EDC3QwA",
+      "https://youtube.com/playlist?list=PLBBzZXcG8cYCWs68JO69dvmN3e6FhH6nj&si=lWAgVNekoZeJZEq2",
+      "https://youtube.com/playlist?list=PLBBzZXcG8cYCQ3lmDu17GHYi2MAomA-aH&si=SPaW4rYaikWFy82L",
     ];
 
+    const YOUTUBE_DATA_API_KEY = "AIzaSyBBxQEZc7DkKtc-1rlKLk9jvLL2D-XJ4mk";
     const PLAYLIST_IDS = PLAYLISTS.map(normalizePlaylistId).filter(Boolean);
     const PROGRAM_SLOT_SECONDS = 300;
 
@@ -53,7 +57,8 @@
     let player;
     let pendingAdvance = false;
     let pendingSeedIndex = 0;
-    let hasAppliedSeedForCurrentBlock = false;
+    let currentBlockVideoIds = [];
+    let blockLoadToken = 0;
 
     const tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
@@ -100,11 +105,6 @@
     }
 
     function onStateChange(event) {
-      if (event.data === YT.PlayerState.PLAYING) {
-        applySeedIndexIfNeeded();
-        return;
-      }
-
       if (event.data !== YT.PlayerState.ENDED) {
         return;
       }
@@ -117,32 +117,35 @@
 
     function onPlayerError(event) {
       const errorCode = event && typeof event.data !== "undefined" ? Number(event.data) : NaN;
-      if (isAtLastVideoInPlaylist() || [2, 100, 101, 150].includes(errorCode)) {
-        queueAdvanceBlock();
-        return;
-      }
-
-      try {
-        player.nextVideo();
-      } catch (_error) {
-        queueAdvanceBlock();
-      }
+      console.warn("YouTube player error:", errorCode);
+      // Do not force-skip here. Ad transitions and transient player issues can
+      // surface as errors, and advancing manually causes the exact jump the
+      // user is seeing. Let the native YouTube playlist flow recover first.
     }
 
-    function loadCurrentBlock() {
+    async function loadCurrentBlock() {
       if (!player || PLAYLIST_IDS.length === 0) {
         return;
       }
-      hasAppliedSeedForCurrentBlock = false;
-      pendingSeedIndex = getSeededVideoIndexForBlock();
+
+      const loadToken = ++blockLoadToken;
+      const playlistId = PLAYLIST_IDS[blockIndex];
 
       try {
-        player.loadPlaylist({
-          listType: "playlist",
-          list: PLAYLIST_IDS[blockIndex],
-          index: 0,
-          startSeconds: 0
-        });
+        currentBlockVideoIds = await getDateFilteredVideoIds(playlistId);
+
+        if (loadToken !== blockLoadToken) {
+          return;
+        }
+
+        if (!currentBlockVideoIds.length) {
+          queueAdvanceBlock();
+          return;
+        }
+
+        pendingSeedIndex = getSeededVideoIndex(currentBlockVideoIds.length);
+
+        player.loadPlaylist(currentBlockVideoIds, pendingSeedIndex, 0);
       } catch (error) {
         console.error("Failed loading playlist block:", error);
         queueAdvanceBlock();
@@ -169,6 +172,60 @@
       blockIndex = (blockIndex + 1) % PLAYLIST_IDS.length;
 
       loadCurrentBlock();
+    }
+
+    async function getDateFilteredVideoIds(playlistId) {
+      if (!YOUTUBE_DATA_API_KEY || YOUTUBE_DATA_API_KEY === "REPLACE_WITH_YOUR_YOUTUBE_DATA_API_KEY") {
+        throw new Error("Set YOUTUBE_DATA_API_KEY to use date filtering.");
+      }
+
+      const items = await fetchAllPlaylistItems(playlistId);
+      const allowedDateKeys = getAllowedDateKeys();
+
+      return items
+        .filter((item) => {
+          const publishedAt = item?.snippet?.publishedAt;
+          if (!publishedAt) {
+            return false;
+          }
+
+          const key = toLocalDateKey(new Date(publishedAt));
+          return allowedDateKeys.has(key);
+        })
+        .map((item) => item?.snippet?.resourceId?.videoId)
+        .filter(Boolean);
+    }
+
+    async function fetchAllPlaylistItems(playlistId) {
+      const allItems = [];
+      let nextPageToken = "";
+
+      do {
+        const params = new URLSearchParams({
+          part: "snippet",
+          maxResults: "50",
+          playlistId,
+          key: YOUTUBE_DATA_API_KEY
+        });
+
+        if (nextPageToken) {
+          params.set("pageToken", nextPageToken);
+        }
+
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error(`YouTube Data API error ${response.status}`);
+        }
+
+        const payload = await response.json();
+        if (Array.isArray(payload.items)) {
+          allItems.push(...payload.items);
+        }
+
+        nextPageToken = payload.nextPageToken || "";
+      } while (nextPageToken);
+
+      return allItems;
     }
 
     function normalizePlaylistId(value) {
@@ -214,36 +271,6 @@
       return Math.floor(slot / blockCycleSize) % videoCount;
     }
 
-    function getSeededVideoIndexForBlock() {
-      // We seed using a rolling counter; actual index is clamped once playlist length is known.
-      const slot = getProgramSlot();
-      const blockCycleSize = Math.max(1, PLAYLIST_IDS.length);
-      return Math.floor(slot / blockCycleSize);
-    }
-
-    function applySeedIndexIfNeeded() {
-      if (hasAppliedSeedForCurrentBlock) {
-        return;
-      }
-
-      const playlist = safeGetPlaylist();
-      if (!playlist.length) {
-        return;
-      }
-
-      const targetIndex = pendingSeedIndex % playlist.length;
-      const currentIndex = safeGetPlaylistIndex();
-      hasAppliedSeedForCurrentBlock = true;
-
-      if (targetIndex !== currentIndex) {
-        try {
-          player.playVideoAt(targetIndex);
-        } catch (_error) {
-          // Keep playing from current index if targeted jump fails.
-        }
-      }
-    }
-
     function isAtLastVideoInPlaylist() {
       const playlist = safeGetPlaylist();
       if (!playlist.length) {
@@ -272,6 +299,24 @@
       } catch {
         return 0;
       }
+    }
+
+    function getAllowedDateKeys() {
+      const now = new Date();
+      const today = toLocalDateKey(now);
+
+      const yesterdayDate = new Date(now);
+      yesterdayDate.setDate(now.getDate() - 1);
+      const yesterday = toLocalDateKey(yesterdayDate);
+
+      return new Set([today, yesterday]);
+    }
+
+    function toLocalDateKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
     }
 
   </script>
